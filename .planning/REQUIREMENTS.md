@@ -122,13 +122,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be filled by roadmap) | | |
+| AUTH-01 | Phase 2: Authentication | Pending |
+| AUTH-02 | Phase 2: Authentication | Pending |
+| AUTH-03 | Phase 2: Authentication | Pending |
+| AUTH-04 | Phase 2: Authentication | Pending |
+| AUTH-05 | Phase 2: Authentication | Pending |
+| AUTH-06 | Phase 2: Authentication | Pending |
+| AUTH-07 | Phase 2: Authentication | Pending |
+| ORG-01 | Phase 3: Organization Management | Pending |
+| ORG-02 | Phase 3: Organization Management | Pending |
+| ORG-03 | Phase 3: Organization Management | Pending |
+| ORG-04 | Phase 3: Organization Management | Pending |
+| ORG-05 | Phase 1: Project Foundation | Pending |
+| DOC-01 | Phase 4: Document Core & Templates | Pending |
+| DOC-02 | Phase 4: Document Core & Templates | Pending |
+| DOC-03 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-04 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-05 | Phase 4: Document Core & Templates | Pending |
+| DOC-06 | Phase 4: Document Core & Templates | Pending |
+| DOC-07 | Phase 6: Document Submission & Numbering | Pending |
+| APR-01 | Phase 7: Approval Workflow | Pending |
+| APR-02 | Phase 7: Approval Workflow | Pending |
+| APR-03 | Phase 7: Approval Workflow | Pending |
+| APR-04 | Phase 7: Approval Workflow | Pending |
+| APR-05 | Phase 7: Approval Workflow | Pending |
+| APR-06 | Phase 7: Approval Workflow | Pending |
+| APR-07 | Phase 7: Approval Workflow | Pending |
+| TPL-01 | Phase 4: Document Core & Templates | Pending |
+| TPL-02 | Phase 4: Document Core & Templates | Pending |
+| TPL-03 | Phase 4: Document Core & Templates | Pending |
+| FILE-01 | Phase 5: File Attachments | Pending |
+| FILE-02 | Phase 5: File Attachments | Pending |
+| FILE-03 | Phase 5: File Attachments | Pending |
+| DASH-01 | Phase 8: Dashboard & Audit | Pending |
+| DASH-02 | Phase 8: Dashboard & Audit | Pending |
+| DASH-03 | Phase 8: Dashboard & Audit | Pending |
+| AUD-01 | Phase 8: Dashboard & Audit | Pending |
 
 **Coverage:**
-- v1 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30 ⚠️
+- v1 requirements: 36 total
+- Mapped to phases: 36
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-03-31 after initial definition*
+*Last updated: 2026-03-31 after roadmap creation*
