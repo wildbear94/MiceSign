@@ -46,6 +46,9 @@ dependencies {
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+
+    // H2 for integration tests (with MariaDB-compatible test migrations)
+    testRuntimeOnly("com.h2database:h2")
 }
 
 tasks.withType<Test> {
