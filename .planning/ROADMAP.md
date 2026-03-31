@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 Plans:
 - [x] 01-01-PLAN.md — Backend scaffolding: Gradle project, Spring Boot config, Flyway migrations (DDL + seed data), API envelope
-- [ ] 01-02-PLAN.md — Frontend scaffolding: Vite + React 18 + TypeScript, TailwindCSS with Pretendard font, Axios client
+- [x] 01-02-PLAN.md — Frontend scaffolding: Vite + React 18 + TypeScript, TailwindCSS with Pretendard font, Axios client
 - [ ] 01-03-PLAN.md — Integration tests (health check + seed data), .gitignore, full-stack verification
 
 ### Phase 2: Authentication
