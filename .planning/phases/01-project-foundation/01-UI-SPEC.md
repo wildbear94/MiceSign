@@ -54,13 +54,15 @@ Exceptions: Touch targets for interactive elements use minimum 44px height (Tail
 | Role | Size | Weight | Line Height | Tailwind Classes |
 |------|------|--------|-------------|-----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm font-normal leading-normal` |
-| Label | 14px | 500 (medium) | 1.4 | `text-sm font-medium leading-snug` |
+| Label | 14px | 400 (regular) | 1.4 | `text-sm font-normal leading-snug tracking-wide uppercase` |
 | Heading | 20px | 600 (semibold) | 1.3 | `text-xl font-semibold leading-tight` |
-| Display | 28px | 700 (bold) | 1.2 | `text-[28px] font-bold leading-tight` |
+| Display | 28px | 600 (semibold) | 1.2 | `text-[28px] font-semibold leading-tight` |
+
+**Label distinction strategy:** Label shares weight 400 with Body. Visual distinction is achieved through `tracking-wide` (0.025em letter-spacing) and `uppercase` transforms when contextually appropriate, or through color (`text-gray-600` for secondary labels vs `text-gray-900` for body). When labels appear alongside form inputs, the smaller context (field above input) provides sufficient distinction without a separate weight.
 
 **Rationale:**
 - Body at 14px: Enterprise approval systems are data-dense. 14px provides readability while fitting more content (document lists, approval lines, form fields) without scrolling. Korean characters render well at 14px with Pretendard.
-- Two primary weights (400 + 600) for body/heading distinction. Medium (500) is added only for labels/form fields to differentiate from body text without competing with headings. Bold (700) reserved for page-level display titles only.
+- Two weights only (400 + 600): Regular for all running text (body, labels, captions) and semibold for all hierarchically prominent text (headings, display titles). This constraint reduces font file weight, simplifies design decisions, and produces a cleaner visual rhythm.
 - Line heights tuned for Korean text which benefits from slightly more generous spacing than Latin-only text.
 
 **Font stack in Tailwind config:**
