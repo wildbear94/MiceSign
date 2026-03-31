@@ -12,7 +12,7 @@ MiceSign delivers a self-hosted electronic approval system for ~50 employees, re
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Project Foundation** - Spring Boot + React scaffolding, database schema, seed data, dev tooling
+- [x] **Phase 1: Project Foundation** - Spring Boot + React scaffolding, database schema, seed data, dev tooling (completed 2026-03-31)
 - [ ] **Phase 2: Authentication** - JWT login/logout, token refresh, account lockout, password management
 - [ ] **Phase 3: Organization Management** - Department/position CRUD, user management, RBAC enforcement
 - [ ] **Phase 4: Document Core & Templates** - Document drafting with three form templates, draft CRUD, document viewing
@@ -33,11 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Database schema is created via Flyway migration on first startup
   4. Default departments, positions, and SUPER_ADMIN account exist after first run
   5. SpringDoc OpenAPI (Swagger UI) is accessible for API exploration
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 01-01-PLAN.md — Backend scaffolding: Gradle project, Spring Boot config, Flyway migrations (DDL + seed data), API envelope
 - [x] 01-02-PLAN.md — Frontend scaffolding: Vite + React 18 + TypeScript, TailwindCSS with Pretendard font, Axios client
-- [ ] 01-03-PLAN.md — Integration tests (health check + seed data), .gitignore, full-stack verification
+- [x] 01-03-PLAN.md — Integration tests (health check + seed data), .gitignore, full-stack verification
 
 ### Phase 2: Authentication
 **Goal**: Users can securely log in, maintain sessions across browser refreshes, and manage their passwords
@@ -128,7 +128,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Foundation | 0/3 | Planning complete | - |
+| 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
 | 2. Authentication | 0/TBD | Not started | - |
 | 3. Organization Management | 0/TBD | Not started | - |
 | 4. Document Core & Templates | 0/TBD | Not started | - |
