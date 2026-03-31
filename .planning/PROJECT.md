@@ -12,7 +12,8 @@ Employees can submit approval documents and get them approved/rejected through a
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Project scaffolding: Spring Boot 3.x backend + React 18 frontend runnable — Validated in Phase 1: Project Foundation
+- [x] Database schema: 12-table Flyway DDL with seed data (departments, positions, SUPER_ADMIN, templates) — Validated in Phase 1: Project Foundation (ORG-05)
 
 ### Active
 
