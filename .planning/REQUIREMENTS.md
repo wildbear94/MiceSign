@@ -23,7 +23,7 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 - [ ] **ORG-02**: Admin can create, edit, and deactivate positions (with sort order)
 - [ ] **ORG-03**: Admin can create and manage user accounts (employee no, name, email, department, position, role, status)
 - [ ] **ORG-04**: System enforces RBAC with three roles: SUPER_ADMIN (full access), ADMIN (org/template management + own dept docs), USER (draft and approve)
-- [ ] **ORG-05**: Initial data seeding on first run (default departments, positions, SUPER_ADMIN account)
+- [x] **ORG-05**: Initial data seeding on first run (default departments, positions, SUPER_ADMIN account)
 
 ### Document
 
@@ -133,7 +133,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-02 | Phase 3: Organization Management | Pending |
 | ORG-03 | Phase 3: Organization Management | Pending |
 | ORG-04 | Phase 3: Organization Management | Pending |
-| ORG-05 | Phase 1: Project Foundation | Pending |
+| ORG-05 | Phase 1: Project Foundation | Complete |
 | DOC-01 | Phase 4: Document Core & Templates | Pending |
 | DOC-02 | Phase 4: Document Core & Templates | Pending |
 | DOC-03 | Phase 6: Document Submission & Numbering | Pending |
