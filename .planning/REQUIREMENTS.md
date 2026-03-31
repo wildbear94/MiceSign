@@ -1,0 +1,134 @@
+# Requirements: MiceSign
+
+**Defined:** 2026-03-31
+**Core Value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
+
+## v1 Requirements
+
+Requirements for Phase 1-A MVP. Each maps to roadmap phases.
+
+### Authentication
+
+- [ ] **AUTH-01**: User can log in with email and password, receiving JWT access + refresh tokens
+- [ ] **AUTH-02**: Access token refreshes automatically via refresh token rotation (HttpOnly cookie)
+- [ ] **AUTH-03**: User can log out, invalidating refresh token
+- [ ] **AUTH-04**: Account locks after 5 consecutive failed login attempts for 15 minutes
+- [ ] **AUTH-05**: User session persists across browser refresh (auto-refresh on app init)
+- [ ] **AUTH-06**: User can change their own password
+- [ ] **AUTH-07**: Admin can reset a user's password
+
+### Organization
+
+- [ ] **ORG-01**: Admin can create, edit, and deactivate departments (hierarchical structure)
+- [ ] **ORG-02**: Admin can create, edit, and deactivate positions (with sort order)
+- [ ] **ORG-03**: Admin can create and manage user accounts (employee no, name, email, department, position, role, status)
+- [ ] **ORG-04**: System enforces RBAC with three roles: SUPER_ADMIN (full access), ADMIN (org/template management + own dept docs), USER (draft and approve)
+- [ ] **ORG-05**: Initial data seeding on first run (default departments, positions, SUPER_ADMIN account)
+
+### Document
+
+- [ ] **DOC-01**: User can create a draft document by selecting a form template
+- [ ] **DOC-02**: User can edit and delete their own draft documents
+- [ ] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
+- [ ] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
+- [ ] **DOC-05**: User can view document detail page with full content, approval line status, and attachments
+- [ ] **DOC-06**: User can view list of their drafted and submitted documents with status
+- [ ] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
+
+### Approval
+
+- [ ] **APR-01**: User can build an approval line selecting approvers from org tree (APPROVE, AGREE, REFERENCE types)
+- [ ] **APR-02**: APPROVE and AGREE types are processed sequentially by step_order; REFERENCE gets immediate read access
+- [ ] **APR-03**: Approver can approve or reject a document with an optional comment
+- [ ] **APR-04**: Rejection by any approver immediately sets document status to REJECTED
+- [ ] **APR-05**: Approval by the last approver sets document status to APPROVED
+- [ ] **APR-06**: Drafter can withdraw a submitted document if the next approver has not yet acted
+- [ ] **APR-07**: User can create a new document (resubmission) from a rejected or withdrawn document, with content pre-filled
+
+### Template
+
+- [ ] **TPL-01**: General approval form (일반 업무 기안) with title, rich text body, and attachments
+- [ ] **TPL-02**: Expense report form (지출 결의서) with item table (item, quantity, unit price, amount), auto-sum, and evidence attachments
+- [ ] **TPL-03**: Leave request form (휴가 신청서) with leave type (연차/반차/병가/경조), start date, end date, auto-calculated days, and reason
+
+### File
+
+- [ ] **FILE-01**: User can upload files to Google Drive via Service Account when attaching to a document
+- [ ] **FILE-02**: User can download attachments with access control verification (only authorized viewers)
+- [ ] **FILE-03**: System validates file uploads: max 50MB per file, max 10 files per document, max 200MB total, allowed/blocked extensions enforced
+
+### Dashboard
+
+- [ ] **DASH-01**: User sees a list of documents pending their approval action
+- [ ] **DASH-02**: User sees their recent documents with current status
+- [ ] **DASH-03**: User sees badge counts for pending approvals, in-progress drafts, and completed documents
+
+### Audit
+
+- [ ] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
+
+## v2 Requirements
+
+Deferred to future releases (Phase 1-B, 1-C, Phase 2).
+
+### Notifications (Phase 1-B)
+
+- **NTF-01**: User receives email notification when a document arrives for their approval
+- **NTF-02**: Drafter receives email when their document is approved or rejected
+- **NTF-03**: Notification delivery history logged in database
+
+### Search (Phase 1-B)
+
+- **SRCH-01**: User can search documents by title, document number, drafter name
+- **SRCH-02**: User can filter documents by status, date range, template type
+
+### Audit UI (Phase 1-C)
+
+- **AUD-02**: SUPER_ADMIN can query audit logs with filters (action type, user, date range)
+
+### Statistics (Phase 1-C)
+
+- **STAT-01**: Admin can view approval statistics (counts by status, average processing time)
+
+### Additional Templates (Phase 1-B)
+
+- **TPL-04**: Purchase request form (구매 요청서)
+- **TPL-05**: Business trip report form (출장 보고서)
+- **TPL-06**: Overtime request form (연장 근무 신청서)
+
+### AI (Phase 2)
+
+- **AI-01**: AI-assisted document drafting based on accumulated data
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| SMTP email notifications | Deferred to Phase 1-B; MVP uses dashboard polling |
+| Document search/filtering | Deferred to Phase 1-B |
+| Dynamic form builder | Hardcoded components are simpler and sufficient for ~50 users |
+| Auto-routing approval rules | PRD specifies 100% manual approval line selection |
+| Delegation/proxy approval (대결/위임) | Explicitly excluded from Phase 1 per PRD |
+| Mobile app | Web-first; mobile later |
+| SSO / OAuth | Email/password sufficient for in-house system |
+| Docker containerization | Native deployment per PRD |
+| Data migration from Docswave | Fresh start confirmed |
+| Real-time notifications (WebSocket) | Deferred; email + dashboard sufficient |
+| Document versioning | Immutability model: changes = new document |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| (To be filled by roadmap) | | |
+
+**Coverage:**
+- v1 requirements: 30 total
+- Mapped to phases: 0
+- Unmapped: 30 ⚠️
+
+---
+*Requirements defined: 2026-03-31*
+*Last updated: 2026-03-31 after initial definition*
