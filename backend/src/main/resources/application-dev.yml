@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:micesign}
+    username: ${DB_USER:micesign}
+    password: ${DB_PASS:micesign}
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.micesign: DEBUG
+    org.hibernate.SQL: DEBUG
