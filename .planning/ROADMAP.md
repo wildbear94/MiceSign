@@ -51,7 +51,7 @@ Plans:
   5. User can change their own password; admin can reset another user's password
 **Plans:** 4 plans
 Plans:
-- [ ] 02-01-PLAN.md — Backend JWT infrastructure: jjwt deps, V3 migration, JPA entities, SecurityConfig, AuthController/AuthService (login/refresh/logout/lockout)
+- [x] 02-01-PLAN.md — Backend JWT infrastructure: jjwt deps, V3 migration, JPA entities, SecurityConfig, AuthController/AuthService (login/refresh/logout/lockout)
 - [ ] 02-02-PLAN.md — Backend password management: PasswordService/Controller + full integration test suite
 - [ ] 02-03-PLAN.md — Frontend auth core: i18n infrastructure, Zustand store, Axios JWT interceptor, React Router, login page UI
 - [ ] 02-04-PLAN.md — Frontend password change page, admin reset/unlock UI, end-to-end verification checkpoint

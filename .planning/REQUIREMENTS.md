@@ -9,10 +9,10 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can log in with email and password, receiving JWT access + refresh tokens
-- [ ] **AUTH-02**: Access token refreshes automatically via refresh token rotation (HttpOnly cookie)
-- [ ] **AUTH-03**: User can log out, invalidating refresh token
-- [ ] **AUTH-04**: Account locks after 5 consecutive failed login attempts for 15 minutes
+- [x] **AUTH-01**: User can log in with email and password, receiving JWT access + refresh tokens
+- [x] **AUTH-02**: Access token refreshes automatically via refresh token rotation (HttpOnly cookie)
+- [x] **AUTH-03**: User can log out, invalidating refresh token
+- [x] **AUTH-04**: Account locks after 5 consecutive failed login attempts for 15 minutes
 - [ ] **AUTH-05**: User session persists across browser refresh (auto-refresh on app init)
 - [ ] **AUTH-06**: User can change their own password
 - [ ] **AUTH-07**: Admin can reset a user's password
@@ -122,10 +122,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 2: Authentication | Pending |
-| AUTH-02 | Phase 2: Authentication | Pending |
-| AUTH-03 | Phase 2: Authentication | Pending |
-| AUTH-04 | Phase 2: Authentication | Pending |
+| AUTH-01 | Phase 2: Authentication | Complete |
+| AUTH-02 | Phase 2: Authentication | Complete |
+| AUTH-03 | Phase 2: Authentication | Complete |
+| AUTH-04 | Phase 2: Authentication | Complete |
 | AUTH-05 | Phase 2: Authentication | Pending |
 | AUTH-06 | Phase 2: Authentication | Pending |
 | AUTH-07 | Phase 2: Authentication | Pending |
