@@ -14,10 +14,11 @@ Employees can submit approval documents and get them approved/rejected through a
 
 - [x] Project scaffolding: Spring Boot 3.x backend + React 18 frontend runnable — Validated in Phase 1: Project Foundation
 - [x] Database schema: 12-table Flyway DDL with seed data (departments, positions, SUPER_ADMIN, templates) — Validated in Phase 1: Project Foundation (ORG-05)
+- [x] JWT-based authentication (login, token refresh, logout) — Validated in Phase 2: Authentication (AUTH-01, AUTH-02, AUTH-03, AUTH-05)
+- [x] Account lockout after failed login attempts — Validated in Phase 2: Authentication (AUTH-04)
+- [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-
-- [ ] JWT-based authentication (login, token refresh, logout)
 - [ ] Admin-managed organization structure (departments, positions, users)
 - [ ] RBAC with three roles (SUPER_ADMIN, ADMIN, USER)
 - [ ] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE)
@@ -89,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after initialization*
+*Last updated: 2026-04-01 after Phase 2 (Authentication) completion*
