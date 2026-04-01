@@ -24,6 +24,8 @@ export interface RefreshResponse {
 }
 
 export interface AuthErrorData {
+  code?: string;
+  message?: string;
   remainingAttempts?: number;
   lockedUntil?: string; // ISO timestamp
 }

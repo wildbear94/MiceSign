@@ -17,17 +17,17 @@ function parseAuthError(error: unknown): AuthError {
     const axiosError = error as { response?: { data?: ApiResponse<AuthErrorData>; status?: number } };
     const data = axiosError.response?.data;
 
-    if (data && !data.success && data.error) {
-      const errorCode = data.error.code;
-      // Extract additional data from the error response
-      // The backend returns remainingAttempts and lockedUntil in the data field
+    if (data && !data.success) {
+      // Backend puts AuthErrorResponse (code, message, remainingAttempts, lockedUntil)
+      // into the data field via: new ApiResponse<>(false, result.error(), null)
       const errorData = data.data as AuthErrorData | null;
+      const errorCode = data.error?.code ?? errorData?.code;
 
       if (errorCode === 'AUTH_ACCOUNT_LOCKED') {
         return {
           type: 'locked',
           lockedUntil: errorData?.lockedUntil,
-          message: data.error.message,
+          message: data.error?.message ?? errorData?.message,
         };
       }
 
@@ -35,7 +35,7 @@ function parseAuthError(error: unknown): AuthError {
         return {
           type: 'credentials',
           remainingAttempts: errorData?.remainingAttempts,
-          message: data.error.message,
+          message: data.error?.message ?? errorData?.message,
         };
       }
     }
