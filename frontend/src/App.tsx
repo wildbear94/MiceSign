@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
+import ForcePasswordChangeGuard from './components/ForcePasswordChangeGuard';
 import LoginPage from './features/auth/pages/LoginPage';
+import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
 import apiClient from './api/client';
 import type { ApiResponse } from './types/api';
@@ -41,9 +43,16 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/change-password"
+        element={
+          <ForcePasswordChangeGuard>
+            <ChangePasswordPage />
+          </ForcePasswordChangeGuard>
+        }
+      />
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<DashboardPlaceholder />} />
-        {/* /change-password will be added in Plan 04 */}
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
