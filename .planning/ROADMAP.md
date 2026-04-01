@@ -65,7 +65,12 @@ Plans:
   2. Admin can create, edit, and deactivate positions with sort ordering
   3. Admin can create and manage user accounts with all required fields (employee no, name, email, department, position, role, status)
   4. SUPER_ADMIN has full access, ADMIN manages org + own dept docs, USER can draft and approve only
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 03-01-PLAN.md — Backend: JPA entities, repositories, DTOs, services, controllers, RBAC logic, integration tests
+- [ ] 03-02-PLAN.md — Frontend infrastructure: types, API clients, hooks, admin layout/sidebar, routing, shared components
+- [ ] 03-03-PLAN.md — Frontend department tree page + position drag-and-drop table page
+- [ ] 03-04-PLAN.md — Frontend user list/detail pages with Phase 2 integration, end-to-end verification
 **UI hint**: yes
 
 ### Phase 4: Document Core & Templates
@@ -135,7 +140,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 |-------|----------------|--------|-----------|
 | 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
 | 2. Authentication | 0/4 | Planning complete | - |
-| 3. Organization Management | 0/TBD | Not started | - |
+| 3. Organization Management | 0/4 | Planning complete | - |
 | 4. Document Core & Templates | 0/TBD | Not started | - |
 | 5. File Attachments | 0/TBD | Not started | - |
 | 6. Document Submission & Numbering | 0/TBD | Not started | - |
