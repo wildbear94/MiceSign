@@ -42,7 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.equals("/api/v1/auth/refresh")
                 || path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
-                || path.equals("/actuator/health");
+                || path.equals("/actuator/health")
+                || path.equals("/api/v1/health");
     }
 
     private String resolveToken(HttpServletRequest request) {

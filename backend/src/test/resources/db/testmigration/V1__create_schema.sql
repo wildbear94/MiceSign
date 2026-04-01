@@ -133,7 +133,7 @@ CREATE TABLE audit_log (
     action          VARCHAR(50) NOT NULL,
     target_type     VARCHAR(50) NULL,
     target_id       BIGINT NULL,
-    detail          CLOB NULL,
+    detail          TEXT NULL,
     ip_address      VARCHAR(50) NULL,
     user_agent      VARCHAR(500) NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
