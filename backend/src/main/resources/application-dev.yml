@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:micesign}
-    username: ${DB_USER:micesign}
-    password: ${DB_PASS:micesign}
+    url: jdbc:mariadb://${DB_HOST:10.211.55.21}:${DB_PORT:3306}/${DB_NAME:micesign}
+    username: ${DB_USER:p30}
+    password: ${DB_PASS:wild0235!}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     show-sql: true
