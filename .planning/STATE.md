@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-04-01T06:04:15.903Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-04-01T06:19:05.245Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 ## Current Position
 
 Phase: 02 (authentication) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-01
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P02 | 3min | 2 tasks | 20 files |
 | Phase 01 P03 | 3min | 3 tasks | 10 files |
 | Phase 02 P01 | 5min | 2 tasks | 24 files |
+| Phase 02 P02 | 12min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase 01]: H2 MariaDB mode with adapted test migrations for integration tests (avoids Docker dependency)
 - [Phase 02]: Result objects (LoginResult, RefreshResult) for auth flow control instead of exceptions
 - [Phase 02]: AuthErrorResponse record for structured lockout error data (remainingAttempts, lockedUntil)
+- [Phase 02]: PasswordResult record pattern for service-layer error handling (consistent with LoginResult/RefreshResult)
+- [Phase 02]: JdbcTemplate @BeforeEach cleanup for test isolation in shared H2 DB (faster than @DirtiesContext)
 
 ### Pending Todos
 
@@ -88,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-01T06:04:15.900Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-04-01T06:19:05.243Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

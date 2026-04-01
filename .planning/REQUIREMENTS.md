@@ -14,8 +14,8 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 - [x] **AUTH-03**: User can log out, invalidating refresh token
 - [x] **AUTH-04**: Account locks after 5 consecutive failed login attempts for 15 minutes
 - [ ] **AUTH-05**: User session persists across browser refresh (auto-refresh on app init)
-- [ ] **AUTH-06**: User can change their own password
-- [ ] **AUTH-07**: Admin can reset a user's password
+- [x] **AUTH-06**: User can change their own password
+- [x] **AUTH-07**: Admin can reset a user's password
 
 ### Organization
 
@@ -127,8 +127,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-03 | Phase 2: Authentication | Complete |
 | AUTH-04 | Phase 2: Authentication | Complete |
 | AUTH-05 | Phase 2: Authentication | Pending |
-| AUTH-06 | Phase 2: Authentication | Pending |
-| AUTH-07 | Phase 2: Authentication | Pending |
+| AUTH-06 | Phase 2: Authentication | Complete |
+| AUTH-07 | Phase 2: Authentication | Complete |
 | ORG-01 | Phase 3: Organization Management | Pending |
 | ORG-02 | Phase 3: Organization Management | Pending |
 | ORG-03 | Phase 3: Organization Management | Pending |
