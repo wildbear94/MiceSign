@@ -28,19 +28,20 @@ No shadcn. No third-party component registry.
 
 ## Spacing
 
-8-point grid. All spacing values must be multiples of 4px.
+8-point grid. All spacing values must be multiples of 4px from the standard set: 4, 8, 16, 24, 32, 48, 64.
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `space-1` | 4px (`p-1`) | Icon padding, inline gaps |
-| `space-2` | 8px (`p-2`) | Between label and input, between icon and text |
-| `space-3` | 12px (`p-3`) | Input internal padding (horizontal) |
-| `space-4` | 16px (`p-4`) | Between form fields, card internal padding (mobile) |
+| `space-1` | 4px (`p-1`) | Icon padding, inline gaps, label-to-input gap |
+| `space-2` | 8px (`p-2`) | Between icon and text, password strength bar to checklist gap |
+| `space-4` | 16px (`p-4`) | Between form fields, card internal padding (mobile), horizontal margin on mobile |
 | `space-6` | 24px (`p-6`) | Card internal padding (desktop), section gaps |
 | `space-8` | 32px (`p-8`) | Between card sections (logo area to form area) |
-| `space-10` | 40px (`p-10`) | Card outer padding on large screens |
+| `space-12` | 48px (`p-12`) | Card outer padding on large screens |
 
-**Exception:** Touch targets for interactive elements (buttons, checkboxes, password toggle) must be at minimum 44px x 44px for accessibility.
+**Exceptions:**
+- Touch targets for interactive elements (buttons, checkboxes, password toggle) must be at minimum 44px x 44px for accessibility. This is a size constraint, not a spacing token.
+- Input horizontal padding uses 16px (`px-4`) from the standard set.
 
 ## Typography
 
@@ -50,10 +51,12 @@ Pretendard Variable is the sole font family. Four sizes, two weights.
 |------|------|--------|-------------|----------------|
 | Page title / Logo text | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold leading-tight` |
 | Section heading | 18px | 600 (semibold) | 1.3 | `text-lg font-semibold leading-snug` |
-| Body / Input text | 16px | 400 (regular) | 1.5 | `text-base font-normal leading-normal` |
-| Caption / Helper text | 14px | 400 (regular) | 1.5 | `text-sm font-normal leading-normal` |
+| Body / Input text / Button text | 16px | 400 (regular) | 1.5 | `text-base font-normal leading-normal` |
+| Caption / Helper / Labels / Strength labels / Checklist | 14px | 400 (regular) | 1.5 | `text-sm font-normal leading-normal` |
 
-**Label text:** 14px, weight 500 (medium). `text-sm font-medium`.
+**Label text:** 14px, weight 600 (semibold), `text-sm font-semibold`. Labels use semibold to visually distinguish them from helper text at the same size.
+
+**Button text exception:** Login and submit buttons use 16px weight 600 (`text-base font-semibold`) for emphasis. This uses the two declared weights (400, 600) only.
 
 ## Color
 
@@ -111,6 +114,8 @@ Follows OS `prefers-color-scheme: dark`. Use Tailwind `dark:` prefix.
 
 **Layout:** Full viewport height. Centered card on dominant surface background.
 
+**Primary visual anchor:** Full-width login button (blue `bg-blue-600`, high contrast against white card, positioned at the bottom of the form) serves as the focal point of the login page. The blue accent against the neutral card creates the strongest contrast point, drawing the user's eye to the primary action.
+
 ```
 +--------------------------------------------------+
 |                  bg-gray-50                        |
@@ -141,7 +146,7 @@ Follows OS `prefers-color-scheme: dark`. Use Tailwind `dark:` prefix.
 **Card specs:**
 - Max width: 400px (`max-w-[400px]`)
 - Width: 100% with 16px horizontal margin on mobile (`w-full mx-4`)
-- Padding: 40px on desktop (`p-10`), 24px on mobile (`p-6`)
+- Padding: 48px on desktop (`p-12`), 24px on mobile (`p-6`)
 - Background: white (`bg-white dark:bg-gray-800`)
 - Border radius: 12px (`rounded-xl`)
 - Shadow: `shadow-lg` (0 10px 15px rgba(0,0,0,0.1))
@@ -156,17 +161,17 @@ Follows OS `prefers-color-scheme: dark`. Use Tailwind `dark:` prefix.
 
 **Input fields:**
 - Height: 44px (`h-11`)
-- Padding: 12px horizontal (`px-3`)
+- Padding: 16px horizontal (`px-4`)
 - Font: 16px regular (prevents iOS zoom)
 - Border: 1px `border-gray-300`, radius 8px (`rounded-lg`)
 - Focus: 2px ring `ring-blue-600`, border transparent
 - Error state: border `border-red-500`, ring `ring-red-500`
 - Placeholder color: `text-gray-400`
-- Gap between label and input: 6px
+- Gap between label and input: 4px
 - Gap between fields: 16px
 
 **Labels:**
-- Font: 14px, weight 500 (`text-sm font-medium`)
+- Font: 14px, weight 600 (`text-sm font-semibold`)
 - Color: `text-gray-700 dark:text-gray-300`
 
 **Email field:**
@@ -209,7 +214,7 @@ Positioned between the remember-me checkbox and the login button.
 - Background: `bg-red-50 dark:bg-red-900/20`
 - Border: 1px `border-red-200 dark:border-red-800`
 - Border radius: 8px
-- Padding: 12px
+- Padding: 16px (`p-4`)
 - Icon: `AlertCircle` from lucide-react, 16px, `text-red-600`
 - Text: 14px, `text-red-700 dark:text-red-400`
 - Message: "이메일 또는 비밀번호가 올바르지 않습니다. N회 남았습니다." / "Incorrect email or password. N attempts remaining."
@@ -219,7 +224,7 @@ Positioned between the remember-me checkbox and the login button.
 - Background: `bg-amber-50 dark:bg-amber-900/20`
 - Border: 1px `border-amber-200 dark:border-amber-800`
 - Border radius: 8px
-- Padding: 12px
+- Padding: 16px (`p-4`)
 - Icon: `Lock` from lucide-react, 16px, `text-amber-600`
 - Text: 14px, `text-amber-700 dark:text-amber-400`
 - Message: "계정이 잠겼습니다. MM:SS 후 다시 시도해주세요." / "Account is locked. Try again in MM:SS."
@@ -260,7 +265,7 @@ Shown during app init auth check (D-14).
 - Border: 1px `border-blue-200`
 - Text: 14px, `text-blue-700`
 - Message: "보안을 위해 비밀번호를 변경해주세요." / "Please change your password for security."
-- Padding: 12px, border radius 8px
+- Padding: 16px (`p-4`), border radius 8px
 - Position: above the form fields, 16px gap below
 
 **Form fields (D-31):**
@@ -278,17 +283,18 @@ All fields: same input specs as login form. All have password visibility toggles
   - Weak (< 33%): `bg-red-500`, width 33%
   - Medium (33-66%): `bg-amber-500`, width 66%
   - Strong (> 66%): `bg-green-500`, width 100%
-- Label below bar: "약함" / "Weak", "보통" / "Medium", "강함" / "Strong" — 12px, matching color
+- Label below bar: "약함" / "Weak", "보통" / "Medium", "강함" / "Strong" — 14px (`text-sm`), matching color
 - Transition: width + color, 300ms ease
 
 **Password requirements checklist (D-28):**
 - Position: below strength bar, 8px gap
-- List of requirements, each with check/x icon (12px):
+- List of requirements, each with check/x icon (14px, using lucide-react `Check` / `X` at `w-3.5 h-3.5`):
   - "8자 이상" / "At least 8 characters"
   - "대문자 포함" / "Contains uppercase"
   - "소문자 포함" / "Contains lowercase"
   - "숫자 포함" / "Contains number"
   - "특수문자 포함" / "Contains special character"
+- Font: 14px (`text-sm`) regular
 - Met requirement: `text-green-600`, `Check` icon
 - Unmet requirement: `text-gray-400`, `X` icon
 - Note: D-27 requires 2 of 4 categories. Show all 5 items but the submit validation passes when 8+ chars AND 2+ of {uppercase, lowercase, number, special} are satisfied.
@@ -443,7 +449,7 @@ All copy must exist in both Korean and English translation files. Korean is the 
 
 ### Responsive Behavior
 - Card is max 400px wide, centered
-- Below 480px: card padding reduces from 40px to 24px
+- Below 480px: card padding reduces from 48px to 24px
 - Below 400px: card uses full width with 16px horizontal margin
 - Input fields always 16px font (prevents iOS zoom on focus)
 
