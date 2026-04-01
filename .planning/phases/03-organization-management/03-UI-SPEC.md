@@ -4,6 +4,7 @@ phase: 3
 phase_name: Organization Management
 design_system: manual (TailwindCSS + Pretendard)
 created: 2026-04-01
+revised: 2026-04-01
 ---
 
 # UI-SPEC: Phase 3 — Organization Management
@@ -12,17 +13,17 @@ created: 2026-04-01
 
 ### 1.1 Spacing
 
-8-point scale with 4px half-step for tight elements.
+Standard 8-point scale. All values are multiples of 4 from the set: 4, 8, 16, 24, 32, 48, 64.
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | `space-1` | 4px (`p-1`) | Icon-to-text gap inside compact elements |
-| `space-2` | 8px (`p-2`, `gap-2`) | Inline element gaps, tree node padding |
-| `space-3` | 12px (`p-3`, `gap-3`) | Card inner padding (compact), button gaps |
+| `space-2` | 8px (`p-2`, `gap-2`) | Inline element gaps, tree node padding, button gaps, card inner padding (compact) |
 | `space-4` | 16px (`p-4`, `gap-4`) | Section padding, form field spacing, sidebar item padding |
 | `space-6` | 24px (`p-6`, `gap-6`) | Modal inner padding, page section gaps |
 | `space-8` | 32px (`p-8`) | Page top/bottom padding |
 | `space-12` | 48px (`p-12`) | Not used in this phase |
+| `space-16` | 64px | Not used in this phase |
 
 **Touch targets:** All interactive elements minimum 44px (`h-11`) height. Established in Phase 2 login form inputs and buttons.
 
@@ -34,11 +35,13 @@ Font family: `Pretendard Variable` (established in `tailwind.config.js`).
 
 | Role | Size | Weight | Line Height | Tailwind Classes |
 |------|------|--------|-------------|-----------------|
-| Page heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold leading-tight` |
+| Page heading | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold leading-tight` |
 | Section heading / Modal title | 18px | 600 (semibold) | 1.2 | `text-lg font-semibold` |
 | Body / Table cells / Form labels | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Body bold / Column headers / Labels | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Caption / Badges / Helper text | 12px | 400 (regular) | 1.5 | `text-xs` |
+
+**Sizes used:** 24px, 18px, 14px, 12px (4 sizes with clear visual hierarchy -- 6px gap between page and section headings).
 
 **Weights used:** 400 (regular) and 600 (semibold) only. Matches Phase 2 pattern.
 
@@ -52,7 +55,7 @@ Font family: `Pretendard Variable` (established in `tailwind.config.js`).
 | **Secondary (30%)** | gray-50 / gray-800 | `bg-gray-50 dark:bg-gray-800` | Sidebar background, card surfaces, table header, detail panel |
 | **Accent (10%)** | blue-600 | `bg-blue-600 text-white` | Primary action buttons, selected tree node highlight, active sidebar item, focus rings |
 
-**Accent reserved for:** Primary CTA buttons (추가, 저장), selected/active state indicators (sidebar nav item, selected tree node `bg-blue-50 text-blue-700`), focus ring (`focus:ring-blue-600`).
+**Accent reserved for:** Primary CTA buttons (부서 추가, 직급 추가, 사용자 추가, 변경사항 저장), selected/active state indicators (sidebar nav item, selected tree node `bg-blue-50 text-blue-700`), focus ring (`focus:ring-blue-600`).
 
 **Semantic colors:**
 
@@ -109,7 +112,7 @@ Library: `lucide-react` (already installed, v1.7.0).
 - **Responsive:** Sidebar collapses to icon-only (`w-16`) below 1024px breakpoint, or hidden below 768px with hamburger toggle
 
 #### AdminSidebar
-- **Nav items:** Vertical list, each item `px-4 py-3 flex items-center gap-3 rounded-lg text-sm`
+- **Nav items:** Vertical list, each item `px-4 py-4 flex items-center gap-2 rounded-lg text-sm`
 - **Active item:** `bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 font-semibold`
 - **Inactive item:** `text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700`
 - **Sections:** 부서 관리, 직급 관리, 사용자 관리 (D-01)
@@ -118,8 +121,8 @@ Library: `lucide-react` (already installed, v1.7.0).
 ### 2.2 Department Management Components
 
 #### DepartmentPage
-- **Layout:** Two-column split — left panel (tree, ~40% width `w-2/5`) + right panel (detail, ~60% width `w-3/5`)
-- **Header:** Page title `text-xl font-semibold` + "부서 추가" primary button (top-right)
+- **Layout:** Two-column split -- left panel (tree, ~40% width `w-2/5`) + right panel (detail, ~60% width `w-3/5`)
+- **Header:** Page title `text-2xl font-semibold` + "부서 추가" primary button (top-right)
 - **Filter bar:** Text input with `Search` icon above tree, and toggle checkbox "비활성 부서 표시" (D-12, D-14)
 
 #### DepartmentTree
@@ -127,7 +130,7 @@ Library: `lucide-react` (already installed, v1.7.0).
 - **Empty state:** Centered `FolderOpen` icon (gray-300) + "부서가 없습니다. 첫 부서를 추가해주세요." text + "부서 추가" button (D-17)
 
 #### DepartmentTreeNode
-- **Container:** `flex items-center gap-1 px-2 py-1.5 rounded cursor-pointer`
+- **Container:** `flex items-center gap-1 px-2 py-2 rounded cursor-pointer`
 - **Hover:** `hover:bg-gray-100 dark:hover:bg-gray-700`
 - **Selected:** `bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400`
 - **Inactive:** `opacity-50` with `text-xs bg-gray-200 dark:bg-gray-600 px-1 rounded` badge "비활성" (D-14)
@@ -138,24 +141,25 @@ Library: `lucide-react` (already installed, v1.7.0).
 
 #### DepartmentDetailPanel
 - **Trigger:** Clicking a tree node populates this panel (D-13)
-- **Header:** Department name as `text-lg font-semibold` + "수정" icon button
+- **Header:** Department name as `text-lg font-semibold` + "수정" button rendered as `Pencil` icon with visible text label "수정" (`<button class="..."><Pencil class="w-4 h-4" /><span>수정</span></button>`). If space-constrained at narrower breakpoints, icon-only is acceptable with `<span class="sr-only">수정</span>` for screen reader accessibility.
 - **Member list:** Simple list of members with name, position name, status badge
 - **Empty member state:** "소속 직원이 없습니다." centered text
 - **Border:** `border-l border-gray-200 dark:border-gray-700`
 
 #### DepartmentFormModal
 - **Trigger:** "부서 추가" button or "수정" button on tree node / detail panel
-- **Fields:** 부서명 (text input, required), 상위 부서 (dropdown, optional — D-15), 정렬 순서 (number input)
+- **Fields:** 부서명 (text input, required), 상위 부서 (dropdown, optional -- D-15), 정렬 순서 (number input)
 - **Parent dropdown:** Excludes self and own descendants when editing (prevents circular ref)
 - **Validation:** Name required, globally unique (D-10)
-- **Modal style:** Matches Phase 2 `AdminPasswordResetModal` pattern — `max-w-[400px]`, `rounded-xl`, `shadow-lg`, `p-6`
-- **Buttons:** "취소" (secondary) + "저장" (primary blue)
+- **Modal style:** Matches Phase 2 `AdminPasswordResetModal` pattern -- `max-w-[400px]`, `rounded-xl`, `shadow-lg`, `p-6`
+- **Buttons (create mode):** "닫기" (secondary, modal dismiss) + "부서 추가" (primary blue)
+- **Buttons (edit mode):** "닫기" (secondary, modal dismiss) + "변경사항 저장" (primary blue)
 
 ### 2.3 Position Management Components
 
 #### PositionPage
 - **Layout:** Single-column centered table, max-width `max-w-3xl mx-auto`
-- **Header:** Page title + "직급 추가" primary button
+- **Header:** Page title `text-2xl font-semibold` + "직급 추가" primary button
 - **Table columns:** 직급명, 순서, 상태, 액션 (D-37)
 
 #### PositionTable
@@ -169,23 +173,25 @@ Library: `lucide-react` (already installed, v1.7.0).
 - **Inactive rows:** `opacity-50` with "비활성" badge
 
 #### PositionFormModal
-- **Fields:** 직급명 (text input, required, globally unique — D-41), 정렬 순서 (auto-assigned for new, shown as info for edit)
+- **Fields:** 직급명 (text input, required, globally unique -- D-41), 정렬 순서 (auto-assigned for new, shown as info for edit)
 - **Modal style:** Same as `DepartmentFormModal`
+- **Buttons (create mode):** "닫기" (secondary, modal dismiss) + "직급 추가" (primary blue)
+- **Buttons (edit mode):** "닫기" (secondary, modal dismiss) + "변경사항 저장" (primary blue)
 
 ### 2.4 User Management Components
 
 #### UserListPage
 - **Layout:** Full-width with filter bar above table
-- **Header:** Page title + "사용자 추가" primary button
+- **Header:** Page title `text-2xl font-semibold` + "사용자 추가" primary button
 
 #### UserFilterBar
-- **Layout:** `flex flex-wrap gap-3 items-end` (D-19)
+- **Layout:** `flex flex-wrap gap-2 items-end` (D-19)
 - **Filters:**
   - 부서: dropdown (`select` element), shows all active departments as flat list
   - 역할: dropdown with options SUPER_ADMIN / ADMIN / USER
   - 상태: dropdown with options 활성 / 비활성 / 퇴직
   - 검색: text input with `Search` icon, placeholder "이름, 이메일, 사번 검색"
-- **Each filter:** `h-9 text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3`
+- **Each filter:** `h-9 text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-4`
 - **Clear all:** "초기화" text button to reset filters
 
 #### UserTable
@@ -193,7 +199,7 @@ Library: `lucide-react` (already installed, v1.7.0).
 - **Sortable columns:** Click header to toggle sort. Active sort shows `ChevronUp` or `ChevronDown` icon. Sort backed by Pageable (D-30)
 - **Header style:** `bg-gray-50 dark:bg-gray-800 text-sm font-semibold text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200`
 - **Row hover:** `hover:bg-gray-50 dark:hover:bg-gray-800/50`
-- **Row click:** Navigates to user detail page (D-23) — `cursor-pointer`
+- **Row click:** Navigates to user detail page (D-23) -- `cursor-pointer`
 - **Role badge colors:**
   - SUPER_ADMIN: `bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400`
   - ADMIN: `bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400`
@@ -207,29 +213,29 @@ Library: `lucide-react` (already installed, v1.7.0).
 
 #### UserFormModal (Create)
 - **Fields (D-20):**
-  - 사번 (text, required, unique — D-28)
+  - 사번 (text, required, unique -- D-28)
   - 이름 (text, required)
   - 이메일 (email, required, unique)
   - 부서 (dropdown, required)
   - 직급 (dropdown, required)
-  - 역할 (dropdown: USER / ADMIN / SUPER_ADMIN — constrained by D-32)
+  - 역할 (dropdown: USER / ADMIN / SUPER_ADMIN -- constrained by D-32)
   - 전화번호 (text, optional)
-  - 초기 비밀번호 (password with toggle, required — D-21)
+  - 초기 비밀번호 (password with toggle, required -- D-21)
 - **Role dropdown:** If current user is ADMIN, only USER option available. SUPER_ADMIN sees all roles (D-32)
 - **Modal size:** `max-w-[500px]` (wider than dept/position modals due to more fields)
 - **Layout:** Single-column form, fields stacked vertically with `space-y-4`
-- **Buttons:** "취소" (secondary) + "생성" (primary blue)
+- **Buttons:** "닫기" (secondary, modal dismiss) + "사용자 추가" (primary blue)
 
 #### UserDetailPage
 - **Layout:** Full-width card with profile information grid
 - **Default mode:** Read-only display of all fields in a 2-column grid (`grid grid-cols-2 gap-4`) (D-24)
 - **Fields displayed:** 사번, 이름, 이메일, 부서, 직급, 역할, 상태, 전화번호, 마지막 로그인, 계정 생성일 (D-29)
-- **Edit mode:** Toggle via "수정" button — fields become editable inputs, "저장" + "취소" buttons appear (D-24)
+- **Edit mode:** Toggle via "수정" button -- fields become editable inputs, "변경사항 저장" + "수정 취소" buttons appear (D-24)
 - **Action buttons (top-right):**
   - "수정" (`Pencil` icon + text, blue)
-  - "비밀번호 초기화" — opens `AdminPasswordResetModal` (D-25)
-  - "계정 잠금 해제" — renders `AdminUnlockButton` (D-25, shown only if account is locked)
-  - "비활성화" (red text, shown only if user is ACTIVE and not self — D-33)
+  - "비밀번호 초기화" -- opens `AdminPasswordResetModal` (D-25)
+  - "계정 잠금 해제" -- renders `AdminUnlockButton` (D-25, shown only if account is locked)
+  - "비활성화" (red text, shown only if user is ACTIVE and not self -- D-33)
 - **Back navigation:** "< 사용자 목록" breadcrumb link at top
 
 ### 2.5 Shared Components
@@ -238,17 +244,17 @@ Library: `lucide-react` (already installed, v1.7.0).
 - **Purpose:** Reusable confirmation modal for destructive actions (D-06, D-26)
 - **Structure:** Overlay + centered card (`max-w-[360px]`)
 - **Content:** Warning icon (amber) + title + description message + two buttons
-- **Buttons:** "취소" (secondary) + action button (red for destructive: "비활성화")
+- **Buttons:** "닫기" (secondary, modal dismiss) + action button (red for destructive: "비활성화")
 - **Variants:**
   - Department deactivation: "이 부서에 N명의 직원이 소속되어 있습니다. 비활성화하시겠습니까?" (D-06)
   - Department move: "N명의 직원이 영향을 받습니다. 상위 부서를 변경하시겠습니까?" (D-16)
-  - Position deactivation blocked: "이 직급에 N명의 직원이 소속되어 있습니다. 먼저 직원의 직급을 변경해주세요." (D-40, info only — single "확인" button)
+  - Position deactivation blocked: "이 직급에 N명의 직원이 소속되어 있습니다. 먼저 직원의 직급을 변경해주세요." (D-40, info only -- single "확인" button)
   - User deactivation: "이 사용자를 비활성화하시겠습니까?" (D-26)
 
 #### Pagination
 - **Layout:** `flex items-center justify-between` below table
 - **Left:** Total count: "전체 N건"
-- **Right:** Page buttons — Previous (`<`), page numbers, Next (`>`)
+- **Right:** Page buttons -- Previous (`<`), page numbers, Next (`>`)
 - **Active page:** `bg-blue-600 text-white rounded`
 - **Inactive page:** `text-gray-600 hover:bg-gray-100 rounded`
 - **Disabled nav:** `text-gray-300 cursor-not-allowed`
@@ -264,7 +270,7 @@ Library: `lucide-react` (already installed, v1.7.0).
 ### 3.2 Tree Expand/Collapse
 1. User clicks `ChevronRight` icon on a node with children
 2. Icon rotates 90 degrees (`transition-transform duration-150`)
-3. Children slide into view (simple `block/hidden` toggle — no animation needed for 3-level tree)
+3. Children slide into view (simple `block/hidden` toggle -- no animation needed for 3-level tree)
 
 ### 3.3 Department Filter
 1. User types in search input above tree
@@ -290,15 +296,15 @@ Library: `lucide-react` (already installed, v1.7.0).
 ### 3.6 User Detail Edit Mode
 1. User clicks "수정" button on detail page
 2. Read-only text fields transition to editable inputs
-3. "수정" button replaced by "저장" + "취소" buttons
-4. "취소" reverts all changes and returns to read-only mode
-5. "저장" submits `PUT /api/v1/admin/users/{id}`, returns to read-only on success
+3. "수정" button replaced by "변경사항 저장" + "수정 취소" buttons
+4. "수정 취소" reverts all changes and returns to read-only mode
+5. "변경사항 저장" submits `PUT /api/v1/admin/users/{id}`, returns to read-only on success
 
 ### 3.7 Modal Form Flow
 1. User clicks create/edit button
 2. Modal overlay appears (`bg-black/50`)
 3. Modal card fades in centered
-4. User fills form, clicks primary button
+4. User fills form, clicks primary button (context-specific label, e.g. "부서 추가" or "변경사항 저장")
 5. Button shows `Loader2` spinner during API call
 6. On success: modal closes, list/tree refreshes (TanStack Query invalidation)
 7. On error: error message appears below relevant field or as banner
@@ -311,7 +317,7 @@ Library: `lucide-react` (already installed, v1.7.0).
 
 ### 3.9 Error States
 - **Field validation:** Red border on input (`border-red-500`) + error text below (`text-sm text-red-600`)
-- **API error in modal:** Error banner above form fields (`bg-red-50 border border-red-200 rounded-lg p-3`)
+- **API error in modal:** Error banner above form fields (`bg-red-50 border border-red-200 rounded-lg p-4`)
 - **API error on page:** Toast notification (top-right, auto-dismiss after 5 seconds)
 - **403 Forbidden:** Redirect to home page with toast "접근 권한이 없습니다."
 
@@ -328,17 +334,25 @@ All UI text goes through i18n (`react-i18next`). Namespace: `admin`.
 | `admin.users.detail` | 사용자 상세 | User Detail |
 
 ### 4.2 Primary CTAs
-| Context | Korean | English |
-|---------|--------|---------|
-| Create department | 부서 추가 | Add Department |
-| Create position | 직급 추가 | Add Position |
-| Create user | 사용자 추가 | Add User |
-| Save changes | 저장 | Save |
-| Edit | 수정 | Edit |
-| Cancel | 취소 | Cancel |
-| Create (modal submit) | 생성 | Create |
-| Deactivate | 비활성화 | Deactivate |
-| Confirm | 확인 | Confirm |
+
+Each CTA is context-specific. No generic "저장" or "취소" used as standalone labels.
+
+| Context | Korean | English | Type |
+|---------|--------|---------|------|
+| DepartmentFormModal (create) | 부서 추가 | Add Department | primary (blue) |
+| DepartmentFormModal (edit) | 변경사항 저장 | Save Changes | primary (blue) |
+| PositionFormModal (create) | 직급 추가 | Add Position | primary (blue) |
+| PositionFormModal (edit) | 변경사항 저장 | Save Changes | primary (blue) |
+| UserFormModal (create) | 사용자 추가 | Add User | primary (blue) |
+| UserDetailPage (edit mode save) | 변경사항 저장 | Save Changes | primary (blue) |
+| UserDetailPage (edit mode cancel) | 수정 취소 | Cancel Edit | secondary (gray) |
+| Enter edit mode | 수정 | Edit | secondary (blue text) |
+| Modal dismiss (all modals) | 닫기 | Close | secondary (gray) -- always paired with specific primary CTA |
+| Deactivate entity | 비활성화 | Deactivate | destructive (red) |
+| Info-only confirm (position block) | 확인 | OK | primary (blue) |
+| DepartmentPage header | 부서 추가 | Add Department | primary (blue) |
+| PositionPage header | 직급 추가 | Add Position | primary (blue) |
+| UserListPage header | 사용자 추가 | Add User | primary (blue) |
 
 ### 4.3 Empty States
 | Context | Korean |
@@ -406,6 +420,7 @@ All UI text goes through i18n (`react-i18next`). Namespace: `admin`.
 | Sort column | `aria-sort="ascending|descending|none"` on `th` elements |
 | Form validation | `aria-describedby` linking inputs to error messages (Phase 2 pattern) |
 | Color contrast | All text meets WCAG 2.1 AA (gray-600 on white = 5.74:1, gray-400 on gray-900 = 5.57:1) |
+| Icon-only buttons | All icon-only buttons include `<span class="sr-only">` with action label for screen readers |
 
 ## 7. Dark Mode
 
@@ -427,7 +442,7 @@ Dark mode follows `darkMode: 'media'` (established in `tailwind.config.js`). All
 
 **Third-party registries:** None.
 
-**New dependency:** `@hello-pangea/dnd@18.0.1` for position drag-and-drop only (D-39). No registry vetting needed — installed via npm.
+**New dependency:** `@hello-pangea/dnd@18.0.1` for position drag-and-drop only (D-39). No registry vetting needed -- installed via npm.
 
 ## 9. Component-to-Requirement Mapping
 
@@ -441,4 +456,5 @@ Dark mode follows `darkMode: 'media'` (established in `tailwind.config.js`). All
 ---
 
 *Generated: 2026-04-01*
+*Revised: 2026-04-01 -- Fixed spacing scale (removed 12px), specific CTAs (removed generic labels), typography hierarchy (24px/18px gap), icon-only button accessibility*
 *Sources: 03-CONTEXT.md (41 decisions), 03-RESEARCH.md (standard stack + patterns), Phase 2 codebase (established visual tokens)*
