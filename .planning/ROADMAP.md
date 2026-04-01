@@ -49,7 +49,12 @@ Plans:
   3. User can log out and cannot access protected pages afterward
   4. Account locks after 5 consecutive failed login attempts and unlocks after 15 minutes
   5. User can change their own password; admin can reset another user's password
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 02-01-PLAN.md — Backend JWT infrastructure: jjwt deps, V3 migration, JPA entities, SecurityConfig, AuthController/AuthService (login/refresh/logout/lockout)
+- [ ] 02-02-PLAN.md — Backend password management: PasswordService/Controller + full integration test suite
+- [ ] 02-03-PLAN.md — Frontend auth core: i18n infrastructure, Zustand store, Axios JWT interceptor, React Router, login page UI
+- [ ] 02-04-PLAN.md — Frontend password change page, admin reset/unlock UI, end-to-end verification checkpoint
 
 ### Phase 3: Organization Management
 **Goal**: Admins can manage the company structure (departments, positions, users) and the system enforces role-based access
@@ -129,7 +134,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
-| 2. Authentication | 0/TBD | Not started | - |
+| 2. Authentication | 0/4 | Planning complete | - |
 | 3. Organization Management | 0/TBD | Not started | - |
 | 4. Document Core & Templates | 0/TBD | Not started | - |
 | 5. File Attachments | 0/TBD | Not started | - |
