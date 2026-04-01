@@ -1,0 +1,13 @@
+{
+  "app": {
+    "name": "MiceSign",
+    "subtitle": "Electronic Approval System"
+  },
+  "error": {
+    "network": "Cannot connect to server. Please try again shortly."
+  },
+  "button": {
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+}
