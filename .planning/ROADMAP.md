@@ -127,7 +127,13 @@ Plans:
   3. Approver can approve or reject with optional comment; rejection immediately sets document to REJECTED
   4. Final approval sets document to APPROVED; the complete state machine (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN) works correctly
   5. Drafter can withdraw a submitted document if the next approver has not acted, and can create a new pre-filled document from rejected or withdrawn documents
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 07-01-PLAN.md — Backend: ApprovalLine entity, enums, repository, DTOs, approval line save/load with document, ApprovalService (approve/reject/sequential), ApprovalController, integration tests
+- [ ] 07-02-PLAN.md — Backend: Withdrawal endpoint with step validation, resubmission endpoint copying content + approval line, integration tests
+- [ ] 07-03-PLAN.md — Frontend: Approval types/API/hooks, approval line editor with org tree and drag-and-drop, document editor integration
+- [ ] 07-04-PLAN.md — Frontend: Approval status display (vertical step list), action bar (approve/reject/withdraw/resubmit), comment dialog, document detail integration
+- [ ] 07-05-PLAN.md — Frontend: Pending approvals page, completed documents page, routing, navigation, end-to-end checkpoint
 **UI hint**: yes
 
 ### Phase 8: Dashboard & Audit
@@ -155,5 +161,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. Document Core & Templates | 0/3 | Planning complete | - |
 | 5. File Attachments | 0/3 | Planning complete | - |
 | 6. Document Submission & Numbering | 0/2 | Planning complete | - |
-| 7. Approval Workflow | 0/TBD | Not started | - |
+| 7. Approval Workflow | 0/5 | Planning complete | - |
 | 8. Dashboard & Audit | 0/TBD | Not started | - |
