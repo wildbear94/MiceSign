@@ -52,11 +52,13 @@ Source: Existing codebase uses Tailwind `p-6` (24px), `gap-2` (8px), `gap-3` (12
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.4 | `text-sm font-medium` |
+| Label | 14px | 600 (semibold) | 1.4 | `text-sm font-semibold` |
 | Heading | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
 | Subheading | 18px | 600 (semibold) | 1.3 | `text-lg font-semibold` |
 
-Source: Existing pattern — `UserListPage.tsx` uses `text-2xl font-semibold` for page title, `text-sm` for body/labels. `ConfirmDialog.tsx` uses `text-lg font-semibold` for dialog titles.
+Declared weights: 400 (regular) for body text, 600 (semibold) for labels, headings, and subheadings. Two weights only.
+
+Source: Existing pattern — `UserListPage.tsx` uses `text-2xl font-semibold` for page title, `text-sm` for body/labels. `ConfirmDialog.tsx` uses `text-lg font-semibold` for dialog titles. Weight 500 (medium) dropped to comply with 2-weight maximum; labels promoted to 600 for consistency.
 
 ---
 
@@ -70,7 +72,7 @@ Source: Existing pattern — `UserListPage.tsx` uses `text-2xl font-semibold` fo
 | Destructive | `red-600` | Delete draft button, danger confirmation |
 
 Accent reserved for:
-- Primary action buttons ("저장", "새 문서")
+- Primary action buttons ("임시저장", "새 문서")
 - Active navigation link highlight (`bg-blue-50 text-blue-700`)
 - Active pagination page indicator
 - Auto-save success indicator text
@@ -179,13 +181,15 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 
 ### Document Editor Page
 
+**Focal point:** The title input field is the primary visual anchor. It appears at the top of the form container with `text-base font-semibold` styling and a prominent focus ring (`focus:ring-2 focus:ring-blue-500`), drawing the user's eye to start composing immediately.
+
 ```
 +---------------------------------------------------------------+
 | MainNavbar                                                     |
 +---------------------------------------------------------------+
 |  max-w-4xl mx-auto                                            |
 |                                                                |
-|  ← 목록으로                    [저장됨 ✓]  [저장]  [삭제]      |
+|  <- 목록으로                 [저장됨 v]  [임시저장]  [삭제]     |
 |                                                                |
 |  +-----------------------------------------------------------+|
 |  | 양식: 일반 업무 기안                                        ||
@@ -193,7 +197,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 |  |                                                           ||
 |  | 제목: [________________________________]                   ||
 |  |                                                           ||
-|  | [Toolbar: B I U H1 H2 • 1. " 🖼 ⊞ ]                     ||
+|  | [Toolbar: B I U H1 H2 * 1. " img tbl ]                   ||
 |  | +-------------------------------------------------------+ ||
 |  | |                                                       | ||
 |  | | (Tiptap editor area, min-h-[300px])                  | ||
@@ -209,7 +213,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 - Content max width: `max-w-4xl` (896px) for editor pages
 - Back link: `text-sm text-gray-500 hover:text-gray-700` with `ArrowLeft` icon
 - Form container: `bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6`
-- Title input: `w-full h-11 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-base font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500`
+- Title input: `w-full h-11 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500`
 - Tiptap toolbar: `flex flex-wrap gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg`
 - Toolbar button: `h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400` with active state `bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400`
 - Tiptap editor area: `min-h-[300px] p-4 prose prose-sm max-w-none dark:prose-invert` within `border border-gray-200 dark:border-gray-700 rounded-b-lg`
@@ -220,29 +224,29 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 +-----------------------------------------------------------+
 | 항목명        | 수량  | 단가       | 금액         | 삭제   |
 +-----------------------------------------------------------+
-| [input______] | [___] | [________] | ₩10,000     | [x]   |
-| [input______] | [___] | [________] | ₩25,000     | [x]   |
+| [input______] | [___] | [________] | W10,000     | [x]   |
+| [input______] | [___] | [________] | W25,000     | [x]   |
 +-----------------------------------------------------------+
-|                              합계   | ₩35,000             |
+|                              합계   | W35,000             |
 +-----------------------------------------------------------+
 |           [+ 항목 추가]                                    |
 +-----------------------------------------------------------+
 ```
 
 - Table: `w-full border-collapse`
-- Header: `bg-gray-50 dark:bg-gray-800 text-left text-sm font-medium text-gray-600 dark:text-gray-400 px-3 py-2`
+- Header: `bg-gray-50 dark:bg-gray-800 text-left text-sm font-semibold text-gray-600 dark:text-gray-400 px-3 py-2`
 - Cells: `px-3 py-2 border-b border-gray-200 dark:border-gray-700`
 - Input cells: `h-9 px-2 border border-gray-300 dark:border-gray-600 rounded text-sm text-right` (number inputs right-aligned)
-- Amount display (read-only computed): `text-sm font-medium text-gray-900 dark:text-gray-50 text-right`
+- Amount display (read-only computed): `text-sm font-semibold text-gray-900 dark:text-gray-50 text-right`
 - Total row: `bg-gray-50 dark:bg-gray-800 font-semibold text-base text-right`
 - Add row button: `text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1` with `Plus` icon
-- Delete row button: `h-8 w-8 text-gray-400 hover:text-red-500` with `X` icon
+- Delete row button: `h-8 w-8 text-gray-400 hover:text-red-500` with `X` icon. Must include `aria-label="항목 삭제"` for accessibility.
 
 ### Leave Form
 
 ```
 +-----------------------------------------------------------+
-| 휴가 유형:  [연차       ▼]                                 |
+| 휴가 유형:  [연차       v]                                 |
 |                                                            |
 | 시작일:     [2026-04-05]     종료일:  [2026-04-07]         |
 |                                                            |
@@ -258,7 +262,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 - Calculated days: `text-base font-semibold text-blue-600` (accent to draw attention)
 - Reason textarea: `w-full min-h-[80px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm resize-y`
 - Form layout: `grid grid-cols-2 gap-4` for date fields, single column for others
-- Field labels: `text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`
+- Field labels: `text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1`
 
 ### Document List Page
 
@@ -293,7 +297,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 +---------------------------------------------------------------+
 |  max-w-4xl mx-auto                                            |
 |                                                                |
-|  ← 목록으로                                                   |
+|  <- 목록으로                                                   |
 |                                                                |
 |  +-----------------------------------------------------------+|
 |  | 문서 정보                                                  ||
@@ -322,7 +326,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 | Element | Copy |
 |---------|------|
 | Primary CTA (document list) | 새 문서 |
-| Primary CTA (editor save) | 저장 |
+| Primary CTA (editor save) | 임시저장 |
 | Template modal title | 새 문서 작성 |
 | Template modal subtitle | 작성할 양식을 선택하세요 |
 | Empty state heading (document list) | 작성된 문서가 없습니다 |
@@ -375,7 +379,7 @@ Source: Korean UI conventions per CLAUDE.md. D-20 specifies inline messages, not
 | Debounce | 30,000ms (30 seconds) of inactivity |
 | Indicator position | Top right of editor area, inline with action buttons |
 | Indicator states | "저장됨" (gray-500, with Check icon), "저장 중..." (blue-600, with Loader2 spinning), "저장 실패" (red-600, with AlertCircle icon) |
-| Manual save | Always visible "저장" button alongside auto-save indicator |
+| Manual save | Always visible "임시저장" button alongside auto-save indicator |
 | New document | First auto-save creates the document (POST), subsequent saves update (PUT) |
 
 ### Template Selection Modal (D-14)
@@ -440,17 +444,29 @@ Source: Korean UI conventions per CLAUDE.md. D-20 specifies inline messages, not
 
 ## Tiptap Editor Toolbar Specification
 
-| Group | Buttons | Icons (lucide-react) |
-|-------|---------|---------------------|
-| Text | Bold, Italic, Underline | `Bold`, `Italic`, `Underline` |
-| Heading | H1, H2, H3 | `Heading1`, `Heading2`, `Heading3` |
-| List | Bullet list, Numbered list | `List`, `ListOrdered` |
-| Block | Blockquote | `Quote` |
-| Table | Insert table | `Table` |
-| Media | Insert image | `Image` |
+| Group | Buttons | Icons (lucide-react) | aria-label |
+|-------|---------|---------------------|------------|
+| Text | Bold, Italic, Underline | `Bold`, `Italic`, `Underline` | "굵게", "기울임", "밑줄" |
+| Heading | H1, H2, H3 | `Heading1`, `Heading2`, `Heading3` | "제목 1", "제목 2", "제목 3" |
+| List | Bullet list, Numbered list | `List`, `ListOrdered` | "글머리 기호", "번호 매기기" |
+| Block | Blockquote | `Quote` | "인용" |
+| Table | Insert table | `Table` | "표 삽입" |
+| Media | Insert image | `Image` | "이미지 삽입" |
 
 - Toolbar dividers: `w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1` between groups
 - Active button state: `bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400`
+- Accessibility: All icon-only toolbar buttons must include `aria-label` as declared above. This ensures screen readers announce the button purpose.
+
+---
+
+## Accessibility Notes
+
+All icon-only buttons in this phase must include an `aria-label` attribute:
+
+| Component | Button | aria-label value |
+|-----------|--------|-----------------|
+| `TiptapToolbar` | Each formatting button | See Tiptap toolbar table above |
+| `ExpenseForm` | Delete row (X icon) | "항목 삭제" |
 
 ---
 
