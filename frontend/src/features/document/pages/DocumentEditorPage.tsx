@@ -110,7 +110,10 @@ export default function DocumentEditorPage() {
     if (!savedDocId) return;
 
     const errors: string[] = [];
-    const { title, formData: formDataStr } = formDataRef.current;
+    // Use saved document data if available (more reliable than formDataRef which
+    // only updates on save), fall back to formDataRef for unsaved changes
+    const title = existingDoc?.title ?? formDataRef.current.title;
+    const formDataStr = existingDoc?.formData ?? formDataRef.current.formData;
 
     // Title validation (all templates)
     if (!title || title.trim() === '') {
@@ -143,7 +146,7 @@ export default function DocumentEditorPage() {
 
     setSubmitValidationErrors(errors);
     setShowSubmitConfirm(true);
-  }, [savedDocId, resolvedTemplateCode, t]);
+  }, [savedDocId, existingDoc, resolvedTemplateCode, t]);
 
   const handleSubmitConfirm = useCallback(async () => {
     if (!savedDocId) return;
