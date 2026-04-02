@@ -19,7 +19,5 @@ INSERT INTO leave_type (code, name, is_half_day, sort_order) VALUES
 ('SICK', '병가', FALSE, 3),
 ('FAMILY', '경조', FALSE, 4);
 
-INSERT INTO approval_template (code, name, description, prefix, sort_order) VALUES
-('GENERAL', '일반 업무 기안', '일반적인 업무 기안 및 보고에 사용합니다.', 'GEN', 1),
-('EXPENSE', '지출 결의서', '지출 내역을 보고하고 승인을 요청합니다.', 'EXP', 2),
-('LEAVE', '휴가 신청서', '휴가를 신청합니다.', 'LEV', 3);
+-- approval_template seeds already exist in V2__seed_initial_data.sql
+-- V5 only adds leave_type table and seeds

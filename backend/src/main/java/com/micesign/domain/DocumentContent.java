@@ -15,10 +15,12 @@ public class DocumentContent {
     @JoinColumn(name = "document_id", nullable = false, unique = true)
     private Document document;
 
-    @Column(name = "body_html", columnDefinition = "LONGTEXT")
+    @Lob
+    @Column(name = "body_html")
     private String bodyHtml;
 
-    @Column(name = "form_data", columnDefinition = "JSON")
+    @Lob
+    @Column(name = "form_data")
     private String formData;
 
     @Column(name = "created_at", nullable = false, updatable = false)
