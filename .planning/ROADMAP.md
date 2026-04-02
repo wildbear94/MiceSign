@@ -114,7 +114,7 @@ Plans:
   3. Document number (PREFIX-YYYY-NNNN) is assigned at submission with no duplicates under concurrent submissions
 **Plans:** 2 plans
 Plans:
-- [ ] 06-01-PLAN.md — Backend: DocSequence entity, pessimistic lock numbering, submit endpoint, immutability enforcement (403), Google Drive file move
+- [x] 06-01-PLAN.md — Backend: DocSequence entity, pessimistic lock numbering, submit endpoint, immutability enforcement (403), Google Drive file move
 - [ ] 06-02-PLAN.md — Frontend: submit button + confirmation dialog, useSubmitDocument hook, document number display in list/detail pages, checkpoint
 
 ### Phase 7: Approval Workflow

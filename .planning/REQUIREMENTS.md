@@ -29,11 +29,11 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 - [x] **DOC-01**: User can create a draft document by selecting a form template
 - [x] **DOC-02**: User can edit and delete their own draft documents
-- [ ] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
-- [ ] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
+- [x] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
+- [x] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
 - [x] **DOC-05**: User can view document detail page with full content, approval line status, and attachments
 - [x] **DOC-06**: User can view list of their drafted and submitted documents with status
-- [ ] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
+- [x] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
 
 ### Approval
 
@@ -136,11 +136,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-05 | Phase 1: Project Foundation | Complete |
 | DOC-01 | Phase 4: Document Core & Templates | Complete |
 | DOC-02 | Phase 4: Document Core & Templates | Complete |
-| DOC-03 | Phase 6: Document Submission & Numbering | Pending |
-| DOC-04 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-03 | Phase 6: Document Submission & Numbering | Complete |
+| DOC-04 | Phase 6: Document Submission & Numbering | Complete |
 | DOC-05 | Phase 4: Document Core & Templates | Complete |
 | DOC-06 | Phase 4: Document Core & Templates | Complete |
-| DOC-07 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-07 | Phase 6: Document Submission & Numbering | Complete |
 | APR-01 | Phase 7: Approval Workflow | Pending |
 | APR-02 | Phase 7: Approval Workflow | Pending |
 | APR-03 | Phase 7: Approval Workflow | Pending |
