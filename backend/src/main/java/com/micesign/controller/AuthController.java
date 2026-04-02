@@ -10,6 +10,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.time.Duration;
 
 @RestController
@@ -21,6 +23,9 @@ public class AuthController {
     private static final Duration REMEMBER_ME_DURATION = Duration.ofDays(14);
 
     private final AuthService authService;
+
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -42,7 +47,7 @@ public class AuthController {
         ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie
                 .from(REFRESH_TOKEN_COOKIE, result.rawRefreshToken())
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path(COOKIE_PATH);
 
@@ -72,7 +77,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from(REFRESH_TOKEN_COOKIE, result.rawRefreshToken())
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path(COOKIE_PATH)
                 .maxAge(REMEMBER_ME_DURATION)
@@ -92,7 +97,7 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from(REFRESH_TOKEN_COOKIE, "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(cookieSecure)
                 .sameSite("Strict")
                 .path(COOKIE_PATH)
                 .maxAge(0)

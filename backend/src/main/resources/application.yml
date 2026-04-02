@@ -23,6 +23,10 @@ jwt:
   access-token-ttl: 1800000      # 30 minutes in milliseconds
   refresh-token-ttl: 1209600000  # 14 days in milliseconds
 
+app:
+  cookie:
+    secure: ${COOKIE_SECURE:false}
+
 server:
   port: 8080
   servlet:

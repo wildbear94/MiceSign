@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -28,9 +28,15 @@ function DashboardPlaceholder() {
 
 function App() {
   const { setAuth, clearAuth } = useAuthStore();
+  const refreshCalled = useRef(false);
 
   // On app mount, attempt silent refresh per D-14
+  // useRef guard prevents StrictMode double-invocation from causing
+  // concurrent refresh token rotation race conditions
   useEffect(() => {
+    if (refreshCalled.current) return;
+    refreshCalled.current = true;
+
     apiClient
       .post<ApiResponse<RefreshResponse>>('/auth/refresh')
       .then((res) => {
