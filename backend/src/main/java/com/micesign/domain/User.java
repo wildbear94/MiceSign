@@ -28,8 +28,16 @@ public class User {
     @Column(name = "department_id", nullable = false)
     private Long departmentId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", insertable = false, updatable = false)
+    private Department department;
+
     @Column(name = "position_id")
     private Long positionId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_id", insertable = false, updatable = false)
+    private Position position;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
@@ -130,6 +138,14 @@ public class User {
 
     public void setPositionId(Long positionId) {
         this.positionId = positionId;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 
     public UserRole getRole() {
