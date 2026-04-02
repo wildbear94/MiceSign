@@ -69,6 +69,35 @@
     "approvalLine": "Approval Line (Coming in Phase 7)",
     "attachments": "Attachments (Coming in Phase 5)"
   },
+  "attachment": {
+    "title": "Attachments",
+    "dropZone": {
+      "text": "Drag and drop files here, or",
+      "browse": "browse",
+      "browseSuffix": " to upload",
+      "constraints": "Max 50MB per file, up to 10 files",
+      "dragOver": "Drop files to attach"
+    },
+    "status": {
+      "editor": "{{count}}/10 files, {{size}}/200MB used",
+      "readOnly": "{{count}} file(s), {{size}}",
+      "empty": "No attachments."
+    },
+    "action": {
+      "download": "Download",
+      "delete": "Delete file",
+      "complete": "Complete"
+    },
+    "error": {
+      "fileTooLarge": "File exceeds 50MB limit: {{filename}}",
+      "blockedExtension": "File type not allowed: .{{ext}}",
+      "maxFiles": "Maximum 10 files per document",
+      "maxTotalSize": "Total attachment size cannot exceed 200MB",
+      "uploadFailed": "File upload failed. Please try again.",
+      "downloadFailed": "File download failed. Please try again.",
+      "deleteFailed": "File deletion failed. Please try again."
+    }
+  },
   "validation": {
     "titleRequired": "Title is required",
     "bodyRequired": "Content is required",

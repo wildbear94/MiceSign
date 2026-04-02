@@ -90,3 +90,24 @@ export interface MyDocumentParams {
   size?: number;
   status?: DocumentStatus;
 }
+
+// === Attachment Types ===
+export interface AttachmentResponse {
+  id: number;
+  documentId: number;
+  originalName: string;
+  fileSize: number;
+  mimeType: string;
+  createdAt: string;
+}
+
+export type UploadStatus = 'pending' | 'uploading' | 'complete' | 'error';
+
+export interface FileUploadItem {
+  id: string;            // temporary client-side ID (crypto.randomUUID())
+  file: File;
+  status: UploadStatus;
+  progress: number;      // 0-100
+  error?: string;
+  attachment?: AttachmentResponse;  // populated after successful upload
+}

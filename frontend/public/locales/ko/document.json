@@ -69,6 +69,35 @@
     "approvalLine": "결재선 (Phase 7에서 구현 예정)",
     "attachments": "첨부파일 (Phase 5에서 구현 예정)"
   },
+  "attachment": {
+    "title": "첨부파일",
+    "dropZone": {
+      "text": "파일을 여기에 끌어다 놓거나",
+      "browse": "파일 찾기",
+      "browseSuffix": "를 클릭하세요",
+      "constraints": "최대 50MB, 10개 파일",
+      "dragOver": "놓아서 파일을 첨부하세요"
+    },
+    "status": {
+      "editor": "파일 {{count}}/10개, {{size}}/200MB 사용 중",
+      "readOnly": "파일 {{count}}개, {{size}}",
+      "empty": "첨부된 파일이 없습니다."
+    },
+    "action": {
+      "download": "다운로드",
+      "delete": "파일 삭제",
+      "complete": "완료"
+    },
+    "error": {
+      "fileTooLarge": "파일 크기가 50MB를 초과합니다: {{filename}}",
+      "blockedExtension": "허용되지 않는 파일 형식입니다: .{{ext}}",
+      "maxFiles": "문서당 첨부파일은 최대 10개입니다",
+      "maxTotalSize": "문서당 첨부파일 총 용량은 200MB를 초과할 수 없습니다",
+      "uploadFailed": "파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "downloadFailed": "파일 다운로드에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      "deleteFailed": "파일 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
+    }
+  },
   "validation": {
     "titleRequired": "제목을 입력해주세요",
     "bodyRequired": "내용을 입력해주세요",
