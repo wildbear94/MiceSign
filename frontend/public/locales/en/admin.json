@@ -1,0 +1,109 @@
+{
+  "departments": {
+    "title": "Department Management",
+    "addDepartment": "Add Department",
+    "addChild": "Add Sub-department",
+    "editDepartment": "Edit Department",
+    "departmentName": "Department Name",
+    "parentDepartment": "Parent Department",
+    "noParent": "None (Top-level)",
+    "members": "Members",
+    "memberCount": "{{count}} members",
+    "emptyTree": "No departments registered.",
+    "emptyMembers": "No members in this department.",
+    "showInactive": "Show Inactive",
+    "inactive": "Inactive",
+    "confirmDeactivate": "Deactivate {{name}} department?",
+    "confirmDeactivateDesc": "Deactivated departments will be excluded from selection lists."
+  },
+  "positions": {
+    "title": "Position Management",
+    "addPosition": "Add Position",
+    "editPosition": "Edit Position",
+    "positionName": "Position Name",
+    "userCount": "{{count}} users",
+    "emptyList": "No positions registered.",
+    "dragToReorder": "Drag to reorder",
+    "inactive": "Inactive",
+    "confirmDeactivate": "Deactivate {{name}} position?",
+    "confirmDeactivateDesc": "Deactivated positions will be excluded from selection lists.",
+    "blockDeactivate": "Cannot deactivate {{name}} position because it has active users."
+  },
+  "users": {
+    "title": "User Management",
+    "detail": "User Detail",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "employeeNo": "Employee No.",
+    "name": "Name",
+    "email": "Email",
+    "department": "Department",
+    "position": "Position",
+    "role": "Role",
+    "status": "Status",
+    "phone": "Phone",
+    "password": "Initial Password",
+    "lastLogin": "Last Login",
+    "createdAt": "Created At",
+    "noPosition": "None",
+    "search": "Search",
+    "searchPlaceholder": "Search by name, employee no., email",
+    "filterDepartment": "All Departments",
+    "filterRole": "All Roles",
+    "filterStatus": "All Statuses",
+    "emptyList": "No users registered.",
+    "emptySearch": "No results found.",
+    "confirmDeactivate": "Deactivate {{name}}?",
+    "confirmDeactivateDesc": "Deactivated users will not be able to log in.",
+    "roles": {
+      "SUPER_ADMIN": "Super Admin",
+      "ADMIN": "Admin",
+      "USER": "User"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "RETIRED": "Retired"
+    }
+  },
+  "sidebar": {
+    "departments": "Departments",
+    "positions": "Positions",
+    "users": "Users"
+  },
+  "common": {
+    "close": "Close",
+    "save": "Save Changes",
+    "create": "Add",
+    "deactivate": "Deactivate",
+    "edit": "Edit",
+    "cancelEdit": "Cancel Edit",
+    "confirm": "OK",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "totalCount": "Total {{count}} items"
+  },
+  "errors": {
+    "ORG_DUPLICATE_NAME": "This name already exists.",
+    "ORG_HAS_ACTIVE_USERS": "Cannot deactivate: has active users.",
+    "ORG_HAS_ACTIVE_CHILDREN": "Cannot deactivate: has active sub-departments.",
+    "ORG_CIRCULAR_REF": "Circular reference detected.",
+    "ORG_DEPTH_EXCEEDED": "Department hierarchy is limited to 3 levels.",
+    "ORG_LAST_SUPER_ADMIN": "At least one Super Admin is required.",
+    "ORG_SELF_DEACTIVATION": "Cannot deactivate yourself.",
+    "AUTH_FORBIDDEN": "Access denied.",
+    "ORG_NOT_FOUND": "Target not found.",
+    "NETWORK_ERROR": "Network error. Please try again."
+  },
+  "toast": {
+    "departmentCreated": "Department has been added.",
+    "departmentUpdated": "Department has been updated.",
+    "departmentDeactivated": "Department has been deactivated.",
+    "positionCreated": "Position has been added.",
+    "positionUpdated": "Position has been updated.",
+    "positionReordered": "Position order has been changed.",
+    "userCreated": "User has been added.",
+    "userUpdated": "User has been updated.",
+    "userDeactivated": "User has been deactivated."
+  }
+}

@@ -11,7 +11,7 @@ i18n
     fallbackLng: 'ko',
     supportedLngs: ['ko', 'en'],
     defaultNS: 'common',
-    ns: ['common', 'auth'],
+    ns: ['common', 'auth', 'admin'],
     interpolation: {
       escapeValue: false,
     },

@@ -1,0 +1,109 @@
+{
+  "departments": {
+    "title": "부서 관리",
+    "addDepartment": "부서 추가",
+    "addChild": "하위 부서 추가",
+    "editDepartment": "부서 수정",
+    "departmentName": "부서명",
+    "parentDepartment": "상위 부서",
+    "noParent": "없음 (최상위)",
+    "members": "소속 직원",
+    "memberCount": "{{count}}명",
+    "emptyTree": "등록된 부서가 없습니다.",
+    "emptyMembers": "소속 직원이 없습니다.",
+    "showInactive": "비활성 포함",
+    "inactive": "비활성",
+    "confirmDeactivate": "{{name}} 부서를 비활성화하시겠습니까?",
+    "confirmDeactivateDesc": "비활성화된 부서는 선택 목록에서 제외됩니다."
+  },
+  "positions": {
+    "title": "직급 관리",
+    "addPosition": "직급 추가",
+    "editPosition": "직급 수정",
+    "positionName": "직급명",
+    "userCount": "{{count}}명",
+    "emptyList": "등록된 직급이 없습니다.",
+    "dragToReorder": "드래그하여 순서 변경",
+    "inactive": "비활성",
+    "confirmDeactivate": "{{name}} 직급을 비활성화하시겠습니까?",
+    "confirmDeactivateDesc": "비활성화된 직급은 선택 목록에서 제외됩니다.",
+    "blockDeactivate": "{{name}} 직급에 활성 사용자가 있어 비활성화할 수 없습니다."
+  },
+  "users": {
+    "title": "사용자 관리",
+    "detail": "사용자 상세",
+    "addUser": "사용자 추가",
+    "editUser": "사용자 수정",
+    "employeeNo": "사번",
+    "name": "이름",
+    "email": "이메일",
+    "department": "부서",
+    "position": "직급",
+    "role": "권한",
+    "status": "상태",
+    "phone": "전화번호",
+    "password": "초기 비밀번호",
+    "lastLogin": "마지막 로그인",
+    "createdAt": "등록일",
+    "noPosition": "없음",
+    "search": "검색",
+    "searchPlaceholder": "이름, 사번, 이메일로 검색",
+    "filterDepartment": "부서 전체",
+    "filterRole": "권한 전체",
+    "filterStatus": "상태 전체",
+    "emptyList": "등록된 사용자가 없습니다.",
+    "emptySearch": "검색 결과가 없습니다.",
+    "confirmDeactivate": "{{name}}님을 비활성화하시겠습니까?",
+    "confirmDeactivateDesc": "비활성화된 사용자는 로그인할 수 없습니다.",
+    "roles": {
+      "SUPER_ADMIN": "최고 관리자",
+      "ADMIN": "관리자",
+      "USER": "일반 사용자"
+    },
+    "statuses": {
+      "ACTIVE": "활성",
+      "INACTIVE": "비활성",
+      "RETIRED": "퇴사"
+    }
+  },
+  "sidebar": {
+    "departments": "부서 관리",
+    "positions": "직급 관리",
+    "users": "사용자 관리"
+  },
+  "common": {
+    "close": "닫기",
+    "save": "변경사항 저장",
+    "create": "추가",
+    "deactivate": "비활성화",
+    "edit": "수정",
+    "cancelEdit": "수정 취소",
+    "confirm": "확인",
+    "cancel": "취소",
+    "reset": "초기화",
+    "totalCount": "전체 {{count}}건"
+  },
+  "errors": {
+    "ORG_DUPLICATE_NAME": "이미 존재하는 이름입니다.",
+    "ORG_HAS_ACTIVE_USERS": "활성 사용자가 있어 비활성화할 수 없습니다.",
+    "ORG_HAS_ACTIVE_CHILDREN": "활성 하위 부서가 있어 비활성화할 수 없습니다.",
+    "ORG_CIRCULAR_REF": "순환 참조가 발생합니다.",
+    "ORG_DEPTH_EXCEEDED": "부서 계층은 최대 3단계까지 가능합니다.",
+    "ORG_LAST_SUPER_ADMIN": "최소 1명의 최고 관리자가 필요합니다.",
+    "ORG_SELF_DEACTIVATION": "자기 자신을 비활성화할 수 없습니다.",
+    "AUTH_FORBIDDEN": "접근 권한이 없습니다.",
+    "ORG_NOT_FOUND": "대상을 찾을 수 없습니다.",
+    "NETWORK_ERROR": "네트워크 오류가 발생했습니다. 다시 시도해주세요."
+  },
+  "toast": {
+    "departmentCreated": "부서가 추가되었습니다.",
+    "departmentUpdated": "부서 정보가 수정되었습니다.",
+    "departmentDeactivated": "부서가 비활성화되었습니다.",
+    "positionCreated": "직급이 추가되었습니다.",
+    "positionUpdated": "직급 정보가 수정되었습니다.",
+    "positionReordered": "직급 순서가 변경되었습니다.",
+    "userCreated": "사용자가 추가되었습니다.",
+    "userUpdated": "사용자 정보가 수정되었습니다.",
+    "userDeactivated": "사용자가 비활성화되었습니다."
+  }
+}
