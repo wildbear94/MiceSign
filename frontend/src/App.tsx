@@ -9,24 +9,15 @@ import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
 import UserListPage from './features/admin/pages/UserListPage';
 import UserDetailPage from './features/admin/pages/UserDetailPage';
+import DocumentListPage from './features/document/pages/DocumentListPage';
+import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
+import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
 import apiClient from './api/client';
 import type { ApiResponse } from './types/api';
 import type { RefreshResponse } from './types/auth';
-
-function DocumentListPlaceholder() {
-  return <div className="text-center text-gray-500 py-12">Document List (Plan 03)</div>;
-}
-
-function DocumentEditorPlaceholder() {
-  return <div className="text-center text-gray-500 py-12">Document Editor (Plan 03)</div>;
-}
-
-function DocumentDetailPlaceholder() {
-  return <div className="text-center text-gray-500 py-12">Document Detail (Plan 03)</div>;
-}
 
 function App() {
   const { setAuth, clearAuth } = useAuthStore();
@@ -68,9 +59,9 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/documents/my" replace />} />
-          <Route path="/documents/my" element={<DocumentListPlaceholder />} />
-          <Route path="/documents/new/:templateCode" element={<DocumentEditorPlaceholder />} />
-          <Route path="/documents/:id" element={<DocumentDetailPlaceholder />} />
+          <Route path="/documents/my" element={<DocumentListPage />} />
+          <Route path="/documents/new/:templateCode" element={<DocumentEditorPage />} />
+          <Route path="/documents/:id" element={<DocumentDetailPage />} />
         </Route>
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
