@@ -70,7 +70,7 @@ Plans:
 - [x] 03-01-PLAN.md — Backend: JPA entities, repositories, DTOs, services, controllers, RBAC logic, integration tests
 - [x] 03-02-PLAN.md — Frontend infrastructure: types, API clients, hooks, admin layout/sidebar, routing, shared components
 - [x] 03-03-PLAN.md — Frontend department tree page + position drag-and-drop table page
-- [ ] 03-04-PLAN.md — Frontend user list/detail pages with Phase 2 integration, end-to-end verification
+- [x] 03-04-PLAN.md — Frontend user list/detail pages with Phase 2 integration, end-to-end verification
 **UI hint**: yes
 
 ### Phase 4: Document Core & Templates
