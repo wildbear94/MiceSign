@@ -112,7 +112,10 @@ Plans:
   1. User can submit a draft document, changing its status from DRAFT to SUBMITTED
   2. Submitted document body, attachments, and approval line are fully locked and cannot be modified
   3. Document number (PREFIX-YYYY-NNNN) is assigned at submission with no duplicates under concurrent submissions
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — Backend: DocSequence entity, pessimistic lock numbering, submit endpoint, immutability enforcement (403), Google Drive file move
+- [ ] 06-02-PLAN.md — Frontend: submit button + confirmation dialog, useSubmitDocument hook, document number display in list/detail pages, checkpoint
 
 ### Phase 7: Approval Workflow
 **Goal**: Users can build approval lines, process approvals sequentially, and handle rejections, withdrawals, and resubmissions
@@ -151,6 +154,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. Organization Management | 2/4 | In Progress|  |
 | 4. Document Core & Templates | 0/3 | Planning complete | - |
 | 5. File Attachments | 0/3 | Planning complete | - |
-| 6. Document Submission & Numbering | 0/TBD | Not started | - |
+| 6. Document Submission & Numbering | 0/2 | Planning complete | - |
 | 7. Approval Workflow | 0/TBD | Not started | - |
 | 8. Dashboard & Audit | 0/TBD | Not started | - |
