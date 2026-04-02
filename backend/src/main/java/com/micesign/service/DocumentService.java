@@ -1,15 +1,19 @@
 package com.micesign.service;
 
 import com.micesign.common.exception.BusinessException;
+import com.micesign.domain.ApprovalLine;
 import com.micesign.domain.ApprovalTemplate;
 import com.micesign.domain.DocSequence;
 import com.micesign.domain.Document;
 import com.micesign.domain.DocumentContent;
 import com.micesign.domain.User;
+import com.micesign.domain.DocumentAttachment;
+import com.micesign.domain.enums.ApprovalLineStatus;
+import com.micesign.domain.enums.ApprovalLineType;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
 import com.micesign.mapper.DocumentMapper;
-import com.micesign.domain.DocumentAttachment;
+import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
 import com.micesign.repository.DocSequenceRepository;
 import com.micesign.repository.DocumentAttachmentRepository;
@@ -24,8 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +41,7 @@ public class DocumentService {
     private final DocumentContentRepository documentContentRepository;
     private final DocumentAttachmentRepository attachmentRepository;
     private final ApprovalTemplateRepository approvalTemplateRepository;
+    private final ApprovalLineRepository approvalLineRepository;
     private final DocSequenceRepository docSequenceRepository;
     private final UserRepository userRepository;
     private final DocumentFormValidator formValidator;
@@ -48,6 +52,7 @@ public class DocumentService {
                            DocumentContentRepository documentContentRepository,
                            DocumentAttachmentRepository attachmentRepository,
                            ApprovalTemplateRepository approvalTemplateRepository,
+                           ApprovalLineRepository approvalLineRepository,
                            DocSequenceRepository docSequenceRepository,
                            UserRepository userRepository,
                            DocumentFormValidator formValidator,
@@ -57,6 +62,7 @@ public class DocumentService {
         this.documentContentRepository = documentContentRepository;
         this.attachmentRepository = attachmentRepository;
         this.approvalTemplateRepository = approvalTemplateRepository;
+        this.approvalLineRepository = approvalLineRepository;
         this.docSequenceRepository = docSequenceRepository;
         this.userRepository = userRepository;
         this.formValidator = formValidator;
@@ -91,6 +97,11 @@ public class DocumentService {
         content.setFormData(req.formData());
         documentContentRepository.save(content);
 
+        // Save approval lines if provided
+        if (req.approvalLines() != null && !req.approvalLines().isEmpty()) {
+            saveApprovalLines(document, req.approvalLines());
+        }
+
         return documentMapper.toResponse(document, template.getName());
     }
 
@@ -111,6 +122,14 @@ public class DocumentService {
         content.setFormData(req.formData());
         documentContentRepository.save(content);
 
+        // Update approval lines if provided (delete all, re-insert)
+        if (req.approvalLines() != null) {
+            approvalLineRepository.deleteByDocumentId(documentId);
+            if (!req.approvalLines().isEmpty()) {
+                saveApprovalLines(document, req.approvalLines());
+            }
+        }
+
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);
     }
@@ -118,7 +137,10 @@ public class DocumentService {
     public void deleteDocument(Long userId, Long documentId) {
         Document document = loadAndVerifyOwnerDraft(userId, documentId);
 
-        // Delete content first, then document
+        // Delete approval lines first
+        approvalLineRepository.deleteByDocumentId(documentId);
+
+        // Delete content, then document
         documentContentRepository.findByDocumentId(documentId)
                 .ifPresent(documentContentRepository::delete);
         documentRepository.delete(document);
@@ -132,6 +154,14 @@ public class DocumentService {
                 .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
         formValidator.validate(document.getTemplateCode(), content.getBodyHtml(), content.getFormData());
 
+        // Validate at least 1 APPROVE type exists (per D-05)
+        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(documentId);
+        boolean hasApprover = approvalLines.stream()
+                .anyMatch(line -> line.getLineType() == ApprovalLineType.APPROVE);
+        if (!hasApprover) {
+            throw new BusinessException("APR_NO_APPROVER", "최소 1명의 승인자(승인 유형)를 추가해주세요.");
+        }
+
         // Generate document number
         String docNumber = generateDocNumber(document.getTemplateCode());
 
@@ -139,6 +169,7 @@ public class DocumentService {
         document.setDocNumber(docNumber);
         document.setStatus(DocumentStatus.SUBMITTED);
         document.setSubmittedAt(LocalDateTime.now());
+        document.setCurrentStep(1); // First sequential step
         documentRepository.save(document);
 
         // Move attachments from draft folder to permanent folder
@@ -171,19 +202,66 @@ public class DocumentService {
         Document document = documentRepository.findById(documentId)
                 .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다."));
 
-        // For now, only drafter can view
-        if (!document.getDrafter().getId().equals(userId)) {
+        // Access control: drafter or approval line participant
+        boolean isDrafter = document.getDrafter().getId().equals(userId);
+        boolean isApprovalParticipant = approvalLineRepository.existsByDocumentIdAndApproverId(documentId, userId);
+        if (!isDrafter && !isApprovalParticipant) {
             throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 조회할 수 있습니다.");
         }
 
         DocumentContent content = documentContentRepository.findByDocumentId(documentId)
                 .orElse(null);
 
+        // Load and map approval lines
+        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(documentId);
+        List<ApprovalLineResponse> approvalLineResponses = approvalLines.stream()
+                .map(documentMapper::toApprovalLineResponse)
+                .toList();
+
         String templateName = getTemplateName(document.getTemplateCode());
-        return documentMapper.toDetailResponse(document, content, templateName);
+        return documentMapper.toDetailResponse(document, content, templateName, approvalLineResponses);
     }
 
     // --- Private helpers ---
+
+    private void saveApprovalLines(Document document, List<ApprovalLineRequest> requests) {
+        // Validate: no self-addition (per D-06)
+        for (ApprovalLineRequest req : requests) {
+            if (req.approverId().equals(document.getDrafter().getId())) {
+                throw new BusinessException("APR_SELF_NOT_ALLOWED", "본인은 결재선에 추가할 수 없습니다.");
+            }
+        }
+
+        // Validate: no duplicates (per D-07)
+        Set<Long> approverIds = new HashSet<>();
+        for (ApprovalLineRequest req : requests) {
+            if (!approverIds.add(req.approverId())) {
+                throw new BusinessException("APR_DUPLICATE", "이미 추가된 사용자입니다.");
+            }
+        }
+
+        // Compute step_order server-side (per D-08)
+        // REFERENCE always gets 0, APPROVE/AGREE get sequential 1, 2, 3...
+        int sequentialStep = 1;
+        for (ApprovalLineRequest req : requests) {
+            ApprovalLine line = new ApprovalLine();
+            line.setDocument(document);
+
+            User approver = userRepository.findById(req.approverId())
+                    .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "결재자를 찾을 수 없습니다."));
+            line.setApprover(approver);
+            line.setLineType(req.lineType());
+            line.setStatus(ApprovalLineStatus.PENDING);
+
+            if (req.lineType() == ApprovalLineType.REFERENCE) {
+                line.setStepOrder(0);
+            } else {
+                line.setStepOrder(sequentialStep++);
+            }
+
+            approvalLineRepository.save(line);
+        }
+    }
 
     private Document loadAndVerifyOwnerDraft(Long userId, Long documentId) {
         Document document = documentRepository.findById(documentId)

@@ -1,6 +1,7 @@
 package com.micesign.dto.document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record DocumentDetailResponse(
     Long id,
@@ -12,6 +13,9 @@ public record DocumentDetailResponse(
     DrafterInfo drafter,
     String bodyHtml,
     String formData,
+    List<ApprovalLineResponse> approvalLines,
+    Long sourceDocId,
+    Integer currentStep,
     LocalDateTime submittedAt,
     LocalDateTime completedAt,
     LocalDateTime createdAt,
