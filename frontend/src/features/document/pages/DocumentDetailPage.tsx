@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
+import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
@@ -116,10 +117,12 @@ export default function DocumentDetailPage() {
         {t('placeholder.approvalLine')}
       </div>
 
-      {/* Attachments placeholder */}
-      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
-        {t('placeholder.attachments')}
-      </div>
+      {/* File Attachments */}
+      <FileAttachmentArea
+        documentId={doc.id}
+        documentStatus={doc.status}
+        readOnly={true}
+      />
     </div>
   );
 }

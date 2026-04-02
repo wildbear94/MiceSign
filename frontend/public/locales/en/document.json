@@ -71,6 +71,7 @@
   },
   "attachment": {
     "title": "Attachments",
+    "saveFirst": "Save the document first to attach files.",
     "dropZone": {
       "text": "Drag and drop files here, or",
       "browse": "browse",

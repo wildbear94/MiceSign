@@ -71,6 +71,7 @@
   },
   "attachment": {
     "title": "첨부파일",
+    "saveFirst": "문서를 저장한 후 파일을 첨부할 수 있습니다.",
     "dropZone": {
       "text": "파일을 여기에 끌어다 놓거나",
       "browse": "파일 찾기",
