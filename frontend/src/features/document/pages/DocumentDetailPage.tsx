@@ -83,7 +83,9 @@ export default function DocumentDetailPage() {
           </div>
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">문서번호</span>
-            <span className="text-gray-900 dark:text-gray-50">{doc.docNumber ?? '-'}</span>
+            <span className={doc.docNumber ? 'font-mono text-base font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'}>
+              {doc.docNumber ?? t('docNumber.draft')}
+            </span>
           </div>
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">작성일</span>
