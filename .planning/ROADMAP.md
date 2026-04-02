@@ -87,7 +87,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md — Backend: V5 migration, JPA entities, DTOs, services, controllers, document CRUD API with form validation, integration tests
 - [x] 04-02-PLAN.md — Frontend infrastructure: Tiptap/date-fns deps, TypeScript types, API clients, hooks, Zod schemas, MainLayout/navbar, routing
-- [ ] 04-03-PLAN.md — Frontend UI: Tiptap editor, 3 template forms (edit + read-only), template selection modal, document list/editor/detail pages, checkpoint
+- [x] 04-03-PLAN.md — Frontend UI: Tiptap editor, 3 template forms (edit + read-only), template selection modal, document list/editor/detail pages, checkpoint
 **UI hint**: yes
 
 ### Phase 5: File Attachments

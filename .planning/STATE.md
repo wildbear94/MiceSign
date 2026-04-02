@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-02T04:21:46.517Z"
+status: verifying
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-04-02T04:57:14.144Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 8
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 14
+  completed_plans: 15
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 
 Phase: 04 (document-core-templates) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P04 | 6min | 2 tasks | 6 files |
 | Phase 04 P01 | 4min | 3 tasks | 34 files |
 | Phase 04-02 P02 | 4min | 3 tasks | 21 files |
+| Phase 04 P03 | 15min | 3 tasks | 21 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Recent decisions affecting current work:
 - [Phase 03]: Phone field z.string().max(20) without .default() to avoid zod v4 type inference issues with react-hook-form
 - [Phase 04]: Used @Lob instead of columnDefinition for DocumentContent body_html/form_data for H2 test compatibility
 - [Phase 04-02]: Root / redirects to /documents/my as primary user view
+- [Phase 04]: Controller pattern for TiptapEditor + react-hook-form sync
+- [Phase 04]: columnDefinition LONGTEXT/JSON instead of @Lob for MariaDB compatibility
+- [Phase 04]: ddl-auto: none for tests — Flyway handles schema, H2 cannot validate MariaDB columnDefinition
 
 ### Pending Todos
 
@@ -116,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T04:21:46.515Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-02T04:57:14.142Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
