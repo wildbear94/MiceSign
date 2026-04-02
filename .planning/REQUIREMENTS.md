@@ -37,7 +37,7 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Approval
 
-- [ ] **APR-01**: User can build an approval line selecting approvers from org tree (APPROVE, AGREE, REFERENCE types)
+- [x] **APR-01**: User can build an approval line selecting approvers from org tree (APPROVE, AGREE, REFERENCE types)
 - [x] **APR-02**: APPROVE and AGREE types are processed sequentially by step_order; REFERENCE gets immediate read access
 - [x] **APR-03**: Approver can approve or reject a document with an optional comment
 - [x] **APR-04**: Rejection by any approver immediately sets document status to REJECTED
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC-05 | Phase 4: Document Core & Templates | Complete |
 | DOC-06 | Phase 4: Document Core & Templates | Complete |
 | DOC-07 | Phase 6: Document Submission & Numbering | Pending |
-| APR-01 | Phase 7: Approval Workflow | Pending |
+| APR-01 | Phase 7: Approval Workflow | Complete |
 | APR-02 | Phase 7: Approval Workflow | Complete |
 | APR-03 | Phase 7: Approval Workflow | Complete |
 | APR-04 | Phase 7: Approval Workflow | Complete |
