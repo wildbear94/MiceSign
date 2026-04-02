@@ -6,6 +6,7 @@ import ForcePasswordChangeGuard from './components/ForcePasswordChangeGuard';
 import AdminLayout from './features/admin/components/AdminLayout';
 import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
+import UserListPage from './features/admin/pages/UserListPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
@@ -65,7 +66,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="departments" element={<DepartmentPage />} />
             <Route path="positions" element={<PositionPage />} />
-            <Route path="users" element={<AdminPlaceholder />} />
+            <Route path="users" element={<UserListPage />} />
             <Route path="users/:id" element={<AdminPlaceholder />} />
           </Route>
         </Route>
