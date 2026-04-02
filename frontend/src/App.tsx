@@ -1,13 +1,19 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import ForcePasswordChangeGuard from './components/ForcePasswordChangeGuard';
+import AdminLayout from './features/admin/components/AdminLayout';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
 import apiClient from './api/client';
 import type { ApiResponse } from './types/api';
 import type { RefreshResponse } from './types/auth';
+
+function AdminPlaceholder() {
+  return <div className="text-gray-500">Loading...</div>;
+}
 
 function DashboardPlaceholder() {
   return (
@@ -53,6 +59,14 @@ function App() {
       />
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<DashboardPlaceholder />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="departments" element={<AdminPlaceholder />} />
+            <Route path="positions" element={<AdminPlaceholder />} />
+            <Route path="users" element={<AdminPlaceholder />} />
+            <Route path="users/:id" element={<AdminPlaceholder />} />
+          </Route>
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
