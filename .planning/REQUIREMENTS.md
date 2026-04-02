@@ -19,10 +19,10 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Organization
 
-- [ ] **ORG-01**: Admin can create, edit, and deactivate departments (hierarchical structure)
-- [ ] **ORG-02**: Admin can create, edit, and deactivate positions (with sort order)
-- [ ] **ORG-03**: Admin can create and manage user accounts (employee no, name, email, department, position, role, status)
-- [ ] **ORG-04**: System enforces RBAC with three roles: SUPER_ADMIN (full access), ADMIN (org/template management + own dept docs), USER (draft and approve)
+- [x] **ORG-01**: Admin can create, edit, and deactivate departments (hierarchical structure)
+- [x] **ORG-02**: Admin can create, edit, and deactivate positions (with sort order)
+- [x] **ORG-03**: Admin can create and manage user accounts (employee no, name, email, department, position, role, status)
+- [x] **ORG-04**: System enforces RBAC with three roles: SUPER_ADMIN (full access), ADMIN (org/template management + own dept docs), USER (draft and approve)
 - [x] **ORG-05**: Initial data seeding on first run (default departments, positions, SUPER_ADMIN account)
 
 ### Document
@@ -129,10 +129,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-05 | Phase 2: Authentication | Complete |
 | AUTH-06 | Phase 2: Authentication | Complete |
 | AUTH-07 | Phase 2: Authentication | Complete |
-| ORG-01 | Phase 3: Organization Management | Pending |
-| ORG-02 | Phase 3: Organization Management | Pending |
-| ORG-03 | Phase 3: Organization Management | Pending |
-| ORG-04 | Phase 3: Organization Management | Pending |
+| ORG-01 | Phase 3: Organization Management | Complete |
+| ORG-02 | Phase 3: Organization Management | Complete |
+| ORG-03 | Phase 3: Organization Management | Complete |
+| ORG-04 | Phase 3: Organization Management | Complete |
 | ORG-05 | Phase 1: Project Foundation | Complete |
 | DOC-01 | Phase 4: Document Core & Templates | Pending |
 | DOC-02 | Phase 4: Document Core & Templates | Pending |
