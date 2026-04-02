@@ -21,38 +21,44 @@ CREATE TABLE department (
 -- ============================================
 -- 직급
 -- ============================================
-CREATE TABLE position (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name        VARCHAR(50) NOT NULL COMMENT '직급명',
-    sort_order  INT NOT NULL COMMENT '서열 순서 (낮을수록 하위)',
-    is_active   BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='직급';
+CREATE TABLE `position`
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(50) NOT NULL COMMENT '직급명',
+    sort_order INT         NOT NULL COMMENT '서열 순서 (낮을수록 하위)',
+    is_active  BOOLEAN     NOT NULL DEFAULT TRUE,
+    created_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT ='직급';
 
 -- ============================================
 -- 사용자
 -- ============================================
-CREATE TABLE `user` (
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    employee_no     VARCHAR(20) NOT NULL UNIQUE COMMENT '사번',
-    name            VARCHAR(50) NOT NULL COMMENT '이름',
-    email           VARCHAR(150) NOT NULL UNIQUE COMMENT '이메일 (로그인 ID)',
-    password        VARCHAR(255) NOT NULL COMMENT 'BCrypt 해시',
-    department_id   BIGINT NOT NULL,
-    position_id     BIGINT NOT NULL,
-    role            ENUM('SUPER_ADMIN','ADMIN','USER') NOT NULL DEFAULT 'USER',
-    status          ENUM('ACTIVE','INACTIVE','RETIRED') NOT NULL DEFAULT 'ACTIVE',
-    phone           VARCHAR(20) NULL,
-    profile_image   VARCHAR(500) NULL COMMENT '프로필 이미지 URL',
-    last_login_at   DATETIME NULL,
-    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (department_id) REFERENCES department(id),
-    FOREIGN KEY (position_id) REFERENCES position(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='사용자';
+CREATE TABLE `user`
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    employee_no   VARCHAR(20)                          NOT NULL UNIQUE COMMENT '사번',
+    name          VARCHAR(50)                          NOT NULL COMMENT '이름',
+    email         VARCHAR(150)                         NOT NULL UNIQUE COMMENT '이메일 (로그인 ID)',
+    password      VARCHAR(255)                         NOT NULL COMMENT 'BCrypt 해시',
+    department_id BIGINT                               NOT NULL,
+    position_id   BIGINT                               NULL,
+    role          ENUM ('SUPER_ADMIN','ADMIN','USER')  NOT NULL DEFAULT 'USER',
+    status        ENUM ('ACTIVE','INACTIVE','RETIRED') NOT NULL DEFAULT 'ACTIVE',
+    phone         VARCHAR(20)                          NULL,
+    profile_image VARCHAR(500)                         NULL COMMENT '프로필 이미지 URL',
+    last_login_at DATETIME                             NULL,
+    created_at    DATETIME                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME                             NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (department_id) REFERENCES department (id) ON DELETE CASCADE,
+    FOREIGN KEY (position_id) REFERENCES `position` (id) ON DELETE SET NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT ='사용자';
 
 -- ============================================
 -- 결재 양식 마스터
@@ -85,28 +91,31 @@ CREATE TABLE doc_sequence (
 -- ============================================
 -- 결재 문서 (메인)
 -- ============================================
-CREATE TABLE document (
-    id              BIGINT AUTO_INCREMENT PRIMARY KEY,
-    doc_number      VARCHAR(30) NULL UNIQUE COMMENT '문서번호 (상신 시 채번, DRAFT는 NULL)',
-    template_code   VARCHAR(20) NOT NULL COMMENT '양식 코드',
-    title           VARCHAR(300) NOT NULL COMMENT '문서 제목',
-    drafter_id      BIGINT NOT NULL COMMENT '기안자 ID',
-    status          ENUM('DRAFT','SUBMITTED','APPROVED','REJECTED','WITHDRAWN')
-                    NOT NULL DEFAULT 'DRAFT',
-    current_step    INT NULL COMMENT '현재 결재 단계 (step_order)',
-    submitted_at    DATETIME NULL COMMENT '상신 일시',
-    completed_at    DATETIME NULL COMMENT '최종 처리 일시 (승인/반려/회수)',
-    source_doc_id   BIGINT NULL COMMENT '재기안 원본 문서 ID (추적용)',
-    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (drafter_id) REFERENCES `user`(id),
-    FOREIGN KEY (source_doc_id) REFERENCES document(id),
+CREATE TABLE document
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    doc_number    VARCHAR(30)  NULL UNIQUE COMMENT '문서번호 (상신 시 채번, DRAFT는 NULL)',
+    template_code VARCHAR(20)  NOT NULL COMMENT '양식 코드',
+    title         VARCHAR(300) NOT NULL COMMENT '문서 제목',
+    drafter_id    BIGINT       NOT NULL COMMENT '기안자 ID',
+    status        ENUM ('DRAFT','SUBMITTED','APPROVED','REJECTED','WITHDRAWN')
+                               NOT NULL DEFAULT 'DRAFT',
+    current_step  INT          NULL COMMENT '현재 결재 단계 (step_order)',
+    submitted_at  DATETIME     NULL COMMENT '상신 일시',
+    completed_at  DATETIME     NULL COMMENT '최종 처리 일시 (승인/반려/회수)',
+    source_doc_id BIGINT       NULL COMMENT '재기안 원본 문서 ID (추적용)',
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (drafter_id) REFERENCES `user` (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (source_doc_id) REFERENCES document (id) ON DELETE SET NULL ON UPDATE CASCADE,
     INDEX idx_drafter_status (drafter_id, status),
     INDEX idx_status (status),
     INDEX idx_template_code (template_code),
     INDEX idx_submitted_at (submitted_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='결재 문서';
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci
+    COMMENT ='결재 문서';
 
 -- ============================================
 -- 문서 본문 / 양식별 데이터
@@ -209,10 +218,12 @@ CREATE TABLE refresh_token (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id         BIGINT NOT NULL,
     token_hash      VARCHAR(255) NOT NULL UNIQUE COMMENT 'SHA-256 해시',
+    position_id BIGINT NULL, -- NOT NULL -> NULL로 변경
     device_info     VARCHAR(500) NULL COMMENT '디바이스 정보',
     expires_at      DATETIME NOT NULL,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES `user`(id),
+    FOREIGN KEY (position_id) REFERENCES `position` (id) ON DELETE SET NULL,
     INDEX idx_user (user_id),
     INDEX idx_expires (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
