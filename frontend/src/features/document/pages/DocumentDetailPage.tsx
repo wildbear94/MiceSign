@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate, Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
@@ -7,12 +7,16 @@ import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
+import ApprovalStatusDisplay from '../components/approval/ApprovalStatusDisplay';
+import ApprovalActionBar from '../components/approval/ApprovalActionBar';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default function DocumentDetailPage() {
   const { t } = useTranslation('document');
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const documentId = id ? Number(id) : null;
+  const { user } = useAuthStore();
 
   const { data: doc, isLoading } = useDocumentDetail(documentId);
 
@@ -62,6 +66,11 @@ export default function DocumentDetailPage() {
         {t('backToList')}
       </button>
 
+      {/* Approval action bar - between back-link and meta info */}
+      {doc.status !== 'DRAFT' && doc.approvalLines?.length > 0 && user && (
+        <ApprovalActionBar document={doc} currentUserId={user.id} />
+      )}
+
       {/* Meta info section */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-3">
@@ -98,6 +107,23 @@ export default function DocumentDetailPage() {
               <span className="text-gray-900 dark:text-gray-50">{formatDate(doc.submittedAt)}</span>
             </div>
           )}
+          {doc.completedAt && (
+            <div>
+              <span className="text-gray-500 dark:text-gray-400 block mb-0.5">완료일시</span>
+              <span className="text-gray-900 dark:text-gray-50">{formatDate(doc.completedAt)}</span>
+            </div>
+          )}
+          {doc.sourceDocId && (
+            <div>
+              <span className="text-gray-500 dark:text-gray-400 block mb-0.5">원본 문서</span>
+              <Link
+                to={`/documents/${doc.sourceDocId}`}
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+              >
+                #{doc.sourceDocId}
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
@@ -114,10 +140,15 @@ export default function DocumentDetailPage() {
         )}
       </div>
 
-      {/* Approval line placeholder */}
-      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400 mb-4">
-        {t('placeholder.approvalLine')}
-      </div>
+      {/* Approval status display */}
+      {doc.approvalLines && doc.approvalLines.length > 0 && (
+        <div className="mb-6">
+          <ApprovalStatusDisplay
+            approvalLines={doc.approvalLines}
+            currentStep={doc.currentStep}
+          />
+        </div>
+      )}
 
       {/* File Attachments */}
       <FileAttachmentArea
