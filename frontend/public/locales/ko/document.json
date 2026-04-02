@@ -27,11 +27,29 @@
     "message": "이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없습니다.",
     "confirm": "문서 삭제"
   },
+  "submit": {
+    "button": "제출",
+    "confirm": {
+      "title": "문서 제출",
+      "message": "제출 후에는 문서를 수정하거나 삭제할 수 없습니다. 제출하시겠습니까?",
+      "confirm": "제출"
+    },
+    "validation": {
+      "title": "제출할 수 없습니다",
+      "message": "다음 항목을 확인해주세요:"
+    },
+    "error": "문서 제출에 실패했습니다. 잠시 후 다시 시도해주세요."
+  },
   "columns": {
     "title": "제목",
+    "docNumber": "문서번호",
     "template": "양식",
     "status": "상태",
     "createdAt": "작성일"
+  },
+  "docNumber": {
+    "draft": "-",
+    "notAssigned": "미발급"
   },
   "status": {
     "DRAFT": "임시저장",

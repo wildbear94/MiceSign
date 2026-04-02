@@ -1,15 +1,17 @@
 import { useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft, Trash2, SendHorizonal } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
+import SubmitConfirmDialog from '../components/SubmitConfirmDialog';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import {
   useDocumentDetail,
   useCreateDocument,
   useUpdateDocument,
   useDeleteDocument,
+  useSubmitDocument,
 } from '../hooks/useDocuments';
 import { useAutoSave } from '../hooks/useAutoSave';
 
@@ -27,6 +29,8 @@ export default function DocumentEditorPage() {
   // Track the saved document ID (starts null for new, set after first save)
   const [savedDocId, setSavedDocId] = useState<number | null>(documentId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [submitValidationErrors, setSubmitValidationErrors] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // For new docs, use templateCode from URL; for edits, from loaded document
@@ -36,6 +40,7 @@ export default function DocumentEditorPage() {
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();
+  const submitMutation = useSubmitDocument();
 
   // Store the latest form data for auto-save
   const formDataRef = useRef<{
@@ -101,6 +106,55 @@ export default function DocumentEditorPage() {
     }
   }, []);
 
+  const handleSubmitClick = useCallback(() => {
+    if (!savedDocId) return;
+
+    const errors: string[] = [];
+    const { title, formData: formDataStr } = formDataRef.current;
+
+    // Title validation (all templates)
+    if (!title || title.trim() === '') {
+      errors.push(t('validation.titleRequired'));
+    }
+
+    // Template-specific validation
+    if (resolvedTemplateCode === 'EXPENSE' && formDataStr) {
+      try {
+        const parsed = JSON.parse(formDataStr);
+        if (!parsed.items || parsed.items.length === 0) {
+          errors.push(t('validation.expenseItemRequired'));
+        }
+      } catch {
+        // Invalid JSON — skip expense validation
+      }
+    }
+
+    if (resolvedTemplateCode === 'LEAVE' && formDataStr) {
+      try {
+        const parsed = JSON.parse(formDataStr);
+        if (!parsed.leaveTypeId) errors.push(t('validation.leaveTypeRequired'));
+        if (!parsed.startDate) errors.push(t('validation.dateRangeRequired'));
+        if (!parsed.days || parsed.days <= 0) errors.push(t('validation.dateRangeRequired'));
+        if (!parsed.reason || parsed.reason.trim() === '') errors.push(t('validation.reasonRequired'));
+      } catch {
+        // Invalid JSON — skip leave validation
+      }
+    }
+
+    setSubmitValidationErrors(errors);
+    setShowSubmitConfirm(true);
+  }, [savedDocId, resolvedTemplateCode, t]);
+
+  const handleSubmitConfirm = useCallback(async () => {
+    if (!savedDocId) return;
+    try {
+      await submitMutation.mutateAsync(savedDocId);
+      navigate(`/documents/${savedDocId}`);
+    } catch {
+      setErrorMessage(t('submit.error'));
+    }
+  }, [savedDocId, submitMutation, navigate, t]);
+
   const handleDelete = useCallback(async () => {
     if (!savedDocId) return;
     try {
@@ -159,6 +213,15 @@ export default function DocumentEditorPage() {
           >
             {t('save')}
           </button>
+          <button
+            type="button"
+            onClick={handleSubmitClick}
+            disabled={!savedDocId || autoSaveStatus === 'saving' || submitMutation.isPending}
+            className="inline-flex items-center gap-2 h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <SendHorizonal className="h-4 w-4" />
+            {t('submit.button')}
+          </button>
           {savedDocId && (
             <button
               type="button"
@@ -208,6 +271,15 @@ export default function DocumentEditorPage() {
         confirmLabel={t('deleteConfirm.confirm')}
         confirmVariant="danger"
         isLoading={deleteMutation.isPending}
+      />
+
+      {/* Submit confirmation */}
+      <SubmitConfirmDialog
+        open={showSubmitConfirm}
+        onClose={() => setShowSubmitConfirm(false)}
+        onConfirm={handleSubmitConfirm}
+        isLoading={submitMutation.isPending}
+        validationErrors={submitValidationErrors}
       />
     </div>
   );
