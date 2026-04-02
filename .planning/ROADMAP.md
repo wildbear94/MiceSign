@@ -98,7 +98,11 @@ Plans:
   1. User can upload files that are stored in Google Drive via Service Account
   2. User can download attachments only if they are an authorized viewer of the document
   3. System rejects uploads exceeding 50MB per file, 10 files per document, or 200MB total, and blocks disallowed extensions
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
+- [ ] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
+- [ ] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
 
 ### Phase 6: Document Submission & Numbering
 **Goal**: Users can submit drafts, triggering immutable locking and document number assignment with race-condition protection
@@ -146,7 +150,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Authentication | 0/4 | Planning complete | - |
 | 3. Organization Management | 2/4 | In Progress|  |
 | 4. Document Core & Templates | 0/3 | Planning complete | - |
-| 5. File Attachments | 0/TBD | Not started | - |
+| 5. File Attachments | 0/3 | Planning complete | - |
 | 6. Document Submission & Numbering | 0/TBD | Not started | - |
 | 7. Approval Workflow | 0/TBD | Not started | - |
 | 8. Dashboard & Audit | 0/TBD | Not started | - |
