@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-04-02T13:31:24.101Z"
+stopped_at: Completed 07-03-PLAN.md
+last_updated: "2026-04-02T13:38:01.900Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 25
-  completed_plans: 22
+  completed_phases: 4
+  total_plans: 18
+  completed_plans: 17
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 07 — approval-workflow
+**Current focus:** Phase 05 — file-attachments
 
 ## Current Position
 
-Phase: 07 (approval-workflow) — EXECUTING
-Plan: 2 of 5
+Phase: 05 (file-attachments) — EXECUTING
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-02
 
@@ -68,11 +68,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04-02 P02 | 4min | 3 tasks | 21 files |
 | Phase 04 P03 | 15min | 3 tasks | 21 files |
 | Phase 05 P01 | 8min | 2 tasks | 11 files |
-| Phase 05 P02 | 7min | 2 tasks | 11 files |
-| Phase 05 P03 | 5min | 2 tasks | 6 files |
-| Phase 06 P01 | 5min | 2 tasks | 10 files |
-| Phase 06 P02 | 3min | 2 tasks | 7 files |
-| Phase 07 P02 | 4min | 2 tasks | 4 files |
+| Phase 07 P03 | 4min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -116,17 +112,8 @@ Recent decisions affecting current work:
 - [Phase 04]: ddl-auto: none for tests — Flyway handles schema, H2 cannot validate MariaDB columnDefinition
 - [Phase 05]: @MockitoBean GoogleDriveService pattern for integration tests without real Drive credentials
 - [Phase 05]: RFC 5987 Content-Disposition encoding for Korean filenames in download responses
-- [Phase 05]: Sequential upload processing (one at a time) for predictable progress UX
-- [Phase 05]: Show save-first message for unsaved documents instead of empty attachment area
-- [Phase 06]: Pessimistic locking (PESSIMISTIC_WRITE) for doc_sequence sequential numbering
-- [Phase 06]: BusinessException httpStatus field backward-compatible (2-arg defaults to 400, 3-arg for custom)
-- [Phase 06]: Google Drive file move failure gracefully handled (logged, not thrown) on submit
-- [Phase 06]: SubmitConfirmDialog reuses ConfirmDialog pattern with conditional validation error display
-- [Phase 07]: Server-side step_order computation: REFERENCE=0, APPROVE/AGREE sequential 1,2,3
-- [Phase 07]: Pessimistic locking on ApprovalLine during approve/reject to prevent concurrent processing
-- [Phase 07]: Remaining PENDING lines stay PENDING on rejection (not SKIPPED) per FSD
-- [Phase 07]: DocumentMapper 4-arg toDetailResponse to pass approval line data and currentStep
-- [Phase 07]: Withdrawal allowed after prior steps approved if current step PENDING (matches D-21 business rule)
+- [Phase 07]: Inline type selector buttons for org tree user add (faster UX than dropdown)
+- [Phase 07]: Approval lines state managed as controlled props from DocumentEditorPage (not Zustand)
 
 ### Pending Todos
 
@@ -139,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T13:31:24.098Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-04-02T13:38:01.897Z
+Stopped at: Completed 07-03-PLAN.md
 Resume file: None

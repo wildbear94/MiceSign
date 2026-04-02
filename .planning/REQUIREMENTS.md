@@ -29,21 +29,21 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 - [x] **DOC-01**: User can create a draft document by selecting a form template
 - [x] **DOC-02**: User can edit and delete their own draft documents
-- [x] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
-- [x] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
+- [ ] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
+- [ ] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
 - [x] **DOC-05**: User can view document detail page with full content, approval line status, and attachments
 - [x] **DOC-06**: User can view list of their drafted and submitted documents with status
-- [x] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
+- [ ] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
 
 ### Approval
 
 - [x] **APR-01**: User can build an approval line selecting approvers from org tree (APPROVE, AGREE, REFERENCE types)
-- [x] **APR-02**: APPROVE and AGREE types are processed sequentially by step_order; REFERENCE gets immediate read access
-- [x] **APR-03**: Approver can approve or reject a document with an optional comment
-- [x] **APR-04**: Rejection by any approver immediately sets document status to REJECTED
-- [x] **APR-05**: Approval by the last approver sets document status to APPROVED
-- [x] **APR-06**: Drafter can withdraw a submitted document if the next approver has not yet acted
-- [x] **APR-07**: User can create a new document (resubmission) from a rejected or withdrawn document, with content pre-filled
+- [ ] **APR-02**: APPROVE and AGREE types are processed sequentially by step_order; REFERENCE gets immediate read access
+- [ ] **APR-03**: Approver can approve or reject a document with an optional comment
+- [ ] **APR-04**: Rejection by any approver immediately sets document status to REJECTED
+- [ ] **APR-05**: Approval by the last approver sets document status to APPROVED
+- [ ] **APR-06**: Drafter can withdraw a submitted document if the next approver has not yet acted
+- [ ] **APR-07**: User can create a new document (resubmission) from a rejected or withdrawn document, with content pre-filled
 
 ### Template
 
@@ -136,18 +136,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-05 | Phase 1: Project Foundation | Complete |
 | DOC-01 | Phase 4: Document Core & Templates | Complete |
 | DOC-02 | Phase 4: Document Core & Templates | Complete |
-| DOC-03 | Phase 6: Document Submission & Numbering | Complete |
-| DOC-04 | Phase 6: Document Submission & Numbering | Complete |
+| DOC-03 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-04 | Phase 6: Document Submission & Numbering | Pending |
 | DOC-05 | Phase 4: Document Core & Templates | Complete |
 | DOC-06 | Phase 4: Document Core & Templates | Complete |
-| DOC-07 | Phase 6: Document Submission & Numbering | Complete |
+| DOC-07 | Phase 6: Document Submission & Numbering | Pending |
 | APR-01 | Phase 7: Approval Workflow | Complete |
-| APR-02 | Phase 7: Approval Workflow | Complete |
-| APR-03 | Phase 7: Approval Workflow | Complete |
-| APR-04 | Phase 7: Approval Workflow | Complete |
-| APR-05 | Phase 7: Approval Workflow | Complete |
-| APR-06 | Phase 7: Approval Workflow | Complete |
-| APR-07 | Phase 7: Approval Workflow | Complete |
+| APR-02 | Phase 7: Approval Workflow | Pending |
+| APR-03 | Phase 7: Approval Workflow | Pending |
+| APR-04 | Phase 7: Approval Workflow | Pending |
+| APR-05 | Phase 7: Approval Workflow | Pending |
+| APR-06 | Phase 7: Approval Workflow | Pending |
+| APR-07 | Phase 7: Approval Workflow | Pending |
 | TPL-01 | Phase 4: Document Core & Templates | Complete |
 | TPL-02 | Phase 4: Document Core & Templates | Complete |
 | TPL-03 | Phase 4: Document Core & Templates | Complete |
