@@ -1,0 +1,83 @@
+{
+  "pageTitle": "내 문서",
+  "newDocument": "새 문서",
+  "templateModal": {
+    "title": "새 문서 작성",
+    "subtitle": "작성할 양식을 선택하세요"
+  },
+  "save": "임시저장",
+  "delete": "문서 삭제",
+  "backToList": "목록으로",
+  "autoSave": {
+    "saved": "저장됨",
+    "saving": "저장 중...",
+    "failed": "저장 실패"
+  },
+  "emptyState": {
+    "title": "작성된 문서가 없습니다",
+    "description": "새 문서 버튼을 눌러 첫 문서를 작성해보세요."
+  },
+  "error": {
+    "saveFailed": "문서 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+    "loadFailed": "문서를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.",
+    "deleteFailed": "문서 삭제에 실패했습니다. 잠시 후 다시 시도해주세요."
+  },
+  "deleteConfirm": {
+    "title": "문서 삭제",
+    "message": "이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없습니다.",
+    "confirm": "문서 삭제"
+  },
+  "columns": {
+    "title": "제목",
+    "template": "양식",
+    "status": "상태",
+    "createdAt": "작성일"
+  },
+  "status": {
+    "DRAFT": "임시저장",
+    "SUBMITTED": "제출됨",
+    "APPROVED": "승인됨",
+    "REJECTED": "반려됨",
+    "WITHDRAWN": "회수됨"
+  },
+  "template": {
+    "GENERAL": "일반 업무 기안",
+    "EXPENSE": "지출 결의서",
+    "LEAVE": "휴가 신청서"
+  },
+  "expense": {
+    "addRow": "항목 추가",
+    "total": "합계",
+    "columns": {
+      "name": "항목명",
+      "quantity": "수량",
+      "unitPrice": "단가",
+      "amount": "금액"
+    }
+  },
+  "leave": {
+    "type": "휴가 유형",
+    "startDate": "시작일",
+    "endDate": "종료일",
+    "startTime": "시작 시간",
+    "endTime": "종료 시간",
+    "days": "사용 일수",
+    "daysFormat": "{{n}}일",
+    "reason": "사유"
+  },
+  "placeholder": {
+    "approvalLine": "결재선 (Phase 7에서 구현 예정)",
+    "attachments": "첨부파일 (Phase 5에서 구현 예정)"
+  },
+  "validation": {
+    "titleRequired": "제목을 입력해주세요",
+    "bodyRequired": "내용을 입력해주세요",
+    "expenseItemRequired": "항목을 1개 이상 추가해주세요",
+    "expenseNameRequired": "항목명을 입력해주세요",
+    "expenseAmountInvalid": "수량과 단가를 올바르게 입력해주세요",
+    "leaveTypeRequired": "휴가 유형을 선택해주세요",
+    "dateRangeRequired": "시작일과 종료일을 선택해주세요",
+    "dateRangeInvalid": "종료일은 시작일 이후여야 합니다",
+    "reasonRequired": "사유를 입력해주세요"
+  }
+}
