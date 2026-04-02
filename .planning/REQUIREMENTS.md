@@ -27,12 +27,12 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Document
 
-- [ ] **DOC-01**: User can create a draft document by selecting a form template
-- [ ] **DOC-02**: User can edit and delete their own draft documents
+- [x] **DOC-01**: User can create a draft document by selecting a form template
+- [x] **DOC-02**: User can edit and delete their own draft documents
 - [ ] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
 - [ ] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
-- [ ] **DOC-05**: User can view document detail page with full content, approval line status, and attachments
-- [ ] **DOC-06**: User can view list of their drafted and submitted documents with status
+- [x] **DOC-05**: User can view document detail page with full content, approval line status, and attachments
+- [x] **DOC-06**: User can view list of their drafted and submitted documents with status
 - [ ] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
 
 ### Approval
@@ -47,9 +47,9 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Template
 
-- [ ] **TPL-01**: General approval form (일반 업무 기안) with title, rich text body, and attachments
-- [ ] **TPL-02**: Expense report form (지출 결의서) with item table (item, quantity, unit price, amount), auto-sum, and evidence attachments
-- [ ] **TPL-03**: Leave request form (휴가 신청서) with leave type (연차/반차/병가/경조), start date, end date, auto-calculated days, and reason
+- [x] **TPL-01**: General approval form (일반 업무 기안) with title, rich text body, and attachments
+- [x] **TPL-02**: Expense report form (지출 결의서) with item table (item, quantity, unit price, amount), auto-sum, and evidence attachments
+- [x] **TPL-03**: Leave request form (휴가 신청서) with leave type (연차/반차/병가/경조), start date, end date, auto-calculated days, and reason
 
 ### File
 
@@ -134,12 +134,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-03 | Phase 3: Organization Management | Complete |
 | ORG-04 | Phase 3: Organization Management | Complete |
 | ORG-05 | Phase 1: Project Foundation | Complete |
-| DOC-01 | Phase 4: Document Core & Templates | Pending |
-| DOC-02 | Phase 4: Document Core & Templates | Pending |
+| DOC-01 | Phase 4: Document Core & Templates | Complete |
+| DOC-02 | Phase 4: Document Core & Templates | Complete |
 | DOC-03 | Phase 6: Document Submission & Numbering | Pending |
 | DOC-04 | Phase 6: Document Submission & Numbering | Pending |
-| DOC-05 | Phase 4: Document Core & Templates | Pending |
-| DOC-06 | Phase 4: Document Core & Templates | Pending |
+| DOC-05 | Phase 4: Document Core & Templates | Complete |
+| DOC-06 | Phase 4: Document Core & Templates | Complete |
 | DOC-07 | Phase 6: Document Submission & Numbering | Pending |
 | APR-01 | Phase 7: Approval Workflow | Pending |
 | APR-02 | Phase 7: Approval Workflow | Pending |
@@ -148,9 +148,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | APR-05 | Phase 7: Approval Workflow | Pending |
 | APR-06 | Phase 7: Approval Workflow | Pending |
 | APR-07 | Phase 7: Approval Workflow | Pending |
-| TPL-01 | Phase 4: Document Core & Templates | Pending |
-| TPL-02 | Phase 4: Document Core & Templates | Pending |
-| TPL-03 | Phase 4: Document Core & Templates | Pending |
+| TPL-01 | Phase 4: Document Core & Templates | Complete |
+| TPL-02 | Phase 4: Document Core & Templates | Complete |
+| TPL-03 | Phase 4: Document Core & Templates | Complete |
 | FILE-01 | Phase 5: File Attachments | Pending |
 | FILE-02 | Phase 5: File Attachments | Pending |
 | FILE-03 | Phase 5: File Attachments | Pending |
