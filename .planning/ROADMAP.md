@@ -83,7 +83,11 @@ Plans:
   3. Expense form supports item table with quantity/unit price/amount and auto-sum calculation
   4. Leave form supports leave type selection, date range, auto-calculated days, and reason
   5. User can view a list of their documents with current status and open any document's detail page
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 04-01-PLAN.md — Backend: V5 migration, JPA entities, DTOs, services, controllers, document CRUD API with form validation, integration tests
+- [ ] 04-02-PLAN.md — Frontend infrastructure: Tiptap/date-fns deps, TypeScript types, API clients, hooks, Zod schemas, MainLayout/navbar, routing
+- [ ] 04-03-PLAN.md — Frontend UI: Tiptap editor, 3 template forms (edit + read-only), template selection modal, document list/editor/detail pages, checkpoint
 **UI hint**: yes
 
 ### Phase 5: File Attachments
@@ -141,7 +145,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
 | 2. Authentication | 0/4 | Planning complete | - |
 | 3. Organization Management | 2/4 | In Progress|  |
-| 4. Document Core & Templates | 0/TBD | Not started | - |
+| 4. Document Core & Templates | 0/3 | Planning complete | - |
 | 5. File Attachments | 0/TBD | Not started | - |
 | 6. Document Submission & Numbering | 0/TBD | Not started | - |
 | 7. Approval Workflow | 0/TBD | Not started | - |
