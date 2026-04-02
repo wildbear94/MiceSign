@@ -115,7 +115,7 @@ Plans:
 **Plans:** 2 plans
 Plans:
 - [x] 06-01-PLAN.md — Backend: DocSequence entity, pessimistic lock numbering, submit endpoint, immutability enforcement (403), Google Drive file move
-- [ ] 06-02-PLAN.md — Frontend: submit button + confirmation dialog, useSubmitDocument hook, document number display in list/detail pages, checkpoint
+- [x] 06-02-PLAN.md — Frontend: submit button + confirmation dialog, useSubmitDocument hook, document number display in list/detail pages, checkpoint
 
 ### Phase 7: Approval Workflow
 **Goal**: Users can build approval lines, process approvals sequentially, and handle rejections, withdrawals, and resubmissions
