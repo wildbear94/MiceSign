@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ForcePasswordChangeGuard from './components/ForcePasswordChangeGuard';
+import MainLayout from './layouts/MainLayout';
 import AdminLayout from './features/admin/components/AdminLayout';
 import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
@@ -15,15 +16,16 @@ import apiClient from './api/client';
 import type { ApiResponse } from './types/api';
 import type { RefreshResponse } from './types/auth';
 
-function DashboardPlaceholder() {
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-50">MiceSign</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Dashboard (coming soon)</p>
-      </div>
-    </div>
-  );
+function DocumentListPlaceholder() {
+  return <div className="text-center text-gray-500 py-12">Document List (Plan 03)</div>;
+}
+
+function DocumentEditorPlaceholder() {
+  return <div className="text-center text-gray-500 py-12">Document Editor (Plan 03)</div>;
+}
+
+function DocumentDetailPlaceholder() {
+  return <div className="text-center text-gray-500 py-12">Document Detail (Plan 03)</div>;
 }
 
 function App() {
@@ -64,7 +66,12 @@ function App() {
         }
       />
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<DashboardPlaceholder />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Navigate to="/documents/my" replace />} />
+          <Route path="/documents/my" element={<DocumentListPlaceholder />} />
+          <Route path="/documents/new/:templateCode" element={<DocumentEditorPlaceholder />} />
+          <Route path="/documents/:id" element={<DocumentDetailPlaceholder />} />
+        </Route>
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="departments" element={<DepartmentPage />} />
