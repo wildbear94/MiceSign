@@ -34,3 +34,4 @@ logs/
 
 # ===== QueryDSL Generated =====
 backend/src/main/generated/
+/micesign-5916d478d644.json
