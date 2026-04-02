@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 5 context gathered
-last_updated: "2026-04-02T05:15:29.637Z"
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-02T06:03:42.888Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 8
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 04 — document-core-templates
+**Current focus:** Phase 05 — file-attachments
 
 ## Current Position
 
-Phase: 5
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 05 (file-attachments) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -67,6 +67,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P01 | 4min | 3 tasks | 34 files |
 | Phase 04-02 P02 | 4min | 3 tasks | 21 files |
 | Phase 04 P03 | 15min | 3 tasks | 21 files |
+| Phase 05 P01 | 8min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Controller pattern for TiptapEditor + react-hook-form sync
 - [Phase 04]: columnDefinition LONGTEXT/JSON instead of @Lob for MariaDB compatibility
 - [Phase 04]: ddl-auto: none for tests — Flyway handles schema, H2 cannot validate MariaDB columnDefinition
+- [Phase 05]: @MockitoBean GoogleDriveService pattern for integration tests without real Drive credentials
+- [Phase 05]: RFC 5987 Content-Disposition encoding for Korean filenames in download responses
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T05:15:29.635Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-file-attachments/05-CONTEXT.md
+Last session: 2026-04-02T06:03:42.885Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None

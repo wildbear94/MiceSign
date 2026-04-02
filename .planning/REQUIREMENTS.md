@@ -53,9 +53,9 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### File
 
-- [ ] **FILE-01**: User can upload files to Google Drive via Service Account when attaching to a document
-- [ ] **FILE-02**: User can download attachments with access control verification (only authorized viewers)
-- [ ] **FILE-03**: System validates file uploads: max 50MB per file, max 10 files per document, max 200MB total, allowed/blocked extensions enforced
+- [x] **FILE-01**: User can upload files to Google Drive via Service Account when attaching to a document
+- [x] **FILE-02**: User can download attachments with access control verification (only authorized viewers)
+- [x] **FILE-03**: System validates file uploads: max 50MB per file, max 10 files per document, max 200MB total, allowed/blocked extensions enforced
 
 ### Dashboard
 
@@ -151,9 +151,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TPL-01 | Phase 4: Document Core & Templates | Complete |
 | TPL-02 | Phase 4: Document Core & Templates | Complete |
 | TPL-03 | Phase 4: Document Core & Templates | Complete |
-| FILE-01 | Phase 5: File Attachments | Pending |
-| FILE-02 | Phase 5: File Attachments | Pending |
-| FILE-03 | Phase 5: File Attachments | Pending |
+| FILE-01 | Phase 5: File Attachments | Complete |
+| FILE-02 | Phase 5: File Attachments | Complete |
+| FILE-03 | Phase 5: File Attachments | Complete |
 | DASH-01 | Phase 8: Dashboard & Audit | Pending |
 | DASH-02 | Phase 8: Dashboard & Audit | Pending |
 | DASH-03 | Phase 8: Dashboard & Audit | Pending |

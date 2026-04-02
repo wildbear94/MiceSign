@@ -100,7 +100,7 @@ Plans:
   3. System rejects uploads exceeding 50MB per file, 10 files per document, or 200MB total, and blocks disallowed extensions
 **Plans:** 3 plans
 Plans:
-- [ ] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
+- [x] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
 - [ ] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
 - [ ] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
 
