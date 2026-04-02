@@ -35,15 +35,19 @@ Declared values (must be multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, badge padding |
 | sm | 8px | Compact element spacing, table cell padding |
-| md | 16px | Default element spacing, form field gaps |
+| md | 16px | Default element spacing, form field gaps, input horizontal padding |
 | lg | 24px | Section padding, card padding |
 | xl | 32px | Layout gaps between major sections |
 | 2xl | 48px | Page top/bottom margin |
 | 3xl | 64px | Not used this phase |
 
-Exceptions: Touch targets remain 44px (`h-11`) per existing pattern (ConfirmDialog buttons, Pagination buttons).
+Exceptions:
 
-Source: Existing codebase uses Tailwind `p-6` (24px), `gap-2` (8px), `gap-3` (12px), `mb-6` (24px), `mb-4` (16px). Contract formalizes this.
+| Value | Justification |
+|-------|---------------|
+| 44px (`h-11`) | Touch target minimum per WCAG 2.5.8. Used for all interactive input elements (title input, select dropdown, date inputs) and buttons (ConfirmDialog, Pagination). |
+
+Source: Existing codebase uses Tailwind `p-6` (24px), `gap-2` (8px), `mb-6` (24px), `mb-4` (16px). Contract formalizes this. All horizontal input padding standardized to `px-4` (16px) to stay within declared scale.
 
 ---
 
@@ -52,13 +56,15 @@ Source: Existing codebase uses Tailwind `p-6` (24px), `gap-2` (8px), `gap-3` (12
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Label | 14px | 600 (semibold) | 1.4 | `text-sm font-semibold` |
-| Heading | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
+| Title Input | 16px | 600 (semibold) | 1.4 | `text-base font-semibold` |
 | Subheading | 18px | 600 (semibold) | 1.3 | `text-lg font-semibold` |
+| Heading | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
 
-Declared weights: 400 (regular) for body text, 600 (semibold) for labels, headings, and subheadings. Two weights only.
+Declared sizes: 14px, 16px, 18px, 24px (4 sizes — maximum allowed).
 
-Source: Existing pattern — `UserListPage.tsx` uses `text-2xl font-semibold` for page title, `text-sm` for body/labels. `ConfirmDialog.tsx` uses `text-lg font-semibold` for dialog titles. Weight 500 (medium) dropped to comply with 2-weight maximum; labels promoted to 600 for consistency.
+Declared weights: 400 (regular) for body text, 600 (semibold) for title input, subheadings, and headings. Two weights only.
+
+Source: Existing pattern — `UserListPage.tsx` uses `text-2xl font-semibold` for page title, `text-sm` for body/labels. `ConfirmDialog.tsx` uses `text-lg font-semibold` for dialog titles. 16px added for title input and expense total row where `text-base` is used. Labels share 14px Body size with `font-semibold` — the weight distinguishes them from body text.
 
 ---
 
@@ -76,6 +82,7 @@ Accent reserved for:
 - Active navigation link highlight (`bg-blue-50 text-blue-700`)
 - Active pagination page indicator
 - Auto-save success indicator text
+- Leave form calculated days display (`text-blue-600`)
 
 Status badge colors (established in Phase 3):
 
@@ -181,7 +188,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 
 ### Document Editor Page
 
-**Focal point:** The title input field is the primary visual anchor. It appears at the top of the form container with `text-base font-semibold` styling and a prominent focus ring (`focus:ring-2 focus:ring-blue-500`), drawing the user's eye to start composing immediately.
+**Focal point:** The title input field is the primary visual anchor. It appears at the top of the form container with `text-base font-semibold` styling (16px, Title Input role) and a prominent focus ring (`focus:ring-2 focus:ring-blue-500`), drawing the user's eye to start composing immediately.
 
 ```
 +---------------------------------------------------------------+
@@ -213,7 +220,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 - Content max width: `max-w-4xl` (896px) for editor pages
 - Back link: `text-sm text-gray-500 hover:text-gray-700` with `ArrowLeft` icon
 - Form container: `bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6`
-- Title input: `w-full h-11 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500`
+- Title input: `w-full h-11 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500`
 - Tiptap toolbar: `flex flex-wrap gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg`
 - Toolbar button: `h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400` with active state `bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400`
 - Tiptap editor area: `min-h-[300px] p-4 prose prose-sm max-w-none dark:prose-invert` within `border border-gray-200 dark:border-gray-700 rounded-b-lg`
@@ -234,8 +241,8 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 ```
 
 - Table: `w-full border-collapse`
-- Header: `bg-gray-50 dark:bg-gray-800 text-left text-sm font-semibold text-gray-600 dark:text-gray-400 px-3 py-2`
-- Cells: `px-3 py-2 border-b border-gray-200 dark:border-gray-700`
+- Header: `bg-gray-50 dark:bg-gray-800 text-left text-sm font-semibold text-gray-600 dark:text-gray-400 px-4 py-2`
+- Cells: `px-4 py-2 border-b border-gray-200 dark:border-gray-700`
 - Input cells: `h-9 px-2 border border-gray-300 dark:border-gray-600 rounded text-sm text-right` (number inputs right-aligned)
 - Amount display (read-only computed): `text-sm font-semibold text-gray-900 dark:text-gray-50 text-right`
 - Total row: `bg-gray-50 dark:bg-gray-800 font-semibold text-base text-right`
@@ -257,10 +264,10 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 +-----------------------------------------------------------+
 ```
 
-- Select dropdown: `h-11 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900`
-- Date inputs: `h-11 px-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm` using native `type="date"`
+- Select dropdown: `h-11 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-900`
+- Date inputs: `h-11 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-sm` using native `type="date"`
 - Calculated days: `text-base font-semibold text-blue-600` (accent to draw attention)
-- Reason textarea: `w-full min-h-[80px] px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm resize-y`
+- Reason textarea: `w-full min-h-[80px] px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm resize-y`
 - Form layout: `grid grid-cols-2 gap-4` for date fields, single column for others
 - Field labels: `text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1`
 
@@ -336,7 +343,7 @@ Source: Phase 3 `UserTable.tsx` ROLE_BADGE/STATUS_BADGE pattern replicated. Acce
 | Error state (delete failure) | 문서 삭제에 실패했습니다. 잠시 후 다시 시도해주세요. |
 | Delete confirmation title | 문서 삭제 |
 | Delete confirmation message | 이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없습니다. |
-| Delete confirmation button | 삭제 |
+| Delete confirmation button | 문서 삭제 |
 | Auto-save: saved | 저장됨 |
 | Auto-save: saving | 저장 중... |
 | Auto-save: failed | 저장 실패 |
