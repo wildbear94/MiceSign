@@ -84,6 +84,21 @@ public class DocumentController {
         return ApiResponse.ok(documentService.getDocumentDetail(user.getUserId(), id));
     }
 
+    @PostMapping("/{id}/withdraw")
+    public ApiResponse<DocumentResponse> withdrawDocument(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long id) {
+        return ApiResponse.ok(documentService.withdrawDocument(user.getUserId(), id));
+    }
+
+    @PostMapping("/{id}/rewrite")
+    public ResponseEntity<ApiResponse<DocumentResponse>> rewriteDocument(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long id) {
+        DocumentResponse response = documentService.rewriteDocument(user.getUserId(), id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
+    }
+
     // --- Attachment endpoints ---
 
     @PostMapping("/{docId}/attachments")

@@ -222,6 +222,107 @@ public class DocumentService {
         return documentMapper.toDetailResponse(document, content, templateName, approvalLineResponses);
     }
 
+    public DocumentResponse withdrawDocument(Long userId, Long documentId) {
+        Document document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다.", 404));
+
+        // Only drafter can withdraw
+        if (!document.getDrafter().getId().equals(userId)) {
+            throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 회수할 수 있습니다.", 403);
+        }
+
+        // Only SUBMITTED documents can be withdrawn
+        if (document.getStatus() != DocumentStatus.SUBMITTED) {
+            throw new BusinessException("DOC_NOT_SUBMITTED", "제출 상태의 문서만 회수할 수 있습니다.");
+        }
+
+        // Check if current step approver(s) have already acted (per D-21, FSD)
+        List<ApprovalLine> currentStepLines = approvalLineRepository
+                .findByDocumentIdAndStepOrder(documentId, document.getCurrentStep());
+        boolean anyActed = currentStepLines.stream()
+                .anyMatch(line -> line.getStatus() != ApprovalLineStatus.PENDING);
+        if (anyActed) {
+            throw new BusinessException("APR_ALREADY_IN_PROGRESS",
+                    "이미 결재가 진행되어 회수할 수 없습니다.");
+        }
+
+        // Set document to WITHDRAWN (per D-23)
+        document.setStatus(DocumentStatus.WITHDRAWN);
+        document.setCompletedAt(LocalDateTime.now());
+        documentRepository.save(document);
+
+        // Change all PENDING approval lines to SKIPPED (per D-24)
+        List<ApprovalLine> allLines = approvalLineRepository
+                .findByDocumentIdOrderByStepOrderAsc(documentId);
+        for (ApprovalLine line : allLines) {
+            if (line.getStatus() == ApprovalLineStatus.PENDING) {
+                line.setStatus(ApprovalLineStatus.SKIPPED);
+                approvalLineRepository.save(line);
+            }
+        }
+
+        String templateName = getTemplateName(document.getTemplateCode());
+        return documentMapper.toResponse(document, templateName);
+    }
+
+    public DocumentResponse rewriteDocument(Long userId, Long documentId) {
+        Document sourceDoc = documentRepository.findById(documentId)
+                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다.", 404));
+
+        // Only drafter can resubmit
+        if (!sourceDoc.getDrafter().getId().equals(userId)) {
+            throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 재기안할 수 있습니다.", 403);
+        }
+
+        // Only REJECTED or WITHDRAWN documents can be resubmitted (per D-27)
+        if (sourceDoc.getStatus() != DocumentStatus.REJECTED &&
+            sourceDoc.getStatus() != DocumentStatus.WITHDRAWN) {
+            throw new BusinessException("DOC_CANNOT_REWRITE",
+                    "반려 또는 회수된 문서만 재기안할 수 있습니다.");
+        }
+
+        User drafter = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "사용자를 찾을 수 없습니다."));
+
+        // Create new document copying content (per D-25)
+        Document newDoc = new Document();
+        newDoc.setTemplateCode(sourceDoc.getTemplateCode());
+        newDoc.setTitle(sourceDoc.getTitle());
+        newDoc.setDrafter(drafter);
+        newDoc.setStatus(DocumentStatus.DRAFT);
+        newDoc.setSourceDocId(documentId); // per D-26
+        newDoc = documentRepository.save(newDoc);
+
+        // Copy content
+        DocumentContent sourceContent = documentContentRepository.findByDocumentId(documentId)
+                .orElse(null);
+        if (sourceContent != null) {
+            DocumentContent newContent = new DocumentContent();
+            newContent.setDocument(newDoc);
+            newContent.setBodyHtml(sourceContent.getBodyHtml());
+            newContent.setFormData(sourceContent.getFormData());
+            documentContentRepository.save(newContent);
+        }
+
+        // Copy approval line (per D-25) -- copy approver list and types, reset status to PENDING
+        List<ApprovalLine> sourceLines = approvalLineRepository
+                .findByDocumentIdOrderByStepOrderAsc(documentId);
+        for (ApprovalLine sourceLine : sourceLines) {
+            ApprovalLine newLine = new ApprovalLine();
+            newLine.setDocument(newDoc);
+            newLine.setApprover(sourceLine.getApprover());
+            newLine.setLineType(sourceLine.getLineType());
+            newLine.setStepOrder(sourceLine.getStepOrder());
+            newLine.setStatus(ApprovalLineStatus.PENDING);
+            approvalLineRepository.save(newLine);
+        }
+
+        // Note: Attachments NOT copied per D-25
+
+        String templateName = getTemplateName(newDoc.getTemplateCode());
+        return documentMapper.toResponse(newDoc, templateName);
+    }
+
     // --- Private helpers ---
 
     private void saveApprovalLines(Document document, List<ApprovalLineRequest> requests) {
