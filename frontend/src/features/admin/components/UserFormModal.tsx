@@ -22,10 +22,10 @@ const schema = z.object({
   employeeNo: z.string().min(1, '사번을 입력해주세요.').max(20),
   name: z.string().min(1, '이름을 입력해주세요.').max(50),
   email: z.string().email('올바른 이메일 형식이 아닙니다.').max(150),
-  departmentId: z.number({ required_error: '부서를 선택해주세요.' }),
+  departmentId: z.number({ error: '부서를 선택해주세요.' }),
   positionId: z.number().nullable(),
   role: z.enum(['SUPER_ADMIN', 'ADMIN', 'USER']),
-  phone: z.string().max(20).optional().default(''),
+  phone: z.string().max(20),
   password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다.').max(100),
 });
 

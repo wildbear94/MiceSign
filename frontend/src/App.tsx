@@ -7,16 +7,13 @@ import AdminLayout from './features/admin/components/AdminLayout';
 import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
 import UserListPage from './features/admin/pages/UserListPage';
+import UserDetailPage from './features/admin/pages/UserDetailPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
 import apiClient from './api/client';
 import type { ApiResponse } from './types/api';
 import type { RefreshResponse } from './types/auth';
-
-function AdminPlaceholder() {
-  return <div className="text-gray-500">Loading...</div>;
-}
 
 function DashboardPlaceholder() {
   return (
@@ -67,7 +64,7 @@ function App() {
             <Route path="departments" element={<DepartmentPage />} />
             <Route path="positions" element={<PositionPage />} />
             <Route path="users" element={<UserListPage />} />
-            <Route path="users/:id" element={<AdminPlaceholder />} />
+            <Route path="users/:id" element={<UserDetailPage />} />
           </Route>
         </Route>
       </Route>
