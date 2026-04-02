@@ -9,11 +9,15 @@ import com.micesign.domain.User;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
 import com.micesign.mapper.DocumentMapper;
+import com.micesign.domain.DocumentAttachment;
 import com.micesign.repository.ApprovalTemplateRepository;
 import com.micesign.repository.DocSequenceRepository;
+import com.micesign.repository.DocumentAttachmentRepository;
 import com.micesign.repository.DocumentContentRepository;
 import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,28 +32,36 @@ import java.util.stream.Collectors;
 @Transactional
 public class DocumentService {
 
+    private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
+
     private final DocumentRepository documentRepository;
     private final DocumentContentRepository documentContentRepository;
+    private final DocumentAttachmentRepository attachmentRepository;
     private final ApprovalTemplateRepository approvalTemplateRepository;
     private final DocSequenceRepository docSequenceRepository;
     private final UserRepository userRepository;
     private final DocumentFormValidator formValidator;
     private final DocumentMapper documentMapper;
+    private final GoogleDriveService googleDriveService;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentContentRepository documentContentRepository,
+                           DocumentAttachmentRepository attachmentRepository,
                            ApprovalTemplateRepository approvalTemplateRepository,
                            DocSequenceRepository docSequenceRepository,
                            UserRepository userRepository,
                            DocumentFormValidator formValidator,
-                           DocumentMapper documentMapper) {
+                           DocumentMapper documentMapper,
+                           GoogleDriveService googleDriveService) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
+        this.attachmentRepository = attachmentRepository;
         this.approvalTemplateRepository = approvalTemplateRepository;
         this.docSequenceRepository = docSequenceRepository;
         this.userRepository = userRepository;
         this.formValidator = formValidator;
         this.documentMapper = documentMapper;
+        this.googleDriveService = googleDriveService;
     }
 
     public DocumentResponse createDocument(Long userId, CreateDocumentRequest req) {
@@ -129,6 +141,9 @@ public class DocumentService {
         document.setSubmittedAt(LocalDateTime.now());
         documentRepository.save(document);
 
+        // Move attachments from draft folder to permanent folder
+        moveAttachmentsToPermanentFolder(documentId, docNumber);
+
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);
     }
@@ -183,6 +198,31 @@ public class DocumentService {
         }
 
         return document;
+    }
+
+    private void moveAttachmentsToPermanentFolder(Long documentId, String docNumber) {
+        List<DocumentAttachment> attachments = attachmentRepository.findByDocumentId(documentId);
+        if (attachments.isEmpty()) {
+            return;
+        }
+
+        try {
+            int year = LocalDateTime.now().getYear();
+            String month = String.format("%02d", LocalDateTime.now().getMonthValue());
+            String permanentPath = String.format("MiceSign/%d/%s/%s/", year, month, docNumber);
+
+            String newFolderId = googleDriveService.findOrCreateFolder(permanentPath);
+
+            for (DocumentAttachment attachment : attachments) {
+                String oldFolderId = googleDriveService.findOrCreateFolder(attachment.getGdriveFolder());
+                googleDriveService.moveFile(attachment.getGdriveFileId(), oldFolderId, newFolderId);
+                attachment.setGdriveFolder(permanentPath);
+                attachmentRepository.save(attachment);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to move attachments to permanent folder for document {}: {}",
+                    documentId, e.getMessage(), e);
+        }
     }
 
     private String generateDocNumber(String templateCode) {
