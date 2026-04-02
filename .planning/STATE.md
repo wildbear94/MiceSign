@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 7 UI-SPEC approved
+status: executing
+stopped_at: Completed 07-01-PLAN.md
 last_updated: "2026-04-02T09:51:50.735Z"
 last_activity: 2026-04-02
 progress:
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 06 — document-submission-numbering
+**Current focus:** Phase 07 — approval-workflow
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 07 (approval-workflow) — EXECUTING
+Plan: 1 of 5
+Status: Plan 07-01 complete
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -121,6 +121,10 @@ Recent decisions affecting current work:
 - [Phase 06]: BusinessException httpStatus field backward-compatible (2-arg defaults to 400, 3-arg for custom)
 - [Phase 06]: Google Drive file move failure gracefully handled (logged, not thrown) on submit
 - [Phase 06]: SubmitConfirmDialog reuses ConfirmDialog pattern with conditional validation error display
+- [Phase 07]: Server-side step_order computation: REFERENCE=0, APPROVE/AGREE sequential 1,2,3
+- [Phase 07]: Pessimistic locking on ApprovalLine during approve/reject to prevent concurrent processing
+- [Phase 07]: Remaining PENDING lines stay PENDING on rejection (not SKIPPED) per FSD
+- [Phase 07]: DocumentMapper 4-arg toDetailResponse to pass approval line data and currentStep
 
 ### Pending Todos
 
@@ -133,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T09:51:50.732Z
-Stopped at: Phase 7 UI-SPEC approved
-Resume file: .planning/phases/07-approval-workflow/07-UI-SPEC.md
+Last session: 2026-04-02T13:22:00Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: None
