@@ -81,7 +81,7 @@ Accent reserved for:
 - Drop zone border and background when dragging over (`border-blue-500 bg-blue-50`)
 - Upload progress bar fill (`bg-blue-600`)
 - "파일 찾기" browse link text inside drop zone (`text-blue-600`)
-- File usage status count when at limit (`text-blue-600` for emphasis)
+- File usage status count when at limit (`text-red-600` for warning)
 
 Additional semantic colors for upload states:
 
@@ -253,6 +253,7 @@ Replaces the dashed placeholder in all three template forms and the detail page.
 | Download button | 다운로드 |
 | Upload progress | {n}% |
 | Upload complete | 완료 |
+| Drop zone drag-over text | 놓아서 파일을 첨부하세요 |
 
 Source: Korean UI conventions per CLAUDE.md. Error messages follow Phase 4 pattern (problem + retry guidance). D-04 specifies pre-selection blocking with immediate error message. D-06 specifies always-visible usage status.
 
