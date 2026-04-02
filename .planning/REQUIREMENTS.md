@@ -42,8 +42,8 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 - [x] **APR-03**: Approver can approve or reject a document with an optional comment
 - [x] **APR-04**: Rejection by any approver immediately sets document status to REJECTED
 - [x] **APR-05**: Approval by the last approver sets document status to APPROVED
-- [ ] **APR-06**: Drafter can withdraw a submitted document if the next approver has not yet acted
-- [ ] **APR-07**: User can create a new document (resubmission) from a rejected or withdrawn document, with content pre-filled
+- [x] **APR-06**: Drafter can withdraw a submitted document if the next approver has not yet acted
+- [x] **APR-07**: User can create a new document (resubmission) from a rejected or withdrawn document, with content pre-filled
 
 ### Template
 
@@ -146,8 +146,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | APR-03 | Phase 7: Approval Workflow | Complete |
 | APR-04 | Phase 7: Approval Workflow | Complete |
 | APR-05 | Phase 7: Approval Workflow | Complete |
-| APR-06 | Phase 7: Approval Workflow | Pending |
-| APR-07 | Phase 7: Approval Workflow | Pending |
+| APR-06 | Phase 7: Approval Workflow | Complete |
+| APR-07 | Phase 7: Approval Workflow | Complete |
 | TPL-01 | Phase 4: Document Core & Templates | Complete |
 | TPL-02 | Phase 4: Document Core & Templates | Complete |
 | TPL-03 | Phase 4: Document Core & Templates | Complete |

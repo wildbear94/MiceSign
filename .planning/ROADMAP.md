@@ -130,7 +130,7 @@ Plans:
 **Plans:** 1/5 plans executed
 Plans:
 - [x] 07-01-PLAN.md — Backend: ApprovalLine entity, enums, repository, DTOs, approval line save/load with document, ApprovalService (approve/reject/sequential), ApprovalController, integration tests
-- [ ] 07-02-PLAN.md — Backend: Withdrawal endpoint with step validation, resubmission endpoint copying content + approval line, integration tests
+- [x] 07-02-PLAN.md — Backend: Withdrawal endpoint with step validation, resubmission endpoint copying content + approval line, integration tests
 - [ ] 07-03-PLAN.md — Frontend: Approval types/API/hooks, approval line editor with org tree and drag-and-drop, document editor integration
 - [ ] 07-04-PLAN.md — Frontend: Approval status display (vertical step list), action bar (approve/reject/withdraw/resubmit), comment dialog, document detail integration
 - [ ] 07-05-PLAN.md — Frontend: Pending approvals page, completed documents page, routing, navigation, end-to-end checkpoint

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-04-02T09:51:50.735Z"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-04-02T13:31:24.101Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 25
+  completed_plans: 22
   percent: 0
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 ## Current Position
 
 Phase: 07 (approval-workflow) — EXECUTING
-Plan: 1 of 5
-Status: Plan 07-01 complete
+Plan: 2 of 5
+Status: Ready to execute
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -72,6 +72,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 05 P03 | 5min | 2 tasks | 6 files |
 | Phase 06 P01 | 5min | 2 tasks | 10 files |
 | Phase 06 P02 | 3min | 2 tasks | 7 files |
+| Phase 07 P02 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -125,6 +126,7 @@ Recent decisions affecting current work:
 - [Phase 07]: Pessimistic locking on ApprovalLine during approve/reject to prevent concurrent processing
 - [Phase 07]: Remaining PENDING lines stay PENDING on rejection (not SKIPPED) per FSD
 - [Phase 07]: DocumentMapper 4-arg toDetailResponse to pass approval line data and currentStep
+- [Phase 07]: Withdrawal allowed after prior steps approved if current step PENDING (matches D-21 business rule)
 
 ### Pending Todos
 
@@ -137,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T13:22:00Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-04-02T13:31:24.098Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
