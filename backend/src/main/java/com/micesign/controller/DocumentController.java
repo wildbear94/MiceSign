@@ -60,6 +60,13 @@ public class DocumentController {
         return ApiResponse.ok(null);
     }
 
+    @PostMapping("/{id}/submit")
+    public ApiResponse<DocumentResponse> submitDocument(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long id) {
+        return ApiResponse.ok(documentService.submitDocument(user.getUserId(), id));
+    }
+
     @GetMapping("/my")
     public ApiResponse<Page<DocumentResponse>> getMyDocuments(
             @AuthenticationPrincipal CustomUserDetails user,

@@ -174,6 +174,10 @@ public class DocumentAttachmentService {
             throw new BusinessException("DOCUMENT_ACCESS_DENIED", "본인의 문서에만 파일을 첨부할 수 있습니다.");
         }
 
+        if (document.getStatus() != DocumentStatus.DRAFT) {
+            throw new BusinessException("DOC_NOT_DRAFT", "제출된 문서에는 파일을 첨부할 수 없습니다.", 403);
+        }
+
         return document;
     }
 

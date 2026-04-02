@@ -2,6 +2,7 @@ package com.micesign.service;
 
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.ApprovalTemplate;
+import com.micesign.domain.DocSequence;
 import com.micesign.domain.Document;
 import com.micesign.domain.DocumentContent;
 import com.micesign.domain.User;
@@ -9,6 +10,7 @@ import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
 import com.micesign.mapper.DocumentMapper;
 import com.micesign.repository.ApprovalTemplateRepository;
+import com.micesign.repository.DocSequenceRepository;
 import com.micesign.repository.DocumentContentRepository;
 import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.UserRepository;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final DocumentContentRepository documentContentRepository;
     private final ApprovalTemplateRepository approvalTemplateRepository;
+    private final DocSequenceRepository docSequenceRepository;
     private final UserRepository userRepository;
     private final DocumentFormValidator formValidator;
     private final DocumentMapper documentMapper;
@@ -35,12 +39,14 @@ public class DocumentService {
     public DocumentService(DocumentRepository documentRepository,
                            DocumentContentRepository documentContentRepository,
                            ApprovalTemplateRepository approvalTemplateRepository,
+                           DocSequenceRepository docSequenceRepository,
                            UserRepository userRepository,
                            DocumentFormValidator formValidator,
                            DocumentMapper documentMapper) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
         this.approvalTemplateRepository = approvalTemplateRepository;
+        this.docSequenceRepository = docSequenceRepository;
         this.userRepository = userRepository;
         this.formValidator = formValidator;
         this.documentMapper = documentMapper;
@@ -106,6 +112,27 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
+    public DocumentResponse submitDocument(Long userId, Long documentId) {
+        Document document = loadAndVerifyOwnerDraft(userId, documentId);
+
+        // Validate form data at submit time
+        DocumentContent content = documentContentRepository.findByDocumentId(documentId)
+                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
+        formValidator.validate(document.getTemplateCode(), content.getBodyHtml(), content.getFormData());
+
+        // Generate document number
+        String docNumber = generateDocNumber(document.getTemplateCode());
+
+        // Update document state
+        document.setDocNumber(docNumber);
+        document.setStatus(DocumentStatus.SUBMITTED);
+        document.setSubmittedAt(LocalDateTime.now());
+        documentRepository.save(document);
+
+        String templateName = getTemplateName(document.getTemplateCode());
+        return documentMapper.toResponse(document, templateName);
+    }
+
     @Transactional(readOnly = true)
     public Page<DocumentResponse> getMyDocuments(Long userId, List<DocumentStatus> statuses, Pageable pageable) {
         Page<Document> documents;
@@ -152,10 +179,35 @@ public class DocumentService {
         }
 
         if (document.getStatus() != DocumentStatus.DRAFT) {
-            throw new BusinessException("DOC_NOT_DRAFT", "임시저장 상태의 문서만 수정할 수 있습니다.");
+            throw new BusinessException("DOC_NOT_DRAFT", "임시저장 상태의 문서만 수정할 수 있습니다.", 403);
         }
 
         return document;
+    }
+
+    private String generateDocNumber(String templateCode) {
+        int currentYear = LocalDateTime.now().getYear();
+
+        // Look up template prefix
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(templateCode)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."));
+        String prefix = template.getPrefix();
+
+        // Pessimistic lock on sequence row
+        DocSequence seq = docSequenceRepository.findByTemplateCodeAndYearForUpdate(templateCode, currentYear)
+                .orElseGet(() -> {
+                    DocSequence newSeq = new DocSequence();
+                    newSeq.setTemplateCode(templateCode);
+                    newSeq.setYear(currentYear);
+                    newSeq.setLastSequence(0);
+                    return docSequenceRepository.save(newSeq);
+                });
+
+        // Increment sequence
+        seq.setLastSequence(seq.getLastSequence() + 1);
+        docSequenceRepository.save(seq);
+
+        return String.format("%s-%d-%04d", prefix, currentYear, seq.getLastSequence());
     }
 
     private String getTemplateName(String templateCode) {
