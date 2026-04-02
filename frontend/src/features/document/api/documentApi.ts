@@ -25,4 +25,13 @@ export const documentApi = {
 
   delete: (id: number) =>
     apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`),
+
+  submit: (id: number) =>
+    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/submit`),
+
+  withdraw: (id: number) =>
+    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/withdraw`),
+
+  rewrite: (id: number) =>
+    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/rewrite`),
 };
