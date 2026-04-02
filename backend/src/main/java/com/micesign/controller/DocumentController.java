@@ -4,16 +4,23 @@ import com.micesign.common.dto.ApiResponse;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
 import com.micesign.security.CustomUserDetails;
+import com.micesign.service.DocumentAttachmentService;
 import com.micesign.service.DocumentService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -21,9 +28,12 @@ import java.util.List;
 public class DocumentController {
 
     private final DocumentService documentService;
+    private final DocumentAttachmentService attachmentService;
 
-    public DocumentController(DocumentService documentService) {
+    public DocumentController(DocumentService documentService,
+                               DocumentAttachmentService attachmentService) {
         this.documentService = documentService;
+        this.attachmentService = attachmentService;
     }
 
     @PostMapping
@@ -65,5 +75,49 @@ public class DocumentController {
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long id) {
         return ApiResponse.ok(documentService.getDocumentDetail(user.getUserId(), id));
+    }
+
+    // --- Attachment endpoints ---
+
+    @PostMapping("/{docId}/attachments")
+    public ResponseEntity<ApiResponse<List<AttachmentResponse>>> uploadAttachments(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long docId,
+            @RequestParam("files") MultipartFile[] files) {
+        List<AttachmentResponse> responses = attachmentService.uploadFiles(user.getUserId(), docId, files);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(responses));
+    }
+
+    @GetMapping("/{docId}/attachments")
+    public ApiResponse<List<AttachmentResponse>> getAttachments(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long docId) {
+        return ApiResponse.ok(attachmentService.getAttachmentsByDocumentId(docId));
+    }
+
+    @GetMapping("/attachments/{attachmentId}/download")
+    public ResponseEntity<InputStreamResource> downloadAttachment(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long attachmentId) {
+        AttachmentResponse metadata = attachmentService.getAttachmentMetadata(attachmentId);
+        InputStreamResource resource = attachmentService.downloadFile(user.getUserId(), attachmentId);
+
+        String encodedName = URLEncoder.encode(metadata.originalName(), StandardCharsets.UTF_8)
+                .replace("+", "%20");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"file\"; filename*=UTF-8''" + encodedName)
+                .contentType(MediaType.parseMediaType(metadata.mimeType()))
+                .contentLength(metadata.fileSize())
+                .body(resource);
+    }
+
+    @DeleteMapping("/attachments/{attachmentId}")
+    public ApiResponse<Void> deleteAttachment(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long attachmentId) {
+        attachmentService.deleteAttachment(user.getUserId(), attachmentId);
+        return ApiResponse.ok(null);
     }
 }

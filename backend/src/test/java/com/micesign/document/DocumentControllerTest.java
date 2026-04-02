@@ -39,7 +39,8 @@ class DocumentControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Clean document data (content first due to FK)
+        // Clean document data (order matters due to FK constraints)
+        jdbcTemplate.update("DELETE FROM document_attachment");
         jdbcTemplate.update("DELETE FROM document_content");
         jdbcTemplate.update("DELETE FROM document");
         // Use super admin (userId=1) which is seeded in V2
