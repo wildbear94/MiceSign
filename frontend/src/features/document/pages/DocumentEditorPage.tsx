@@ -1,9 +1,10 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
+import ApprovalLineEditor from '../components/approval/ApprovalLineEditor';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import {
   useDocumentDetail,
@@ -12,6 +13,7 @@ import {
   useDeleteDocument,
 } from '../hooks/useDocuments';
 import { useAutoSave } from '../hooks/useAutoSave';
+import type { ApprovalLineItem } from '../../approval/types/approval';
 
 export default function DocumentEditorPage() {
   const { t } = useTranslation('document');
@@ -28,6 +30,7 @@ export default function DocumentEditorPage() {
   const [savedDocId, setSavedDocId] = useState<number | null>(documentId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [approvalLines, setApprovalLines] = useState<ApprovalLineItem[]>([]);
 
   // For new docs, use templateCode from URL; for edits, from loaded document
   const { data: existingDoc } = useDocumentDetail(documentId);
@@ -36,6 +39,21 @@ export default function DocumentEditorPage() {
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();
+
+  // Populate approval lines from existing document when editing
+  useEffect(() => {
+    if (existingDoc?.approvalLines && existingDoc.approvalLines.length > 0 && approvalLines.length === 0) {
+      setApprovalLines(
+        existingDoc.approvalLines.map((line) => ({
+          userId: line.approver.id,
+          userName: line.approver.name,
+          departmentName: line.approver.departmentName,
+          positionName: line.approver.positionName,
+          lineType: line.lineType,
+        })),
+      );
+    }
+  }, [existingDoc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Store the latest form data for auto-save
   const formDataRef = useRef<{
@@ -49,6 +67,11 @@ export default function DocumentEditorPage() {
       formDataRef.current = data;
       setErrorMessage(null);
 
+      // Convert approval lines to request format
+      const approvalLineRequests = approvalLines.length > 0
+        ? approvalLines.map((item) => ({ approverId: item.userId, lineType: item.lineType }))
+        : null;
+
       try {
         if (savedDocId) {
           // Update existing
@@ -58,6 +81,7 @@ export default function DocumentEditorPage() {
               title: data.title,
               bodyHtml: data.bodyHtml ?? null,
               formData: data.formData ?? null,
+              approvalLines: approvalLineRequests,
             },
           });
         } else {
@@ -67,6 +91,7 @@ export default function DocumentEditorPage() {
             title: data.title,
             bodyHtml: data.bodyHtml ?? null,
             formData: data.formData ?? null,
+            approvalLines: approvalLineRequests,
           });
           setSavedDocId(created.id);
           // Update URL without re-rendering
@@ -77,7 +102,7 @@ export default function DocumentEditorPage() {
         throw new Error('save failed');
       }
     },
-    [savedDocId, resolvedTemplateCode, createMutation, updateMutation, t],
+    [savedDocId, resolvedTemplateCode, createMutation, updateMutation, approvalLines, t],
   );
 
   // Auto-save: triggered when form data changes
@@ -197,6 +222,14 @@ export default function DocumentEditorPage() {
           />
         )}
       </div>
+
+      {/* Approval line editor - only for DRAFT documents */}
+      {(!existingDoc || existingDoc.status === 'DRAFT') && (
+        <ApprovalLineEditor
+          items={approvalLines}
+          onItemsChange={setApprovalLines}
+        />
+      )}
 
       {/* Delete confirmation */}
       <ConfirmDialog
