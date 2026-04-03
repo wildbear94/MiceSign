@@ -31,6 +31,14 @@ public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long
            "ORDER BY d.submittedAt ASC")
     Page<ApprovalLine> findPendingByApproverId(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT COUNT(al) FROM ApprovalLine al JOIN al.document d " +
+           "WHERE al.approver.id = :userId " +
+           "AND al.status = com.micesign.domain.enums.ApprovalLineStatus.PENDING " +
+           "AND al.lineType IN (com.micesign.domain.enums.ApprovalLineType.APPROVE, com.micesign.domain.enums.ApprovalLineType.AGREE) " +
+           "AND d.status = com.micesign.domain.enums.DocumentStatus.SUBMITTED " +
+           "AND d.currentStep = al.stepOrder")
+    long countPendingByApproverId(@Param("userId") Long userId);
+
     void deleteByDocumentId(Long documentId);
 
     List<ApprovalLine> findByDocumentIdAndStepOrder(Long documentId, Integer stepOrder);
