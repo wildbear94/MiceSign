@@ -14,6 +14,7 @@ import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
 import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
 import PendingApprovalsPage from './features/approval/pages/PendingApprovalsPage';
 import CompletedDocumentsPage from './features/approval/pages/CompletedDocumentsPage';
+import DashboardPage from './features/dashboard/pages/DashboardPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
@@ -60,7 +61,7 @@ function App() {
       />
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/documents/my" replace />} />
+          <Route path="/" element={<DashboardPage />} />
           <Route path="/documents/my" element={<DocumentListPage />} />
           <Route path="/documents/new/:templateCode" element={<DocumentEditorPage />} />
           <Route path="/documents/:id" element={<DocumentDetailPage />} />
