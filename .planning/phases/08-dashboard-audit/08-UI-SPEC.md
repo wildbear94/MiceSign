@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: dashboard-audit
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-03
+reviewed_at: 2026-04-03
 ---
 
 # Phase 8 — UI Design Contract
@@ -46,10 +47,11 @@ Exceptions: Navbar height is 64px (h-16), established in Phase 1.
 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
-| Body | 14px (text-sm) | 400 (font-normal) | 1.5 (leading-5) | Table rows, list items, descriptions |
-| Label | 12px (text-xs) | 500 (font-medium) | 1.5 (leading-4) | Table headers, badge text, count card labels |
+| Body | 14px (text-sm) | 400 (font-normal) | 1.5 (leading-5) | Table rows, list items, descriptions, table headers, badge text, count card labels |
 | Heading | 20px (text-xl) | 600 (font-semibold) | 1.2 (leading-tight) | Page title "대시보드", section headings |
-| Display | 28px (text-2xl) | 700 (font-bold) | 1.0 (leading-none) | Badge count numbers on dashboard cards |
+| Display | 28px (text-2xl) | 600 (font-semibold) | 1.0 (leading-none) | Badge count numbers on dashboard cards |
+
+Weights used: **2** (400 normal, 600 semibold). All label/caption text uses 400; all headings and display numbers use 600.
 
 ---
 
@@ -65,7 +67,6 @@ Exceptions: Navbar height is 64px (h-16), established in Phase 1.
 Accent reserved for:
 - "새 문서 작성" button (primary CTA)
 - Active NavLink indicator (`bg-blue-50 text-blue-700`)
-- SUBMITTED status badge (`bg-blue-100 text-blue-700`)
 - "더보기" links in dashboard lists
 
 ### Semantic Status Colors (established in prior phases)
@@ -77,6 +78,8 @@ Accent reserved for:
 | APPROVED | `bg-green-100 text-green-700` | `bg-green-900/30 text-green-400` |
 | REJECTED | `bg-red-100 text-red-700` | `bg-red-900/30 text-red-400` |
 | WITHDRAWN | `bg-amber-100 text-amber-700` | `bg-amber-900/30 text-amber-400` |
+
+Note: SUBMITTED badge uses blue from the semantic status palette, not from the accent budget. These are separate concerns -- status colors are data-driven indicators, accent is for interactive affordances.
 
 ---
 
@@ -135,8 +138,8 @@ Accent reserved for:
 ```
 +---------------------------+
 |  [Icon]                   |  <- 40px icon in muted color
-|  32                       |  <- Display size (28px), font-bold
-|  결재 대기                  |  <- Label (12px), text-gray-500
+|  32                       |  <- Display size (28px), font-semibold
+|  결재 대기                  |  <- Body size (14px), font-normal, text-gray-500
 +---------------------------+
 ```
 
@@ -153,7 +156,7 @@ Accent reserved for:
 ```
 
 - Parent link: `relative` positioning
-- Badge: `absolute -top-1 -right-3 bg-red-500 text-white text-xs font-medium rounded-full h-5 min-w-[20px] flex items-center justify-center px-1`
+- Badge: `absolute -top-1 -right-3 bg-red-500 text-white text-xs font-normal rounded-full h-5 min-w-[20px] flex items-center justify-center px-1`
 - Hidden when count is 0 (do not render)
 - Maximum display: "99+" for counts over 99
 
