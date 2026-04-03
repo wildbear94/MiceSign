@@ -188,7 +188,11 @@ Plans:
   3. User can create an overtime request (연장근무신청서) with date, hours, reason, and manager selection
   4. All three new templates work through the full document lifecycle (draft, submit, approve, view read-only) without regressions to existing templates
   5. Backend DocumentFormValidator uses strategy pattern instead of switch/case, cleanly supporting 6+ template types
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 10-01-PLAN.md — Backend: Strategy pattern refactor of DocumentFormValidator, Flyway V7 migration, 3 new form validators (Purchase, BusinessTrip, Overtime)
+- [ ] 10-02-PLAN.md — Frontend foundation: TypeScript types, Zod schemas, i18n keys, OvertimeForm + PurchaseForm components
+- [ ] 10-03-PLAN.md — Frontend: BusinessTripForm (dual tables), template registry wiring, visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 11: Document Search & Filter
@@ -220,5 +224,5 @@ Recommended order: 9 -> 10 -> 11 (or 9 and 10 in parallel if two work streams av
 | 7. Approval Workflow | v1.0 | 5/5 | Complete | - |
 | 8. Dashboard & Audit | v1.0 | 3/3 | Complete | - |
 | 9. SMTP Email Notifications | v1.1 | 3/3 | Complete   | 2026-04-03 |
-| 10. Additional Form Templates | v1.1 | 0/? | Not started | - |
+| 10. Additional Form Templates | v1.1 | 0/3 | Planning complete | - |
 | 11. Document Search & Filter | v1.1 | 0/? | Not started | - |
