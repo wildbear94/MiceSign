@@ -174,7 +174,7 @@ Plans:
   5. All notification attempts (success and failure) are recorded in the notification_log table and visible to SUPER_ADMIN
 **Plans:** 3 plans
 Plans:
-- [ ] 09-01-PLAN.md — Backend core: Gradle deps, AsyncConfig, Flyway migration, enums, entity, event class, EmailService, NotificationService, Thymeleaf templates, event publishing
+- [x] 09-01-PLAN.md — Backend core: Gradle deps, AsyncConfig, Flyway migration, enums, entity, event class, EmailService, NotificationService, Thymeleaf templates, event publishing
 - [ ] 09-02-PLAN.md — Backend admin API: NotificationLogSpecification, DTO, Controller (list + resend), integration tests
 - [ ] 09-03-PLAN.md — Frontend: notification feature module (types, API, hooks, components, page), sidebar + routing, visual checkpoint
 

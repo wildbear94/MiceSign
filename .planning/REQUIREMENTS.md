@@ -73,11 +73,11 @@ Milestone v1.1: Extended Features — SMTP notifications, document search/filter
 
 ### Notifications
 
-- [ ] **NTF-01**: User receives email notification when a document arrives for their approval
-- [ ] **NTF-02**: Drafter receives email when their document is approved or rejected
-- [ ] **NTF-03**: Drafter receives email when their document is withdrawn by an approver action
-- [ ] **NTF-04**: Approvers receive email when a document is submitted for approval workflow
-- [ ] **NTF-05**: Notification delivery history is logged in the database (notification_log table)
+- [x] **NTF-01**: User receives email notification when a document arrives for their approval
+- [x] **NTF-02**: Drafter receives email when their document is approved or rejected
+- [x] **NTF-03**: Drafter receives email when their document is withdrawn by an approver action
+- [x] **NTF-04**: Approvers receive email when a document is submitted for approval workflow
+- [x] **NTF-05**: Notification delivery history is logged in the database (notification_log table)
 
 ### Search
 
@@ -163,11 +163,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Complete |
 | DASH-03 | Phase 8: Dashboard & Audit | Complete |
 | AUD-01 | Phase 8: Dashboard & Audit | Complete |
-| NTF-01 | Phase 9: SMTP Email Notifications | Pending |
-| NTF-02 | Phase 9: SMTP Email Notifications | Pending |
-| NTF-03 | Phase 9: SMTP Email Notifications | Pending |
-| NTF-04 | Phase 9: SMTP Email Notifications | Pending |
-| NTF-05 | Phase 9: SMTP Email Notifications | Pending |
+| NTF-01 | Phase 9: SMTP Email Notifications | Complete |
+| NTF-02 | Phase 9: SMTP Email Notifications | Complete |
+| NTF-03 | Phase 9: SMTP Email Notifications | Complete |
+| NTF-04 | Phase 9: SMTP Email Notifications | Complete |
+| NTF-05 | Phase 9: SMTP Email Notifications | Complete |
 | TPL-04 | Phase 10: Additional Form Templates | Pending |
 | TPL-05 | Phase 10: Additional Form Templates | Pending |
 | TPL-06 | Phase 10: Additional Form Templates | Pending |
