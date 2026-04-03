@@ -45,16 +45,20 @@ Exceptions: Touch target height is 44px (`h-11`) for all input fields and select
 
 ## Typography
 
+Two weights only: 400 (regular) for body/input text, 600 (semibold) for all labels, headers, and titles.
+
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body / Input text | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Label | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Title input | 16px | 600 (semibold) | 1.5 | `text-base font-semibold` |
-| Template badge | 12px | 500 (medium) | 1.5 | `text-xs font-medium` |
+| Template badge | 12px | 400 (regular) | 1.5 | `text-xs` |
 | Table header | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Table footer total | 16px | 600 (semibold) | 1.5 | `text-base font-semibold` |
 | Auto-calculated value | 16px | 600 (semibold) | 1.5 | `text-base font-semibold text-blue-600` |
 | Error message | 14px | 400 (regular) | 1.5 | `text-sm text-red-600` |
+
+Note: Template badge uses 400 weight — the 12px size and `text-gray-500` color already differentiate it from body text without needing a third weight.
 
 Source: Extracted from `ExpenseForm.tsx`, `LeaveForm.tsx` existing class patterns. All new forms MUST match these exactly.
 
@@ -89,6 +93,18 @@ Source: All values extracted from existing `ExpenseForm.tsx`, `LeaveForm.tsx` pa
 
 ---
 
+## Visual Focal Points
+
+Each form screen has one visual anchor that draws the user's eye to the most important calculated or summary information.
+
+| Form | Focal Point | Treatment |
+|------|-------------|-----------|
+| PurchaseForm | Auto-calculated total amount in table footer | `text-base font-semibold text-blue-600` — the only blue text on screen, positioned at the bottom-right of the item table |
+| BusinessTripForm | Expense total in expense table footer | `text-base font-semibold text-blue-600` — same treatment as PurchaseForm, anchoring the cost summary |
+| OvertimeForm | Auto-calculated overtime hours display | `text-base font-semibold text-blue-600` showing "X.X시간" — the single calculated output that confirms the request |
+
+---
+
 ## Component Inventory
 
 ### Shared Patterns (reuse from existing templates)
@@ -106,7 +122,7 @@ Source: All values extracted from existing `ExpenseForm.tsx`, `LeaveForm.tsx` pa
 | Editable table (border, rounded-lg, overflow-hidden) | ExpenseForm | PurchaseForm, BusinessTripForm |
 | Table row input (h-9, compact) | ExpenseForm | PurchaseForm, BusinessTripForm |
 | Add row button (text-sm, blue-600, Plus icon) | ExpenseForm | PurchaseForm, BusinessTripForm |
-| Remove row button (h-8 w-8, X icon, red hover) | ExpenseForm | PurchaseForm, BusinessTripForm |
+| Remove row button (h-8 w-8, X icon, red hover, `aria-label="행 삭제"`) | ExpenseForm | PurchaseForm, BusinessTripForm |
 | Auto-sum footer (bg-gray-50, text-base semibold) | ExpenseForm | PurchaseForm, BusinessTripForm |
 | FileAttachmentArea component | Phase 5 | PurchaseForm, BusinessTripForm |
 | Error message (mt-1, text-sm, red-600) | All forms | All 3 new forms |
@@ -216,7 +232,7 @@ No table, no attachments. Simplest form.
 | Interaction | Behavior |
 |-------------|----------|
 | Add row | Append row with empty defaults. Button below table with Plus icon. |
-| Remove row | X button in last column. Disabled when only 1 row remains (`disabled:opacity-30 disabled:cursor-not-allowed`). |
+| Remove row | X button (`aria-label="행 삭제"`) in last column. Disabled when only 1 row remains (`disabled:opacity-30 disabled:cursor-not-allowed`). |
 | Auto-sum | Recalculate per-row amount and total on every keystroke via `watch('items')` + `useEffect`. |
 | Min rows | At least 1 row required. Cannot remove the last row. |
 | New row defaults | PurchaseForm: `{name:'', spec:'', quantity:1, unitPrice:0, amount:0}`. BusinessTrip itinerary: `{date:'', location:'', description:''}`. BusinessTrip expense: `{category:'transport', description:'', amount:0}`. |
@@ -243,6 +259,13 @@ If `endTime < startTime` (overnight work, e.g., 22:00 to 02:00): add 24 hours to
 ### Form Validation (Zod + React Hook Form)
 
 Validation errors display as `<p className="mt-1 text-sm text-red-600">` immediately below the offending field. Real-time validation on blur/change + full validation on submit.
+
+### Accessibility
+
+| Element | Attribute | Value |
+|---------|-----------|-------|
+| Remove row button (X icon) | `aria-label` | `"행 삭제"` |
+| Add row button | Text content | Visible label ("품목 추가", "일정 추가", "경비 추가") — no aria-label needed |
 
 ---
 
