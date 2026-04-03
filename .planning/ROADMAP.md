@@ -156,7 +156,7 @@ Plans:
 
 **Milestone Goal:** SMTP 이메일 알림, 추가 양식 템플릿, 문서 검색/필터로 전자결재 시스템의 실용성 확장
 
-- [ ] **Phase 9: SMTP Email Notifications** - Event-driven email notifications for all document state changes with retry and delivery logging
+- [x] **Phase 9: SMTP Email Notifications** - Event-driven email notifications for all document state changes with retry and delivery logging (completed 2026-04-03)
 - [ ] **Phase 10: Additional Form Templates** - Purchase request, business trip report, overtime request forms with validator refactoring
 - [ ] **Phase 11: Document Search & Filter** - Keyword search, status/date/template filters with role-based access control
 
@@ -172,11 +172,11 @@ Plans:
   3. All approvers in a workflow receive email when a document is initially submitted
   4. Failed email deliveries are retried automatically (up to 2 retries) without blocking the approval transaction
   5. All notification attempts (success and failure) are recorded in the notification_log table and visible to SUPER_ADMIN
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 09-01-PLAN.md — Backend core: Gradle deps, AsyncConfig, Flyway migration, enums, entity, event class, EmailService, NotificationService, Thymeleaf templates, event publishing
 - [x] 09-02-PLAN.md — Backend admin API: NotificationLogSpecification, DTO, Controller (list + resend), integration tests
-- [ ] 09-03-PLAN.md — Frontend: notification feature module (types, API, hooks, components, page), sidebar + routing, visual checkpoint
+- [x] 09-03-PLAN.md — Frontend: notification feature module (types, API, hooks, components, page), sidebar + routing, visual checkpoint
 
 ### Phase 10: Additional Form Templates
 **Goal**: Users can draft documents using three new form templates (purchase request, business trip report, overtime request), expanding coverage to all common Korean corporate approval types
@@ -219,6 +219,6 @@ Recommended order: 9 -> 10 -> 11 (or 9 and 10 in parallel if two work streams av
 | 6. Document Submission & Numbering | v1.0 | 2/2 | Complete | - |
 | 7. Approval Workflow | v1.0 | 5/5 | Complete | - |
 | 8. Dashboard & Audit | v1.0 | 3/3 | Complete | - |
-| 9. SMTP Email Notifications | v1.1 | 0/3 | Planning | - |
+| 9. SMTP Email Notifications | v1.1 | 3/3 | Complete   | 2026-04-03 |
 | 10. Additional Form Templates | v1.1 | 0/? | Not started | - |
 | 11. Document Search & Filter | v1.1 | 0/? | Not started | - |
