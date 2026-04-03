@@ -1,199 +1,183 @@
 # Project Research Summary
 
-**Project:** MiceSign
-**Domain:** In-house electronic approval system (전자 결재) — Korean corporate workflow, ~50 employees
-**Researched:** 2026-03-31
-**Confidence:** HIGH
+**Project:** MiceSign v1.1 — SMTP Notifications, Search/Filter, Additional Templates, Custom Template Builder
+**Domain:** Electronic approval system (전자 결재) extension — Korean corporate workflow, ~50 employees
+**Researched:** 2026-04-03
+**Confidence:** HIGH (notifications, search, templates), MEDIUM (custom template builder)
 
 ## Executive Summary
 
-MiceSign is a Korean corporate electronic approval (전자 결재) system replacing Docswave for a ~50-person company. This is a well-understood domain with established feature expectations: the product must faithfully replicate the core workflow of draft → submit → sequential approval → completion, with strict document immutability and full audit trails. The recommended approach is a **layered monolith** (Spring Boot + React SPA) deployed natively on a single server — microservices, BPMN engines, and dynamic form builders are all explicit anti-patterns at this scale and user count.
+MiceSign v1.1 extends a functioning electronic approval system (MVP complete) with four feature areas: SMTP email notifications, document search/filter, three additional hardcoded form templates, and a custom drag-and-drop template builder. The existing system is a well-structured Spring Boot layered monolith with React SPA frontend. Three of the four feature areas (notifications, search, templates) follow well-established patterns that integrate cleanly into the existing architecture without schema changes or paradigm shifts. Only the custom template builder requires novel architectural work and carries meaningful risk.
 
-The PRD-specified stack is valid and coherent. The key additions not in the PRD that are blocking without them: **Flyway** for schema versioning, **React Hook Form + Zod** for form validation, **Axios** for JWT interceptor pattern, and **React Router 7** for SPA navigation. The stack should be finalized in project scaffolding before any business logic begins, because getting QueryDSL annotation processors and the Axios 401 interceptor wrong at the start creates expensive rework.
+The recommended approach is to build in waves matching dependency and risk profile. SMTP notifications and additional form templates can be built independently and in parallel — they share zero cross-dependencies. Document search/filter builds on the existing document list patterns and benefits from having the complete template registry in place. The custom template builder — the only architecturally significant addition — should be tackled last and treated as a separate milestone: it introduces a dual rendering path, requires a JSON schema contract, and needs a versioning strategy for existing documents. For a 50-person company, nine hardcoded templates may be permanently sufficient; the builder's necessity should be validated after v1.1 ships.
 
-The primary delivery risk is the **approval line editor UX** (결재선 지정): it is the most complex frontend component, sits on the critical path, and poor UX here directly kills adoption. A second risk is concurrency — document numbering and approval state transitions must use pessimistic locking from day one, not retrofitted later. Both risks are well-understood and have clear mitigations; this is a buildable system with no novel technical uncertainty.
+The critical risk is introducing the custom template builder without a proper architectural boundary. If the dynamic form system is not separated from the hardcoded component system via a `template_type` discriminator (BUILTIN/CUSTOM) and a stable JSON schema contract, both systems become coupled and unmaintainable across all layers: rendering, validation, read-only display, and backend validator. The second major risk — email-in-transaction coupling — is fully preventable: SMTP sends must always be decoupled from the approval transaction via `@TransactionalEventListener(AFTER_COMMIT)` + `@Async`. Both risks have clear, established mitigations.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The PRD stack is validated as cohesive. Spring Boot 3.4.x on Java 17 LTS with Hibernate 6.x and QueryDSL 5.1.0 (`jakarta` classifier) covers the backend. The frontend is React 18.3.x + TypeScript 5.x + Vite 5.x + Zustand 5.x + TanStack Query v5. MariaDB 10.11 LTS (not 11.x) is the correct database choice. Google Drive API v3 with a Service Account handles file storage. Tailwind v3.4.x is preferred over v4 until ecosystem maturity is confirmed.
+No new frontend libraries are required for v1.1. All existing dependencies cover the feature set: `@hello-pangea/dnd` for the template builder's drag-and-drop, React Hook Form + Zod for new form templates, TanStack Query for search API calls. On the backend, four Spring ecosystem libraries are added exclusively for SMTP notifications — all version-managed by the Spring Boot BOM, requiring no explicit version pinning.
 
-**Core technologies:**
-- **Spring Boot 3.4.x / Java 17 LTS**: backend framework — stable LTS stack, no bleeding-edge risk
-- **Spring Security 6.x + jjwt 0.12.x**: authentication — stateless JWT, fits in with Boot 3.4 auto-config
-- **QueryDSL 5.1.0 (jakarta)**: complex queries — required for flexible document search/inbox filtering
-- **Flyway**: schema migration — must be included from day one; retrofitting is painful
-- **React 18.3.x + TypeScript 5.x**: frontend — type safety is essential given the complexity of approval workflows
-- **TanStack Query v5**: server state — handles caching and invalidation for document inboxes
-- **Axios (with interceptor)**: HTTP client — the 401 → refresh → retry pattern must be designed before building any auth-dependent feature
-- **React Hook Form + Zod**: form management — hardcoded template forms require complex structured validation
-- **MariaDB 10.11 LTS**: database — LTS release, avoid 11.x (short-term support only)
-- **MapStruct**: DTO mapping — compile-time safety for 10+ entity types
-- **SpringDoc OpenAPI**: API docs — Swagger UI is critical for solo dev debugging
+**Core additions (backend only):**
+- `spring-boot-starter-mail`: SMTP transport via `JavaMailSender` — PRD-mandated, zero-config auto-configuration with Boot BOM
+- `spring-boot-starter-thymeleaf`: HTML email templates — standard Spring Boot email templating, natural HTML preview in browser
+- `spring-retry`: `@Retryable` for failed email delivery — declarative retry matches PRD 2-retry spec exactly
+- `spring-boot-starter-aop`: required for `@EnableRetry` — Spring Boot standard, no version conflict
+
+**Zero new frontend dependencies.** `@hello-pangea/dnd` is already installed (used for approval line reordering). Reusing it eliminates bundle bloat and DnD behavior conflicts.
+
+**Explicit rejections:**
+- Elasticsearch / Meilisearch: overkill for 50 users; MariaDB LIKE + QueryDSL covers the scale
+- SurveyJS / FormEngine: commercial licenses, heavy, Tailwind styling conflicts, designed for enterprise scale
+- `@dnd-kit/core`: project already uses `@hello-pangea/dnd`; mixing DnD libraries causes conflicts and doubles bundle size
+- MariaDB MATCH...AGAINST full-text: broken for Korean without n-gram parser configuration; use LIKE instead
+- `@rjsf/core`: adds complexity without value; a custom renderer with React Hook Form integrates cleanly with existing Zod validation
 
 ### Expected Features
 
-**Must have (table stakes) — Phase 1-A:**
-- Authentication (login/logout/JWT refresh + account lockout)
-- Document drafting with 3 hardcoded form templates (GENERAL, EXPENSE, LEAVE)
-- Draft save (임시저장) — users lose trust if work disappears
-- Approval line selection editor (결재선 지정) — hardest UX component, invest heavily
-- Sequential approval processing (state machine: DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
-- Document immutability after submission — legal/audit requirement, non-negotiable
-- Approve/Reject with comments (reject comment mandatory)
-- Document withdrawal (회수) and re-draft (재기안)
-- Document numbering (채번) — assigned at submission, never at draft
-- File attachments via Google Drive API
-- Document inboxes: My Documents, Pending Approvals, Completed, Reference
-- Dashboard with pending count and quick navigation
-- Organization management (departments, positions, users + RBAC)
-- Audit trail recording (backend) — start recording in Phase 1-A, UI can wait
+**Must have (table stakes) — v1.1 scope:**
+- Email on submission, intermediate approval, final approval, rejection, withdrawal — approvers have no awareness of pending items without this
+- Keyword search (title + doc number) — essential once document volume grows beyond trivial count
+- Status filter, date range filter, template type filter, drafter filter — standard document management UI expectations
+- Access-controlled search results — users must only see documents they are authorized to view per FSD FN-SEARCH-001
+- Purchase Request (구매요청서), Business Trip Report (출장보고서), Overtime Request (연장근무신청서) — all named in PRD 5.1, legally required or common in Korean corporate culture
 
-**Should have (differentiators) — Phase 1-B:**
-- Email notifications (SMTP) — highest adoption impact; without this, approvals stall
-- Document search/filtering — essential once volume exceeds ~100 docs
-- Additional form templates (PURCHASE, BUSINESS_TRIP, OVERTIME)
-- Forced password change on first login
-- Read/unread status for reference documents
+**Should have (differentiators):**
+- Automatic notification retry (max 2x, 5-minute intervals) — explicitly specified in FSD FN-NTF-001
+- Template metadata admin (FN-TPL-002) — enables deactivating unused templates without code changes
+- Notification failure visibility for SUPER_ADMIN — simple query on existing `notification_log` table
+- URL-synced filter state in search — enables sharing filtered views and surviving browser back navigation
 
-**Defer to Phase 1-C:**
-- Audit log query UI (backend is already logging)
-- Statistics and reports (needs data volume)
-- Retirement/handover processing (edge case, handle manually initially)
-
-**Defer to Phase 2+:**
-- AI-assisted document drafting (needs 6+ months corpus)
-- Proxy/delegation approval (adds significant state machine complexity)
-- PDF export/print
-- Approval line favorites
-- Parallel approval (over-engineered for 50 users)
+**Defer to separate milestone:**
+- Custom template builder — 3-5x effort of all other v1.1 features combined; architectural paradigm shift from hardcoded approach; evaluate need after v1.1 ships with 9 total templates
+- In-app notification center (bell + real-time) — requires WebSocket/SSE infrastructure; email covers the need at 50 users
+- Search result Excel export — defer to Phase 1-C with statistics/reports
+- Auto-complete typeahead search — API complexity for minimal gain at this scale
+- Email opt-out preferences — all approval notifications are business-critical; no opt-out needed
 
 ### Architecture Approach
 
-The correct architecture is a **vertically-sliced monolith**: a single Spring Boot application organized by business domain (auth, org, template, document, approval, file, dashboard, common), with React SPA served through Nginx as a reverse proxy. No microservices, no BPMN engine, no event sourcing. The document state machine is an enum with 5 states enforced in the service layer — a dedicated workflow engine adds complexity with zero benefit at this scale. Deployment is a Spring Boot JAR via systemd plus React static files via Nginx on a single server; Docker is explicitly an anti-pattern here.
+The existing layered monolith (Controller → Service → Repository with MapStruct DTOs) accommodates all v1.1 features without structural change to the core model. Notifications integrate via Spring Application Events — domain events published from service methods, consumed by `@TransactionalEventListener` + `@Async` listeners that are fully decoupled from business transactions. Search integrates via a new `DocumentSearchSpecification` following the existing `UserSpecification` pattern. Templates are purely additive — 6 new React components, 3 Zod schemas, 3 registry entries, 3 backend validator strategies. The custom template builder requires the only genuine architectural extension: a `template_type` discriminator on `approval_template`, a `form_schema` JSON column, and a dual rendering path in the template registry.
 
-**Major components:**
-1. **auth/** — JWT authentication, token management, login/logout, Spring Security filter chain
-2. **org/** — Department tree, position hierarchy, user CRUD, RBAC (SUPER_ADMIN/ADMIN/USER)
-3. **document/** — Document CRUD, enum-based state machine, document numbering (채번), audit logging
-4. **approval/** — Approval line management, sequential processing, pessimistic locking
-5. **file/** — Google Drive API v3 integration, upload/download, retry with backoff
-6. **dashboard/** — Aggregation queries for pending counts, recent documents
-7. **common/** — Cross-cutting: audit logging (AOP/event listener), security config, exception handling
-8. **React SPA** — Pages per route, hardcoded template components, approval line editor, Zustand auth store, Axios API client with 401 interceptor
+**New components (notifications):**
+1. `NotificationEventListener` — `@TransactionalEventListener(AFTER_COMMIT)` + `@Async`, orchestrates email dispatch from domain events
+2. `EmailService` + Thymeleaf templates — SMTP transport layer, 5 HTML email template types
+3. `NotificationLog` entity + `@Scheduled` retry — delivery tracking and automated retry up to 2x
+
+**New components (search):**
+4. `DocumentSearchSpecification` — JPA Specification with permission-aware WHERE clause: drafter OR approval-line member OR ADMIN department scope OR SUPER_ADMIN
+5. `SearchPage` + `SearchFilterBar` + `useDocumentSearch` — frontend search UI with `useSearchParams` URL sync
+
+**New components (custom template builder — separate milestone):**
+6. `DynamicFormRenderer` / `DynamicFormReadOnly` / `DynamicFormValidator` — JSON schema-driven form rendering and server-side validation
+7. `FormSchemaBuilder` admin UI — drag-and-drop template designer using `@hello-pangea/dnd`
 
 ### Critical Pitfalls
 
-1. **Document numbering race condition** — Use `SELECT ... FOR UPDATE` on `doc_sequence` table within transaction; assign number only at SUBMITTED transition, never at DRAFT
-2. **Approval state machine race conditions** — Pessimistic lock (`@Lock(PESSIMISTIC_WRITE)`) on approval_line row; idempotency check on current status; frontend button disable on click
-3. **JWT refresh token stampede** — Axios interceptor must queue concurrent 401s and retry after single refresh promise resolves; do not let each concurrent request independently attempt a refresh
-4. **Access token lost on page refresh** — On app init, always call refresh endpoint to rehydrate access token from httpOnly cookie before rendering protected routes
-5. **Document immutability gaps** — Every mutation endpoint must check `document.status == DRAFT`; write integration tests for all mutation endpoints with SUBMITTED document expecting 400/409
-6. **Spring @Transactional self-invocation** — Avoid calling @Transactional methods within the same class; document numbering must be in its own transaction entry point
-7. **Resubmission with inactive approvers** — When creating re-draft, validate all copied approval line members are still ACTIVE; warn user if any have been deactivated
+1. **Custom template builder breaks the hardcoded template system** — Design the JSON schema format first, before writing any UI code. Add a `template_type` discriminator (BUILTIN/CUSTOM) to `approval_template`. If `if (isCustomTemplate)` branches appear in more than 3 places across the codebase, the dual-system coupling is already a structural problem that will compound.
+
+2. **Email sending inside transaction boundaries** — Any call to `JavaMailSender.send()` inside a `@Transactional` method is wrong. SMTP latency (500ms-3s per email) blocks the transaction; SMTP failure rolls back the approval action. Use `@TransactionalEventListener(phase = AFTER_COMMIT)` + `@Async` without exception.
+
+3. **Korean full-text search without n-gram tokenization** — MariaDB default full-text search uses word-boundary tokenization that fails for Korean (e.g., "결재" does not match "전자결재"). Use `LIKE '%keyword%'` on indexed `title` and `doc_number` columns. Never use `MATCH...AGAINST` without configuring n-gram parser (`WITH PARSER ngram`, `ngram_token_size=2`).
+
+4. **Template schema versioning gap** — Custom template edits after documents exist corrupt read-only rendering. Either snapshot the schema at document submission or lock templates from structural edits once any submitted documents reference them. Simplest safe rule: once submitted documents exist for a template, prohibit field removal.
+
+5. **N+1 query problem in search results** — Document search returning 20 rows must not trigger 60 lazy-load queries for drafter/department/template relations. Use QueryDSL projections with explicit JOINs to a flat `DocumentSearchDto`. Indexes required on `document.status`, `document.template_code`, `document.submitted_at`, `document.title(100)`.
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure:
+Based on combined research findings, the optimal phase structure follows the dependency graph and risk escalation:
 
-### Phase 1: Project Foundation
-**Rationale:** All subsequent phases depend on correct infrastructure setup. QueryDSL annotation processor misconfiguration and missing Flyway cause expensive rework. Korean encoding and CORS must be correct from the start.
-**Delivers:** Runnable Spring Boot + React project with all dependencies wired, Flyway migrations for initial schema, Axios interceptor skeleton, dev CORS config, Korean encoding setup, SpringDoc OpenAPI endpoint
-**Addresses:** All must-have libraries from STACK.md (Flyway, Axios, React Hook Form + Zod, React Router, MapStruct, Headless UI)
-**Avoids:** Korean text encoding corruption (Pitfall 12), CORS/cookie misconfiguration (Pitfall 13), QueryDSL setup pain
+### Phase 1: SMTP Email Notifications
+**Rationale:** No dependencies on other v1.1 features. The `notification_log` table DDL already exists in the database schema. FSD FN-NTF-001 fully specifies all behavior including event types, retry policy, and failure handling. This is a textbook Spring Boot pattern with zero architectural uncertainty. Highest user impact relative to implementation effort (2-3 days estimated).
+**Delivers:** Email notifications for all 5 event types (submit, intermediate approve, final approve, reject, withdraw) with `@Retryable` delivery retry and `notification_log` tracking.
+**Uses:** `spring-boot-starter-mail`, `spring-boot-starter-thymeleaf`, `spring-retry`, `@TransactionalEventListener`, `@Async`
+**Avoids:** Pitfall 2 (email in transaction — use AFTER_COMMIT event listener), Pitfall 8 (SMTP credential leak — environment variables, never committed config)
 
-### Phase 2: Auth + Organization
-**Rationale:** Every other feature requires authenticated users and an org structure. Org management must be built before the approval line editor (which browses the org tree). The JWT interceptor pattern (Pitfall 3 + 4) must be implemented here, not retrofitted later.
-**Delivers:** Working login/logout/token refresh, RBAC, user account lockout, org tree CRUD, department/position management, admin pages
-**Addresses:** FN-AUTH-001–005, FN-ORG-001–008
-**Avoids:** JWT refresh stampede (Pitfall 4), access token loss on refresh (Pitfall 8), CORS cookie issues (Pitfall 13)
+### Phase 2: Additional Form Templates (3 hardcoded)
+**Rationale:** Fully independent of notifications and search. Follows the exact existing pattern proven by GENERAL, EXPENSE, and LEAVE templates — purely additive changes with no risk to existing functionality. Before adding templates, refactor `DocumentFormValidator` from switch/case to a strategy pattern to prevent the validator from growing to 250+ unmaintainable lines at 6+ template types. The strategy pattern refactoring also directly benefits the custom template builder phase.
+**Delivers:** Purchase Request (구매요청서), Business Trip Report (출장보고서), Overtime Request (연장근무신청서) — 6 new React components, 3 Zod schemas, 3 validator strategy classes, 3 Flyway seed migrations. `DocumentFormValidator` refactored to strategy pattern.
+**Avoids:** Pitfall 9 (validator bloat — refactor before adding new cases), establishes stable template count for search filter dropdown
 
-### Phase 3: Document Core
-**Rationale:** Documents are the central entity that everything else touches. Must be correct before approval workflow is layered on top. Immutability enforcement and document numbering locking must be built here — they cannot be retrofitted safely.
-**Delivers:** Document CRUD with DRAFT state, 3 hardcoded form templates, draft save, document numbering (채번) with SELECT FOR UPDATE, document immutability enforcement, re-draft from rejected/withdrawn, file attachment (Google Drive), audit log recording
-**Addresses:** FN-TPL-001/003, FN-DOC-001–009, FN-FILE-001–003, FN-AUD-001
-**Avoids:** Document numbering race condition (Pitfall 1), immutability gaps (Pitfall 3), resubmission with inactive approvers (Pitfall 10), @Transactional self-invocation (Pitfall 11)
+### Phase 3: Document Search/Filter
+**Rationale:** Builds on the existing document list page and `UserSpecification` JPA Specification pattern. Benefits from Phase 2 being complete so the template-type filter dropdown is fully populated with all 6 templates. FSD FN-SEARCH-001 specifies the exact access control WHERE clause logic. The permission-aware subquery is the only non-trivial implementation challenge.
+**Delivers:** Full document search with keyword, status, template, date range, and drafter filters; paginated results with existing `Pagination.tsx` component; role-based access control (drafter OR approval line member OR ADMIN dept scope OR SUPER_ADMIN); URL-synced filter state via `useSearchParams`.
+**Uses:** QueryDSL `BooleanBuilder` / `JpaSpecificationExecutor`, Spring `Pageable`, `useSearchParams` from React Router
+**Avoids:** Pitfall 3 (Korean full-text — LIKE '%keyword%' not MATCH...AGAINST), Pitfall 5 (N+1 — QueryDSL projections with JOIN FETCH), Pitfall 10 (lost filter state — URL params from day one)
 
-### Phase 4: Approval Workflow
-**Rationale:** This is the core product. Depends on documents (to approve) and org structure (for approval line selection). The approval line editor is the most complex single component — build and test with real users before building anything else. State machine concurrency must be addressed here.
-**Delivers:** Approval line editor UI (org tree browser + search + drag-and-drop ordering + type assignment), document submission (DRAFT → SUBMITTED), sequential approval processing, approve/reject with comments, withdrawal (회수), complete state machine with pessimistic locking
-**Addresses:** FN-APR-001–005
-**Avoids:** Approval state machine race conditions (Pitfall 2), withdrawal race with approval (Pitfall 7), mixed APPROVE/AGREE step logic (Pitfall 6), approval line editor UX complexity (Pitfall 14)
-
-### Phase 5: Dashboard + Inboxes
-**Rationale:** Depends on documents and approval workflow existing. Dashboard and inboxes complete the day-to-day user experience — without them the system has no navigable home base.
-**Delivers:** Dashboard (pending count, recent docs, quick links), My Documents inbox, Pending Approvals inbox with badge count, Completed Approvals inbox, Reference Documents inbox
-**Addresses:** FN-DASH-001, inbox features
-**Avoids:** Audit log performance (Pitfall 9 — ensure proper indexes exist before inbox queries run)
-
-### Phase 6: Notifications + Search + Additional Templates
-**Rationale:** These are high-impact differentiators but not blocking for initial deployment. Email notifications have the highest adoption impact of any Phase 1-B feature.
-**Delivers:** Email notifications (SMTP, async/event-driven), document search/filtering, additional form templates (PURCHASE, BUSINESS_TRIP, OVERTIME), forced password change on first login, read/unread status for reference docs
-**Addresses:** FN-NTF-001, FN-SEARCH-001, additional template FNs
-
-### Phase 7: Admin Tools + Reports
-**Rationale:** Meaningful only after sufficient data and workflow history exist. Audit log UI and statistics require a populated database.
-**Delivers:** Audit log query UI (SUPER_ADMIN), statistics and reports (approval turnaround times, rejection rates, department volumes), retirement/handover processing (bulk WITHDRAWN/SKIPPED)
-**Addresses:** FN-AUD-002, FN-ORG-009, statistics features
+### Phase 4: Custom Template Builder (Separate Milestone — Evaluate After v1.1)
+**Rationale:** Architecturally distinct from all prior v1.1 work. Should only begin after Phases 1-3 are shipped and the hardcoded template pattern is proven stable with real usage. Has its own internal dependency chain that must be respected, and introduces the highest implementation risk of any v1.1 feature. With 9 hardcoded templates covering all common Korean corporate approval types, the builder may not be needed.
+**Delivers:** Admin drag-and-drop form designer producing JSON schema definitions; dynamic form renderer consuming schemas; schema-driven server-side validation; dual rendering path in template registry (BUILTIN uses hardcoded components, CUSTOM uses `DynamicFormRenderer`).
+**Sub-phases (in strict order):**
+- D1: JSON schema format finalization + `DynamicFormRenderer` + `DynamicFormReadOnly` (foundation)
+- D2: `DynamicFormValidator` server-side schema-driven validation
+- D3: `TemplateBuilderPage` admin UI with `@hello-pangea/dnd` field palette and canvas
+- D4: Integration with template selection modal and document creation flow
+**Avoids:** Pitfall 1 (dual system — BUILTIN/CUSTOM discriminator, schema-first design), Pitfall 4 (schema versioning — snapshot at submission), Pitfall 7 (scope creep — v1 field types: text, textarea, number, date, select, checkbox only; no conditional logic, no repeating rows, no calculated fields)
 
 ### Phase Ordering Rationale
 
-- Phases 1–2 are pure infrastructure and must be sequential — no business logic can start before auth/org exists
-- Phase 3 (Document Core) must precede Phase 4 (Approval) because approval acts on document entities; the state machine must be built document-first
-- Phase 4 (Approval Line Editor) is the riskiest component and should be prototyped early with actual users; it's the make-or-break UX component
-- Phase 5 (Dashboard/Inboxes) is intentionally late because the queries are additive and depend on data from Phases 3–4
-- Phases 6–7 follow the PRD's Phase 1-B / Phase 1-C structure — useful but not blocking for initial deployment
-- Google Drive file attachment is placed in Phase 3 (Document Core) despite being an external dependency — this is deliberate so attachment behavior is validated alongside the document lifecycle before approval workflow adds complexity
+- Notifications and additional templates (Phases 1-2) have zero cross-dependencies and can proceed in parallel if two work streams are available
+- Search (Phase 3) follows templates because the template-type filter dropdown needs a complete template registry to be useful
+- Both waves (1-2 and then 3) complete the entire v1.1 specification except the builder
+- Builder (Phase 4) is last because it requires all hardcoded templates to be stable and proven before introducing the parallel rendering path, and because it carries the highest risk of any feature
+- Treating the builder as a separate milestone after v1.1 ships is the lower-risk path — real usage data from 9 templates will clarify whether a builder is genuinely needed
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-- **Phase 2 (Auth):** Axios interceptor queue pattern for concurrent 401s is nuanced — verify against current jjwt 0.12.x and TanStack Query v5 interaction patterns
-- **Phase 4 (Approval Workflow):** Approval line editor requires UX research with actual users before committing to implementation; org tree component selection (Headless UI vs Radix) needs evaluation
+Phases needing deeper research during planning:
+- **Phase 4 (Custom Template Builder):** No existing FSD specification for this feature. Schema format, versioning strategy, and builder UX require deliberate design before implementation begins. Recommend `/gsd:research-phase` at the start of Phase D1. Key decisions: include or exclude `table` field type (doubles complexity if included), snapshot vs. version-locking strategy for schema changes.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** Standard Spring Boot + Vite scaffolding, well-documented
-- **Phase 3 (Document Core):** Standard CRUD + state machine patterns, well-understood
-- **Phase 5 (Dashboard):** Aggregation query patterns are straightforward
-- **Phase 6 (Notifications/Search):** Spring Mail + JPA full-text search are standard
-- **Phase 7 (Admin Tools):** CRUD + filtered query patterns, standard
+- **Phase 1 (Notifications):** FSD FN-NTF-001 fully specified; `@TransactionalEventListener` + `@Async` is textbook Spring Boot pattern; `notification_log` table DDL exists
+- **Phase 2 (Templates):** Direct replication of GENERAL/EXPENSE/LEAVE pattern; 6 reference files exist in codebase; strategy pattern refactor is straightforward
+- **Phase 3 (Search/Filter):** FSD FN-SEARCH-001 fully specified including exact access control logic; existing `UserSpecification` is the reference implementation
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | PRD choices validated as cohesive; missing libraries identified with clear rationale |
-| Features | HIGH | Based on PRD v2.0, FSD v1.0, and well-established Korean corporate approval system domain |
-| Architecture | HIGH | Layered monolith with vertical slicing is the consensus pattern for this scale; anti-patterns clearly identified |
-| Pitfalls | HIGH | Concurrency, JWT, and immutability pitfalls are well-documented and have verified mitigations |
+| Stack | HIGH | 0 new frontend deps confirmed; 4 backend deps all Spring BOM-managed; validated against existing `build.gradle.kts` and `package.json` |
+| Features | HIGH | FSD FN-NTF-001, FN-SEARCH-001, FN-TPL-002/003 fully specify notifications, search, and templates; builder is the only unspecified area |
+| Architecture | HIGH (phases 1-3) / MEDIUM (phase 4) | Notifications, search, templates follow verified existing codebase patterns; builder design is opinionated analysis with no FSD backing |
+| Pitfalls | HIGH | 8 of 11 pitfalls derived from direct codebase inspection; SMTP and Korean search pitfalls from well-documented authoritative sources |
 
-**Overall confidence:** HIGH
+**Overall confidence:** HIGH for Phases 1-3, MEDIUM for Phase 4
 
 ### Gaps to Address
 
-- **Vite 5 vs 6 / Tailwind 3 vs 4:** Both have "verify current stable" flags in STACK.md. Lock versions explicitly in Phase 1 scaffolding after checking current releases.
-- **Headless UI vs Radix UI** for approval line tree component: both are viable but should be evaluated against actual org tree interaction requirements during Phase 4 planning.
-- **Google Drive Service Account quota:** Per-second rate limits could cause issues under simultaneous bulk uploads. Validate retry/backoff behavior during Phase 3 testing.
-- **Email SMTP provider:** PRD specifies SMTP but does not specify provider. Needs configuration decision before Phase 6 (likely company's existing email infrastructure).
+- **Custom builder field type scope:** Research recommends 6 field types for v1 (text, textarea, number, date, select, checkbox). The decision to include `table` (repeating rows like expense items) is the single most impactful scope decision — including it roughly doubles builder complexity. Resolve explicitly before Phase D1 begins.
+- **Template schema versioning strategy:** Two options are viable (snapshot schema JSON at document submission vs. lock templates from structural edits once submitted documents exist). Neither is specified in FSD. Choose one strategy before building any persistence layer for custom templates.
+- **Notification batching:** Per-event notifications are correct for v1. Pitfall 6 (notification spam) is low risk at 50 users but the `notification_log` table design should anticipate batching — include a `digest_group` or `batch_id` column even if the batching logic comes later.
+- **SMTP provider selection:** Research assumes company's existing email infrastructure. Confirm SMTP host, port, and TLS requirements before Phase 1 implementation. Local development should use MailPit or MailHog (mock SMTP) to avoid committing real credentials.
+- **`react-day-picker` decision:** Research recommends starting with native HTML5 `<input type="date">`. Defer adding `react-day-picker` (9.x, ~10KB) until Phase 4 custom builder UX testing reveals an actual need — do not add it speculatively.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- PRD v2.0: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/docs/PRD_MiceSign_v2.0.md`
-- FSD v1.0: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/docs/FSD_MiceSign_v1.0.md`
-- PROJECT.md: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/.planning/PROJECT.md`
+- FSD v1.0 FN-NTF-001 — email notification spec, event types, retry policy, `notification_log` table
+- FSD v1.0 FN-SEARCH-001 — document search spec, access control WHERE clause, query parameters
+- FSD v1.0 FN-TPL-002 / FN-TPL-003 — template admin spec, form data JSON schemas
+- PRD v2.0 section 5.1 — template structure, planned additional templates list
+- Existing codebase: `templateRegistry.ts`, `DocumentFormValidator.java`, `UserSpecification.java`, `V1__create_schema.sql` (notification_log DDL)
+- [Spring Boot Mail Reference](https://docs.spring.io/spring-boot/reference/io/email.html)
+- [Spring @TransactionalEventListener documentation](https://docs.spring.io/spring-framework/reference/data-access/transaction/event.html)
+- [Thymeleaf Spring Mail Article](https://www.thymeleaf.org/doc/articles/springmail.html)
+- [Spring Retry Guide — Baeldung](https://www.baeldung.com/spring-retry)
 
 ### Secondary (MEDIUM confidence)
-- Domain knowledge: Korean corporate 전자 결재 systems (Docswave, Hiworks, Hancom Groupware, Samsung SDS Brity Works, LG CNS) — consensus feature set
-- Spring Boot 3.4.x + QueryDSL 5.1.0 jakarta classifier setup patterns — community-verified configuration
-- JWT refresh token queue pattern — widely documented Axios interceptor pattern
+- [Spring Core Resilience Features (2025)](https://spring.io/blog/2025/09/09/core-spring-resilience-features/) — retry pattern options
+- [Transactional Outbox pattern with Spring Boot — Wim Deblauwe](https://www.wimdeblauwe.com/blog/2024/06/25/transactional-outbox-pattern-with-spring-boot/) — outbox vs. @Async tradeoffs
+- [MariaDB Full-Text Index Pitfalls and n-gram Parser](https://runebook.dev/en/docs/mariadb/full-text-index-overview/index) — Korean tokenization gap
+- [@hello-pangea/dnd npm](https://www.npmjs.com/package/@hello-pangea/dnd) — DnD library status and maintenance
+- [Top 5 DnD Libraries for React 2026 — Puck](https://puckeditor.com/blog/top-5-drag-and-drop-libraries-for-react) — dnd-kit maintenance concerns (pre-1.0 @dnd-kit/react)
+- [spring-boot-starter-mail on Maven Central](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail)
 
-### Tertiary (LOW confidence — verify during implementation)
-- Vite 5 vs 6 current stable release
-- Tailwind v4 ecosystem readiness
-- Google Drive API v3 per-second rate limits for concurrent uploads
+### Tertiary (LOW confidence — validate during implementation)
+- [Drag-and-Drop React Form Builder with Zod — dev.to](https://dev.to/shoaeeb_osman_e3e2ae43910/i-built-a-drag-and-drop-react-form-builder-with-zod-react-hook-form-heres-how-3bc4) — builder architecture patterns (single dev blog post, needs validation)
+- [Understanding TransactionalEventListener in Spring Boot — dev.to](https://dev.to/haraf/understanding-transactioneventlistener-in-spring-boot-use-cases-real-time-examples-and-4aof) — supplementary examples
 
 ---
-*Research completed: 2026-03-31*
+*Research completed: 2026-04-03*
 *Ready for roadmap: yes*
