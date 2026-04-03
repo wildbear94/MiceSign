@@ -3,9 +3,9 @@
 **Defined:** 2026-03-31
 **Core Value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
 
-## v1 Requirements
+## v1.0 Requirements (Complete)
 
-Requirements for Phase 1-A MVP. Each maps to roadmap phases.
+Phase 1-A MVP — all requirements validated.
 
 ### Authentication
 
@@ -29,11 +29,11 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 - [x] **DOC-01**: User can create a draft document by selecting a form template
 - [x] **DOC-02**: User can edit and delete their own draft documents
-- [ ] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
-- [ ] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
+- [x] **DOC-03**: User can submit a draft, triggering document numbering (format: PREFIX-YYYY-NNNN)
+- [x] **DOC-04**: Submitted documents are fully locked (body, attachments, approval line cannot be modified)
 - [x] **DOC-05**: User can view document detail page with full content, approval line status, and attachments
 - [x] **DOC-06**: User can view list of their drafted and submitted documents with status
-- [ ] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
+- [x] **DOC-07**: Document numbering uses per-template, per-year sequences with race condition protection
 
 ### Approval
 
@@ -67,34 +67,41 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 - [x] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
 
-## v2 Requirements
+## v1.1 Requirements
 
-Deferred to future releases (Phase 1-B, 1-C, Phase 2).
+Milestone v1.1: Extended Features — SMTP notifications, document search/filter, additional form templates.
 
-### Notifications (Phase 1-B)
+### Notifications
 
-- **NTF-01**: User receives email notification when a document arrives for their approval
-- **NTF-02**: Drafter receives email when their document is approved or rejected
-- **NTF-03**: Notification delivery history logged in database
+- [ ] **NTF-01**: User receives email notification when a document arrives for their approval
+- [ ] **NTF-02**: Drafter receives email when their document is approved or rejected
+- [ ] **NTF-03**: Drafter receives email when their document is withdrawn by an approver action
+- [ ] **NTF-04**: Approvers receive email when a document is submitted for approval workflow
+- [ ] **NTF-05**: Notification delivery history is logged in the database (notification_log table)
 
-### Search (Phase 1-B)
+### Search
 
-- **SRCH-01**: User can search documents by title, document number, drafter name
-- **SRCH-02**: User can filter documents by status, date range, template type
+- [ ] **SRCH-01**: User can search documents by title, document number, and drafter name
+- [ ] **SRCH-02**: User can filter documents by status, date range, and template type
 
-### Audit UI (Phase 1-C)
+### Additional Templates
 
-- **AUD-02**: SUPER_ADMIN can query audit logs with filters (action type, user, date range)
+- [ ] **TPL-04**: Purchase request form (구매 요청서) with item table, auto-sum, and evidence attachments
+- [ ] **TPL-05**: Business trip report form (출장 보고서) with itinerary, expense breakdown, and attachments
+- [ ] **TPL-06**: Overtime request form (연장 근무 신청서) with date, hours, reason, and manager selection
 
-### Statistics (Phase 1-C)
+## Future Requirements
+
+### Custom Template Builder (v1.2)
+
+- **BLDR-01**: Admin can create custom form templates using drag & drop builder
+- **BLDR-02**: Custom templates support field types: text, textarea, number, date, select, table
+- **BLDR-03**: System renders custom templates dynamically from JSON schema
+- **BLDR-04**: Template versioning preserves existing documents when schema changes
+
+### Statistics (Future)
 
 - **STAT-01**: Admin can view approval statistics (counts by status, average processing time)
-
-### Additional Templates (Phase 1-B)
-
-- **TPL-04**: Purchase request form (구매 요청서)
-- **TPL-05**: Business trip report form (출장 보고서)
-- **TPL-06**: Overtime request form (연장 근무 신청서)
 
 ### AI (Phase 2)
 
@@ -104,9 +111,7 @@ Deferred to future releases (Phase 1-B, 1-C, Phase 2).
 
 | Feature | Reason |
 |---------|--------|
-| SMTP email notifications | Deferred to Phase 1-B; MVP uses dashboard polling |
-| Document search/filtering | Deferred to Phase 1-B |
-| Dynamic form builder | Hardcoded components are simpler and sufficient for ~50 users |
+| Full-text search | LIKE search sufficient for ~50 users; Elasticsearch overkill |
 | Auto-routing approval rules | PRD specifies 100% manual approval line selection |
 | Delegation/proxy approval (대결/위임) | Explicitly excluded from Phase 1 per PRD |
 | Mobile app | Web-first; mobile later |
@@ -136,11 +141,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ORG-05 | Phase 1: Project Foundation | Complete |
 | DOC-01 | Phase 4: Document Core & Templates | Complete |
 | DOC-02 | Phase 4: Document Core & Templates | Complete |
-| DOC-03 | Phase 6: Document Submission & Numbering | Pending |
-| DOC-04 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-03 | Phase 6: Document Submission & Numbering | Complete |
+| DOC-04 | Phase 6: Document Submission & Numbering | Complete |
 | DOC-05 | Phase 4: Document Core & Templates | Complete |
 | DOC-06 | Phase 4: Document Core & Templates | Complete |
-| DOC-07 | Phase 6: Document Submission & Numbering | Pending |
+| DOC-07 | Phase 6: Document Submission & Numbering | Complete |
 | APR-01 | Phase 7: Approval Workflow | Complete |
 | APR-02 | Phase 7: Approval Workflow | Complete |
 | APR-03 | Phase 7: Approval Workflow | Complete |
@@ -158,12 +163,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Complete |
 | DASH-03 | Phase 8: Dashboard & Audit | Complete |
 | AUD-01 | Phase 8: Dashboard & Audit | Complete |
+| NTF-01 | - | Pending |
+| NTF-02 | - | Pending |
+| NTF-03 | - | Pending |
+| NTF-04 | - | Pending |
+| NTF-05 | - | Pending |
+| SRCH-01 | - | Pending |
+| SRCH-02 | - | Pending |
+| TPL-04 | - | Pending |
+| TPL-05 | - | Pending |
+| TPL-06 | - | Pending |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36
-- Unmapped: 0
+- v1.0 requirements: 36 total (36 complete)
+- v1.1 requirements: 10 total (0 complete)
+- Unmapped: 10
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-03-31 after roadmap creation*
+*Last updated: 2026-04-03 — v1.1 requirements added*
