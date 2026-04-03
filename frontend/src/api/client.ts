@@ -47,6 +47,11 @@ function processQueue(error: unknown, token: string | null = null): void {
 // Request interceptor: attach JWT and proactive refresh
 apiClient.interceptors.request.use(
   async (config) => {
+    // Let browser set correct Content-Type with boundary for FormData
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+
     const { accessToken } = useAuthStore.getState();
 
     if (accessToken) {

@@ -15,7 +15,6 @@ export const attachmentApi = {
       `/documents/${documentId}/attachments`,
       formData,
       {
-        headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => {
           if (e.total) onProgress(Math.round((e.loaded / e.total) * 100));
         },

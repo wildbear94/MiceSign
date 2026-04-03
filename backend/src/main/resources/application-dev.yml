@@ -14,3 +14,4 @@ logging:
   level:
     com.micesign: DEBUG
     org.hibernate.SQL: DEBUG
+    com.google.api.client: DEBUG

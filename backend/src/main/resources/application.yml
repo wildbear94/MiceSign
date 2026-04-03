@@ -34,12 +34,16 @@ app:
 google:
   drive:
     credentials-path: ${GOOGLE_DRIVE_CREDENTIALS_PATH:}
-    root-folder-name: MiceSign
+    #root-folder-name: MiceSign
+    root-folder-id: ${GOOGLE_DRIVE_ROOT_FOLDER_ID:0AGXiBf9tQrzEUk9PVA}
 
 server:
   port: 8080
   servlet:
     context-path: /
+  tomcat:
+    max-http-form-post-size: 250MB
+    max-swallow-size: 250MB
 
 management:
   endpoints:
