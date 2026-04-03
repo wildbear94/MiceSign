@@ -19,10 +19,22 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] Audit trail logging for all document state changes
-- [ ] Dashboard showing pending approvals and recent documents
+- [ ] SMTP email notifications for all document state changes
+- [ ] Document search/filter (title, doc number, drafter name + status/date/template filters)
+- [ ] Additional form templates: purchase request, business trip report, overtime request
+- [ ] Custom template builder (Admin drag & drop form designer)
 
-### Validated (Phases 3-7)
+## Current Milestone: v1.1 Extended Features
+
+**Goal:** 알림, 검색, 추가 양식, 커스텀 양식 빌더로 전자결재 시스템 확장
+
+**Target features:**
+- SMTP 이메일 알림 (모든 문서 상태 변경 — 제출/승인/반려/회수)
+- 문서 검색/필터 (제목, 문서번호, 기안자명 검색 + 상태/날짜/양식 필터)
+- 추가 양식 템플릿 3종 (구매요청서, 출장보고서, 연장근무신청서)
+- 커스텀 템플릿 빌더 (Admin이 드래그&드롭으로 새 양식 생성)
+
+### Validated (Phases 3-8)
 - [x] Admin-managed organization structure (departments, positions, users) — Validated in Phase 3: Organization Management (ORG-01, ORG-02, ORG-03, ORG-04)
 - [x] RBAC with three roles (SUPER_ADMIN, ADMIN, USER) — Validated in Phase 3: Organization Management
 - [x] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE) — Validated in Phase 4: Document Core & Templates (DOC-01, DOC-02, DOC-05, DOC-06, TPL-01, TPL-02, TPL-03)
@@ -31,14 +43,13 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] File attachments via Google Drive API (Service Account) — Validated in Phase 5: File Attachments (FILE-01, FILE-02, FILE-03)
 - [x] Flexible approval line selection (APPROVE, AGREE, REFERENCE types) — Validated in Phase 7: Approval Workflow (APR-01, APR-02)
 - [x] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN) — Validated in Phase 7: Approval Workflow (APR-03, APR-04, APR-05, APR-06, APR-07)
+- [x] Dashboard with pending approvals, recent documents, badge counts — Validated in Phase 8: Dashboard & Audit (DASH-01, DASH-02, DASH-03)
+- [x] Immutable audit trail for all document state changes and key user actions — Validated in Phase 8: Dashboard & Audit (AUD-01)
 
 ### Out of Scope
 
-- SMTP email notifications — deferred to Phase 1-B
-- Document search/filtering — deferred to Phase 1-B
-- Audit log query UI — deferred to Phase 1-C
-- Statistics/reports — deferred to Phase 1-C
-- Handover features — deferred to Phase 1-C
+- Statistics/reports — deferred to future milestone
+- Handover features — deferred to future milestone
 - AI-assisted proposals — deferred to Phase 2
 - Data migration from Docswave — fresh start, no migration needed
 - Docker containerization — native deployment, local dev for now
@@ -92,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after Phase 2 (Authentication) completion*
+*Last updated: 2026-04-03 — Milestone v1.1 started*
