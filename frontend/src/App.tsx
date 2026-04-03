@@ -16,6 +16,7 @@ import PendingApprovalsPage from './features/approval/pages/PendingApprovalsPage
 import CompletedDocumentsPage from './features/approval/pages/CompletedDocumentsPage';
 import DashboardPage from './features/dashboard/pages/DashboardPage';
 import AuditLogPage from './features/audit/pages/AuditLogPage';
+import NotificationLogPage from './features/notification/pages/NotificationLogPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
@@ -76,6 +77,7 @@ function App() {
             <Route path="users" element={<UserListPage />} />
             <Route path="users/:id" element={<UserDetailPage />} />
             <Route path="audit-logs" element={<AuditLogPage />} />
+            <Route path="notifications" element={<NotificationLogPage />} />
           </Route>
         </Route>
       </Route>

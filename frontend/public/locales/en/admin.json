@@ -69,7 +69,9 @@
   "sidebar": {
     "departments": "Departments",
     "positions": "Positions",
-    "users": "Users"
+    "users": "Users",
+    "auditLogs": "Audit Logs",
+    "notifications": "Notifications"
   },
   "common": {
     "close": "Close",

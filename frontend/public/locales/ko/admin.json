@@ -70,7 +70,8 @@
     "departments": "부서 관리",
     "positions": "직급 관리",
     "users": "사용자 관리",
-    "auditLogs": "감사 로그"
+    "auditLogs": "감사 로그",
+    "notifications": "알림 이력"
   },
   "audit": {
     "title": "감사 로그",
