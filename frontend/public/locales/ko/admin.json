@@ -69,7 +69,25 @@
   "sidebar": {
     "departments": "부서 관리",
     "positions": "직급 관리",
-    "users": "사용자 관리"
+    "users": "사용자 관리",
+    "auditLogs": "감사 로그"
+  },
+  "audit": {
+    "title": "감사 로그",
+    "allActions": "모든 액션",
+    "allUsers": "모든 사용자",
+    "search": "검색",
+    "empty": "조건에 맞는 로그가 없습니다.",
+    "error": "데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "noAccess": "접근 권한이 없습니다.",
+    "columns": {
+      "action": "액션",
+      "user": "사용자",
+      "target": "대상",
+      "detail": "상세",
+      "ip": "IP 주소",
+      "timestamp": "일시"
+    }
   },
   "common": {
     "close": "닫기",
