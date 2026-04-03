@@ -145,7 +145,11 @@ Plans:
   2. User sees their recent documents with current status on the dashboard
   3. Badge counts display for pending approvals, in-progress drafts, and completed documents
   4. All document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file operations, admin edits) are recorded in immutable audit log entries
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 08-01-PLAN.md — Backend: Dashboard summary endpoint, AuditLogService, AuditAction constants, AOP auth logging, audit insertion points, audit query endpoint
+- [ ] 08-02-PLAN.md — Frontend: Dashboard page (count cards, pending list, recent docs), navbar badge, routing changes, visual checkpoint
+- [ ] 08-03-PLAN.md — Frontend: Audit log admin UI (SUPER_ADMIN filters, table, pagination, routing)
 **UI hint**: yes
 
 ## Progress
@@ -162,4 +166,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. File Attachments | 0/3 | Planning complete | - |
 | 6. Document Submission & Numbering | 0/2 | Planning complete | - |
 | 7. Approval Workflow | 1/5 | In Progress|  |
-| 8. Dashboard & Audit | 0/TBD | Not started | - |
+| 8. Dashboard & Audit | 0/3 | Planning complete | - |
