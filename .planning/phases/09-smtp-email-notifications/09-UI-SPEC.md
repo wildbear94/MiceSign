@@ -51,10 +51,10 @@ Exceptions: none
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 14px (text-sm) | 400 (font-normal) | 1.5 (leading-5) | Table rows, filter labels, status text, timestamps |
-| Label | 12px (text-xs) | 500 (font-medium) | 1.5 (leading-4) | Table headers (uppercase tracking-wider), status badges |
+| Label | 12px (text-xs) | 600 (font-semibold) | 1.5 (leading-4) | Table headers (uppercase tracking-wider), status badges |
 | Heading | 20px (text-xl) | 600 (font-semibold) | 1.2 (leading-tight) | Page title "알림 이력" |
 
-Weights used: **2** (400 normal, 600 semibold). Label weight 500 is used only for table headers following the existing AuditLogTable pattern (`font-medium` on `<th>` elements).
+Weights used: **2** (400 normal, 600 semibold).
 
 ---
 
@@ -64,12 +64,12 @@ Weights used: **2** (400 normal, 600 semibold). Label weight 500 is used only fo
 |------|-------|-------|
 | Dominant (60%) | white / `bg-white` (dark: `bg-gray-900`) | Page background, main content area |
 | Secondary (30%) | `bg-gray-50` (dark: `bg-gray-800`) | Table header row, filter bar background |
-| Accent (10%) | `bg-blue-600` / `text-blue-700` (dark: `text-blue-400`) | "검색" filter button, "재발송" action button |
+| Accent (10%) | `bg-blue-600` / `text-blue-600` (dark: `text-blue-400`) | "검색" filter button (filled), "재발송" action link (text-only) |
 | Destructive | `bg-red-500` / `text-red-700` | FAILED status badge only |
 
 Accent reserved for:
-- "검색" filter button (primary filter CTA)
-- "재발송" button on FAILED notification rows (primary action)
+- "검색" filter button (filled: `bg-blue-600 text-white`)
+- "재발송" text button on FAILED notification rows (text-only: `text-blue-600 hover:text-blue-700 dark:text-blue-400`)
 
 ### Notification Status Colors
 
@@ -124,7 +124,7 @@ These follow the same pattern as document status badges established in Phase 4.
 - Status select: options are "전체", "성공", "실패", "대기"
 - Event type select: options are "전체", "제출", "승인", "반려", "회수"
 - Date range: two `<input type="date">` fields
-- Search button: `bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium`
+- Search button: `bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold`
 
 ### NotificationLogTable Columns
 
@@ -141,7 +141,7 @@ These follow the same pattern as document status badges established in Phase 4.
 ### Resend Button
 
 - Visible only on rows with status FAILED
-- Style: `text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm font-medium` (text button, not filled)
+- Style: `text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm font-semibold` (text button, not filled)
 - Click triggers ConfirmDialog before API call
 - During resend request: button text changes to "발송 중..." with `opacity-50 pointer-events-none`
 - After success: row status updates to SUCCESS (via TanStack Query invalidation)
