@@ -7,6 +7,7 @@ import com.micesign.domain.User;
 import com.micesign.domain.enums.*;
 import com.micesign.event.ApprovalNotificationEvent;
 import com.micesign.repository.ApprovalLineRepository;
+import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.NotificationLogRepository;
 import com.micesign.repository.UserRepository;
 import com.micesign.service.EmailService;
@@ -41,6 +42,9 @@ class NotificationServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private DocumentRepository documentRepository;
+
     private NotificationService notificationService;
 
     private User drafter;
@@ -51,7 +55,7 @@ class NotificationServiceTest {
     @BeforeEach
     void setUp() {
         notificationService = new NotificationService(
-                emailService, notificationLogRepository, approvalLineRepository, userRepository);
+                emailService, notificationLogRepository, approvalLineRepository, userRepository, documentRepository);
 
         drafter = new User();
         drafter.setId(1L);

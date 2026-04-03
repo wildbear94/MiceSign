@@ -11,6 +11,7 @@ import com.micesign.domain.enums.NotificationEventType;
 import com.micesign.domain.enums.NotificationStatus;
 import com.micesign.event.ApprovalNotificationEvent;
 import com.micesign.repository.ApprovalLineRepository;
+import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.NotificationLogRepository;
 import com.micesign.repository.UserRepository;
 import org.slf4j.Logger;
@@ -37,15 +38,18 @@ public class NotificationService {
     private final NotificationLogRepository notificationLogRepository;
     private final ApprovalLineRepository approvalLineRepository;
     private final UserRepository userRepository;
+    private final DocumentRepository documentRepository;
 
     public NotificationService(EmailService emailService,
                                NotificationLogRepository notificationLogRepository,
                                ApprovalLineRepository approvalLineRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               DocumentRepository documentRepository) {
         this.emailService = emailService;
         this.notificationLogRepository = notificationLogRepository;
         this.approvalLineRepository = approvalLineRepository;
         this.userRepository = userRepository;
+        this.documentRepository = documentRepository;
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -103,6 +107,60 @@ public class NotificationService {
             }
             default:
                 return List.of();
+        }
+    }
+
+    public void resend(NotificationLog notificationLog) {
+        NotificationEventType eventType = NotificationEventType.valueOf(notificationLog.getEventType());
+        String templateName = emailService.getTemplateName(eventType);
+
+        // Build template variables from available data
+        Map<String, Object> variables = new java.util.HashMap<>();
+        variables.put("documentId", notificationLog.getDocumentId());
+
+        if (notificationLog.getDocumentId() != null) {
+            documentRepository.findById(notificationLog.getDocumentId()).ifPresent(doc -> {
+                variables.put("documentTitle", doc.getTitle());
+                variables.put("docNumber", doc.getDocNumber() != null ? doc.getDocNumber() : "");
+                variables.put("drafterName", doc.getDrafter().getName());
+            });
+        }
+
+        String statusLabel = switch (eventType) {
+            case SUBMIT -> "결재 요청";
+            case APPROVE -> "승인 완료";
+            case REJECT -> "반려";
+            case WITHDRAW -> "회수";
+        };
+        variables.put("statusLabel", statusLabel);
+
+        // Reset status to PENDING and attempt resend
+        notificationLog.setStatus(NotificationStatus.PENDING);
+        notificationLog.setErrorMessage(null);
+        notificationLogRepository.save(notificationLog);
+
+        try {
+            emailService.sendEmail(
+                    notificationLog.getRecipientEmail(),
+                    notificationLog.getSubject(),
+                    templateName,
+                    variables);
+
+            notificationLog.setStatus(NotificationStatus.SUCCESS);
+            notificationLog.setSentAt(LocalDateTime.now());
+            notificationLog.setRetryCount(notificationLog.getRetryCount() + 1);
+            notificationLogRepository.save(notificationLog);
+        } catch (Exception e) {
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && errorMsg.length() > 1000) {
+                errorMsg = errorMsg.substring(0, 1000);
+            }
+            notificationLog.setStatus(NotificationStatus.FAILED);
+            notificationLog.setRetryCount(notificationLog.getRetryCount() + 1);
+            notificationLog.setErrorMessage(errorMsg);
+            notificationLogRepository.save(notificationLog);
+
+            log.warn("Failed to resend notification email to {}: id={}", notificationLog.getRecipientEmail(), notificationLog.getId(), e);
         }
     }
 
