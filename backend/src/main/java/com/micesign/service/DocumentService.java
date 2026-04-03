@@ -13,6 +13,8 @@ import com.micesign.domain.enums.ApprovalLineType;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
 import com.micesign.common.AuditAction;
+import com.micesign.event.ApprovalNotificationEvent;
+import com.micesign.domain.enums.NotificationEventType;
 import com.micesign.mapper.DocumentMapper;
 import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
@@ -25,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +52,7 @@ public class DocumentService {
     private final DocumentMapper documentMapper;
     private final GoogleDriveService googleDriveService;
     private final AuditLogService auditLogService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentContentRepository documentContentRepository,
@@ -60,7 +64,8 @@ public class DocumentService {
                            DocumentFormValidator formValidator,
                            DocumentMapper documentMapper,
                            GoogleDriveService googleDriveService,
-                           AuditLogService auditLogService) {
+                           AuditLogService auditLogService,
+                           ApplicationEventPublisher applicationEventPublisher) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
         this.attachmentRepository = attachmentRepository;
@@ -72,6 +77,7 @@ public class DocumentService {
         this.documentMapper = documentMapper;
         this.googleDriveService = googleDriveService;
         this.auditLogService = auditLogService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public DocumentResponse createDocument(Long userId, CreateDocumentRequest req) {
@@ -185,6 +191,9 @@ public class DocumentService {
         auditLogService.log(userId, AuditAction.DOCUMENT_SUBMIT, "DOCUMENT", documentId,
                 "DocNumber: " + document.getDocNumber());
 
+        applicationEventPublisher.publishEvent(
+                new ApprovalNotificationEvent(document, NotificationEventType.SUBMIT, userId, null));
+
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);
     }
@@ -272,6 +281,9 @@ public class DocumentService {
         }
 
         auditLogService.log(userId, AuditAction.DOCUMENT_WITHDRAW, "DOCUMENT", documentId, null);
+
+        applicationEventPublisher.publishEvent(
+                new ApprovalNotificationEvent(document, NotificationEventType.WITHDRAW, userId, null));
 
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);

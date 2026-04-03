@@ -1,0 +1,169 @@
+package com.micesign.service;
+
+import com.micesign.domain.ApprovalLine;
+import com.micesign.domain.Document;
+import com.micesign.domain.NotificationLog;
+import com.micesign.domain.User;
+import com.micesign.domain.enums.ApprovalLineStatus;
+import com.micesign.domain.enums.ApprovalLineType;
+import com.micesign.domain.enums.DocumentStatus;
+import com.micesign.domain.enums.NotificationEventType;
+import com.micesign.domain.enums.NotificationStatus;
+import com.micesign.event.ApprovalNotificationEvent;
+import com.micesign.repository.ApprovalLineRepository;
+import com.micesign.repository.NotificationLogRepository;
+import com.micesign.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class NotificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
+
+    private static final int MAX_RETRIES = 2;
+    private static final long[] RETRY_DELAYS = {1000L, 3000L};
+
+    private final EmailService emailService;
+    private final NotificationLogRepository notificationLogRepository;
+    private final ApprovalLineRepository approvalLineRepository;
+    private final UserRepository userRepository;
+
+    public NotificationService(EmailService emailService,
+                               NotificationLogRepository notificationLogRepository,
+                               ApprovalLineRepository approvalLineRepository,
+                               UserRepository userRepository) {
+        this.emailService = emailService;
+        this.notificationLogRepository = notificationLogRepository;
+        this.approvalLineRepository = approvalLineRepository;
+        this.userRepository = userRepository;
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Async
+    public void handleNotificationEvent(ApprovalNotificationEvent event) {
+        try {
+            List<User> recipients = resolveRecipients(event);
+            for (User recipient : recipients) {
+                sendWithRetry(recipient, event);
+            }
+        } catch (Exception e) {
+            log.error("Failed to process notification event: type={}, documentId={}, error={}",
+                    event.getEventType(), event.getDocument().getId(), e.getMessage(), e);
+        }
+    }
+
+    public List<User> resolveRecipients(ApprovalNotificationEvent event) {
+        Document document = event.getDocument();
+        NotificationEventType eventType = event.getEventType();
+
+        switch (eventType) {
+            case SUBMIT: {
+                // All approval line members with type APPROVE or AGREE (not REFERENCE)
+                List<ApprovalLine> lines = approvalLineRepository
+                        .findByDocumentIdOrderByStepOrderAsc(document.getId());
+                return lines.stream()
+                        .filter(line -> line.getLineType() == ApprovalLineType.APPROVE
+                                || line.getLineType() == ApprovalLineType.AGREE)
+                        .map(ApprovalLine::getApprover)
+                        .toList();
+            }
+            case APPROVE: {
+                // Check if final approval or intermediate
+                if (document.getStatus() == DocumentStatus.APPROVED) {
+                    // Final approval -> notify drafter
+                    return List.of(document.getDrafter());
+                } else {
+                    // Intermediate -> notify next pending approver
+                    List<ApprovalLine> lines = approvalLineRepository
+                            .findByDocumentIdOrderByStepOrderAsc(document.getId());
+                    return lines.stream()
+                            .filter(line -> line.getStatus() == ApprovalLineStatus.PENDING)
+                            .filter(line -> line.getStepOrder() > 0)
+                            .filter(line -> line.getLineType() == ApprovalLineType.APPROVE
+                                    || line.getLineType() == ApprovalLineType.AGREE)
+                            .findFirst()
+                            .map(line -> List.of(line.getApprover()))
+                            .orElse(List.of());
+                }
+            }
+            case REJECT:
+            case WITHDRAW: {
+                // Notify drafter only
+                return List.of(document.getDrafter());
+            }
+            default:
+                return List.of();
+        }
+    }
+
+    public void sendWithRetry(User recipient, ApprovalNotificationEvent event) {
+        Document document = event.getDocument();
+        NotificationEventType eventType = event.getEventType();
+
+        String subject = emailService.buildSubject(eventType, document.getTitle());
+        String templateName = emailService.getTemplateName(eventType);
+        Map<String, Object> variables = emailService.buildTemplateVariables(document, eventType, event.getComment());
+
+        // Create initial log entry with PENDING status
+        NotificationLog notificationLog = new NotificationLog();
+        notificationLog.setRecipientId(recipient.getId());
+        notificationLog.setRecipientEmail(recipient.getEmail());
+        notificationLog.setEventType(eventType.name());
+        notificationLog.setDocumentId(document.getId());
+        notificationLog.setSubject(subject);
+        notificationLog.setStatus(NotificationStatus.PENDING);
+        notificationLog.setRetryCount(0);
+        notificationLog = notificationLogRepository.save(notificationLog);
+
+        for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                emailService.sendEmail(recipient.getEmail(), subject, templateName, variables);
+
+                // Success
+                notificationLog.setStatus(NotificationStatus.SUCCESS);
+                notificationLog.setSentAt(LocalDateTime.now());
+                notificationLog.setRetryCount(attempt);
+                notificationLogRepository.save(notificationLog);
+                return;
+
+            } catch (Exception e) {
+                if (attempt < MAX_RETRIES) {
+                    // Retry
+                    notificationLog.setStatus(NotificationStatus.RETRY);
+                    notificationLog.setRetryCount(attempt + 1);
+                    notificationLogRepository.save(notificationLog);
+
+                    try {
+                        Thread.sleep(RETRY_DELAYS[attempt]);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                } else {
+                    // Final failure
+                    String errorMsg = e.getMessage();
+                    if (errorMsg != null && errorMsg.length() > 1000) {
+                        errorMsg = errorMsg.substring(0, 1000);
+                    }
+                    notificationLog.setStatus(NotificationStatus.FAILED);
+                    notificationLog.setRetryCount(attempt);
+                    notificationLog.setErrorMessage(errorMsg);
+                    notificationLogRepository.save(notificationLog);
+
+                    log.warn("Failed to send notification email to {} after {} retries: type={}, documentId={}",
+                            recipient.getEmail(), MAX_RETRIES, eventType, document.getId(), e);
+                }
+            }
+        }
+    }
+}

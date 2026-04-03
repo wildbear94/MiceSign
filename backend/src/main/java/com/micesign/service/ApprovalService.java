@@ -15,6 +15,9 @@ import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
 import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.UserRepository;
+import com.micesign.event.ApprovalNotificationEvent;
+import com.micesign.domain.enums.NotificationEventType;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,19 +38,22 @@ public class ApprovalService {
     private final UserRepository userRepository;
     private final DocumentMapper documentMapper;
     private final AuditLogService auditLogService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public ApprovalService(ApprovalLineRepository approvalLineRepository,
                            DocumentRepository documentRepository,
                            ApprovalTemplateRepository approvalTemplateRepository,
                            UserRepository userRepository,
                            DocumentMapper documentMapper,
-                           AuditLogService auditLogService) {
+                           AuditLogService auditLogService,
+                           ApplicationEventPublisher applicationEventPublisher) {
         this.approvalLineRepository = approvalLineRepository;
         this.documentRepository = documentRepository;
         this.approvalTemplateRepository = approvalTemplateRepository;
         this.userRepository = userRepository;
         this.documentMapper = documentMapper;
         this.auditLogService = auditLogService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     public void approve(Long userId, Long lineId, String comment) {
@@ -102,6 +108,9 @@ public class ApprovalService {
 
         auditLogService.log(userId, AuditAction.DOCUMENT_APPROVE, "DOCUMENT", document.getId(),
                 "Step: " + line.getStepOrder());
+
+        applicationEventPublisher.publishEvent(
+                new ApprovalNotificationEvent(document, NotificationEventType.APPROVE, userId, comment));
     }
 
     public void reject(Long userId, Long lineId, String comment) {
@@ -149,6 +158,9 @@ public class ApprovalService {
 
         auditLogService.log(userId, AuditAction.DOCUMENT_REJECT, "DOCUMENT", document.getId(),
                 "Step: " + line.getStepOrder());
+
+        applicationEventPublisher.publishEvent(
+                new ApprovalNotificationEvent(document, NotificationEventType.REJECT, userId, comment));
     }
 
     @Transactional(readOnly = true)
