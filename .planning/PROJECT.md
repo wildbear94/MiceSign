@@ -19,16 +19,18 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] Admin-managed organization structure (departments, positions, users)
-- [ ] RBAC with three roles (SUPER_ADMIN, ADMIN, USER)
-- [ ] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE)
-- [ ] Flexible approval line selection (APPROVE, AGREE, REFERENCE types)
-- [ ] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
-- [ ] Document immutability after submission (locked body, attachments, approval line)
-- [ ] Document numbering system (prefix-year-sequence, assigned at submission)
-- [ ] File attachments via Google Drive API (Service Account)
 - [ ] Audit trail logging for all document state changes
 - [ ] Dashboard showing pending approvals and recent documents
+
+### Validated (Phases 3-7)
+- [x] Admin-managed organization structure (departments, positions, users) — Validated in Phase 3: Organization Management (ORG-01, ORG-02, ORG-03, ORG-04)
+- [x] RBAC with three roles (SUPER_ADMIN, ADMIN, USER) — Validated in Phase 3: Organization Management
+- [x] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE) — Validated in Phase 4: Document Core & Templates (DOC-01, DOC-02, DOC-05, DOC-06, TPL-01, TPL-02, TPL-03)
+- [x] Document immutability after submission (locked body, attachments, approval line) — Validated in Phase 6: Document Submission & Numbering (DOC-03, DOC-04)
+- [x] Document numbering system (prefix-year-sequence, assigned at submission) — Validated in Phase 6: Document Submission & Numbering (DOC-07)
+- [x] File attachments via Google Drive API (Service Account) — Validated in Phase 5: File Attachments (FILE-01, FILE-02, FILE-03)
+- [x] Flexible approval line selection (APPROVE, AGREE, REFERENCE types) — Validated in Phase 7: Approval Workflow (APR-01, APR-02)
+- [x] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN) — Validated in Phase 7: Approval Workflow (APR-03, APR-04, APR-05, APR-06, APR-07)
 
 ### Out of Scope
 
