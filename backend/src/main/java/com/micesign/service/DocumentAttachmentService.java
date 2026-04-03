@@ -1,5 +1,6 @@
 package com.micesign.service;
 
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.Document;
 import com.micesign.domain.DocumentAttachment;
@@ -36,17 +37,20 @@ public class DocumentAttachmentService {
     private final DocumentRepository documentRepository;
     private final ApprovalLineRepository approvalLineRepository;
     private final DocumentAttachmentMapper attachmentMapper;
+    private final AuditLogService auditLogService;
 
     public DocumentAttachmentService(DocumentAttachmentRepository attachmentRepository,
                                       GoogleDriveService googleDriveService,
                                       DocumentRepository documentRepository,
                                       ApprovalLineRepository approvalLineRepository,
-                                      DocumentAttachmentMapper attachmentMapper) {
+                                      DocumentAttachmentMapper attachmentMapper,
+                                      AuditLogService auditLogService) {
         this.attachmentRepository = attachmentRepository;
         this.googleDriveService = googleDriveService;
         this.documentRepository = documentRepository;
         this.approvalLineRepository = approvalLineRepository;
         this.attachmentMapper = attachmentMapper;
+        this.auditLogService = auditLogService;
     }
 
     public List<AttachmentResponse> uploadFiles(Long userId, Long docId, MultipartFile[] files) {
@@ -99,6 +103,8 @@ public class DocumentAttachmentService {
                 attachment.setGdriveFolder(result.folderPath());
                 attachment.setUploadedBy(userId);
                 savedAttachments.add(attachmentRepository.save(attachment));
+                auditLogService.log(userId, AuditAction.FILE_UPLOAD, "DOCUMENT", docId,
+                        "File: " + file.getOriginalFilename());
             } catch (IOException e) {
                 throw new BusinessException("FILE_UPLOAD_FAILED",
                         "파일 업로드 중 오류가 발생했습니다: " + file.getOriginalFilename());
@@ -123,6 +129,10 @@ public class DocumentAttachmentService {
         validateDocumentAccess(userId, attachment.getDocumentId());
 
         InputStream inputStream = googleDriveService.downloadFile(attachment.getGdriveFileId());
+
+        auditLogService.log(userId, AuditAction.FILE_DOWNLOAD, "ATTACHMENT", attachmentId,
+                "File: " + attachment.getOriginalName());
+
         return new InputStreamResource(inputStream);
     }
 

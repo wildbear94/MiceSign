@@ -12,6 +12,7 @@ import com.micesign.domain.enums.ApprovalLineStatus;
 import com.micesign.domain.enums.ApprovalLineType;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
+import com.micesign.common.AuditAction;
 import com.micesign.mapper.DocumentMapper;
 import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
@@ -47,6 +48,7 @@ public class DocumentService {
     private final DocumentFormValidator formValidator;
     private final DocumentMapper documentMapper;
     private final GoogleDriveService googleDriveService;
+    private final AuditLogService auditLogService;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentContentRepository documentContentRepository,
@@ -57,7 +59,8 @@ public class DocumentService {
                            UserRepository userRepository,
                            DocumentFormValidator formValidator,
                            DocumentMapper documentMapper,
-                           GoogleDriveService googleDriveService) {
+                           GoogleDriveService googleDriveService,
+                           AuditLogService auditLogService) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
         this.attachmentRepository = attachmentRepository;
@@ -68,6 +71,7 @@ public class DocumentService {
         this.formValidator = formValidator;
         this.documentMapper = documentMapper;
         this.googleDriveService = googleDriveService;
+        this.auditLogService = auditLogService;
     }
 
     public DocumentResponse createDocument(Long userId, CreateDocumentRequest req) {
@@ -101,6 +105,9 @@ public class DocumentService {
         if (req.approvalLines() != null && !req.approvalLines().isEmpty()) {
             saveApprovalLines(document, req.approvalLines());
         }
+
+        auditLogService.log(userId, AuditAction.DOCUMENT_CREATE, "DOCUMENT", document.getId(),
+                "Template: " + req.templateCode());
 
         return documentMapper.toResponse(document, template.getName());
     }
@@ -174,6 +181,9 @@ public class DocumentService {
 
         // Move attachments from draft folder to permanent folder
         moveAttachmentsToPermanentFolder(documentId, docNumber);
+
+        auditLogService.log(userId, AuditAction.DOCUMENT_SUBMIT, "DOCUMENT", documentId,
+                "DocNumber: " + document.getDocNumber());
 
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);
@@ -260,6 +270,8 @@ public class DocumentService {
                 approvalLineRepository.save(line);
             }
         }
+
+        auditLogService.log(userId, AuditAction.DOCUMENT_WITHDRAW, "DOCUMENT", documentId, null);
 
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);

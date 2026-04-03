@@ -7,8 +7,10 @@ import com.micesign.domain.User;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.AttachmentResponse;
 import com.micesign.mapper.DocumentAttachmentMapper;
+import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.DocumentAttachmentRepository;
 import com.micesign.repository.DocumentRepository;
+import com.micesign.service.AuditLogService;
 import com.micesign.service.DocumentAttachmentService;
 import com.micesign.service.GoogleDriveService;
 import com.micesign.service.GoogleDriveService.DriveUploadResult;
@@ -46,7 +48,13 @@ class DocumentAttachmentServiceTest {
     DocumentRepository documentRepository;
 
     @Mock
+    ApprovalLineRepository approvalLineRepository;
+
+    @Mock
     DocumentAttachmentMapper attachmentMapper;
+
+    @Mock
+    AuditLogService auditLogService;
 
     @InjectMocks
     DocumentAttachmentService service;

@@ -1,5 +1,6 @@
 package com.micesign.service;
 
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.ApprovalLine;
 import com.micesign.domain.ApprovalTemplate;
@@ -33,17 +34,20 @@ public class ApprovalService {
     private final ApprovalTemplateRepository approvalTemplateRepository;
     private final UserRepository userRepository;
     private final DocumentMapper documentMapper;
+    private final AuditLogService auditLogService;
 
     public ApprovalService(ApprovalLineRepository approvalLineRepository,
                            DocumentRepository documentRepository,
                            ApprovalTemplateRepository approvalTemplateRepository,
                            UserRepository userRepository,
-                           DocumentMapper documentMapper) {
+                           DocumentMapper documentMapper,
+                           AuditLogService auditLogService) {
         this.approvalLineRepository = approvalLineRepository;
         this.documentRepository = documentRepository;
         this.approvalTemplateRepository = approvalTemplateRepository;
         this.userRepository = userRepository;
         this.documentMapper = documentMapper;
+        this.auditLogService = auditLogService;
     }
 
     public void approve(Long userId, Long lineId, String comment) {
@@ -95,6 +99,9 @@ public class ApprovalService {
             document.setCompletedAt(LocalDateTime.now());
         }
         documentRepository.save(document);
+
+        auditLogService.log(userId, AuditAction.DOCUMENT_APPROVE, "DOCUMENT", document.getId(),
+                "Step: " + line.getStepOrder());
     }
 
     public void reject(Long userId, Long lineId, String comment) {
@@ -139,6 +146,9 @@ public class ApprovalService {
         document.setStatus(DocumentStatus.REJECTED);
         document.setCompletedAt(LocalDateTime.now());
         documentRepository.save(document);
+
+        auditLogService.log(userId, AuditAction.DOCUMENT_REJECT, "DOCUMENT", document.getId(),
+                "Step: " + line.getStepOrder());
     }
 
     @Transactional(readOnly = true)
