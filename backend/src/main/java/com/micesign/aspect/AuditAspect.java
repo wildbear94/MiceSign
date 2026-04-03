@@ -46,12 +46,12 @@ public class AuditAspect {
                 // Login success
                 Long userId = loginResponse.user().id();
                 auditLogService.log(userId, AuditAction.LOGIN_SUCCESS, "USER", userId,
-                        "Email: " + loginResponse.user().email());
+                        "{\"email\": \"" + loginResponse.user().email() + "\"}");
             } else {
                 // Login failure
                 String email = extractEmailFromArgs(joinPoint);
                 auditLogService.log(null, AuditAction.LOGIN_FAILED, "USER", null,
-                        "Email: " + email);
+                        "{\"email\": \"" + email + "\"}");
             }
         } catch (Exception e) {
             log.warn("Failed to audit login event: {}", e.getMessage());

@@ -18,6 +18,16 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 250MB
+  mail:
+    host: ${MAIL_HOST:smtp.mailplug.co.kr}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:sypark@miceleech.com}
+    password: ${MAIL_PASSWORD:lt3DcNq49>d7QsZ+qHT=}
+    protocol: smtps
+    properties:
+      mail.smtps.auth: ${MAIL_SMTP_AUTH:true}
+      mail.smtps.ssl.enable: true
+      mail.smtps.ssl.trust: ${MAIL_HOST:smtp.mailplug.co.kr}
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -32,7 +42,7 @@ app:
     secure: ${COOKIE_SECURE:false}
   notification:
     sender-name: MiceSign 전자결재
-    sender-email: ${NOTIFICATION_SENDER_EMAIL:approval@example.com}
+    sender-email: ${NOTIFICATION_SENDER_EMAIL:sypark@miceleech.com}
     base-url: ${APP_BASE_URL:http://localhost:5173}
 
 google:

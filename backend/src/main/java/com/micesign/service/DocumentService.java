@@ -113,7 +113,7 @@ public class DocumentService {
         }
 
         auditLogService.log(userId, AuditAction.DOCUMENT_CREATE, "DOCUMENT", document.getId(),
-                "Template: " + req.templateCode());
+                "{\"template\": \"" + req.templateCode() + "\"}");
 
         return documentMapper.toResponse(document, template.getName());
     }
@@ -189,7 +189,7 @@ public class DocumentService {
         moveAttachmentsToPermanentFolder(documentId, docNumber);
 
         auditLogService.log(userId, AuditAction.DOCUMENT_SUBMIT, "DOCUMENT", documentId,
-                "DocNumber: " + document.getDocNumber());
+                "{\"docNumber\": \"" + document.getDocNumber() + "\"}");
 
         applicationEventPublisher.publishEvent(
                 new ApprovalNotificationEvent(document, NotificationEventType.SUBMIT, userId, null));

@@ -104,7 +104,7 @@ public class DocumentAttachmentService {
                 attachment.setUploadedBy(userId);
                 savedAttachments.add(attachmentRepository.save(attachment));
                 auditLogService.log(userId, AuditAction.FILE_UPLOAD, "DOCUMENT", docId,
-                        "File: " + file.getOriginalFilename());
+                        "{\"file\": \"" + file.getOriginalFilename() + "\"}");
             } catch (IOException e) {
                 throw new BusinessException("FILE_UPLOAD_FAILED",
                         "파일 업로드 중 오류가 발생했습니다: " + file.getOriginalFilename());
@@ -131,7 +131,7 @@ public class DocumentAttachmentService {
         InputStream inputStream = googleDriveService.downloadFile(attachment.getGdriveFileId());
 
         auditLogService.log(userId, AuditAction.FILE_DOWNLOAD, "ATTACHMENT", attachmentId,
-                "File: " + attachment.getOriginalName());
+                "{\"file\": \"" + attachment.getOriginalName() + "\"}");
 
         return new InputStreamResource(inputStream);
     }

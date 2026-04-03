@@ -107,7 +107,7 @@ public class ApprovalService {
         documentRepository.save(document);
 
         auditLogService.log(userId, AuditAction.DOCUMENT_APPROVE, "DOCUMENT", document.getId(),
-                "Step: " + line.getStepOrder());
+                "{\"step\": " + line.getStepOrder() + "}");
 
         applicationEventPublisher.publishEvent(
                 new ApprovalNotificationEvent(document, NotificationEventType.APPROVE, userId, comment));
@@ -157,7 +157,7 @@ public class ApprovalService {
         documentRepository.save(document);
 
         auditLogService.log(userId, AuditAction.DOCUMENT_REJECT, "DOCUMENT", document.getId(),
-                "Step: " + line.getStepOrder());
+                "{\"step\": " + line.getStepOrder() + "}");
 
         applicationEventPublisher.publishEvent(
                 new ApprovalNotificationEvent(document, NotificationEventType.REJECT, userId, comment));

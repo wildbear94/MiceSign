@@ -56,9 +56,21 @@ public class NotificationService {
     @Async
     public void handleNotificationEvent(ApprovalNotificationEvent event) {
         try {
-            List<User> recipients = resolveRecipients(event);
+            // Re-fetch with JOIN FETCH to eagerly load drafter — avoids LazyInitializationException
+            // (the original entity's Hibernate session is already closed in this @Async thread)
+            Document document = documentRepository.findByIdWithDrafter(event.getDocument().getId())
+                    .orElse(null);
+            if (document == null) {
+                log.warn("Document not found for notification: id={}", event.getDocument().getId());
+                return;
+            }
+            ApprovalNotificationEvent freshEvent = new ApprovalNotificationEvent(
+                    document, event.getEventType(), event.getActorUserId(), event.getComment());
+
+            List<Long> recipientIds = resolveRecipientIds(freshEvent);
+            List<User> recipients = userRepository.findAllById(recipientIds);
             for (User recipient : recipients) {
-                sendWithRetry(recipient, event);
+                sendWithRetry(recipient, freshEvent);
             }
         } catch (Exception e) {
             log.error("Failed to process notification event: type={}, documentId={}, error={}",
@@ -66,7 +78,7 @@ public class NotificationService {
         }
     }
 
-    public List<User> resolveRecipients(ApprovalNotificationEvent event) {
+    public List<Long> resolveRecipientIds(ApprovalNotificationEvent event) {
         Document document = event.getDocument();
         NotificationEventType eventType = event.getEventType();
 
@@ -78,14 +90,14 @@ public class NotificationService {
                 return lines.stream()
                         .filter(line -> line.getLineType() == ApprovalLineType.APPROVE
                                 || line.getLineType() == ApprovalLineType.AGREE)
-                        .map(ApprovalLine::getApprover)
+                        .map(line -> line.getApprover().getId())
                         .toList();
             }
             case APPROVE: {
                 // Check if final approval or intermediate
                 if (document.getStatus() == DocumentStatus.APPROVED) {
                     // Final approval -> notify drafter
-                    return List.of(document.getDrafter());
+                    return List.of(document.getDrafter().getId());
                 } else {
                     // Intermediate -> notify next pending approver
                     List<ApprovalLine> lines = approvalLineRepository
@@ -96,14 +108,14 @@ public class NotificationService {
                             .filter(line -> line.getLineType() == ApprovalLineType.APPROVE
                                     || line.getLineType() == ApprovalLineType.AGREE)
                             .findFirst()
-                            .map(line -> List.of(line.getApprover()))
+                            .map(line -> List.of(line.getApprover().getId()))
                             .orElse(List.of());
                 }
             }
             case REJECT:
             case WITHDRAW: {
                 // Notify drafter only
-                return List.of(document.getDrafter());
+                return List.of(document.getDrafter().getId());
             }
             default:
                 return List.of();
