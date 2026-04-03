@@ -163,22 +163,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Complete |
 | DASH-03 | Phase 8: Dashboard & Audit | Complete |
 | AUD-01 | Phase 8: Dashboard & Audit | Complete |
-| NTF-01 | - | Pending |
-| NTF-02 | - | Pending |
-| NTF-03 | - | Pending |
-| NTF-04 | - | Pending |
-| NTF-05 | - | Pending |
-| SRCH-01 | - | Pending |
-| SRCH-02 | - | Pending |
-| TPL-04 | - | Pending |
-| TPL-05 | - | Pending |
-| TPL-06 | - | Pending |
+| NTF-01 | Phase 9: SMTP Email Notifications | Pending |
+| NTF-02 | Phase 9: SMTP Email Notifications | Pending |
+| NTF-03 | Phase 9: SMTP Email Notifications | Pending |
+| NTF-04 | Phase 9: SMTP Email Notifications | Pending |
+| NTF-05 | Phase 9: SMTP Email Notifications | Pending |
+| TPL-04 | Phase 10: Additional Form Templates | Pending |
+| TPL-05 | Phase 10: Additional Form Templates | Pending |
+| TPL-06 | Phase 10: Additional Form Templates | Pending |
+| SRCH-01 | Phase 11: Document Search & Filter | Pending |
+| SRCH-02 | Phase 11: Document Search & Filter | Pending |
 
 **Coverage:**
 - v1.0 requirements: 36 total (36 complete)
-- v1.1 requirements: 10 total (0 complete)
-- Unmapped: 10
+- v1.1 requirements: 10 total (0 complete, 10 mapped)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-03 — v1.1 requirements added*
+*Last updated: 2026-04-03 -- v1.1 roadmap traceability updated*
