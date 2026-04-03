@@ -12,6 +12,7 @@ import UserDetailPage from './features/admin/pages/UserDetailPage';
 import DocumentListPage from './features/document/pages/DocumentListPage';
 import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
 import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
+import AuditLogPage from './features/audit/pages/AuditLogPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
@@ -69,6 +70,7 @@ function App() {
             <Route path="positions" element={<PositionPage />} />
             <Route path="users" element={<UserListPage />} />
             <Route path="users/:id" element={<UserDetailPage />} />
+            <Route path="audit-logs" element={<AuditLogPage />} />
           </Route>
         </Route>
       </Route>
