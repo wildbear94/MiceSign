@@ -172,7 +172,11 @@ Plans:
   3. All approvers in a workflow receive email when a document is initially submitted
   4. Failed email deliveries are retried automatically (up to 2 retries) without blocking the approval transaction
   5. All notification attempts (success and failure) are recorded in the notification_log table and visible to SUPER_ADMIN
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 09-01-PLAN.md — Backend core: Gradle deps, AsyncConfig, Flyway migration, enums, entity, event class, EmailService, NotificationService, Thymeleaf templates, event publishing
+- [ ] 09-02-PLAN.md — Backend admin API: NotificationLogSpecification, DTO, Controller (list + resend), integration tests
+- [ ] 09-03-PLAN.md — Frontend: notification feature module (types, API, hooks, components, page), sidebar + routing, visual checkpoint
 
 ### Phase 10: Additional Form Templates
 **Goal**: Users can draft documents using three new form templates (purchase request, business trip report, overtime request), expanding coverage to all common Korean corporate approval types
@@ -215,6 +219,6 @@ Recommended order: 9 -> 10 -> 11 (or 9 and 10 in parallel if two work streams av
 | 6. Document Submission & Numbering | v1.0 | 2/2 | Complete | - |
 | 7. Approval Workflow | v1.0 | 5/5 | Complete | - |
 | 8. Dashboard & Audit | v1.0 | 3/3 | Complete | - |
-| 9. SMTP Email Notifications | v1.1 | 0/? | Not started | - |
+| 9. SMTP Email Notifications | v1.1 | 0/3 | Planning | - |
 | 10. Additional Form Templates | v1.1 | 0/? | Not started | - |
 | 11. Document Search & Filter | v1.1 | 0/? | Not started | - |
