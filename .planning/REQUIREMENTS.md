@@ -59,13 +59,13 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Dashboard
 
-- [ ] **DASH-01**: User sees a list of documents pending their approval action
-- [ ] **DASH-02**: User sees their recent documents with current status
-- [ ] **DASH-03**: User sees badge counts for pending approvals, in-progress drafts, and completed documents
+- [x] **DASH-01**: User sees a list of documents pending their approval action
+- [x] **DASH-02**: User sees their recent documents with current status
+- [x] **DASH-03**: User sees badge counts for pending approvals, in-progress drafts, and completed documents
 
 ### Audit
 
-- [ ] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
+- [x] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
 
 ## v2 Requirements
 
@@ -154,10 +154,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FILE-01 | Phase 5: File Attachments | Complete |
 | FILE-02 | Phase 5: File Attachments | Complete |
 | FILE-03 | Phase 5: File Attachments | Complete |
-| DASH-01 | Phase 8: Dashboard & Audit | Pending |
-| DASH-02 | Phase 8: Dashboard & Audit | Pending |
-| DASH-03 | Phase 8: Dashboard & Audit | Pending |
-| AUD-01 | Phase 8: Dashboard & Audit | Pending |
+| DASH-01 | Phase 8: Dashboard & Audit | Complete |
+| DASH-02 | Phase 8: Dashboard & Audit | Complete |
+| DASH-03 | Phase 8: Dashboard & Audit | Complete |
+| AUD-01 | Phase 8: Dashboard & Audit | Complete |
 
 **Coverage:**
 - v1 requirements: 36 total
