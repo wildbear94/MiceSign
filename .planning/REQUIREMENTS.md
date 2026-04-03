@@ -65,7 +65,7 @@ Requirements for Phase 1-A MVP. Each maps to roadmap phases.
 
 ### Audit
 
-- [ ] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
+- [x] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
 
 ## v2 Requirements
 
@@ -157,7 +157,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-01 | Phase 8: Dashboard & Audit | Pending |
 | DASH-02 | Phase 8: Dashboard & Audit | Pending |
 | DASH-03 | Phase 8: Dashboard & Audit | Pending |
-| AUD-01 | Phase 8: Dashboard & Audit | Pending |
+| AUD-01 | Phase 8: Dashboard & Audit | Complete |
 
 **Coverage:**
 - v1 requirements: 36 total
