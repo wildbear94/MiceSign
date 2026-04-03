@@ -9,6 +9,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 
 logging:
   level:

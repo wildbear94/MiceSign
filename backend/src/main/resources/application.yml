@@ -30,6 +30,10 @@ jwt:
 app:
   cookie:
     secure: ${COOKIE_SECURE:false}
+  notification:
+    sender-name: MiceSign 전자결재
+    sender-email: ${NOTIFICATION_SENDER_EMAIL:approval@example.com}
+    base-url: ${APP_BASE_URL:http://localhost:5173}
 
 google:
   drive:
