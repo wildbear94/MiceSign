@@ -1,36 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Extended Features
-status: executing
-stopped_at: Completed 11-02-PLAN.md (Task 3 checkpoint pending)
-last_updated: "2026-04-04T22:44:26.401Z"
-last_activity: 2026-04-04
+milestone: v1.2
+milestone_name: Custom Template Builder
+status: defining
+stopped_at: null
+last_updated: "2026-04-05"
+last_activity: 2026-04-05
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-31)
+See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 11 — document-search-filter
+**Current focus:** Defining requirements for v1.2 Custom Template Builder
 
 ## Current Position
 
-Phase: 11
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-04
-
-Progress: [░░░░░░░░░░] 0%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-05 — Milestone v1.2 started
 
 ## Performance Metrics
 
