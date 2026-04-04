@@ -3,8 +3,13 @@ package com.micesign.document;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.service.DocumentFormValidator;
+import com.micesign.service.validation.ExpenseFormValidator;
+import com.micesign.service.validation.GeneralFormValidator;
+import com.micesign.service.validation.LeaveFormValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -15,7 +20,12 @@ class DocumentFormValidatorTest {
 
     @BeforeEach
     void setUp() {
-        validator = new DocumentFormValidator(new ObjectMapper());
+        ObjectMapper objectMapper = new ObjectMapper();
+        validator = new DocumentFormValidator(List.of(
+            new GeneralFormValidator(),
+            new ExpenseFormValidator(objectMapper),
+            new LeaveFormValidator(objectMapper)
+        ));
     }
 
     // --- GENERAL ---
