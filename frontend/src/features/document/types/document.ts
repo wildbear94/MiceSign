@@ -8,6 +8,8 @@ export interface DocumentResponse {
   templateName: string;
   title: string;
   status: DocumentStatus;
+  drafterName: string;
+  drafterDepartmentName: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -160,6 +162,20 @@ export interface AttachmentResponse {
 }
 
 export type UploadStatus = 'pending' | 'uploading' | 'complete' | 'error';
+
+// === Search Types ===
+export type SearchTab = 'MY' | 'APPROVAL' | 'ALL';
+
+export interface DocumentSearchParams {
+  tab: SearchTab;
+  keyword?: string;
+  status?: DocumentStatus;
+  templateCode?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  size?: number;
+}
 
 export interface FileUploadItem {
   id: string;            // temporary client-side ID (crypto.randomUUID())
