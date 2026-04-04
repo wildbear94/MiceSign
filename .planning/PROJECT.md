@@ -21,7 +21,7 @@ Employees can submit approval documents and get them approved/rejected through a
 ### Active
 - [ ] SMTP email notifications for all document state changes
 - [ ] Document search/filter (title, doc number, drafter name + status/date/template filters)
-- [ ] Additional form templates: purchase request, business trip report, overtime request
+- [x] Additional form templates: purchase request, business trip report, overtime request — Validated in Phase 10: Additional Form Templates (TPL-04, TPL-05, TPL-06)
 - [ ] Custom template builder (Admin drag & drop form designer)
 
 ## Current Milestone: v1.1 Extended Features
@@ -103,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 — Phase 9 complete (SMTP Email Notifications)*
+*Last updated: 2026-04-04 — Phase 10 complete (Additional Form Templates: Purchase, BusinessTrip, Overtime)*
