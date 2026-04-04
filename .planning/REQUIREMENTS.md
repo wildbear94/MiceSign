@@ -86,9 +86,9 @@ Milestone v1.1: Extended Features — SMTP notifications, document search/filter
 
 ### Additional Templates
 
-- [ ] **TPL-04**: Purchase request form (구매 요청서) with item table, auto-sum, and evidence attachments
-- [ ] **TPL-05**: Business trip report form (출장 보고서) with itinerary, expense breakdown, and attachments
-- [ ] **TPL-06**: Overtime request form (연장 근무 신청서) with date, hours, reason, and manager selection
+- [x] **TPL-04**: Purchase request form (구매 요청서) with item table, auto-sum, and evidence attachments
+- [x] **TPL-05**: Business trip report form (출장 보고서) with itinerary, expense breakdown, and attachments
+- [x] **TPL-06**: Overtime request form (연장 근무 신청서) with date, hours, reason, and manager selection
 
 ## Future Requirements
 
@@ -168,15 +168,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NTF-03 | Phase 9: SMTP Email Notifications | Complete |
 | NTF-04 | Phase 9: SMTP Email Notifications | Complete |
 | NTF-05 | Phase 9: SMTP Email Notifications | Complete |
-| TPL-04 | Phase 10: Additional Form Templates | Pending |
-| TPL-05 | Phase 10: Additional Form Templates | Pending |
-| TPL-06 | Phase 10: Additional Form Templates | Pending |
+| TPL-04 | Phase 10: Additional Form Templates | Complete |
+| TPL-05 | Phase 10: Additional Form Templates | Complete |
+| TPL-06 | Phase 10: Additional Form Templates | Complete |
 | SRCH-01 | Phase 11: Document Search & Filter | Complete |
 | SRCH-02 | Phase 11: Document Search & Filter | Complete |
 
 **Coverage:**
 - v1.0 requirements: 36 total (36 complete)
-- v1.1 requirements: 10 total (0 complete, 10 mapped)
+- v1.1 requirements: 10 total (10 complete)
 - Unmapped: 0
 
 ---
