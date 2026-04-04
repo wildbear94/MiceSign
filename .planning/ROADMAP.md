@@ -158,7 +158,7 @@ Plans:
 
 - [x] **Phase 9: SMTP Email Notifications** - Event-driven email notifications for all document state changes with retry and delivery logging (completed 2026-04-03)
 - [x] **Phase 10: Additional Form Templates** - Purchase request, business trip report, overtime request forms with validator refactoring (completed 2026-04-04)
-- [ ] **Phase 11: Document Search & Filter** - Keyword search, status/date/template filters with role-based access control
+- [x] **Phase 11: Document Search & Filter** - Keyword search, status/date/template filters with role-based access control (completed 2026-04-04)
 
 ## Phase Details
 
@@ -204,10 +204,10 @@ Plans:
   2. User can filter documents by status, date range, and template type (all 6 templates in dropdown)
   3. Search results respect role-based access control: users see only documents they drafted, are on the approval line for, or have admin scope over
   4. Filter state is preserved in the URL so bookmarking and browser back/forward work correctly
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 11-01-PLAN.md — Backend: QueryDSL config, search endpoint with keyword/filter/tab-scoping, DocumentResponse drafter fields, integration tests
-- [ ] 11-02-PLAN.md — Frontend: tabs, search filters, URL state management, keyword highlighting, DocumentListPage integration, visual checkpoint
+- [x] 11-02-PLAN.md — Frontend: tabs, search filters, URL state management, keyword highlighting, DocumentListPage integration, visual checkpoint
 **UI hint**: yes
 
 ## Progress
@@ -228,4 +228,4 @@ Recommended order: 9 -> 10 -> 11 (or 9 and 10 in parallel if two work streams av
 | 8. Dashboard & Audit | v1.0 | 3/3 | Complete | - |
 | 9. SMTP Email Notifications | v1.1 | 3/3 | Complete   | 2026-04-03 |
 | 10. Additional Form Templates | v1.1 | 0/3 | Complete    | 2026-04-04 |
-| 11. Document Search & Filter | v1.1 | 1/2 | In Progress|  |
+| 11. Document Search & Filter | v1.1 | 2/2 | Complete    | 2026-04-04 |
