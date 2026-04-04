@@ -19,8 +19,8 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] SMTP email notifications for all document state changes
-- [ ] Document search/filter (title, doc number, drafter name + status/date/template filters)
+- [x] SMTP email notifications for all document state changes — Validated in Phase 9: SMTP Email Notifications (NTF-01, NTF-02, NTF-03)
+- [x] Document search/filter (title, doc number, drafter name + status/date/template filters) — Validated in Phase 11: Document Search & Filter (SRCH-01, SRCH-02)
 - [x] Additional form templates: purchase request, business trip report, overtime request — Validated in Phase 10: Additional Form Templates (TPL-04, TPL-05, TPL-06)
 - [ ] Custom template builder (Admin drag & drop form designer)
 
@@ -103,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 — Phase 10 complete (Additional Form Templates: Purchase, BusinessTrip, Overtime)*
+*Last updated: 2026-04-05 — Phase 11 complete (Document Search & Filter: keyword search, multi-criteria filters, tab-scoped RBAC, URL state sync)*
