@@ -15,6 +15,7 @@ import com.micesign.dto.document.*;
 import com.micesign.common.AuditAction;
 import com.micesign.event.ApprovalNotificationEvent;
 import com.micesign.domain.enums.NotificationEventType;
+import com.micesign.dto.document.DocumentSearchCondition;
 import com.micesign.mapper.DocumentMapper;
 import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
@@ -345,6 +346,18 @@ public class DocumentService {
 
         String templateName = getTemplateName(newDoc.getTemplateCode());
         return documentMapper.toResponse(newDoc, templateName);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DocumentResponse> searchDocuments(DocumentSearchCondition condition, Long userId, Pageable pageable) {
+        Page<Document> documents = documentRepository.searchDocuments(condition, userId, pageable);
+
+        Map<String, String> templateNameMap = approvalTemplateRepository.findByIsActiveTrueOrderBySortOrder()
+                .stream()
+                .collect(Collectors.toMap(ApprovalTemplate::getCode, ApprovalTemplate::getName));
+
+        return documents.map(doc -> documentMapper.toResponse(doc,
+                templateNameMap.getOrDefault(doc.getTemplateCode(), doc.getTemplateCode())));
     }
 
     // --- Private helpers ---

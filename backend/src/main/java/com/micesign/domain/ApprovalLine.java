@@ -32,7 +32,7 @@ public class ApprovalLine {
     @Column(name = "status", nullable = false, length = 20)
     private ApprovalLineStatus status = ApprovalLineStatus.PENDING;
 
-    @Column(name = "comment", columnDefinition = "CLOB")
+    @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
     @Column(name = "acted_at")

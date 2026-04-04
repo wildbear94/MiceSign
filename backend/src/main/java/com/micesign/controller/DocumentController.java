@@ -1,8 +1,10 @@
 package com.micesign.controller;
 
 import com.micesign.common.dto.ApiResponse;
+import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
+import com.micesign.dto.document.DocumentSearchCondition;
 import com.micesign.security.CustomUserDetails;
 import com.micesign.service.DocumentAttachmentService;
 import com.micesign.service.DocumentService;
@@ -11,6 +13,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -97,6 +101,33 @@ public class DocumentController {
             @PathVariable Long id) {
         DocumentResponse response = documentService.rewriteDocument(user.getUserId(), id);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<Page<DocumentResponse>> searchDocuments(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam(defaultValue = "MY") DocumentSearchCondition.SearchTab tab,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) DocumentStatus status,
+            @RequestParam(required = false) String templateCode,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        // RBAC enforcement for ALL tab
+        if (tab == DocumentSearchCondition.SearchTab.ALL) {
+            String role = user.getRole();
+            if (!"SUPER_ADMIN".equals(role) && !"ADMIN".equals(role)) {
+                throw new BusinessException("AUTH_FORBIDDEN", "권한이 없습니다.", 403);
+            }
+        }
+
+        DocumentSearchCondition condition = new DocumentSearchCondition(
+                tab, keyword, status, templateCode, startDate, endDate);
+        PageRequest pageable = PageRequest.of(page, size);
+
+        return ApiResponse.ok(documentService.searchDocuments(condition, user.getUserId(), pageable));
     }
 
     // --- Attachment endpoints ---

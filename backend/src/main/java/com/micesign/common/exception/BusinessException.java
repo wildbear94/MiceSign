@@ -6,9 +6,7 @@ public class BusinessException extends RuntimeException {
     private final int httpStatus;
 
     public BusinessException(String code, String message) {
-        super(message);
-        this.code = code;
-        this.httpStatus = 400;
+        this(code, message, 400);
     }
 
     public BusinessException(String code, String message, int httpStatus) {
