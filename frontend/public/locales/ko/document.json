@@ -27,11 +27,29 @@
     "message": "이 문서를 삭제하시겠습니까? 삭제된 문서는 복구할 수 없습니다.",
     "confirm": "문서 삭제"
   },
+  "submit": {
+    "button": "제출",
+    "confirm": {
+      "title": "문서 제출",
+      "message": "제출 후에는 문서를 수정하거나 삭제할 수 없습니다. 제출하시겠습니까?",
+      "confirm": "제출"
+    },
+    "validation": {
+      "title": "제출할 수 없습니다",
+      "message": "다음 항목을 확인해주세요:"
+    },
+    "error": "문서 제출에 실패했습니다. 잠시 후 다시 시도해주세요."
+  },
   "columns": {
     "title": "제목",
+    "docNumber": "문서번호",
     "template": "양식",
     "status": "상태",
     "createdAt": "작성일"
+  },
+  "docNumber": {
+    "draft": "-",
+    "notAssigned": "미발급"
   },
   "status": {
     "DRAFT": "임시저장",
@@ -43,7 +61,10 @@
   "template": {
     "GENERAL": "일반 업무 기안",
     "EXPENSE": "지출 결의서",
-    "LEAVE": "휴가 신청서"
+    "LEAVE": "휴가 신청서",
+    "PURCHASE": "구매 요청서",
+    "BUSINESS_TRIP": "출장 보고서",
+    "OVERTIME": "연장 근무 신청서"
   },
   "expense": {
     "addRow": "항목 추가",
@@ -71,6 +92,7 @@
   },
   "attachment": {
     "title": "첨부파일",
+    "saveFirst": "문서를 저장한 후 파일을 첨부할 수 있습니다.",
     "dropZone": {
       "text": "파일을 여기에 끌어다 놓거나",
       "browse": "파일 찾기",
@@ -108,5 +130,57 @@
     "dateRangeRequired": "시작일과 종료일을 선택해주세요",
     "dateRangeInvalid": "종료일은 시작일 이후여야 합니다",
     "reasonRequired": "사유를 입력해주세요"
+  },
+  "purchase": {
+    "supplier": "납품업체명",
+    "deliveryDate": "희망 납품일",
+    "paymentMethod": "결제 방법",
+    "paymentMethodPlaceholder": "결제 방법을 선택해주세요",
+    "purchaseReason": "구매 사유/용도",
+    "addRow": "품목 추가",
+    "total": "합계",
+    "columns": {
+      "name": "품목명",
+      "spec": "규격/사양",
+      "quantity": "수량",
+      "unitPrice": "단가",
+      "amount": "금액"
+    }
+  },
+  "businessTrip": {
+    "destination": "출장지",
+    "startDate": "출장 시작일",
+    "endDate": "출장 종료일",
+    "purpose": "출장 목적",
+    "result": "출장 결과",
+    "itinerary": "일정",
+    "expenses": "경비 내역",
+    "addItinerary": "일정 추가",
+    "addExpense": "경비 추가",
+    "totalExpense": "경비 합계",
+    "itineraryColumns": {
+      "date": "날짜",
+      "location": "장소",
+      "description": "일정 내용"
+    },
+    "expenseColumns": {
+      "category": "분류",
+      "description": "내용",
+      "amount": "금액"
+    },
+    "expenseCategories": {
+      "transport": "교통비",
+      "lodging": "숙박비",
+      "meals": "식비",
+      "other": "기타"
+    }
+  },
+  "overtime": {
+    "workDate": "근무 날짜",
+    "startTime": "시작 시간",
+    "endTime": "종료 시간",
+    "hours": "연장 근무 시간",
+    "hoursFormat": "{{n}}시간",
+    "reason": "사유"
   }
 }
