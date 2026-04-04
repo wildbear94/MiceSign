@@ -81,8 +81,8 @@ Milestone v1.1: Extended Features — SMTP notifications, document search/filter
 
 ### Search
 
-- [ ] **SRCH-01**: User can search documents by title, document number, and drafter name
-- [ ] **SRCH-02**: User can filter documents by status, date range, and template type
+- [x] **SRCH-01**: User can search documents by title, document number, and drafter name
+- [x] **SRCH-02**: User can filter documents by status, date range, and template type
 
 ### Additional Templates
 
@@ -171,8 +171,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TPL-04 | Phase 10: Additional Form Templates | Pending |
 | TPL-05 | Phase 10: Additional Form Templates | Pending |
 | TPL-06 | Phase 10: Additional Form Templates | Pending |
-| SRCH-01 | Phase 11: Document Search & Filter | Pending |
-| SRCH-02 | Phase 11: Document Search & Filter | Pending |
+| SRCH-01 | Phase 11: Document Search & Filter | Complete |
+| SRCH-02 | Phase 11: Document Search & Filter | Complete |
 
 **Coverage:**
 - v1.0 requirements: 36 total (36 complete)

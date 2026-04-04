@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Extended Features
 status: executing
-stopped_at: Phase 11 context gathered
-last_updated: "2026-04-04T03:02:38.265Z"
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-04-04T03:45:59.145Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 05 — file-attachments
+**Current focus:** Phase 11 — document-search-filter
 
 ## Current Position
 
-Phase: 11
-Plan: Not started
+Phase: 11 (document-search-filter) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
 Last activity: 2026-04-04
 
@@ -69,6 +69,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P03 | 15min | 3 tasks | 21 files |
 | Phase 05 P01 | 8min | 2 tasks | 11 files |
 | Phase 10 P03 | 3min | 1 tasks | 13 files |
+| Phase 11 P01 | 10min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,9 @@ Recent decisions affecting current work:
 - [Phase 05]: @MockitoBean GoogleDriveService pattern for integration tests without real Drive credentials
 - [Phase 05]: RFC 5987 Content-Disposition encoding for Korean filenames in download responses
 - [Phase 10]: Expense category labels as static Record map in BusinessTripReadOnly for simplicity
+- [Phase 11]: ApprovalLine entity created as blocking dependency for APPROVAL tab search query
+- [Phase 11]: BusinessException enhanced with httpStatus for proper HTTP status code responses (403 for RBAC)
+- [Phase 11]: QueryDSL BooleanBuilder pattern for dynamic multi-criteria document search
 
 ### Pending Todos
 
@@ -125,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T03:02:38.262Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-document-search-filter/11-CONTEXT.md
+Last session: 2026-04-04T03:45:59.143Z
+Stopped at: Completed 11-01-PLAN.md
+Resume file: None
