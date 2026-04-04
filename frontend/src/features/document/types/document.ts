@@ -91,6 +91,57 @@ export interface LeaveFormData {
   emergencyContact?: string;
 }
 
+// === Purchase Request Form Data (per D-04) ===
+export interface PurchaseItem {
+  name: string;
+  spec: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+
+export interface PurchaseFormData {
+  supplier: string;
+  deliveryDate: string;
+  paymentMethod: string;
+  purchaseReason: string;
+  items: PurchaseItem[];
+  totalAmount: number;
+}
+
+// === Business Trip Report Form Data (per D-09) ===
+export interface ItineraryItem {
+  date: string;
+  location: string;
+  description: string;
+}
+
+export interface TripExpenseItem {
+  category: string;
+  description: string;
+  amount: number;
+}
+
+export interface BusinessTripFormData {
+  destination: string;
+  startDate: string;
+  endDate: string;
+  purpose: string;
+  result: string;
+  itinerary: ItineraryItem[];
+  expenses: TripExpenseItem[];
+  totalExpense: number;
+}
+
+// === Overtime Request Form Data (per D-14) ===
+export interface OvertimeFormData {
+  workDate: string;
+  startTime: string;
+  endTime: string;
+  hours: number;
+  reason: string;
+}
+
 // === Query Params ===
 export interface MyDocumentParams {
   page?: number;
