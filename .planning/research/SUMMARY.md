@@ -1,183 +1,194 @@
 # Project Research Summary
 
-**Project:** MiceSign v1.1 — SMTP Notifications, Search/Filter, Additional Templates, Custom Template Builder
-**Domain:** Electronic approval system (전자 결재) extension — Korean corporate workflow, ~50 employees
-**Researched:** 2026-04-03
-**Confidence:** HIGH (notifications, search, templates), MEDIUM (custom template builder)
+**Project:** MiceSign v1.2 — Custom Template Builder
+**Domain:** Drag-and-drop form builder for Korean corporate electronic approval system
+**Researched:** 2026-04-05
+**Confidence:** HIGH
 
 ## Executive Summary
 
-MiceSign v1.1 extends a functioning electronic approval system (MVP complete) with four feature areas: SMTP email notifications, document search/filter, three additional hardcoded form templates, and a custom drag-and-drop template builder. The existing system is a well-structured Spring Boot layered monolith with React SPA frontend. Three of the four feature areas (notifications, search, templates) follow well-established patterns that integrate cleanly into the existing architecture without schema changes or paradigm shifts. Only the custom template builder requires novel architectural work and carries meaningful risk.
+MiceSign v1.2 adds admin-configurable form templates to an existing, live electronic approval system. The project is an extension to a working product — not a greenfield build — which fundamentally shapes every architectural decision. The central challenge is not "how to build a form builder" but "how to build a form builder on top of 6 hardcoded templates and live document history without breaking anything." Every major technical decision (schema format, DB migration, renderer, validation) revolves around the same constraint: the new system must be strictly additive.
 
-The recommended approach is to build in waves matching dependency and risk profile. SMTP notifications and additional form templates can be built independently and in parallel — they share zero cross-dependencies. Document search/filter builds on the existing document list patterns and benefits from having the complete template registry in place. The custom template builder — the only architecturally significant addition — should be tackled last and treated as a separate milestone: it introduces a dual rendering path, requires a JSON schema contract, and needs a versioning strategy for existing documents. For a 50-person company, nine hardcoded templates may be permanently sufficient; the builder's necessity should be validated after v1.1 ships.
+The recommended approach is a dual rendering path. Existing hardcoded templates (GENERAL, EXPENSE, LEAVE, PURCHASE, BUSINESS_TRIP, OVERTIME) continue using their purpose-built React components and Java validators. New admin-created templates use a dynamic JSON renderer built on the existing react-hook-form + zod + TailwindCSS stack. The binary discriminator is `schema_definition IS NULL` on the `approval_template` table: null means hardcoded, non-null means dynamic. This architecture avoids a full migration of existing templates while enabling new ones from day one.
 
-The critical risk is introducing the custom template builder without a proper architectural boundary. If the dynamic form system is not separated from the hardcoded component system via a `template_type` discriminator (BUILTIN/CUSTOM) and a stable JSON schema contract, both systems become coupled and unmaintainable across all layers: rendering, validation, read-only display, and backend validator. The second major risk — email-in-transaction coupling — is fully preventable: SMTP sends must always be decoupled from the approval transaction via `@TransactionalEventListener(AFTER_COMMIT)` + `@Async`. Both risks have clear, established mitigations.
+The critical risks are schema design lock-in (a poorly designed JSON schema format is almost impossible to change retroactively), breaking the dual rendering path (one wrong change to templateRegistry.ts or DocumentFormValidator destroys all 6 existing templates), and calculation field security (using eval() or new Function() opens stored XSS). These three risks must be addressed at the start of the first phase — before any builder UI is built. Everything else is implementation work with well-understood patterns.
 
 ## Key Findings
 
 ### Recommended Stack
 
-No new frontend libraries are required for v1.1. All existing dependencies cover the feature set: `@hello-pangea/dnd` for the template builder's drag-and-drop, React Hook Form + Zod for new form templates, TanStack Query for search API calls. On the backend, four Spring ecosystem libraries are added exclusively for SMTP notifications — all version-managed by the Spring Boot BOM, requiring no explicit version pinning.
+The stack addition is minimal: only 2 new dependencies are needed. The existing stack already provides everything required for the form builder. `@hello-pangea/dnd` is already installed and used in 3 components — reuse it for builder drag-and-drop. `react-hook-form`, `zod`, and TanStack Query are already used in all 6 existing form templates — the dynamic renderer follows the same patterns.
 
-**Core additions (backend only):**
-- `spring-boot-starter-mail`: SMTP transport via `JavaMailSender` — PRD-mandated, zero-config auto-configuration with Boot BOM
-- `spring-boot-starter-thymeleaf`: HTML email templates — standard Spring Boot email templating, natural HTML preview in browser
-- `spring-retry`: `@Retryable` for failed email delivery — declarative retry matches PRD 2-retry spec exactly
-- `spring-boot-starter-aop`: required for `@EnableRetry` — Spring Boot standard, no version conflict
+**New dependencies only:**
+- `expr-eval` (frontend, ~15KB): Safe sandboxed formula evaluation for calculation fields — use `expr-eval-fork` (v3.0.3) as drop-in replacement if maintenance becomes a concern
+- `com.networknt:json-schema-validator:1.5.5` (backend): Jackson-native JSON Schema validation for dynamic template form data; evaluate against pure Java field-by-field validation during Phase 2 — use whichever proves simpler for the custom schema format
 
-**Zero new frontend dependencies.** `@hello-pangea/dnd` is already installed (used for approval line reordering). Reusing it eliminates bundle bloat and DnD behavior conflicts.
-
-**Explicit rejections:**
-- Elasticsearch / Meilisearch: overkill for 50 users; MariaDB LIKE + QueryDSL covers the scale
-- SurveyJS / FormEngine: commercial licenses, heavy, Tailwind styling conflicts, designed for enterprise scale
-- `@dnd-kit/core`: project already uses `@hello-pangea/dnd`; mixing DnD libraries causes conflicts and doubles bundle size
-- MariaDB MATCH...AGAINST full-text: broken for Korean without n-gram parser configuration; use LIKE instead
-- `@rjsf/core`: adds complexity without value; a custom renderer with React Hook Form integrates cleanly with existing Zod validation
+**Technologies to explicitly reject:**
+- `@dnd-kit/core`: Already have @hello-pangea/dnd in 3 components; mixing DnD libraries doubles bundle size and requires rewriting working code
+- RJSF / JSON Forms: Both conflict with existing react-hook-form + zod; would create two parallel form systems
+- `eval()` / `new Function()`: Security risk — stored XSS via admin-authored formulas
+- `@dnd-kit/react` (0.3.x): Pre-1.0, not production-ready
 
 ### Expected Features
 
-**Must have (table stakes) — v1.1 scope:**
-- Email on submission, intermediate approval, final approval, rejection, withdrawal — approvers have no awareness of pending items without this
-- Keyword search (title + doc number) — essential once document volume grows beyond trivial count
-- Status filter, date range filter, template type filter, drafter filter — standard document management UI expectations
-- Access-controlled search results — users must only see documents they are authorized to view per FSD FN-SEARCH-001
-- Purchase Request (구매요청서), Business Trip Report (출장보고서), Overtime Request (연장근무신청서) — all named in PRD 5.1, legally required or common in Korean corporate culture
+Research identified 5 phases of feature delivery from schema-critical foundations to optional migration work.
+
+**Must have (table stakes for builder to be usable):**
+- 6 core field types: text, textarea, number, date, select, table (covers all 6 existing form patterns)
+- Three-panel builder UI: field palette (left), canvas with drag reorder (center), property panel (right)
+- Live preview toggle between builder mode and rendered form
+- Template CRUD admin page with active/inactive toggle
+- Dynamic form rendering in both edit and read-only modes
+- Runtime Zod schema generation from JSON field definitions
+- Backend JSON schema validation (dynamic validator as fallback in DocumentFormValidator)
+- Template versioning with schema snapshot on document submission
 
 **Should have (differentiators):**
-- Automatic notification retry (max 2x, 5-minute intervals) — explicitly specified in FSD FN-NTF-001
-- Template metadata admin (FN-TPL-002) — enables deactivating unused templates without code changes
-- Notification failure visibility for SUPER_ADMIN — simple query on existing `notification_log` table
-- URL-synced filter state in search — enables sharing filtered views and surviving browser back navigation
+- Conditional show/hide logic (declarative rules, not code)
+- Calculation fields with SUM and basic arithmetic (generalize existing ExpenseForm pattern)
+- Date range compound field (start + end + auto-duration)
+- Field sections/grouping for visual organization
+- Template duplication
 
-**Defer to separate milestone:**
-- Custom template builder — 3-5x effort of all other v1.1 features combined; architectural paradigm shift from hardcoded approach; evaluate need after v1.1 ships with 9 total templates
-- In-app notification center (bell + real-time) — requires WebSocket/SSE infrastructure; email covers the need at 50 users
-- Search result Excel export — defer to Phase 1-C with statistics/reports
-- Auto-complete typeahead search — API complexity for minimal gain at this scale
-- Email opt-out preferences — all approval notifications are business-critical; no opt-out needed
+**Defer to v2+:**
+- Undo/redo in builder (2-3 admins create templates; "save frequently" is sufficient)
+- Migration of 6 hardcoded forms to JSON schemas (optional, high-risk, low-reward)
+- User picker field (requires org tree component integration)
+- Template import/export
+- Checkbox/radio groups (add when a specific form needs them)
+
+**Explicit anti-features — do not build:**
+- Full formula/spreadsheet engine (security risk; predefined SUM/arithmetic covers 95% of needs)
+- 2D grid drag-and-drop layout (5x harder than vertical list; use width hints instead)
+- Multi-page forms (Korean approval forms are single-page by industry convention)
+- User-facing builder (restrict to ADMIN/SUPER_ADMIN only)
 
 ### Architecture Approach
 
-The existing layered monolith (Controller → Service → Repository with MapStruct DTOs) accommodates all v1.1 features without structural change to the core model. Notifications integrate via Spring Application Events — domain events published from service methods, consumed by `@TransactionalEventListener` + `@Async` listeners that are fully decoupled from business transactions. Search integrates via a new `DocumentSearchSpecification` following the existing `UserSpecification` pattern. Templates are purely additive — 6 new React components, 3 Zod schemas, 3 registry entries, 3 backend validator strategies. The custom template builder requires the only genuine architectural extension: a `template_type` discriminator on `approval_template`, a `form_schema` JSON column, and a dual rendering path in the template registry.
+The architecture centers on a dual rendering path maintained through two extension points: `getTemplateEntry()` in the frontend (extends TEMPLATE_REGISTRY without replacing it) and `DocumentFormValidator.validate()` in the backend (falls through to `DynamicFormValidator` when no hardcoded strategy exists). Schema snapshots on `document_content` guarantee that submitted documents always render with the exact schema they were created with, regardless of subsequent template changes.
 
-**New components (notifications):**
-1. `NotificationEventListener` — `@TransactionalEventListener(AFTER_COMMIT)` + `@Async`, orchestrates email dispatch from domain events
-2. `EmailService` + Thymeleaf templates — SMTP transport layer, 5 HTML email template types
-3. `NotificationLog` entity + `@Scheduled` retry — delivery tracking and automated retry up to 2x
+**Major components:**
+1. `approval_template` (EXTENDED DB) — gains `schema_definition JSON NULL`, `schema_version INT`, `is_custom BOOLEAN`, `category`, `icon`, `created_by` columns via Flyway migration
+2. `template_schema_version` (NEW DB TABLE) — append-only version history; every schema save creates a new entry
+3. `document_content` (EXTENDED DB) — gains `schema_version INT NULL` and `schema_definition_snapshot JSON NULL` for document-pinned rendering
+4. `DynamicFormValidator` (NEW backend) — validates formData against stored JSON schema; invoked by DocumentFormValidator as fallback for non-hardcoded template codes
+5. `DynamicFormRenderer` (NEW frontend) — renders JSON schema into React form using react-hook-form + zod; both edit and read-only modes
+6. `TemplateBuilderPage` (NEW frontend) — three-panel admin UI using @hello-pangea/dnd for field palette-to-canvas and reorder
+7. `useTemplateBuilderStore` (NEW Zustand store) — builder UI state (selected field, schema draft state)
+8. `useConditionalLogic` (NEW frontend hook) — reactive evaluation of show/hide/require rules via react-hook-form `watch()`
+9. `formulaEngine` (NEW frontend module) — wraps expr-eval for safe calculation field evaluation
 
-**New components (search):**
-4. `DocumentSearchSpecification` — JPA Specification with permission-aware WHERE clause: drafter OR approval-line member OR ADMIN department scope OR SUPER_ADMIN
-5. `SearchPage` + `SearchFilterBar` + `useDocumentSearch` — frontend search UI with `useSearchParams` URL sync
-
-**New components (custom template builder — separate milestone):**
-6. `DynamicFormRenderer` / `DynamicFormReadOnly` / `DynamicFormValidator` — JSON schema-driven form rendering and server-side validation
-7. `FormSchemaBuilder` admin UI — drag-and-drop template designer using `@hello-pangea/dnd`
+**JSON Schema format (custom, not JSON Schema Draft 7):**
+- Root: `{ version: number, fields: FieldDefinition[], conditionalRules?, calculationRules? }`
+- Each field: `{ id, type, label, required, config?, conditions? }` using discriminated union pattern
+- `config` object holds type-specific settings; unknown field types ignore unknown config keys
+- `version` at root is non-negotiable even if it seems unnecessary at first
 
 ### Critical Pitfalls
 
-1. **Custom template builder breaks the hardcoded template system** — Design the JSON schema format first, before writing any UI code. Add a `template_type` discriminator (BUILTIN/CUSTOM) to `approval_template`. If `if (isCustomTemplate)` branches appear in more than 3 places across the codebase, the dual-system coupling is already a structural problem that will compound.
+1. **Schema migration breaks existing documents** — New columns must be nullable. `schema_version = NULL` in `document_content` means "hardcoded template, use TEMPLATE_REGISTRY." Never alter existing data semantics. Test Flyway migration against a real DB dump before deploy. (Phase 1)
 
-2. **Email sending inside transaction boundaries** — Any call to `JavaMailSender.send()` inside a `@Transactional` method is wrong. SMTP latency (500ms-3s per email) blocks the transaction; SMTP failure rolls back the approval action. Use `@TransactionalEventListener(phase = AFTER_COMMIT)` + `@Async` without exception.
+2. **Breaking the dual rendering path** — Never replace TEMPLATE_REGISTRY or DocumentFormValidator's hardcoded strategy dispatch. Extend them. The 6 existing FormValidationStrategy beans and hardcoded React components must remain untouched. The moment these are removed, all existing functionality breaks. (Phase 1 architectural constraint, enforced permanently)
 
-3. **Korean full-text search without n-gram tokenization** — MariaDB default full-text search uses word-boundary tokenization that fails for Korean (e.g., "결재" does not match "전자결재"). Use `LIKE '%keyword%'` on indexed `title` and `doc_number` columns. Never use `MATCH...AGAINST` without configuring n-gram parser (`WITH PARSER ngram`, `ngram_token_size=2`).
+3. **Calculation field code injection via eval()** — Use `expr-eval` exclusively. Never use `eval()`, `new Function()`, or dynamic code execution for admin-authored formulas. Backend must recalculate all formula fields on document submission to prevent client-tampered values. (Phase 4)
 
-4. **Template schema versioning gap** — Custom template edits after documents exist corrupt read-only rendering. Either snapshot the schema at document submission or lock templates from structural edits once any submitted documents reference them. Simplest safe rule: once submitted documents exist for a template, prohibit field removal.
+4. **Conditional logic circular dependencies** — Build DAG cycle detection (DFS, ~30 lines) before allowing conditional rule saves. Circular rules cause React "Maximum update depth exceeded" browser freezes. Add a max evaluation depth of 20 as runtime safety net. (Phase 4)
 
-5. **N+1 query problem in search results** — Document search returning 20 rows must not trigger 60 lazy-load queries for drafter/department/template relations. Use QueryDSL projections with explicit JOINs to a flat `DocumentSearchDto`. Indexes required on `document.status`, `document.template_code`, `document.submitted_at`, `document.title(100)`.
+5. **JSON schema format that cannot evolve** — Use discriminated union pattern with type-specific `config` objects. Always include `version` at schema root. Field IDs must be stable identifiers (not labels, not positions). Finalize in Phase 1 before any rendering code is written.
 
 ## Implications for Roadmap
 
-Based on combined research findings, the optimal phase structure follows the dependency graph and risk escalation:
+Based on the feature dependency graph and pitfall phase warnings, a 5-phase structure is recommended:
 
-### Phase 1: SMTP Email Notifications
-**Rationale:** No dependencies on other v1.1 features. The `notification_log` table DDL already exists in the database schema. FSD FN-NTF-001 fully specifies all behavior including event types, retry policy, and failure handling. This is a textbook Spring Boot pattern with zero architectural uncertainty. Highest user impact relative to implementation effort (2-3 days estimated).
-**Delivers:** Email notifications for all 5 event types (submit, intermediate approve, final approve, reject, withdraw) with `@Retryable` delivery retry and `notification_log` tracking.
-**Uses:** `spring-boot-starter-mail`, `spring-boot-starter-thymeleaf`, `spring-retry`, `@TransactionalEventListener`, `@Async`
-**Avoids:** Pitfall 2 (email in transaction — use AFTER_COMMIT event listener), Pitfall 8 (SMTP credential leak — environment variables, never committed config)
+### Phase 1: Schema Foundation
+**Rationale:** Everything else — renderer, builder UI, conditional logic, calculations — depends on the JSON schema format and DB structure. Getting the schema design wrong is the hardest mistake to undo. This phase must be completed and validated before any UI work begins.
+**Delivers:** Correct DB structure, stable JSON schema format, template CRUD API, backend dynamic validation service, template versioning infrastructure
+**Addresses:** JSON schema storage, template CRUD, template versioning, backend validation
+**Avoids:** Pitfall 1 (schema migration), Pitfall 2 (dual path — architectural decision made here), Pitfall 9 (inflexible schema format), Pitfall 11 (template code/prefix collisions)
+**Key decisions to make:** Schema format design (discriminated union, `version` at root, stable field IDs), Flyway migration strategy (additive-only, nullable columns), auto-generated template codes (`CUSTOM_{id}`)
 
-### Phase 2: Additional Form Templates (3 hardcoded)
-**Rationale:** Fully independent of notifications and search. Follows the exact existing pattern proven by GENERAL, EXPENSE, and LEAVE templates — purely additive changes with no risk to existing functionality. Before adding templates, refactor `DocumentFormValidator` from switch/case to a strategy pattern to prevent the validator from growing to 250+ unmaintainable lines at 6+ template types. The strategy pattern refactoring also directly benefits the custom template builder phase.
-**Delivers:** Purchase Request (구매요청서), Business Trip Report (출장보고서), Overtime Request (연장근무신청서) — 6 new React components, 3 Zod schemas, 3 validator strategy classes, 3 Flyway seed migrations. `DocumentFormValidator` refactored to strategy pattern.
-**Avoids:** Pitfall 9 (validator bloat — refactor before adding new cases), establishes stable template count for search filter dropdown
+### Phase 2: Dynamic Form Rendering
+**Rationale:** The renderer must work before the builder is useful. Approvers and drafters interact with the renderer on every document. The builder is only used by 2-3 admins occasionally. Renderer correctness is higher priority than builder polish.
+**Delivers:** DynamicFormRenderer (edit + read-only), runtime Zod schema generation, DynamicFormValidator backend, integration into existing DocumentEditorPage and DocumentDetailPage
+**Addresses:** Dynamic form rendering both modes, runtime Zod generation, backend schema validation
+**Avoids:** Pitfall 2 (extend getTemplateEntry() instead of replacing TEMPLATE_REGISTRY), Pitfall 8 (validation mismatch — shared schema drives both FE and BE), Pitfall 12 (missing read-only mode)
+**Key order:** Build read-only mode first (simpler, more frequently used by all approvers), then edit mode
 
-### Phase 3: Document Search/Filter
-**Rationale:** Builds on the existing document list page and `UserSpecification` JPA Specification pattern. Benefits from Phase 2 being complete so the template-type filter dropdown is fully populated with all 6 templates. FSD FN-SEARCH-001 specifies the exact access control WHERE clause logic. The permission-aware subquery is the only non-trivial implementation challenge.
-**Delivers:** Full document search with keyword, status, template, date range, and drafter filters; paginated results with existing `Pagination.tsx` component; role-based access control (drafter OR approval line member OR ADMIN dept scope OR SUPER_ADMIN); URL-synced filter state via `useSearchParams`.
-**Uses:** QueryDSL `BooleanBuilder` / `JpaSpecificationExecutor`, Spring `Pageable`, `useSearchParams` from React Router
-**Avoids:** Pitfall 3 (Korean full-text — LIKE '%keyword%' not MATCH...AGAINST), Pitfall 5 (N+1 — QueryDSL projections with JOIN FETCH), Pitfall 10 (lost filter state — URL params from day one)
+### Phase 3: Builder UI
+**Rationale:** Can only be built after the renderer works — builder preview mode requires real-time schema rendering. Builder produces the JSON schema; renderer consumes it. Reversing this order means building preview twice.
+**Delivers:** Three-panel TemplateBuilderPage, field palette, canvas with drag-and-drop reorder, property panel per field type, live preview toggle, template list admin page
+**Addresses:** Builder UX (palette, canvas, property panel, preview), template management admin page
+**Avoids:** Pitfall 5 (over-engineering — hard scope enforced: 6 field types, flat list, no undo/redo, no nested containers), Pitfall 7 (DnD touch/accessibility — add keyboard arrow buttons as fallback to DnD)
+**Hard scope boundary:** text, textarea, number, date, select, table field types only; flat single-column list; no undo/redo; no drag between nested containers
 
-### Phase 4: Custom Template Builder (Separate Milestone — Evaluate After v1.1)
-**Rationale:** Architecturally distinct from all prior v1.1 work. Should only begin after Phases 1-3 are shipped and the hardcoded template pattern is proven stable with real usage. Has its own internal dependency chain that must be respected, and introduces the highest implementation risk of any v1.1 feature. With 9 hardcoded templates covering all common Korean corporate approval types, the builder may not be needed.
-**Delivers:** Admin drag-and-drop form designer producing JSON schema definitions; dynamic form renderer consuming schemas; schema-driven server-side validation; dual rendering path in template registry (BUILTIN uses hardcoded components, CUSTOM uses `DynamicFormRenderer`).
-**Sub-phases (in strict order):**
-- D1: JSON schema format finalization + `DynamicFormRenderer` + `DynamicFormReadOnly` (foundation)
-- D2: `DynamicFormValidator` server-side schema-driven validation
-- D3: `TemplateBuilderPage` admin UI with `@hello-pangea/dnd` field palette and canvas
-- D4: Integration with template selection modal and document creation flow
-**Avoids:** Pitfall 1 (dual system — BUILTIN/CUSTOM discriminator, schema-first design), Pitfall 4 (schema versioning — snapshot at submission), Pitfall 7 (scope creep — v1 field types: text, textarea, number, date, select, checkbox only; no conditional logic, no repeating rows, no calculated fields)
+### Phase 4: Advanced Features
+**Rationale:** Conditional logic and calculations are differentiators, not table stakes. They depend on the full set of basic field types working correctly in Phase 3. Building them earlier risks designing rules that reference field types that don't exist yet.
+**Delivers:** Conditional show/hide/require logic engine, calculation fields (SUM, arithmetic), DAG cycle detection for conditional rules, backend formula recalculation on submission
+**Addresses:** Conditional logic, calculation fields (differentiators)
+**Avoids:** Pitfall 3 (circular dependencies — DAG cycle detection on save, max depth at runtime), Pitfall 4 (eval() injection — expr-eval only, backend recalculation)
+
+### Phase 5: Hardcoded Template Migration (Optional)
+**Rationale:** The 6 hardcoded templates already work. Migration is optional and carries regression risk. Only pursue after Phase 4 is stable and production-proven. Defer indefinitely if no operational need emerges.
+**Delivers:** JSON schemas matching the 6 existing hardcoded form types, dual-mode rendering verification, gradual one-at-a-time template flipping
+**Addresses:** Migration tooling (optional differentiator)
+**Avoids:** All existing template breakage by testing each migration in isolation before flipping. Schema snapshot on document_content ensures old documents still render via their original path.
 
 ### Phase Ordering Rationale
 
-- Notifications and additional templates (Phases 1-2) have zero cross-dependencies and can proceed in parallel if two work streams are available
-- Search (Phase 3) follows templates because the template-type filter dropdown needs a complete template registry to be useful
-- Both waves (1-2 and then 3) complete the entire v1.1 specification except the builder
-- Builder (Phase 4) is last because it requires all hardcoded templates to be stable and proven before introducing the parallel rendering path, and because it carries the highest risk of any feature
-- Treating the builder as a separate milestone after v1.1 ships is the lower-risk path — real usage data from 9 templates will clarify whether a builder is genuinely needed
+- Schema Foundation must come first because every other phase depends on it. Changing the JSON schema format after Phase 2 or 3 requires rewriting the renderer and the builder.
+- Dynamic Rendering before Builder UI because the builder's live preview requires the renderer to work. Building them in reverse order means building preview twice.
+- Advanced Features after Builder UI because conditional logic and calculations require all basic field types to exist as targets for rules and formulas.
+- Migration is last and optional because it carries the highest regression risk with the lowest reward — the 6 existing templates already work correctly.
 
 ### Research Flags
 
-Phases needing deeper research during planning:
-- **Phase 4 (Custom Template Builder):** No existing FSD specification for this feature. Schema format, versioning strategy, and builder UX require deliberate design before implementation begins. Recommend `/gsd:research-phase` at the start of Phase D1. Key decisions: include or exclude `table` field type (doubles complexity if included), snapshot vs. version-locking strategy for schema changes.
+Phases likely needing deeper research during planning:
+- **Phase 4 (Conditional Logic):** The interaction between conditional visibility, required-state changes, and react-hook-form `watch()` + dynamic Zod schema regeneration has edge cases (e.g., conditionally required field inside a table) that need careful API design before implementation
+- **Phase 4 (Calculation Fields):** expr-eval formula variable whitelisting and backend recalculation placement (DocumentService vs DynamicFormValidator) need implementation design decisions
 
-Phases with standard patterns (skip research-phase):
-- **Phase 1 (Notifications):** FSD FN-NTF-001 fully specified; `@TransactionalEventListener` + `@Async` is textbook Spring Boot pattern; `notification_log` table DDL exists
-- **Phase 2 (Templates):** Direct replication of GENERAL/EXPENSE/LEAVE pattern; 6 reference files exist in codebase; strategy pattern refactor is straightforward
-- **Phase 3 (Search/Filter):** FSD FN-SEARCH-001 fully specified including exact access control logic; existing `UserSpecification` is the reference implementation
+Phases with standard patterns (skip research):
+- **Phase 1 (Schema Foundation):** Flyway additive-only migrations are standard; discriminated union schema format is a well-established pattern
+- **Phase 2 (Dynamic Rendering):** Custom renderer with react-hook-form switch-on-type is well-documented; existing codebase (ExpenseForm.tsx, templateRegistry.ts) provides direct reference implementations
+- **Phase 3 (Builder UI):** Three-panel builder using @hello-pangea/dnd follows existing codebase patterns (ApprovalLineList, PositionTable already demonstrate this)
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | 0 new frontend deps confirmed; 4 backend deps all Spring BOM-managed; validated against existing `build.gradle.kts` and `package.json` |
-| Features | HIGH | FSD FN-NTF-001, FN-SEARCH-001, FN-TPL-002/003 fully specify notifications, search, and templates; builder is the only unspecified area |
-| Architecture | HIGH (phases 1-3) / MEDIUM (phase 4) | Notifications, search, templates follow verified existing codebase patterns; builder design is opinionated analysis with no FSD backing |
-| Pitfalls | HIGH | 8 of 11 pitfalls derived from direct codebase inspection; SMTP and Korean search pitfalls from well-documented authoritative sources |
+| Stack | HIGH | Minimal new dependencies; reuses existing stack. expr-eval maintenance concern noted but documented fallback (expr-eval-fork) exists. |
+| Features | HIGH | Korean groupware competitors analyzed; existing codebase provides ground truth for which field types are needed. |
+| Architecture | HIGH | Dual rendering path, discriminator pattern, and schema snapshot strategy are well-justified. Conditional logic evaluation edge cases are MEDIUM. |
+| Pitfalls | HIGH | Most pitfalls based on direct codebase inspection (templateRegistry.ts, DocumentFormValidator.java, V1 DDL). Real code, not hypothetical. |
 
-**Overall confidence:** HIGH for Phases 1-3, MEDIUM for Phase 4
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Custom builder field type scope:** Research recommends 6 field types for v1 (text, textarea, number, date, select, checkbox). The decision to include `table` (repeating rows like expense items) is the single most impactful scope decision — including it roughly doubles builder complexity. Resolve explicitly before Phase D1 begins.
-- **Template schema versioning strategy:** Two options are viable (snapshot schema JSON at document submission vs. lock templates from structural edits once submitted documents exist). Neither is specified in FSD. Choose one strategy before building any persistence layer for custom templates.
-- **Notification batching:** Per-event notifications are correct for v1. Pitfall 6 (notification spam) is low risk at 50 users but the `notification_log` table design should anticipate batching — include a `digest_group` or `batch_id` column even if the batching logic comes later.
-- **SMTP provider selection:** Research assumes company's existing email infrastructure. Confirm SMTP host, port, and TLS requirements before Phase 1 implementation. Local development should use MailPit or MailHog (mock SMTP) to avoid committing real credentials.
-- **`react-day-picker` decision:** Research recommends starting with native HTML5 `<input type="date">`. Defer adding `react-day-picker` (9.x, ~10KB) until Phase 4 custom builder UX testing reveals an actual need — do not add it speculatively.
+- **networknt version:** STACK.md recommends v1.5.5; ARCHITECTURE.md code examples use v3.0.x. Resolve which line to use in Phase 1. v1.5.x is more battle-tested with more community examples; v3.0.x is a breaking rewrite. Recommend v1.5.5 unless a specific v3 feature is needed.
+- **Calculation field backend recalculation placement:** Architecture specifies backend must recalculate formula fields on submission but does not specify whether this lives in DocumentService or DynamicFormValidator. Design decision needed in Phase 4 planning.
+- **Draft document schema version upgrade UX:** When a template is updated while a user has an open draft, PITFALLS.md documents the desired UX ("Continue with old version" vs "Upgrade to new version" warning banner). ARCHITECTURE.md does not cover this flow. Design needed in Phase 1.
+- **Table field calculation columns:** ARCHITECTURE.md's TableColumn type supports text/number/date/select but not calculation. FEATURES.md notes that amount = quantity x unitPrice is needed inside table rows (existing ExpenseForm pattern). Clarify whether intra-table calculations are in Phase 2 scope or Phase 4 scope.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- FSD v1.0 FN-NTF-001 — email notification spec, event types, retry policy, `notification_log` table
-- FSD v1.0 FN-SEARCH-001 — document search spec, access control WHERE clause, query parameters
-- FSD v1.0 FN-TPL-002 / FN-TPL-003 — template admin spec, form data JSON schemas
-- PRD v2.0 section 5.1 — template structure, planned additional templates list
-- Existing codebase: `templateRegistry.ts`, `DocumentFormValidator.java`, `UserSpecification.java`, `V1__create_schema.sql` (notification_log DDL)
-- [Spring Boot Mail Reference](https://docs.spring.io/spring-boot/reference/io/email.html)
-- [Spring @TransactionalEventListener documentation](https://docs.spring.io/spring-framework/reference/data-access/transaction/event.html)
-- [Thymeleaf Spring Mail Article](https://www.thymeleaf.org/doc/articles/springmail.html)
-- [Spring Retry Guide — Baeldung](https://www.baeldung.com/spring-retry)
+- Direct codebase inspection: `templateRegistry.ts`, `DocumentFormValidator.java`, `FormValidationStrategy.java`, `ExpenseFormValidator.java`, `DocumentContent.java`, `Document.java`, `ApprovalTemplate.java`, `V1__create_schema.sql`
+- [@hello-pangea/dnd npm](https://www.npmjs.com/package/@hello-pangea/dnd) — v18.0.1 already installed, used in 3 components
+- [networknt json-schema-validator GitHub](https://github.com/networknt/json-schema-validator) — v1.5.5, Jackson-native, active maintenance
+- [MDN eval() Security Documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval)
+- [dnd-kit Accessibility Documentation](https://docs.dndkit.com/guides/accessibility)
 
 ### Secondary (MEDIUM confidence)
-- [Spring Core Resilience Features (2025)](https://spring.io/blog/2025/09/09/core-spring-resilience-features/) — retry pattern options
-- [Transactional Outbox pattern with Spring Boot — Wim Deblauwe](https://www.wimdeblauwe.com/blog/2024/06/25/transactional-outbox-pattern-with-spring-boot/) — outbox vs. @Async tradeoffs
-- [MariaDB Full-Text Index Pitfalls and n-gram Parser](https://runebook.dev/en/docs/mariadb/full-text-index-overview/index) — Korean tokenization gap
-- [@hello-pangea/dnd npm](https://www.npmjs.com/package/@hello-pangea/dnd) — DnD library status and maintenance
-- [Top 5 DnD Libraries for React 2026 — Puck](https://puckeditor.com/blog/top-5-drag-and-drop-libraries-for-react) — dnd-kit maintenance concerns (pre-1.0 @dnd-kit/react)
-- [spring-boot-starter-mail on Maven Central](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail)
+- Korean groupware competitors: DaouOffice, HiWorks — field type analysis for Korean corporate approval forms
+- [expr-eval GitHub](https://github.com/silentmatt/expr-eval) — v2.0.2, sandboxed evaluation
+- [expr-eval-fork npm](https://www.npmjs.com/package/expr-eval-fork) — v3.0.3, maintained alternative
+- [Schema Versioning Pattern (MongoDB)](https://www.mongodb.com/company/blog/building-with-patterns/the-schema-versioning-pattern)
+- [dnd-kit Touch Sensor Issues (GitHub #435)](https://github.com/clauderic/dnd-kit/issues/435)
+- [dnd-kit form builder discussion #639](https://github.com/clauderic/dnd-kit/discussions/639) — palette-to-canvas cross-container DnD pattern
 
-### Tertiary (LOW confidence — validate during implementation)
-- [Drag-and-Drop React Form Builder with Zod — dev.to](https://dev.to/shoaeeb_osman_e3e2ae43910/i-built-a-drag-and-drop-react-form-builder-with-zod-react-hook-form-heres-how-3bc4) — builder architecture patterns (single dev blog post, needs validation)
-- [Understanding TransactionalEventListener in Spring Boot — dev.to](https://dev.to/haraf/understanding-transactioneventlistener-in-spring-boot-use-cases-real-time-examples-and-4aof) — supplementary examples
+### Tertiary (LOW confidence)
+- [safe-expr-eval — patches CVE-2025-12735](https://github.com/alecasg455/safe-expr-eval) — CVE reference needs independent verification before relying on this library
 
 ---
-*Research completed: 2026-04-03*
+*Research completed: 2026-04-05*
 *Ready for roadmap: yes*

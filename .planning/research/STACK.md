@@ -1,232 +1,289 @@
-# Technology Stack: MiceSign v1.1 Extended Features
+# Technology Stack: Custom Template Builder
 
-**Project:** MiceSign v1.1 — SMTP notifications, search/filter, additional templates, custom template builder
-**Researched:** 2026-04-03
-**Scope:** NEW additions only. Existing stack (Spring Boot 3.5.x, React 18, MariaDB 10.11, etc.) is validated and not re-researched.
+**Project:** MiceSign v1.2 -- Custom Template Builder
+**Researched:** 2026-04-05
+**Scope:** NEW libraries only for template builder features. Existing stack validated in v1.0/v1.1 is not re-researched.
 
-## New Stack Additions
+## Recommended Stack Additions
 
-### 1. SMTP Email Notifications (Backend)
-
-| Technology | Version | Purpose | Why |
-|------------|---------|---------|-----|
-| `spring-boot-starter-mail` | (managed by Boot 3.5.x BOM) | JavaMailSender + SMTP | PRD specifies this. Zero-config auto-configuration with Spring Boot. Provides `JavaMailSender` bean automatically. |
-| `spring-boot-starter-thymeleaf` | (managed by Boot 3.5.x BOM) | HTML email templates | Thymeleaf is the standard Spring email templating engine. Natural templates that preview in browsers. Inline CSS support for email clients. |
-| `spring-retry` | 2.0.x (managed by Boot BOM) | @Retryable for mail delivery | PRD requires 2-retry policy for failed emails. `@Retryable` + `@Recover` annotations provide declarative retry with exponential backoff — cleaner than manual retry loops. |
-
-**Why these choices:**
-- `spring-boot-starter-mail` is the PRD-mandated approach and wraps Jakarta Mail with Spring auto-configuration. Version is managed by the Spring Boot BOM — no explicit version needed.
-- Thymeleaf over FreeMarker: Thymeleaf is the default Spring Boot template engine. Templates are valid HTML that designers can preview directly. Already has Spring Boot auto-configuration.
-- `spring-retry` over manual retry: The FSD specifies `@TransactionalEventListener` + `@Async` for mail dispatch. Adding `@Retryable` on the actual send method gives clean retry semantics with `@Recover` fallback to mark `notification_log.status = FAILED`.
-
-**Configuration needed:**
-```yaml
-# application.yml
-spring:
-  mail:
-    host: smtp.example.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-```
-
-**No separate template engine needed for email body:** Thymeleaf templates go in `src/main/resources/templates/email/` and are resolved by Spring Boot auto-configuration.
-
-### 2. Document Search/Filter (Backend + Frontend)
-
-**No new libraries needed.**
-
-| Concern | Solution | Why No New Library |
-|---------|----------|-------------------|
-| Backend search | QueryDSL dynamic predicates | Already in stack. `BooleanBuilder` with conditional `.and()` clauses handles all FSD search parameters (keyword LIKE, status filter, date range, template filter). |
-| Full-text search | MariaDB `LIKE '%keyword%'` | 50 users, ~10K documents max. Full-text search engines (Elasticsearch) are massive overkill. MariaDB LIKE with proper indexes is sub-second for this scale. |
-| Frontend search UI | React Hook Form + existing components | Search form is just input fields + select dropdowns + date pickers. No new form library needed. |
-| Date picker | Native HTML `<input type="date">` or lightweight component | Avoid pulling in a full date picker library. HTML5 date inputs work well for simple date range filtering. If UX demands more, `react-day-picker` (10KB) is the lightest option. |
-| Pagination | Spring Data `Pageable` + TanStack Query | Already in stack. Backend returns `Page<T>`, frontend handles with existing TanStack Query patterns. |
-
-**Key implementation note:** The FSD search query (FN-SEARCH-001) has a complex WHERE clause with role-based filtering. This is a QueryDSL `BooleanExpression` composition problem, not a search engine problem. QueryDSL's `BooleanBuilder` is purpose-built for this.
-
-### 3. Additional Form Templates (Frontend)
-
-**No new libraries needed.**
-
-The 3 new templates (PURCHASE, BUSINESS_TRIP, OVERTIME) follow the established pattern: each is a hardcoded React component registered in `TEMPLATE_REGISTRY`. They use the existing React Hook Form + Zod validation stack.
-
-| Template | Notable UI Elements | Existing Stack Coverage |
-|----------|-------------------|------------------------|
-| Purchase Request (구매요청서) | Item list with add/remove rows, amount calculation | React Hook Form `useFieldArray` + Zod |
-| Business Trip Report (출장보고서) | Date range, itinerary table, expense breakdown | React Hook Form + date inputs + `useFieldArray` |
-| Overtime Request (연장근무신청서) | Date/time pickers, hour calculation | React Hook Form + native time inputs |
-
-**No additional libraries.** `useFieldArray` from React Hook Form handles dynamic rows (expense items, itinerary entries). Amount/hour calculations are plain TypeScript arithmetic.
-
-### 4. Custom Template Builder — Drag & Drop Form Designer (Frontend)
-
-This is the only feature requiring significant new dependencies. The admin needs to visually design form templates that users can then fill out.
-
-**Architecture decision: Build custom vs. use a form builder library.**
-
-| Approach | Pros | Cons |
-|----------|------|------|
-| Full library (SurveyJS, FormEngine) | Feature-complete, battle-tested | Heavy (200KB+), opinionated styling conflicts with Tailwind, license concerns (SurveyJS commercial), learning curve for customization |
-| RJSF (@rjsf/core) for rendering + custom builder UI | Standard JSON Schema, good rendering | Builder UI must be built separately, RJSF rendering may conflict with existing template components |
-| **Custom builder with @hello-pangea/dnd + JSON schema** | Full control, consistent with existing DnD usage, lightweight, matches Tailwind styling | More development effort for builder UI |
-
-**Recommendation: Custom builder using existing `@hello-pangea/dnd` + JSON schema storage + custom renderer.**
+### 1. Drag & Drop -- @hello-pangea/dnd (ALREADY INSTALLED)
 
 | Technology | Version | Purpose | Why |
 |------------|---------|---------|-----|
-| `@hello-pangea/dnd` | ^18.0.1 | Drag & drop in form builder | **Already in the project** (used for approval line editor). Reuse eliminates bundle size increase and learning curve. Handles list-based DnD (field reordering) which is the primary builder interaction. |
-| JSON Schema (custom subset) | N/A | Form definition storage | Store template definitions as JSON in `document_content` or a new `template_definition` column. Define a subset of field types (text, textarea, number, date, select, table) that maps to React components. |
+| `@hello-pangea/dnd` | ^18.0.1 (installed) | Drag fields from palette to canvas, reorder fields | Already used in 3 components (ApprovalLineList, ApprovalLineItem, PositionTable). Reusing avoids bundle bloat and behavioral inconsistency. |
 
-**Why NOT a full form builder library:**
-1. **@hello-pangea/dnd is already installed.** Adding another DnD library means bundle bloat and DnD behavior conflicts.
-2. **50-user system with admin-only builder.** Enterprise form builder libraries (SurveyJS, FormEngine) are designed for customer-facing products with hundreds of field types. MiceSign needs ~8 field types max.
-3. **Tailwind consistency.** Third-party form builders have their own styling systems that fight with Tailwind. Building custom means pixel-perfect consistency.
-4. **JSON Schema is the right storage format.** A simple schema like `{ fields: [{ type: "text", label: "...", required: true, ... }] }` stored as JSON in MariaDB is sufficient. No need for JSON Schema draft-07 compliance — a custom subset is simpler.
-5. **The renderer is straightforward.** Map field types to React components: `text` -> `<input>`, `textarea` -> `<textarea>`, `select` -> `<select>`, `table` -> dynamic rows with `useFieldArray`. The existing React Hook Form + Zod stack handles validation.
+**No new DnD library needed.** The form builder's core interaction is:
+1. Drag field types from a palette onto a canvas (single droppable)
+2. Reorder fields within the canvas (sortable list)
+3. Optionally reorder columns within table fields (nested sortable)
 
-**Builder component structure:**
-```
-TemplateBuilder (admin page)
-├── FieldPalette (available field types to drag from)
-├── FormCanvas (drop zone, @hello-pangea/dnd DragDropContext)
-│   └── FieldCard[] (draggable, with edit/delete controls)
-└── FieldEditor (sidebar: label, placeholder, required, options)
+All of these are standard `DragDropContext` + `Droppable` + `Draggable` patterns that `@hello-pangea/dnd` handles well. The approval line editor already demonstrates this exact pattern in the codebase.
 
-TemplateRenderer (user-facing)
-├── Reads JSON schema from template
-├── Renders fields using React Hook Form
-└── Validates with dynamically generated Zod schema
-```
+**Why NOT switch to @dnd-kit/core:**
+- `@hello-pangea/dnd` is already installed and used in 3 components. Switching means rewriting those components plus learning a new API.
+- `@dnd-kit/core` (6.3.1) has more features (multiple collision strategies, keyboard sensors) but the form builder doesn't need them. Field reordering is a simple vertical sortable list.
+- `@dnd-kit/react` (0.3.x) is the future but is pre-1.0. Not production-ready.
+- The only scenario where dnd-kit is better: complex nested drag & drop (e.g., fields inside sections inside tabs). If the builder evolves to that complexity, migration can happen then.
 
-**One potential addition if needed:**
+**Confidence:** HIGH -- reuse existing dependency for the same pattern.
 
-| Technology | Version | Purpose | When to Add |
-|------------|---------|---------|-------------|
-| `react-day-picker` | ^9.x | Date picker component | Only if native `<input type="date">` UX is insufficient for the custom template builder's date field type |
-
-### Backend Support for Custom Templates
+### 2. JSON Schema Form Rendering -- Custom Renderer (NO new library)
 
 | Technology | Version | Purpose | Why |
 |------------|---------|---------|-----|
-| MariaDB JSON column | N/A (built-in) | Store template field definitions | MariaDB 10.11 supports `JSON` column type with `JSON_EXTRACT` functions. Template definitions stored as JSON alongside existing `approval_template` table. |
+| `react-hook-form` | ^7.72.0 (installed) | Form state management for rendered templates | Already used in all 6 existing form templates. `useFieldArray` handles dynamic rows (table fields). |
+| `zod` | ^4.3.6 (installed) | Runtime validation for rendered templates | Already used. Can dynamically construct schemas: `z.object({ [fieldName]: z.string().min(1) })` |
+| Custom `DynamicFormRenderer` | N/A | Map JSON field definitions to React components | 6-8 field types is well within custom code territory |
 
-**No new backend libraries needed.** JPA's `@Column(columnDefinition = "JSON")` with a custom `AttributeConverter` handles JSON <-> Java object mapping. Jackson (already included via Spring Boot Web) handles serialization.
+**Why NOT use RJSF (react-jsonschema-form v5):**
+- MiceSign uses `react-hook-form` + `zod` everywhere. RJSF brings its own form state manager and uses `ajv` for validation. This creates two competing form systems.
+- RJSF's theming system conflicts with TailwindCSS. Custom widgets would need to be written for every field type anyway, eliminating RJSF's main value proposition.
+- RJSF expects standard JSON Schema (Draft 7+). Our schema is simpler -- a flat array of field definitions. RJSF's complexity (refs, allOf/anyOf, definitions) is unnecessary.
 
-## Installation Summary
+**Why NOT use JSON Forms (@jsonforms/react):**
+- Same problem: brings its own form state/validation layer separate from react-hook-form.
+- Renderer-based architecture is powerful but over-engineered for 6-8 field types.
 
-### Backend (Gradle)
+**Why NOT use SurveyJS:**
+- Commercial license required for the form builder component.
+- Designed for survey/quiz scenarios, not approval document workflows.
 
-```kotlin
-// build.gradle.kts — add to existing dependencies block
-dependencies {
-    // SMTP Email
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-    
-    // Email HTML templates
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    
-    // Retry for email delivery
-    implementation("org.springframework.retry:spring-retry")
-    implementation("org.springframework.boot:spring-boot-starter-aop")  // Required for @EnableRetry
+**Custom schema format (NOT JSON Schema Draft 7):**
+```typescript
+interface TemplateSchema {
+  fields: FieldDefinition[];
+}
+
+interface FieldDefinition {
+  id: string;           // unique field identifier
+  type: 'text' | 'textarea' | 'number' | 'date' | 'select' | 'checkbox' | 'table' | 'calculated';
+  label: string;
+  required: boolean;
+  placeholder?: string;
+  defaultValue?: string | number;
+  options?: { label: string; value: string }[];  // for select
+  columns?: FieldDefinition[];                    // for table (nested fields)
+  formula?: string;                                // for calculated fields
+  condition?: {                                    // for conditional visibility
+    field: string;      // id of the controlling field
+    operator: 'eq' | 'neq' | 'gt' | 'lt' | 'contains';
+    value: string | number;
+  };
+  validation?: {
+    min?: number;
+    max?: number;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: string;
+  };
 }
 ```
 
-**Total: 4 new backend dependencies** (all Spring ecosystem, versions managed by BOM).
+This is deliberately simpler than JSON Schema Draft 7. It maps 1:1 to React components and Zod validators without a translation layer.
 
-### Frontend (npm)
+**Confidence:** HIGH -- correct architectural decision for existing stack. Avoids introducing competing form frameworks.
 
-```bash
-# No new packages needed!
-# @hello-pangea/dnd already installed
-# React Hook Form + Zod already installed
-# All search/filter UI built with existing components
+### 3. Formula/Calculation Engine -- expr-eval (v2.0.2)
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `expr-eval` | 2.0.2 | Evaluate admin-defined formulas safely | Sandboxed expression parser, ~15KB gzip, supports variables/functions/operators |
+
+**What this enables:**
+- Admin defines formula: `price * quantity` or `SUM(items.amount)` or `total * 0.1`
+- At runtime, field values are injected as variables and the expression is evaluated
+- Result displayed in a read-only calculated field
+
+**Why expr-eval over alternatives:**
+
+| Library | Bundle Size | Security | Maintenance | Fit |
+|---------|-------------|----------|-------------|-----|
+| **expr-eval** | ~15KB gzip | Sandboxed, no global access | Stable (v2.0.2, feature-complete) | Exact match for form calculations |
+| math.js | ~170KB gzip | Sandboxed | Active | Massive overkill -- matrices, complex numbers, symbolic math |
+| `new Function()` | 0KB | UNSAFE -- arbitrary JS execution | N/A | Security nightmare for admin-authored formulas |
+| hot-formula-parser | ~50KB gzip | Sandboxed | Abandoned (last update 2020) | Excel-style formulas, heavier than needed |
+
+**Maintenance note:** expr-eval has not had a release since 2020, but the library is feature-complete for expression evaluation. The core parser has no reported bugs. If maintenance becomes a concern, `expr-eval-fork` (v3.0.3, updated Feb 2026) is a drop-in replacement with TypeScript types and minor fixes.
+
+**Usage pattern:**
+```typescript
+import { Parser } from 'expr-eval';
+
+const parser = new Parser();
+const expr = parser.parse('price * quantity * (1 + taxRate)');
+const result = expr.evaluate({ price: 50000, quantity: 3, taxRate: 0.1 });
+// => 165000
 ```
 
-**Total: 0 new frontend dependencies.**
+**Confidence:** MEDIUM -- expr-eval is unmaintained but stable and feature-complete. `expr-eval-fork` is the fallback. Flag for evaluation if any parsing bugs surface.
+
+### 4. Backend JSON Schema Validation -- networknt/json-schema-validator (v1.5.5)
+
+| Technology | Version | Purpose | Why |
+|------------|---------|---------|-----|
+| `com.networknt:json-schema-validator` | 1.5.5 | Validate submitted form data against template schema on backend | Jackson-native, fastest Java validator, supports Draft 2020-12, actively maintained (March 2026 release) |
+
+**Why this is needed:**
+- Frontend validation (Zod) prevents honest mistakes. Backend validation prevents malicious submissions.
+- When a user submits a document, the backend must verify that `form_data` JSON conforms to the template's `schema_definition`. Without this, a crafted API call could submit invalid data that breaks rendering.
+
+**Why networknt over alternatives:**
+
+| Library | Jackson Native | Performance | Maintenance | Draft Support |
+|---------|---------------|-------------|-------------|---------------|
+| **networknt** | Yes -- uses `JsonNode` directly | Fastest in benchmarks | Active (v1.5.5, Mar 2026) | V4, V6, V7, 2019-09, 2020-12 |
+| everit/json-schema | No -- uses org.json | Good | Slower release cadence | V4, V6, V7 |
+| justify | No -- uses Jakarta JSON-P | Good | Low activity | V4, V6, V7 |
+
+**Why v1.5.x instead of v3.0.x:**
+- v1.5.x is the mature, well-documented line with extensive Spring Boot integration examples.
+- v3.0.x is a major rewrite with breaking API changes and fewer community examples. No compelling feature for our use case.
+
+**Integration with custom schema format:**
+Even though our template schema is a custom format (not JSON Schema Draft 7), networknt is still useful for:
+1. Validating the structure of the template definition itself (meta-schema validation)
+2. Generating a JSON Schema from our custom format at runtime for data validation
+3. Future-proofing if we later adopt standard JSON Schema
+
+Alternatively, validation can be done entirely in Java code by iterating over the field definitions and checking types/constraints. For v1.2 MVP, this simpler approach may be sufficient, with networknt added later if schemas become complex.
+
+**Confidence:** MEDIUM -- networknt is the right choice IF we use JSON Schema for validation. For a custom schema format, pure Java validation may be simpler initially. Include in build.gradle but evaluate during implementation.
+
+### 5. Template Versioning -- Database Schema Pattern (NO new library)
+
+No new library needed. This is solved with schema design.
+
+**Approach: Version column + schema snapshot on document**
+
+| Change | Table | Column | Type | Purpose |
+|--------|-------|--------|------|---------|
+| ADD | `approval_template` | `schema_definition` | `JSON` | Current template field layout (the builder-produced JSON) |
+| ADD | `approval_template` | `schema_version` | `INT NOT NULL DEFAULT 1` | Auto-incremented when admin modifies the template schema |
+| ADD | `approval_template` | `is_custom` | `BOOLEAN NOT NULL DEFAULT FALSE` | Distinguishes builder-created templates from legacy hardcoded ones |
+| ADD | `approval_template` | `created_by` | `BIGINT NULL` | FK to user who created (NULL for seed/legacy templates) |
+| ADD | `document_content` | `schema_version` | `INT NOT NULL DEFAULT 1` | Which template version this document was created with |
+| ADD | `document_content` | `schema_definition_snapshot` | `JSON NULL` | Full copy of the template schema at submission time |
+
+**Why snapshot on document_content (not a version history table):**
+- When template v2 is published, documents created with v1 must still render correctly using v1's field layout. The snapshot guarantees this.
+- Snapshot is captured at SUBMISSION time (consistent with MiceSign's existing immutability model: submitted documents are locked).
+- Drafts always use the latest template version. If a template is updated while a user has an unsaved draft, they see the new version next time they open it.
+- `schema_definition_snapshot` is NULL for legacy hardcoded-template documents (they render via the existing `TEMPLATE_REGISTRY` code path).
+
+**Why NOT a separate `template_version_history` table:**
+- For ~50 users and likely <20 templates, a full version history table adds schema complexity and query overhead without proportional value.
+- The document already contains the schema it was submitted with. Admin audit trail (who changed what, when) is handled by the existing `audit_log` table.
+- If version history browsing becomes a requirement later, it can be added without affecting the document rendering path.
+
+**Rendering decision tree:**
+```
+Document has schema_definition_snapshot?
+  YES -> Render with DynamicFormRenderer using snapshot schema
+  NO  -> Legacy document. Render with TEMPLATE_REGISTRY hardcoded component
+```
+
+This allows gradual migration: existing 6 hardcoded templates keep working. New custom templates use the dynamic renderer. Eventually, hardcoded templates can be converted to JSON schemas.
+
+**Confidence:** HIGH -- standard pattern for template-driven document systems. Snapshot approach is simpler and more reliable than lazy migration at this scale.
+
+## Alternatives Considered
+
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Drag & Drop | @hello-pangea/dnd (existing) | @dnd-kit/core 6.3.x | Already have @hello-pangea/dnd in 3 components. Switching = rewrite for no gain. |
+| Drag & Drop | @hello-pangea/dnd (existing) | @dnd-kit/react 0.3.x | Pre-1.0, not production-ready |
+| Form Rendering | Custom renderer (RHF + Zod) | RJSF v5 | Conflicts with existing RHF + Zod; different validation/state/styling |
+| Form Rendering | Custom renderer (RHF + Zod) | JSON Forms | Same conflict -- own state/validation layer |
+| Form Rendering | Custom renderer (RHF + Zod) | SurveyJS | Commercial license for builder; overkill for 6-8 field types |
+| Calculation | expr-eval 2.0.2 | math.js 13.x | 10x bundle size for unused features (matrices, complex numbers) |
+| Calculation | expr-eval 2.0.2 | Function() constructor | Arbitrary JS execution -- security risk for admin formulas |
+| Backend Validation | networknt 1.5.5 | everit/json-schema | Uses org.json instead of Jackson -- poor Spring Boot fit |
+| Backend Validation | networknt 1.5.5 | Pure Java validation | Simpler for custom schema; networknt better if adopting standard JSON Schema later |
+| Versioning | Schema snapshot on document | Separate version history table | Over-engineering for ~50 users, ~20 templates |
 
 ## What NOT to Add
 
 | Technology | Why Not |
 |-----------|---------|
-| **Elasticsearch / Meilisearch** | Massive overkill for 50 users. MariaDB LIKE + QueryDSL handles search at this scale. Add only if search response exceeds 1s threshold from NFR. |
-| **SurveyJS** | Commercial license for builder features. Heavy. Styling conflicts with Tailwind. |
-| **FormEngine** | Designed for enterprise-scale form builders. MiceSign needs ~8 field types, not 50+. |
-| **@rjsf/core (react-jsonschema-form)** | Adds complexity without proportional value. A custom renderer with React Hook Form is simpler for a known, small set of field types and integrates cleanly with existing validation (Zod). |
-| **@dnd-kit/core** | Project already uses @hello-pangea/dnd. Mixing DnD libraries causes conflicts and doubles bundle size. dnd-kit is also in a transition period (@dnd-kit/react 0.3.x is pre-1.0). |
-| **Dedicated date picker library** | Start with native HTML5 date inputs. Only add `react-day-picker` if UX testing reveals issues. |
-| **Spring Modulith** | Transactional outbox pattern is over-engineering for email notifications at this scale. Simple `@Async` + `@Retryable` + `notification_log` table covers the requirement. |
-| **Thymeleaf for frontend (SSR)** | Thymeleaf is ONLY for email templates. Frontend remains React SPA. Do not configure Thymeleaf view resolvers for web pages. |
-| **FreeMarker** | Thymeleaf is the default Spring Boot template engine with better tooling and natural template previewing. No reason to use FreeMarker. |
+| **@dnd-kit/core** | Project already uses @hello-pangea/dnd. Mixing DnD libraries causes conflicts and doubles bundle size. |
+| **RJSF (react-jsonschema-form)** | Conflicts with existing react-hook-form + zod. Two parallel form systems = maintenance burden. |
+| **JSON Forms** | Same conflict as RJSF -- brings its own form state/validation. |
+| **SurveyJS** | Commercial license for builder. Wrong domain (surveys, not approval documents). |
+| **Formio** | Server-side form platform -- wrong paradigm for self-hosted system. |
+| **ajv (JSON schema validator for JS)** | Backend validates with networknt. Frontend validates with zod. No need for a third validator. |
+| **math.js** | ~170KB for features (matrices, complex numbers) that form calculations never use. |
+| **Immer** | Sometimes recommended for complex builder state. Zustand handles this natively; builder state is a flat field array, not deeply nested. |
+| **react-grid-layout** | Form fields are a vertical list, not a 2D grid. Sortable list is the correct abstraction. |
+| **Monaco Editor / CodeMirror** | Tempting for formula editing, but formulas are one-line expressions. A plain `<input>` with syntax hints is sufficient. |
 
-## Integration Points
+## Installation
 
-### Email Notification Integration
-
-```
-Document State Change (APR service)
-  → publishes ApprovalEvent
-  → @TransactionalEventListener(AFTER_COMMIT) catches event
-  → @Async runs in separate thread
-  → NotificationService.sendEmail() with @Retryable(maxAttempts=3)
-  → Thymeleaf processes email/approval-request.html template
-  → JavaMailSender sends via SMTP
-  → notification_log records result
-  → @Recover on final failure → notification_log.status = FAILED
+```bash
+# Frontend -- 1 new dependency only
+npm install expr-eval
+npm install -D @types/expr-eval
 ```
 
-### Search Integration
-
-```
-GET /api/documents/search?keyword=...&status=...&startDate=...
-  → DocumentSearchService
-  → QueryDSL BooleanBuilder with conditional predicates
-  → Role-based WHERE clause (per FSD FN-SEARCH-001)
-  → Spring Data Pageable
-  → Returns Page<DocumentSearchDto>
+```kotlin
+// Backend -- build.gradle.kts addition
+implementation("com.networknt:json-schema-validator:1.5.5")
 ```
 
-### Custom Template Builder Integration
+**Total new dependencies: 1 frontend (expr-eval) + 1 backend (networknt)**. Everything else reuses existing libraries.
+
+## Integration Points with Existing Stack
+
+### Frontend Integration
+
+| Existing Component | Integration Point | Change Required |
+|-------------------|-------------------|-----------------|
+| `TEMPLATE_REGISTRY` | Add `CUSTOM` type entry that delegates to `DynamicFormRenderer` | Extend registry lookup to check `is_custom` flag |
+| `TemplateEditProps` interface | DynamicFormRenderer implements same interface | No change to interface |
+| `TemplateReadOnlyProps` interface | DynamicReadOnlyRenderer implements same interface | No change to interface |
+| `DocumentEditorPage` | Check if template is custom, use dynamic renderer | Add conditional rendering branch |
+| `DocumentDetailPage` | Check if document has schema snapshot, use dynamic read-only renderer | Add conditional rendering branch |
+| `react-hook-form` | DynamicFormRenderer uses `useForm()` with dynamic zod schema | Same patterns as existing forms |
+| `@hello-pangea/dnd` | Builder uses DragDropContext for field palette -> canvas and reordering | Same patterns as ApprovalLineList |
+| `Zustand` | New `useTemplateBuilderStore` for builder UI state (selected field, undo stack) | New store, follows existing patterns |
+| `TanStack Query` | Template CRUD queries/mutations | Follows existing patterns |
+
+### Backend Integration
+
+| Existing Component | Integration Point | Change Required |
+|-------------------|-------------------|-----------------|
+| `ApprovalTemplate` entity | Add `schemaDefinition`, `schemaVersion`, `isCustom`, `createdBy` fields | Extend entity |
+| `DocumentContent` entity | Add `schemaVersion`, `schemaDefinitionSnapshot` fields | Extend entity |
+| `TemplateService` | Add CRUD for custom templates, version increment on update | Extend service |
+| `DocumentService` | On submission, snapshot template schema into document_content | Add snapshot logic |
+| `TemplateMapper` | Map new fields to DTOs | Extend mapper |
+| Flyway | `V8__add_template_builder_columns.sql` (or next available) | New migration |
+| Jackson | Serialize/deserialize JSON schema (already available) | No new dependency |
+
+### Validation Flow
 
 ```
-Admin creates template:
-  → TemplateBuilder UI (drag & drop with @hello-pangea/dnd)
-  → Produces JSON field definition
-  → POST /api/admin/templates with JSON body
-  → Stored in approval_template.field_definition (JSON column)
-
-User fills template:
-  → TemplateRenderer reads field_definition JSON
-  → Dynamically generates React Hook Form fields
-  → Dynamically generates Zod validation schema
-  → Submitted as document_content.body (JSON)
+User submits document with custom template:
+  1. Frontend: Zod validates form data against dynamically built schema
+  2. Backend receives form_data JSON + templateCode
+  3. Backend loads template.schema_definition
+  4. Backend validates form_data against schema (networknt or pure Java)
+  5. Backend snapshots schema into document_content.schema_definition_snapshot
+  6. Backend sets document_content.schema_version = template.schema_version
+  7. Document proceeds through existing approval workflow unchanged
 ```
-
-## Confidence Assessment
-
-| Addition | Confidence | Rationale |
-|----------|------------|-----------|
-| spring-boot-starter-mail | HIGH | PRD-mandated, standard Spring Boot starter, auto-configured |
-| spring-boot-starter-thymeleaf | HIGH | Standard Spring email templating, well-documented pattern |
-| spring-retry | HIGH | Official Spring project, declarative retry fits PRD retry spec exactly |
-| No new search libraries | HIGH | QueryDSL + MariaDB LIKE is correct for 50-user scale, verified against NFR |
-| No new template libraries | HIGH | 3 new templates follow established hardcoded component pattern |
-| Custom builder with @hello-pangea/dnd | MEDIUM | Sound architecture but builder UI complexity may surface unforeseen needs. Flag for deeper research during builder phase. |
-| JSON schema storage in MariaDB | HIGH | MariaDB 10.11 JSON support is production-ready, JPA handles it cleanly |
 
 ## Sources
 
-- [Spring Boot Mail Reference](https://docs.spring.io/spring-boot/reference/io/email.html)
-- [Thymeleaf Spring Mail Article](https://www.thymeleaf.org/doc/articles/springmail.html)
-- [Spring Retry Guide — Baeldung](https://www.baeldung.com/spring-retry)
-- [Spring Core Resilience Features (2025)](https://spring.io/blog/2025/09/09/core-spring-resilience-features/)
-- [spring-boot-starter-mail on Maven Central](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail)
-- [@hello-pangea/dnd on npm](https://www.npmjs.com/package/@hello-pangea/dnd)
-- [dnd-kit maintenance discussion](https://github.com/clauderic/dnd-kit/issues/1194)
-- [Top 5 DnD Libraries for React 2026 — Puck](https://puckeditor.com/blog/top-5-drag-and-drop-libraries-for-react)
-- [@rjsf/core on npm](https://www.npmjs.com/package/@rjsf/core)
-- [React JSON Schema Form Builder](https://github.com/ginkgobioworks/react-json-schema-form-builder)
+- [@hello-pangea/dnd npm](https://www.npmjs.com/package/@hello-pangea/dnd) -- v18.0.1, already installed
+- [@dnd-kit/core npm](https://www.npmjs.com/package/@dnd-kit/core) -- v6.3.1, 12M+ weekly downloads
+- [@dnd-kit/react npm](https://www.npmjs.com/package/@dnd-kit/react) -- v0.3.2, pre-1.0
+- [dnd-kit official docs](https://dndkit.com/) -- API reference, migration guide
+- [Schema-Driven Forms Comparison (DEV.to)](https://dev.to/yanggmtl/schema-driven-forms-in-react-comparing-rjsf-json-forms-uniforms-formio-and-formitiva-2fg2) -- RJSF vs alternatives
+- [expr-eval GitHub](https://github.com/silentmatt/expr-eval) -- v2.0.2, sandboxed evaluation
+- [expr-eval vs mathjs (npm-compare)](https://npm-compare.com/expr-eval,mathjs) -- bundle size and feature comparison
+- [expr-eval-fork npm](https://www.npmjs.com/package/expr-eval-fork) -- v3.0.3, maintained alternative
+- [networknt json-schema-validator GitHub](https://github.com/networknt/json-schema-validator) -- v1.5.5, Jackson-native
+- [networknt on Maven Central](https://mvnrepository.com/artifact/com.networknt/json-schema-validator)
+- [JSON Schema Validation in Spring Boot (Medium, Apr 2026)](https://medium.com/@vassanor/json-schema-validation-in-java-spring-boot-a-clean-way-to-validate-dynamic-requests-d47e7f45afe4)
+- [Schema Versioning Pattern (MongoDB)](https://www.mongodb.com/company/blog/building-with-patterns-the-schema-versioning-pattern)
+- [Data Versioning Patterns (bool.dev)](https://bool.dev/blog/detail/data-versioning-patterns) -- snapshot vs version table tradeoffs
