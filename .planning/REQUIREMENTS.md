@@ -90,14 +90,52 @@ Milestone v1.1: Extended Features — SMTP notifications, document search/filter
 - [x] **TPL-05**: Business trip report form (출장 보고서) with itinerary, expense breakdown, and attachments
 - [x] **TPL-06**: Overtime request form (연장 근무 신청서) with date, hours, reason, and manager selection
 
+## v1.2 Requirements
+
+Milestone v1.2: Custom Template Builder — drag & drop form builder, dynamic rendering, conditional logic, calculations, migration, budget integration.
+
+### Schema Foundation
+
+- [ ] **SCHM-01**: Admin can define form template schema as JSON (field definitions, order, validation rules)
+- [ ] **SCHM-02**: System stores template schema versions immutably (schema changes create new version, existing documents retain original version)
+- [ ] **SCHM-03**: Backend validates submitted form_data against template's JSON schema before persisting
+- [ ] **SCHM-04**: Template schema supports 8 field types: text, textarea, number, date, select, table, staticText, hidden
+
+### Dynamic Rendering
+
+- [ ] **RNDR-01**: User can fill out a dynamic form rendered from JSON schema in edit mode (all field types functional)
+- [ ] **RNDR-02**: User can view submitted documents rendered in read-only mode from stored JSON schema + form_data
+- [ ] **RNDR-03**: Frontend generates Zod validation schema at runtime from JSON schema (required, min/max, type checks)
+- [ ] **RNDR-04**: Table field supports dynamic rows with defined columns, row add/remove, and per-cell validation
+
+### Builder UI
+
+- [ ] **BLDR-01**: Admin can build forms using 3-panel layout (field palette, canvas, property panel)
+- [ ] **BLDR-02**: Admin can add fields via drag & drop from palette to canvas or click-to-append
+- [ ] **BLDR-03**: Admin can reorder fields by dragging within canvas
+- [ ] **BLDR-04**: Admin can configure field properties (label, required, placeholder, options, etc.) in property panel
+- [ ] **BLDR-05**: Admin can preview the form as end-users will see it (live preview toggle)
+- [ ] **BLDR-06**: Admin can create, edit, deactivate, and list templates in template management page
+
+### Advanced Logic
+
+- [ ] **LOGIC-01**: Admin can set conditional rules on fields (show/hide/require based on another field's value)
+- [ ] **LOGIC-02**: System detects circular dependencies in conditional logic and prevents saving
+- [ ] **LOGIC-03**: Admin can define calculation fields with predefined operations (SUM, MULTIPLY, ADD, COUNT)
+- [ ] **LOGIC-04**: Admin can group fields into visual sections with section headers
+
+### Migration
+
+- [ ] **MIGR-01**: Existing 6 hardcoded forms are converted to JSON schema equivalents
+- [ ] **MIGR-02**: System supports dual rendering mode (hardcoded for legacy documents, dynamic for new)
+- [ ] **MIGR-03**: All existing documents render correctly after migration without data changes
+
+### Budget Integration
+
+- [ ] **BDGT-01**: System sends expense data to external budget system via REST API when financial documents are submitted
+- [ ] **BDGT-02**: Failed API calls are retried and logged without blocking the submission workflow
+
 ## Future Requirements
-
-### Custom Template Builder (v1.2)
-
-- **BLDR-01**: Admin can create custom form templates using drag & drop builder
-- **BLDR-02**: Custom templates support field types: text, textarea, number, date, select, table
-- **BLDR-03**: System renders custom templates dynamically from JSON schema
-- **BLDR-04**: Template versioning preserves existing documents when schema changes
 
 ### Statistics (Future)
 
@@ -177,8 +215,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1.0 requirements: 36 total (36 complete)
 - v1.1 requirements: 10 total (10 complete)
-- Unmapped: 0
+- v1.2 requirements: 21 total (0 complete)
+- Unmapped: 21 ⚠️ (pending roadmap creation)
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-03 -- v1.1 roadmap traceability updated*
+*Last updated: 2026-04-05 -- v1.2 requirements defined*
