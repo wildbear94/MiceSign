@@ -12,6 +12,8 @@ public interface DocumentMapper {
 
     @Mapping(target = "status", expression = "java(document.getStatus().name())")
     @Mapping(target = "templateName", source = "templateName")
+    @Mapping(target = "drafterName", expression = "java(document.getDrafter() != null ? document.getDrafter().getName() : null)")
+    @Mapping(target = "drafterDepartmentName", expression = "java(document.getDrafter() != null && document.getDrafter().getDepartment() != null ? document.getDrafter().getDepartment().getName() : null)")
     DocumentResponse toResponse(Document document, String templateName);
 
     @Mapping(target = "status", expression = "java(document.getStatus().name())")
