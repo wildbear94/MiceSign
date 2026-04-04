@@ -45,7 +45,7 @@ Exceptions: Touch target height is 44px (`h-11`) for search input and filter inp
 
 ## Typography
 
-Two weights only: 400 (regular) for body/input text, 600 (semibold) for labels, headings, and active tab.
+Two weights only: 400 (regular) for body/input text, 600 (semibold) for labels, headings, badges, and active tab.
 
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
@@ -56,11 +56,11 @@ Two weights only: 400 (regular) for body/input text, 600 (semibold) for labels, 
 | Tab label (active) | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold text-blue-600` |
 | Table header | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Table body | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Empty state heading | 18px | 500 (medium) | 1.5 | `text-lg font-medium` |
+| Empty state heading | 18px | 600 (semibold) | 1.5 | `text-lg font-semibold` |
 | Empty state body | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Search highlight | 14px | 400 (regular) | 1.5 | Inherits parent size; `<mark>` with background |
 | Pagination info | 14px | 400 (regular) | 1.5 | `text-sm` |
-| Badge (status/template) | 12px | 500 (medium) | 1.5 | `text-xs font-medium` |
+| Badge (status/template) | 12px | 600 (semibold) | 1.5 | `text-xs font-semibold` |
 
 Source: Extracted from existing `DocumentListPage.tsx`, `AuditLogFilters.tsx`, `DocumentListTable.tsx`.
 
@@ -195,7 +195,7 @@ Tab styling:
 - Filter row: `flex flex-wrap gap-4 mt-4`
 - All filter inputs use the established `inputStyle` from AuditLogFilters
 - Reset button: `text-sm text-gray-500 hover:text-gray-700 px-3 py-2` (text-only, not filled)
-- Search button: `bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium`
+- Search button: `bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold`
 
 ### DocumentListTable Extended Columns
 
