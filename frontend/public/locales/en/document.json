@@ -43,7 +43,10 @@
   "template": {
     "GENERAL": "General Proposal",
     "EXPENSE": "Expense Report",
-    "LEAVE": "Leave Request"
+    "LEAVE": "Leave Request",
+    "PURCHASE": "Purchase Request",
+    "BUSINESS_TRIP": "Business Trip Report",
+    "OVERTIME": "Overtime Request"
   },
   "expense": {
     "addRow": "Add Item",
@@ -108,5 +111,57 @@
     "dateRangeRequired": "Start and end dates are required",
     "dateRangeInvalid": "End date must be after start date",
     "reasonRequired": "Reason is required"
+  },
+  "purchase": {
+    "supplier": "Supplier",
+    "deliveryDate": "Desired Delivery Date",
+    "paymentMethod": "Payment Method",
+    "paymentMethodPlaceholder": "Select payment method",
+    "purchaseReason": "Purchase Reason",
+    "addRow": "Add Item",
+    "total": "Total",
+    "columns": {
+      "name": "Item Name",
+      "spec": "Specifications",
+      "quantity": "Qty",
+      "unitPrice": "Unit Price",
+      "amount": "Amount"
+    }
+  },
+  "businessTrip": {
+    "destination": "Destination",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "purpose": "Purpose",
+    "result": "Result",
+    "itinerary": "Itinerary",
+    "expenses": "Expenses",
+    "addItinerary": "Add Schedule",
+    "addExpense": "Add Expense",
+    "totalExpense": "Total Expenses",
+    "itineraryColumns": {
+      "date": "Date",
+      "location": "Location",
+      "description": "Description"
+    },
+    "expenseColumns": {
+      "category": "Category",
+      "description": "Description",
+      "amount": "Amount"
+    },
+    "expenseCategories": {
+      "transport": "Transportation",
+      "lodging": "Lodging",
+      "meals": "Meals",
+      "other": "Other"
+    }
+  },
+  "overtime": {
+    "workDate": "Work Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "hours": "Overtime Hours",
+    "hoursFormat": "{{n}} hour(s)",
+    "reason": "Reason"
   }
 }
