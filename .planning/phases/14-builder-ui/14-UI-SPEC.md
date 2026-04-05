@@ -1,7 +1,8 @@
 ---
 phase: 14
 slug: builder-ui
-status: draft
+status: approved
+reviewed_at: 2026-04-05
 shadcn_initialized: false
 preset: none
 created: 2026-04-05
@@ -58,10 +59,10 @@ Exceptions:
 Notes:
 - Matches existing admin page typography (UserListPage, DepartmentPage use `text-2xl font-semibold leading-tight` for page headings)
 - All text uses Pretendard Variable via `font-sans` (configured in tailwind.config.js)
-- Field card labels on canvas: text-sm font-medium
+- Field card labels on canvas: text-sm font-semibold
 - Palette field type labels: text-sm
-- Property panel tab labels: text-sm font-medium
-- Builder toolbar button labels: text-sm font-medium
+- Property panel tab labels: text-sm font-semibold
+- Builder toolbar button labels: text-sm font-semibold
 
 ---
 
@@ -102,8 +103,8 @@ Accent reserved for:
 | Toggle button (inactive) | bg-gray-100 text-gray-600 | bg-gray-800 text-gray-400 |
 | Toggle button (active) | bg-blue-600 text-white | bg-blue-600 text-white |
 | Drag handle icon | text-gray-400 hover:text-gray-600 | text-gray-500 hover:text-gray-300 |
-| Field type badge | bg-gray-100 text-gray-500 text-xs px-1.5 py-0.5 rounded | bg-gray-800 text-gray-400 |
-| Width badge (half) | bg-purple-100 text-purple-600 text-xs px-1.5 py-0.5 rounded | bg-purple-900/30 text-purple-400 |
+| Field type badge | bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded | bg-gray-800 text-gray-400 |
+| Width badge (half) | bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded | bg-purple-900/30 text-purple-400 |
 | Required badge | text-red-500 text-xs | text-red-400 |
 
 ---
@@ -124,6 +125,10 @@ Accent reserved for:
 ---
 
 ## Interaction Contracts
+
+### Visual Focal Point
+- The canvas (center panel) is the primary visual anchor — palette and property panel are supporting panels
+- Eye flow: canvas center → property panel right → palette left
 
 ### Three-Panel Layout (BLDR-01)
 - Left palette: 200px fixed width, `overflow-y: auto`, scrollable when field types exceed viewport
@@ -316,11 +321,11 @@ DynamicForm and DynamicReadOnly must be extended to support `config.width`:
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS (focal point added)
+- [x] Dimension 3 Color: PASS (px-1.5 → px-2 fixed)
+- [x] Dimension 4 Typography: PASS (font-medium → font-semibold fixed)
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-04-05
