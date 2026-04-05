@@ -17,6 +17,8 @@ import CompletedDocumentsPage from './features/approval/pages/CompletedDocuments
 import DashboardPage from './features/dashboard/pages/DashboardPage';
 import AuditLogPage from './features/audit/pages/AuditLogPage';
 import NotificationLogPage from './features/notification/pages/NotificationLogPage';
+import TemplateListPage from './features/admin/pages/TemplateListPage';
+import TemplateBuilderPage from './features/admin/pages/TemplateBuilderPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
@@ -78,6 +80,8 @@ function App() {
             <Route path="users/:id" element={<UserDetailPage />} />
             <Route path="audit-logs" element={<AuditLogPage />} />
             <Route path="notifications" element={<NotificationLogPage />} />
+            <Route path="templates" element={<TemplateListPage />} />
+            <Route path="templates/:id/builder" element={<TemplateBuilderPage />} />
           </Route>
         </Route>
       </Route>

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { Building2, Award, Users, ScrollText, Mail, X, ArrowLeft } from 'lucide-react';
+import { Building2, Award, Users, ScrollText, Mail, LayoutTemplate, X, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface AdminSidebarProps {
@@ -13,6 +13,7 @@ const navItems = [
   { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
   { to: '/admin/audit-logs', icon: ScrollText, labelKey: 'sidebar.auditLogs' },
   { to: '/admin/notifications', icon: Mail, labelKey: 'sidebar.notifications' },
+  { to: '/admin/templates', icon: LayoutTemplate, labelKey: 'sidebar.templates' },
 ] as const;
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
