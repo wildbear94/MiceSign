@@ -213,7 +213,7 @@ Plans:
 
 **Milestone Goal:** Admin이 코드 없이 드래그&드롭으로 결재 양식을 생성하고, 기존 하드코딩 양식을 JSON 스키마 기반으로 전환
 
-- [ ] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure
+- [x] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure (completed 2026-04-05)
 - [ ] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support
 - [ ] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page
 - [ ] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections
@@ -231,11 +231,11 @@ Plans:
   2. Editing a template's schema creates a new version automatically, and existing documents retain the schema version they were created with
   3. Backend rejects form_data submissions that violate the template's JSON schema (missing required fields, wrong types, invalid values)
   4. Template CRUD API supports create, read, update, deactivate, and list operations with proper ADMIN/SUPER_ADMIN authorization
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 12-01-PLAN.md — DB migration (V8/V9/V10), JPA entity extensions, schema DTO records, repositories, FormValidationException
-- [ ] 12-02-PLAN.md — Template CRUD API, schema versioning service, option set CRUD, integration tests
-- [ ] 12-03-PLAN.md — DynamicFormValidator, DocumentFormValidator fallback, schema snapshot on document creation, validation tests
+- [x] 12-01-PLAN.md — DB migration (V8/V9/V10), JPA entity extensions, schema DTO records, repositories, FormValidationException
+- [x] 12-02-PLAN.md — Template CRUD API, schema versioning service, option set CRUD, integration tests
+- [x] 12-03-PLAN.md — DynamicFormValidator, DocumentFormValidator fallback, schema snapshot on document creation, validation tests
 
 ### Phase 13: Dynamic Form Rendering
 **Goal**: Users can fill out and view documents created from dynamic JSON schema templates, with the same quality as hardcoded forms
@@ -310,7 +310,7 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 9. SMTP Email Notifications | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 10. Additional Form Templates | v1.1 | 3/3 | Complete | 2026-04-04 |
 | 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
-| 12. Schema Foundation | v1.2 | 0/3 | Planning | - |
+| 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 13. Dynamic Form Rendering | v1.2 | 0/0 | Not started | - |
 | 14. Builder UI | v1.2 | 0/0 | Not started | - |
 | 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
