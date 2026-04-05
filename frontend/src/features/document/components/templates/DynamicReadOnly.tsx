@@ -42,9 +42,11 @@ export default function DynamicReadOnly({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-wrap gap-x-4 gap-y-4">
       {schema.fields.map((field) => (
-        <ReadOnlyField key={field.id} field={field} data={data} />
+        <div key={field.id} className={field.config?.width === 'half' ? 'w-[calc(50%-0.5rem)]' : 'w-full'}>
+          <ReadOnlyField field={field} data={data} />
+        </div>
       ))}
     </div>
   );

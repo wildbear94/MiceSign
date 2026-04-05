@@ -139,17 +139,18 @@ export default function DynamicForm({
       id="document-form"
       ref={formRef}
       onSubmit={handleSubmit(onFormSubmit)}
-      className="space-y-4"
+      className="flex flex-wrap gap-x-4 gap-y-4"
     >
       {schema.fields.map((field) => (
-        <DynamicFieldRenderer
-          key={field.id}
-          fieldDef={field}
-          control={control}
-          register={register}
-          setValue={setValue}
-          errors={errors}
-        />
+        <div key={field.id} className={field.config?.width === 'half' ? 'w-[calc(50%-0.5rem)]' : 'w-full'}>
+          <DynamicFieldRenderer
+            fieldDef={field}
+            control={control}
+            register={register}
+            setValue={setValue}
+            errors={errors}
+          />
+        </div>
       ))}
     </form>
   );

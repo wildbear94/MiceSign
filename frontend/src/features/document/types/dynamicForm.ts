@@ -28,6 +28,8 @@ export interface FieldConfig {
   content?: string;
   // hidden
   defaultValue?: string;
+  // layout
+  width?: 'full' | 'half';
 }
 
 export interface FieldDefinition {

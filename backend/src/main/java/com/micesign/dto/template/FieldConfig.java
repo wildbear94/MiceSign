@@ -29,5 +29,8 @@ public record FieldConfig(
     String content,
 
     // hidden
-    String defaultValue
+    String defaultValue,
+
+    // layout
+    String width
 ) {}
