@@ -246,7 +246,11 @@ Plans:
   2. User can view a submitted document rendered in read-only mode from the stored schema snapshot and form_data
   3. Form validation errors appear inline next to the relevant field, generated at runtime from the JSON schema's validation rules
   4. Table fields support adding and removing rows, with per-cell validation and defined column types
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 13-01-PLAN.md — Backend API extensions (public schema endpoint, DocumentDetail snapshot) + frontend types, schemaToZod, npm deps
+- [ ] 13-02-PLAN.md — DynamicForm edit component + 8 field type components + DynamicReadOnly
+- [ ] 13-03-PLAN.md — EditorPage/DetailPage fallback integration + TemplateSelectionModal + E2E checkpoint
 **UI hint**: yes
 
 ### Phase 14: Builder UI
@@ -311,7 +315,7 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 10. Additional Form Templates | v1.1 | 3/3 | Complete | 2026-04-04 |
 | 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
 | 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
-| 13. Dynamic Form Rendering | v1.2 | 0/0 | Not started | - |
+| 13. Dynamic Form Rendering | v1.2 | 0/3 | Planning complete | - |
 | 14. Builder UI | v1.2 | 0/0 | Not started | - |
 | 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
 | 16. Template Migration | v1.2 | 0/0 | Not started | - |
