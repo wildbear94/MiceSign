@@ -1,23 +1,17 @@
-import { useParams, useNavigate, Link } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
-import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
-import DynamicReadOnly from '../components/templates/DynamicReadOnly';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
-import ApprovalStatusDisplay from '../components/approval/ApprovalStatusDisplay';
-import ApprovalActionBar from '../components/approval/ApprovalActionBar';
-import { useAuthStore } from '../../../stores/authStore';
 
 export default function DocumentDetailPage() {
   const { t } = useTranslation('document');
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const documentId = id ? Number(id) : null;
-  const { user } = useAuthStore();
 
   const { data: doc, isLoading } = useDocumentDetail(documentId);
 
@@ -43,7 +37,6 @@ export default function DocumentDetailPage() {
   // Non-DRAFT: render read-only view
   const templateEntry = TEMPLATE_REGISTRY[doc.templateCode];
   const ReadOnlyComponent = templateEntry?.readOnlyComponent;
-  const isDynamic = !templateEntry;
 
   function formatDate(dateString: string | null): string {
     if (!dateString) return '-';
@@ -68,11 +61,6 @@ export default function DocumentDetailPage() {
         {t('backToList')}
       </button>
 
-      {/* Approval action bar - between back-link and meta info */}
-      {doc.status !== 'DRAFT' && doc.approvalLines?.length > 0 && user && (
-        <ApprovalActionBar document={doc} currentUserId={user.id} />
-      )}
-
       {/* Meta info section */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-3">
@@ -95,9 +83,7 @@ export default function DocumentDetailPage() {
           </div>
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">문서번호</span>
-            <span className={doc.docNumber ? 'font-mono text-base font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600'}>
-              {doc.docNumber ?? t('docNumber.draft')}
-            </span>
+            <span className="text-gray-900 dark:text-gray-50">{doc.docNumber ?? '-'}</span>
           </div>
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">작성일</span>
@@ -109,64 +95,31 @@ export default function DocumentDetailPage() {
               <span className="text-gray-900 dark:text-gray-50">{formatDate(doc.submittedAt)}</span>
             </div>
           )}
-          {doc.completedAt && (
-            <div>
-              <span className="text-gray-500 dark:text-gray-400 block mb-0.5">완료일시</span>
-              <span className="text-gray-900 dark:text-gray-50">{formatDate(doc.completedAt)}</span>
-            </div>
-          )}
-          {doc.sourceDocId && (
-            <div>
-              <span className="text-gray-500 dark:text-gray-400 block mb-0.5">원본 문서</span>
-              <Link
-                to={`/documents/${doc.sourceDocId}`}
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
-              >
-                #{doc.sourceDocId}
-              </Link>
-            </div>
-          )}
         </div>
       </div>
 
       {/* Content */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
-        {isDynamic ? (
-          <DynamicReadOnly
-            title={doc.title}
-            bodyHtml={doc.bodyHtml}
-            formData={doc.formData}
-            schemaDefinitionSnapshot={doc.schemaDefinitionSnapshot}
-          />
-        ) : ReadOnlyComponent ? (
+        {ReadOnlyComponent ? (
           <ReadOnlyComponent
             title={doc.title}
             bodyHtml={doc.bodyHtml}
             formData={doc.formData}
           />
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            양식을 표시할 수 없습니다.
-          </div>
+          <p className="text-sm text-gray-400">알 수 없는 양식입니다.</p>
         )}
       </div>
 
-      {/* Approval status display */}
-      {doc.approvalLines && doc.approvalLines.length > 0 && (
-        <div className="mb-6">
-          <ApprovalStatusDisplay
-            approvalLines={doc.approvalLines}
-            currentStep={doc.currentStep}
-          />
-        </div>
-      )}
+      {/* Approval line placeholder */}
+      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400 mb-4">
+        {t('placeholder.approvalLine')}
+      </div>
 
-      {/* File Attachments */}
-      <FileAttachmentArea
-        documentId={doc.id}
-        documentStatus={doc.status}
-        readOnly={true}
-      />
+      {/* Attachments placeholder */}
+      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
+        {t('placeholder.attachments')}
+      </div>
     </div>
   );
 }

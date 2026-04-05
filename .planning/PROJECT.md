@@ -19,47 +19,24 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] Admin drag & drop form template builder
-- [ ] Field types: text, textarea, number, date, select, table
-- [ ] Conditional logic (show/hide fields based on field values)
-- [ ] Calculation fields (formula-based auto-computation)
-- [ ] JSON schema-based dynamic form rendering (edit + read-only)
-- [ ] Migration of existing 6 hardcoded forms to JSON schema
-- [ ] Template versioning (preserve existing documents when schema changes)
-
-## Current Milestone: v1.2 Custom Template Builder
-
-**Goal:** Admin이 코드 없이 드래그&드롭으로 결재 양식을 생성하고, 기존 하드코딩 양식을 JSON 스키마 기반으로 전환
-
-**Target features:**
-- Admin 드래그&드롭 양식 빌더 UI
-- 필드 타입 지원: text, textarea, number, date, select, table
-- 조건부 로직 (필드 값에 따라 다른 필드 표시/숨김)
-- 계산 필드 (합계 자동 계산 등 수식 기반 필드)
-- JSON 스키마 기반 동적 양식 렌더링 (작성/읽기 모드)
-- 기존 6개 하드코딩 양식을 JSON 스키마로 점진적 마이그레이션
-- 템플릿 버전 관리 (스키마 변경 시 기존 문서 보존)
-
-### Validated (Phases 3-12)
-- [x] Admin-managed organization structure (departments, positions, users) — Validated in Phase 3: Organization Management (ORG-01, ORG-02, ORG-03, ORG-04)
-- [x] RBAC with three roles (SUPER_ADMIN, ADMIN, USER) — Validated in Phase 3: Organization Management
-- [x] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE) — Validated in Phase 4: Document Core & Templates (DOC-01, DOC-02, DOC-05, DOC-06, TPL-01, TPL-02, TPL-03)
-- [x] Document immutability after submission (locked body, attachments, approval line) — Validated in Phase 6: Document Submission & Numbering (DOC-03, DOC-04)
-- [x] Document numbering system (prefix-year-sequence, assigned at submission) — Validated in Phase 6: Document Submission & Numbering (DOC-07)
-- [x] File attachments via Google Drive API (Service Account) — Validated in Phase 5: File Attachments (FILE-01, FILE-02, FILE-03)
-- [x] Flexible approval line selection (APPROVE, AGREE, REFERENCE types) — Validated in Phase 7: Approval Workflow (APR-01, APR-02)
-- [x] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN) — Validated in Phase 7: Approval Workflow (APR-03, APR-04, APR-05, APR-06, APR-07)
-- [x] Dashboard with pending approvals, recent documents, badge counts — Validated in Phase 8: Dashboard & Audit (DASH-01, DASH-02, DASH-03)
-- [x] Immutable audit trail for all document state changes and key user actions — Validated in Phase 8: Dashboard & Audit (AUD-01)
-- [x] SMTP email notifications for all document state changes — Validated in Phase 9: SMTP Email Notifications (NTF-01 ~ NTF-05)
-- [x] Document search/filter (keyword + multi-criteria) — Validated in Phase 11: Document Search & Filter (SRCH-01, SRCH-02)
-- [x] Additional form templates (purchase, business trip, overtime) — Validated in Phase 10: Additional Form Templates (TPL-04, TPL-05, TPL-06)
-- [x] Schema foundation: DB 스키마 확장, 템플릿 CRUD API, 스키마 버전 관리, 동적 폼 검증 — Validated in Phase 12: Schema Foundation (SCHM-01, SCHM-02, SCHM-03, SCHM-04)
+- [ ] Admin-managed organization structure (departments, positions, users)
+- [ ] RBAC with three roles (SUPER_ADMIN, ADMIN, USER)
+- [ ] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE)
+- [ ] Flexible approval line selection (APPROVE, AGREE, REFERENCE types)
+- [ ] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
+- [ ] Document immutability after submission (locked body, attachments, approval line)
+- [ ] Document numbering system (prefix-year-sequence, assigned at submission)
+- [ ] File attachments via Google Drive API (Service Account)
+- [ ] Audit trail logging for all document state changes
+- [ ] Dashboard showing pending approvals and recent documents
 
 ### Out of Scope
 
-- Statistics/reports — deferred to future milestone
-- Handover features — deferred to future milestone
+- SMTP email notifications — deferred to Phase 1-B
+- Document search/filtering — deferred to Phase 1-B
+- Audit log query UI — deferred to Phase 1-C
+- Statistics/reports — deferred to Phase 1-C
+- Handover features — deferred to Phase 1-C
 - AI-assisted proposals — deferred to Phase 2
 - Data migration from Docswave — fresh start, no migration needed
 - Docker containerization — native deployment, local dev for now
@@ -81,7 +58,7 @@ Employees can submit approval documents and get them approved/rejected through a
 - **Auth:** Stateless JWT — Access Token in memory (30min TTL), Refresh Token in HttpOnly cookie (14 days TTL) with rotation
 - **DB charset:** utf8mb4 / utf8mb4_unicode_ci
 - **File storage:** Google Drive API v3 with Service Account — metadata only in DB
-- **Form templates:** Transitioning from hardcoded React components to JSON schema-based dynamic rendering (v1.2)
+- **Form templates:** Hardcoded React components per template type, not a dynamic form builder
 - **Approval rules:** 100% manual approval line selection by drafter — no auto-routing
 
 ## Key Decisions
@@ -113,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 — Phase 13 complete (Dynamic Form Rendering)*
+*Last updated: 2026-04-01 after Phase 2 (Authentication) completion*

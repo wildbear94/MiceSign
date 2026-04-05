@@ -7,14 +7,6 @@ spring:
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
-  mail:
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT:587}
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
 
 app:
   cookie:

@@ -5,8 +5,5 @@ public record TemplateResponse(
     String code,
     String name,
     String description,
-    String prefix,
-    boolean isCustom,
-    String category,
-    String icon
+    String prefix
 ) {}

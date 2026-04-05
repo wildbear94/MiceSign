@@ -1,23 +1,17 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Trash2, SendHorizonal } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
-import SubmitConfirmDialog from '../components/SubmitConfirmDialog';
-import ApprovalLineEditor from '../components/approval/ApprovalLineEditor';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
-import DynamicForm from '../components/templates/DynamicForm';
-import type { SchemaDefinition } from '../types/dynamicForm';
 import {
   useDocumentDetail,
   useCreateDocument,
   useUpdateDocument,
   useDeleteDocument,
-  useSubmitDocument,
 } from '../hooks/useDocuments';
 import { useAutoSave } from '../hooks/useAutoSave';
-import type { ApprovalLineItem } from '../../approval/types/approval';
 
 export default function DocumentEditorPage() {
   const { t } = useTranslation('document');
@@ -33,10 +27,7 @@ export default function DocumentEditorPage() {
   // Track the saved document ID (starts null for new, set after first save)
   const [savedDocId, setSavedDocId] = useState<number | null>(documentId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
-  const [submitValidationErrors, setSubmitValidationErrors] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [approvalLines, setApprovalLines] = useState<ApprovalLineItem[]>([]);
 
   // For new docs, use templateCode from URL; for edits, from loaded document
   const { data: existingDoc } = useDocumentDetail(documentId);
@@ -45,22 +36,6 @@ export default function DocumentEditorPage() {
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();
-  const submitMutation = useSubmitDocument();
-
-  // Populate approval lines from existing document when editing
-  useEffect(() => {
-    if (existingDoc?.approvalLines && existingDoc.approvalLines.length > 0 && approvalLines.length === 0) {
-      setApprovalLines(
-        existingDoc.approvalLines.map((line) => ({
-          userId: line.approver.id,
-          userName: line.approver.name,
-          departmentName: line.approver.departmentName,
-          positionName: line.approver.positionName,
-          lineType: line.lineType,
-        })),
-      );
-    }
-  }, [existingDoc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Store the latest form data for auto-save
   const formDataRef = useRef<{
@@ -74,11 +49,6 @@ export default function DocumentEditorPage() {
       formDataRef.current = data;
       setErrorMessage(null);
 
-      // Convert approval lines to request format
-      const approvalLineRequests = approvalLines.length > 0
-        ? approvalLines.map((item) => ({ approverId: item.userId, lineType: item.lineType }))
-        : null;
-
       try {
         if (savedDocId) {
           // Update existing
@@ -88,7 +58,6 @@ export default function DocumentEditorPage() {
               title: data.title,
               bodyHtml: data.bodyHtml ?? null,
               formData: data.formData ?? null,
-              approvalLines: approvalLineRequests,
             },
           });
         } else {
@@ -98,7 +67,6 @@ export default function DocumentEditorPage() {
             title: data.title,
             bodyHtml: data.bodyHtml ?? null,
             formData: data.formData ?? null,
-            approvalLines: approvalLineRequests,
           });
           setSavedDocId(created.id);
           // Update URL without re-rendering
@@ -109,7 +77,7 @@ export default function DocumentEditorPage() {
         throw new Error('save failed');
       }
     },
-    [savedDocId, resolvedTemplateCode, createMutation, updateMutation, approvalLines, t],
+    [savedDocId, resolvedTemplateCode, createMutation, updateMutation, t],
   );
 
   // Auto-save: triggered when form data changes
@@ -133,58 +101,6 @@ export default function DocumentEditorPage() {
     }
   }, []);
 
-  const handleSubmitClick = useCallback(() => {
-    if (!savedDocId) return;
-
-    const errors: string[] = [];
-    // Use saved document data if available (more reliable than formDataRef which
-    // only updates on save), fall back to formDataRef for unsaved changes
-    const title = existingDoc?.title ?? formDataRef.current.title;
-    const formDataStr = existingDoc?.formData ?? formDataRef.current.formData;
-
-    // Title validation (all templates)
-    if (!title || title.trim() === '') {
-      errors.push(t('validation.titleRequired'));
-    }
-
-    // Template-specific validation
-    if (resolvedTemplateCode === 'EXPENSE' && formDataStr) {
-      try {
-        const parsed = JSON.parse(formDataStr);
-        if (!parsed.items || parsed.items.length === 0) {
-          errors.push(t('validation.expenseItemRequired'));
-        }
-      } catch {
-        // Invalid JSON — skip expense validation
-      }
-    }
-
-    if (resolvedTemplateCode === 'LEAVE' && formDataStr) {
-      try {
-        const parsed = JSON.parse(formDataStr);
-        if (!parsed.leaveTypeId) errors.push(t('validation.leaveTypeRequired'));
-        if (!parsed.startDate) errors.push(t('validation.dateRangeRequired'));
-        if (!parsed.days || parsed.days <= 0) errors.push(t('validation.dateRangeRequired'));
-        if (!parsed.reason || parsed.reason.trim() === '') errors.push(t('validation.reasonRequired'));
-      } catch {
-        // Invalid JSON — skip leave validation
-      }
-    }
-
-    setSubmitValidationErrors(errors);
-    setShowSubmitConfirm(true);
-  }, [savedDocId, existingDoc, resolvedTemplateCode, t]);
-
-  const handleSubmitConfirm = useCallback(async () => {
-    if (!savedDocId) return;
-    try {
-      await submitMutation.mutateAsync(savedDocId);
-      navigate(`/documents/${savedDocId}`);
-    } catch {
-      setErrorMessage(t('submit.error'));
-    }
-  }, [savedDocId, submitMutation, navigate, t]);
-
   const handleDelete = useCallback(async () => {
     if (!savedDocId) return;
     try {
@@ -196,7 +112,13 @@ export default function DocumentEditorPage() {
   }, [savedDocId, deleteMutation, navigate, t]);
 
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
-  const isDynamic = !templateEntry;
+  if (!templateEntry && !isEditMode) {
+    return (
+      <div className="text-center py-12 text-gray-500">
+        Unknown template: {resolvedTemplateCode}
+      </div>
+    );
+  }
 
   // While loading existing document
   if (isEditMode && !existingDoc) {
@@ -237,15 +159,6 @@ export default function DocumentEditorPage() {
           >
             {t('save')}
           </button>
-          <button
-            type="button"
-            onClick={handleSubmitClick}
-            disabled={!savedDocId || autoSaveStatus === 'saving' || submitMutation.isPending}
-            className="inline-flex items-center gap-2 h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <SendHorizonal className="h-4 w-4" />
-            {t('submit.button')}
-          </button>
           {savedDocId && (
             <button
               type="button"
@@ -268,27 +181,7 @@ export default function DocumentEditorPage() {
 
       {/* Form container */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-        {isDynamic ? (
-          <DynamicForm
-            documentId={savedDocId}
-            templateCode={resolvedTemplateCode}
-            initialData={
-              existingDoc
-                ? {
-                    title: existingDoc.title,
-                    bodyHtml: existingDoc.bodyHtml ?? undefined,
-                    formData: existingDoc.formData ?? undefined,
-                  }
-                : undefined
-            }
-            onSave={handleSave}
-            schemaDefinition={
-              existingDoc?.schemaDefinitionSnapshot
-                ? (JSON.parse(existingDoc.schemaDefinitionSnapshot) as SchemaDefinition)
-                : undefined
-            }
-          />
-        ) : EditComponent ? (
+        {EditComponent && (
           <EditComponent
             documentId={savedDocId}
             initialData={
@@ -302,16 +195,8 @@ export default function DocumentEditorPage() {
             }
             onSave={handleSave}
           />
-        ) : null}
+        )}
       </div>
-
-      {/* Approval line editor - only for DRAFT documents */}
-      {(!existingDoc || existingDoc.status === 'DRAFT') && (
-        <ApprovalLineEditor
-          items={approvalLines}
-          onItemsChange={setApprovalLines}
-        />
-      )}
 
       {/* Delete confirmation */}
       <ConfirmDialog
@@ -323,15 +208,6 @@ export default function DocumentEditorPage() {
         confirmLabel={t('deleteConfirm.confirm')}
         confirmVariant="danger"
         isLoading={deleteMutation.isPending}
-      />
-
-      {/* Submit confirmation */}
-      <SubmitConfirmDialog
-        open={showSubmitConfirm}
-        onClose={() => setShowSubmitConfirm(false)}
-        onConfirm={handleSubmitConfirm}
-        isLoading={submitMutation.isPending}
-        validationErrors={submitValidationErrors}
       />
     </div>
   );

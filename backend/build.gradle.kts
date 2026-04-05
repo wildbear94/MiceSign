@@ -23,8 +23,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     // QueryDSL - jakarta classifier required for Boot 3.x
     implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
@@ -49,9 +47,6 @@ dependencies {
     // Google Drive API
     implementation("com.google.apis:google-api-services-drive:v3-rev20260220-2.0.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.43.0")
-
-    // NanoID
-    implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
 
     // MapStruct
     implementation("org.mapstruct:mapstruct:1.6.3")

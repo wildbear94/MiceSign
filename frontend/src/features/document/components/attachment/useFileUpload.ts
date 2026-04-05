@@ -144,25 +144,16 @@ export function useFileUpload({
         setTimeout(() => {
           setUploadItems((prev) => prev.filter((item) => item.id !== pendingItem.id));
         }, 2000);
-      } catch (err: unknown) {
+      } catch (err) {
         // Ignore aborted requests (user cancelled)
         if (err instanceof DOMException && err.name === 'AbortError') {
           return;
         }
 
-        // Extract actual error message from backend response
-        let errorMessage = '파일 업로드에 실패했습니다.';
-        if (err && typeof err === 'object' && 'response' in err) {
-          const axiosErr = err as { response?: { data?: { message?: string } } };
-          if (axiosErr.response?.data?.message) {
-            errorMessage = axiosErr.response.data.message;
-          }
-        }
-
         setUploadItems((prev) =>
           prev.map((item) =>
             item.id === pendingItem.id
-              ? { ...item, status: 'error' as const, error: errorMessage }
+              ? { ...item, status: 'error' as const, error: '파일 업로드에 실패했습니다.' }
               : item,
           ),
         );

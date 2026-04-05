@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { Building2, Award, Users, ScrollText, Mail, LayoutTemplate, X, ArrowLeft } from 'lucide-react';
+import { Building2, Award, Users, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface AdminSidebarProps {
@@ -11,9 +11,6 @@ const navItems = [
   { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
   { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
   { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
-  { to: '/admin/audit-logs', icon: ScrollText, labelKey: 'sidebar.auditLogs' },
-  { to: '/admin/notifications', icon: Mail, labelKey: 'sidebar.notifications' },
-  { to: '/admin/templates', icon: LayoutTemplate, labelKey: 'sidebar.templates' },
 ] as const;
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
@@ -21,13 +18,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   const navContent = (
     <nav className="flex flex-col gap-1 p-3">
-      <NavLink
-        to="/documents/my"
-        className="px-4 py-3 flex items-center gap-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-2 border-b border-gray-200 dark:border-gray-700 pb-3"
-      >
-        <ArrowLeft className="h-4 w-4 shrink-0" />
-        <span className="hidden xl:inline">{t('sidebar.backToDocuments', '문서 목록')}</span>
-      </NavLink>
       {navItems.map(({ to, icon: Icon, labelKey }) => (
         <NavLink
           key={to}
@@ -74,14 +64,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </button>
             </div>
             <nav className="flex flex-col gap-1 px-3">
-              <NavLink
-                to="/documents/my"
-                onClick={onClose}
-                className="px-4 py-3 flex items-center gap-2 rounded-lg text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors mb-2 border-b border-gray-200 dark:border-gray-700 pb-3"
-              >
-                <ArrowLeft className="h-4 w-4 shrink-0" />
-                <span>{t('sidebar.backToDocuments', '문서 목록')}</span>
-              </NavLink>
               {navItems.map(({ to, icon: Icon, labelKey }) => (
                 <NavLink
                   key={to}
