@@ -231,7 +231,11 @@ Plans:
   2. Editing a template's schema creates a new version automatically, and existing documents retain the schema version they were created with
   3. Backend rejects form_data submissions that violate the template's JSON schema (missing required fields, wrong types, invalid values)
   4. Template CRUD API supports create, read, update, deactivate, and list operations with proper ADMIN/SUPER_ADMIN authorization
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 12-01-PLAN.md — DB migration (V8/V9/V10), JPA entity extensions, schema DTO records, repositories, FormValidationException
+- [ ] 12-02-PLAN.md — Template CRUD API, schema versioning service, option set CRUD, integration tests
+- [ ] 12-03-PLAN.md — DynamicFormValidator, DocumentFormValidator fallback, schema snapshot on document creation, validation tests
 
 ### Phase 13: Dynamic Form Rendering
 **Goal**: Users can fill out and view documents created from dynamic JSON schema templates, with the same quality as hardcoded forms
@@ -306,7 +310,7 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 9. SMTP Email Notifications | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 10. Additional Form Templates | v1.1 | 3/3 | Complete | 2026-04-04 |
 | 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
-| 12. Schema Foundation | v1.2 | 0/0 | Not started | - |
+| 12. Schema Foundation | v1.2 | 0/3 | Planning | - |
 | 13. Dynamic Form Rendering | v1.2 | 0/0 | Not started | - |
 | 14. Builder UI | v1.2 | 0/0 | Not started | - |
 | 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
