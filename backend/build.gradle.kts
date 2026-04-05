@@ -50,6 +50,9 @@ dependencies {
     implementation("com.google.apis:google-api-services-drive:v3-rev20260220-2.0.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.43.0")
 
+    // NanoID
+    implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+
     // MapStruct
     implementation("org.mapstruct:mapstruct:1.6.3")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
