@@ -40,7 +40,7 @@ Employees can submit approval documents and get them approved/rejected through a
 - 기존 6개 하드코딩 양식을 JSON 스키마로 점진적 마이그레이션
 - 템플릿 버전 관리 (스키마 변경 시 기존 문서 보존)
 
-### Validated (Phases 3-11)
+### Validated (Phases 3-12)
 - [x] Admin-managed organization structure (departments, positions, users) — Validated in Phase 3: Organization Management (ORG-01, ORG-02, ORG-03, ORG-04)
 - [x] RBAC with three roles (SUPER_ADMIN, ADMIN, USER) — Validated in Phase 3: Organization Management
 - [x] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE) — Validated in Phase 4: Document Core & Templates (DOC-01, DOC-02, DOC-05, DOC-06, TPL-01, TPL-02, TPL-03)
@@ -54,6 +54,7 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] SMTP email notifications for all document state changes — Validated in Phase 9: SMTP Email Notifications (NTF-01 ~ NTF-05)
 - [x] Document search/filter (keyword + multi-criteria) — Validated in Phase 11: Document Search & Filter (SRCH-01, SRCH-02)
 - [x] Additional form templates (purchase, business trip, overtime) — Validated in Phase 10: Additional Form Templates (TPL-04, TPL-05, TPL-06)
+- [x] Schema foundation: DB 스키마 확장, 템플릿 CRUD API, 스키마 버전 관리, 동적 폼 검증 — Validated in Phase 12: Schema Foundation (SCHM-01, SCHM-02, SCHM-03, SCHM-04)
 
 ### Out of Scope
 
@@ -112,4 +113,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 — Milestone v1.2 started (Custom Template Builder)*
+*Last updated: 2026-04-05 — Phase 12 complete (Schema Foundation)*
