@@ -7,6 +7,8 @@ import ConfirmDialog from '../../admin/components/ConfirmDialog';
 import SubmitConfirmDialog from '../components/SubmitConfirmDialog';
 import ApprovalLineEditor from '../components/approval/ApprovalLineEditor';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import DynamicForm from '../components/templates/DynamicForm';
+import type { SchemaDefinition } from '../types/dynamicForm';
 import {
   useDocumentDetail,
   useCreateDocument,
@@ -194,13 +196,7 @@ export default function DocumentEditorPage() {
   }, [savedDocId, deleteMutation, navigate, t]);
 
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
-  if (!templateEntry && !isEditMode) {
-    return (
-      <div className="text-center py-12 text-gray-500">
-        Unknown template: {resolvedTemplateCode}
-      </div>
-    );
-  }
+  const isDynamic = !templateEntry;
 
   // While loading existing document
   if (isEditMode && !existingDoc) {
@@ -272,7 +268,27 @@ export default function DocumentEditorPage() {
 
       {/* Form container */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-        {EditComponent && (
+        {isDynamic ? (
+          <DynamicForm
+            documentId={savedDocId}
+            templateCode={resolvedTemplateCode}
+            initialData={
+              existingDoc
+                ? {
+                    title: existingDoc.title,
+                    bodyHtml: existingDoc.bodyHtml ?? undefined,
+                    formData: existingDoc.formData ?? undefined,
+                  }
+                : undefined
+            }
+            onSave={handleSave}
+            schemaDefinition={
+              existingDoc?.schemaDefinitionSnapshot
+                ? (JSON.parse(existingDoc.schemaDefinitionSnapshot) as SchemaDefinition)
+                : undefined
+            }
+          />
+        ) : EditComponent ? (
           <EditComponent
             documentId={savedDocId}
             initialData={
@@ -286,7 +302,7 @@ export default function DocumentEditorPage() {
             }
             onSave={handleSave}
           />
-        )}
+        ) : null}
       </div>
 
       {/* Approval line editor - only for DRAFT documents */}

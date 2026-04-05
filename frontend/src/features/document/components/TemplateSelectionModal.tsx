@@ -101,7 +101,7 @@ export default function TemplateSelectionModal({
           {t('templateModal.subtitle')}
         </p>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 max-h-96 overflow-y-auto">
           {templates?.map((template) => (
             <button
               key={template.id}

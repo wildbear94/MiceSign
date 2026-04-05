@@ -5,6 +5,7 @@ import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
 import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import DynamicReadOnly from '../components/templates/DynamicReadOnly';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
 import ApprovalStatusDisplay from '../components/approval/ApprovalStatusDisplay';
@@ -42,6 +43,7 @@ export default function DocumentDetailPage() {
   // Non-DRAFT: render read-only view
   const templateEntry = TEMPLATE_REGISTRY[doc.templateCode];
   const ReadOnlyComponent = templateEntry?.readOnlyComponent;
+  const isDynamic = !templateEntry;
 
   function formatDate(dateString: string | null): string {
     if (!dateString) return '-';
@@ -129,14 +131,23 @@ export default function DocumentDetailPage() {
 
       {/* Content */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
-        {ReadOnlyComponent ? (
+        {isDynamic ? (
+          <DynamicReadOnly
+            title={doc.title}
+            bodyHtml={doc.bodyHtml}
+            formData={doc.formData}
+            schemaDefinitionSnapshot={doc.schemaDefinitionSnapshot}
+          />
+        ) : ReadOnlyComponent ? (
           <ReadOnlyComponent
             title={doc.title}
             bodyHtml={doc.bodyHtml}
             formData={doc.formData}
           />
         ) : (
-          <p className="text-sm text-gray-400">알 수 없는 양식입니다.</p>
+          <div className="text-center py-8 text-gray-500">
+            양식을 표시할 수 없습니다.
+          </div>
         )}
       </div>
 
