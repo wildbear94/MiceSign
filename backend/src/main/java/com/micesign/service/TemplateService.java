@@ -130,6 +130,32 @@ public class TemplateService {
         approvalTemplateRepository.save(template);
     }
 
+    /**
+     * 공개 스키마 조회 — 템플릿 코드로 활성 커스텀 템플릿의 스키마를 반환
+     * 하드코딩 양식(schemaDefinition == null)이나 비활성/존재하지 않는 템플릿은 404
+     */
+    public SchemaDefinition getTemplateSchemaByCode(String code) {
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(code)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
+
+        if (!template.isActive()) {
+            throw new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404);
+        }
+
+        if (template.getSchemaDefinition() == null) {
+            throw new BusinessException("TPL_NOT_FOUND", "해당 양식에는 스키마가 정의되어 있지 않습니다.", 404);
+        }
+
+        // 옵션 세트 resolve 후 SchemaDefinition으로 역직렬화
+        String resolvedJson = schemaService.resolveSchemaWithOptions(template.getSchemaDefinition());
+        try {
+            return objectMapper.readValue(resolvedJson, SchemaDefinition.class);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("SCHEMA_PARSE_ERROR",
+                    "스키마 역직렬화에 실패했습니다: " + e.getMessage());
+        }
+    }
+
     private TemplateDetailResponse toDetailResponse(ApprovalTemplate t) {
         SchemaDefinition schema = null;
         if (t.getSchemaDefinition() != null) {

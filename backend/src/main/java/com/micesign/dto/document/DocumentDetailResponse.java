@@ -19,7 +19,8 @@ public record DocumentDetailResponse(
     LocalDateTime submittedAt,
     LocalDateTime completedAt,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    String schemaDefinitionSnapshot
 ) {
     public record DrafterInfo(
         Long id,

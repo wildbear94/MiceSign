@@ -37,6 +37,7 @@ public interface DocumentMapper {
     @Mapping(target = "completedAt", source = "document.completedAt")
     @Mapping(target = "createdAt", source = "document.createdAt")
     @Mapping(target = "updatedAt", source = "document.updatedAt")
+    @Mapping(target = "schemaDefinitionSnapshot", source = "content.schemaDefinitionSnapshot")
     DocumentDetailResponse toDetailResponse(Document document, DocumentContent content,
                                              String templateName, List<ApprovalLineResponse> approvalLines);
 

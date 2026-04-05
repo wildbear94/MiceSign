@@ -2,6 +2,7 @@ package com.micesign.controller;
 
 import com.micesign.common.dto.ApiResponse;
 import com.micesign.dto.template.CreateTemplateRequest;
+import com.micesign.dto.template.SchemaDefinition;
 import com.micesign.dto.template.TemplateDetailResponse;
 import com.micesign.dto.template.TemplateResponse;
 import com.micesign.dto.template.UpdateTemplateRequest;
@@ -31,6 +32,15 @@ public class TemplateController {
     @GetMapping("/templates")
     public ApiResponse<List<TemplateResponse>> getActiveTemplates() {
         return ApiResponse.ok(templateService.getActiveTemplates());
+    }
+
+    /**
+     * 공개: 템플릿 스키마 조회 (templateCode로)
+     * 커스텀 템플릿의 SchemaDefinition을 반환 (옵션 세트 resolve 포함)
+     */
+    @GetMapping("/templates/{code}/schema")
+    public ApiResponse<SchemaDefinition> getTemplateSchema(@PathVariable String code) {
+        return ApiResponse.ok(templateService.getTemplateSchemaByCode(code));
     }
 
     /**
