@@ -214,7 +214,7 @@ Plans:
 **Milestone Goal:** Admin이 코드 없이 드래그&드롭으로 결재 양식을 생성하고, 기존 하드코딩 양식을 JSON 스키마 기반으로 전환
 
 - [x] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure (completed 2026-04-05)
-- [ ] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support
+- [x] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support (completed 2026-04-05)
 - [ ] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page
 - [ ] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections
 - [ ] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification
@@ -246,11 +246,11 @@ Plans:
   2. User can view a submitted document rendered in read-only mode from the stored schema snapshot and form_data
   3. Form validation errors appear inline next to the relevant field, generated at runtime from the JSON schema's validation rules
   4. Table fields support adding and removing rows, with per-cell validation and defined column types
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 13-01-PLAN.md — Backend API extensions (public schema endpoint, DocumentDetail snapshot) + frontend types, schemaToZod, npm deps
-- [ ] 13-02-PLAN.md — DynamicForm edit component + 8 field type components + DynamicReadOnly
-- [ ] 13-03-PLAN.md — EditorPage/DetailPage fallback integration + TemplateSelectionModal + E2E checkpoint
+- [x] 13-01-PLAN.md — Backend API extensions (public schema endpoint, DocumentDetail snapshot) + frontend types, schemaToZod, npm deps
+- [x] 13-02-PLAN.md — DynamicForm edit component + 8 field type components + DynamicReadOnly
+- [x] 13-03-PLAN.md — EditorPage/DetailPage fallback integration + TemplateSelectionModal + E2E checkpoint
 **UI hint**: yes
 
 ### Phase 14: Builder UI
@@ -315,7 +315,7 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 10. Additional Form Templates | v1.1 | 3/3 | Complete | 2026-04-04 |
 | 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
 | 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
-| 13. Dynamic Form Rendering | v1.2 | 0/3 | Planning complete | - |
+| 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 14. Builder UI | v1.2 | 0/0 | Not started | - |
 | 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
 | 16. Template Migration | v1.2 | 0/0 | Not started | - |
