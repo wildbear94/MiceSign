@@ -29,6 +29,25 @@ public class ApprovalTemplate {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder = 0;
 
+    @Column(name = "schema_definition", columnDefinition = "LONGTEXT")
+    private String schemaDefinition;
+
+    @Column(name = "schema_version", nullable = false)
+    private int schemaVersion = 0;
+
+    @Column(name = "is_custom", nullable = false)
+    private boolean isCustom = false;
+
+    @Column(name = "category", length = 50)
+    private String category;
+
+    @Column(name = "icon", length = 50)
+    private String icon;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -110,5 +129,53 @@ public class ApprovalTemplate {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getSchemaDefinition() {
+        return schemaDefinition;
+    }
+
+    public void setSchemaDefinition(String schemaDefinition) {
+        this.schemaDefinition = schemaDefinition;
+    }
+
+    public int getSchemaVersion() {
+        return schemaVersion;
+    }
+
+    public void setSchemaVersion(int schemaVersion) {
+        this.schemaVersion = schemaVersion;
+    }
+
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public void setCustom(boolean custom) {
+        isCustom = custom;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }

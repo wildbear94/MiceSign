@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -29,6 +30,15 @@ public class GlobalExceptionHandler {
             .map(e -> e.getField() + ": " + e.getDefaultMessage())
             .collect(Collectors.joining(", "));
         return ResponseEntity.badRequest().body(ApiResponse.error("VALIDATION_ERROR", message));
+    }
+
+    @ExceptionHandler(FormValidationException.class)
+    public ResponseEntity<ApiResponse<?>> handleFormValidation(FormValidationException ex) {
+        log.warn("FormValidationException: {}", ex.getFieldErrors());
+        return ResponseEntity.badRequest().body(
+            new ApiResponse<>(false, Map.of("fieldErrors", ex.getFieldErrors()),
+                new ApiResponse.ErrorDetail("FORM_VALIDATION_ERROR", "양식 검증에 실패했습니다."))
+        );
     }
 
     @ExceptionHandler(Exception.class)
