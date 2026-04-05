@@ -10,6 +10,8 @@ import FieldPalette from '../components/builder/FieldPalette';
 import BuilderCanvas from '../components/builder/BuilderCanvas';
 import BuilderToolbar from '../components/builder/BuilderToolbar';
 import BuilderPreview from '../components/builder/BuilderPreview';
+import PropertyPanel from '../components/builder/PropertyPanel';
+import JsonImportModal from '../components/builder/JsonImportModal';
 import { useBuilderReducer } from '../components/builder/useBuilderReducer';
 import { useAdminTemplate, useUpdateTemplate } from '../hooks/useAdminTemplates';
 import { PALETTE_ITEMS } from '../types/builder';
@@ -27,6 +29,7 @@ export default function TemplateBuilderPage() {
   // Builder state
   const [state, dispatch] = useBuilderReducer();
   const [isPreview, setIsPreview] = useState(false);
+  const [isJsonImportOpen, setIsJsonImportOpen] = useState(false);
 
   // Initialize builder from API response
   useEffect(() => {
@@ -167,6 +170,7 @@ export default function TemplateBuilderPage() {
   }
 
   return (
+    <>
     <DragDropContext onDragEnd={handleDragEnd}>
       <BuilderLayout
         toolbar={
@@ -178,9 +182,7 @@ export default function TemplateBuilderPage() {
             onTogglePreview={() => setIsPreview((p) => !p)}
             onSave={handleSave}
             onBack={handleBack}
-            onJsonImport={() => {
-              /* JSON import modal - Plan 04 */
-            }}
+            onJsonImport={() => setIsJsonImportOpen(true)}
             onJsonExport={handleJsonExport}
           />
         }
@@ -214,12 +216,40 @@ export default function TemplateBuilderPage() {
         }
         propertyPanel={
           <div
-            className={`p-4 text-sm text-gray-400 ${isPreview ? 'opacity-60 pointer-events-none' : ''}`}
+            className={isPreview ? 'opacity-60 pointer-events-none' : ''}
           >
-            {t('templates.noFieldSelected')}
+            <PropertyPanel
+              selectedField={
+                state.fields.find((f) => f.id === state.selectedFieldId) ??
+                null
+              }
+              templateSettings={state.templateSettings}
+              onUpdateField={(id, changes) =>
+                dispatch({ type: 'UPDATE_FIELD', fieldId: id, changes })
+              }
+              onUpdateFieldConfig={(id, config) =>
+                dispatch({
+                  type: 'UPDATE_FIELD_CONFIG',
+                  fieldId: id,
+                  config,
+                })
+              }
+              onUpdateTemplateSettings={(changes) =>
+                dispatch({ type: 'UPDATE_TEMPLATE_SETTINGS', changes })
+              }
+            />
           </div>
         }
       />
     </DragDropContext>
+
+    {isJsonImportOpen && (
+      <JsonImportModal
+        isOpen={isJsonImportOpen}
+        onClose={() => setIsJsonImportOpen(false)}
+        onImport={(schema) => dispatch({ type: 'IMPORT_SCHEMA', schema })}
+      />
+    )}
+    </>
   );
 }
