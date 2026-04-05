@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.micesign.service.TemplateSchemaService;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -54,6 +55,7 @@ public class DocumentService {
     private final GoogleDriveService googleDriveService;
     private final AuditLogService auditLogService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final TemplateSchemaService templateSchemaService;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentContentRepository documentContentRepository,
@@ -66,7 +68,8 @@ public class DocumentService {
                            DocumentMapper documentMapper,
                            GoogleDriveService googleDriveService,
                            AuditLogService auditLogService,
-                           ApplicationEventPublisher applicationEventPublisher) {
+                           ApplicationEventPublisher applicationEventPublisher,
+                           TemplateSchemaService templateSchemaService) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
         this.attachmentRepository = attachmentRepository;
@@ -79,6 +82,7 @@ public class DocumentService {
         this.googleDriveService = googleDriveService;
         this.auditLogService = auditLogService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.templateSchemaService = templateSchemaService;
     }
 
     public DocumentResponse createDocument(Long userId, CreateDocumentRequest req) {
@@ -106,6 +110,15 @@ public class DocumentService {
         content.setDocument(document);
         content.setBodyHtml(req.bodyHtml());
         content.setFormData(req.formData());
+
+        // 동적 템플릿인 경우 스키마 스냅샷 저장 (D-10, D-08)
+        if (template.getSchemaDefinition() != null) {
+            content.setSchemaVersion(template.getSchemaVersion());
+            String resolvedSchema = templateSchemaService.resolveSchemaWithOptions(
+                template.getSchemaDefinition());
+            content.setSchemaDefinitionSnapshot(resolvedSchema);
+        }
+
         documentContentRepository.save(content);
 
         // Save approval lines if provided
@@ -134,6 +147,17 @@ public class DocumentService {
                 .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
         content.setBodyHtml(req.bodyHtml());
         content.setFormData(req.formData());
+
+        // 동적 템플릿인 경우 최신 스키마 스냅샷 반영
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(document.getTemplateCode())
+                .orElse(null);
+        if (template != null && template.getSchemaDefinition() != null) {
+            content.setSchemaVersion(template.getSchemaVersion());
+            String resolvedSchema = templateSchemaService.resolveSchemaWithOptions(
+                template.getSchemaDefinition());
+            content.setSchemaDefinitionSnapshot(resolvedSchema);
+        }
+
         documentContentRepository.save(content);
 
         // Update approval lines if provided (delete all, re-insert)

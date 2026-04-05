@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.service.DocumentFormValidator;
 import com.micesign.service.validation.BusinessTripFormValidator;
+import com.micesign.service.validation.DynamicFormValidator;
 import com.micesign.service.validation.ExpenseFormValidator;
 import com.micesign.service.validation.GeneralFormValidator;
 import com.micesign.service.validation.LeaveFormValidator;
@@ -11,19 +12,24 @@ import com.micesign.service.validation.OvertimeFormValidator;
 import com.micesign.service.validation.PurchaseFormValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 
 class DocumentFormValidatorTest {
 
     private DocumentFormValidator validator;
+    private DynamicFormValidator dynamicFormValidator;
 
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
+        dynamicFormValidator = Mockito.mock(DynamicFormValidator.class);
         validator = new DocumentFormValidator(List.of(
             new GeneralFormValidator(),
             new ExpenseFormValidator(objectMapper),
@@ -31,7 +37,7 @@ class DocumentFormValidatorTest {
             new PurchaseFormValidator(objectMapper),
             new BusinessTripFormValidator(objectMapper),
             new OvertimeFormValidator(objectMapper)
-        ));
+        ), dynamicFormValidator);
     }
 
     // --- GENERAL ---
@@ -336,12 +342,15 @@ class DocumentFormValidatorTest {
             .hasFieldOrPropertyWithValue("code", "DOC_INVALID_FORM_DATA");
     }
 
-    // --- UNKNOWN TEMPLATE ---
+    // --- UNKNOWN TEMPLATE (falls back to DynamicFormValidator) ---
 
     @Test
-    void validateUnknownTemplate_throwsException() {
-        assertThatThrownBy(() -> validator.validate("UNKNOWN", null, null))
+    void validateUnknownTemplate_delegatesToDynamicValidator() {
+        doThrow(new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."))
+            .when(dynamicFormValidator).validate(anyString(), anyString());
+
+        assertThatThrownBy(() -> validator.validate("UNKNOWN", null, "{}"))
             .isInstanceOf(BusinessException.class)
-            .hasFieldOrPropertyWithValue("code", "TPL_UNKNOWN");
+            .hasFieldOrPropertyWithValue("code", "TPL_NOT_FOUND");
     }
 }
