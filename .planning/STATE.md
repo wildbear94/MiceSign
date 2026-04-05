@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Custom Template Builder
 status: executing
-stopped_at: Phase 13 UI-SPEC approved
-last_updated: "2026-04-05T08:28:34.150Z"
+stopped_at: Phase 14 context gathered
+last_updated: "2026-04-05T08:49:21.230Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 6
@@ -75,6 +75,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T05:05:25.732Z
-Stopped at: Phase 13 UI-SPEC approved
-Resume file: .planning/phases/13-dynamic-form-rendering/13-UI-SPEC.md
+Last session: 2026-04-05T08:49:21.228Z
+Stopped at: Phase 14 context gathered
+Resume file: .planning/phases/14-builder-ui/14-CONTEXT.md
