@@ -30,6 +30,7 @@ export interface DocumentDetailResponse extends DocumentResponse {
   currentStep: number | null;
   submittedAt: string | null;
   completedAt: string | null;
+  schemaDefinitionSnapshot?: string | null;
 }
 
 export interface TemplateResponse {
@@ -38,6 +39,9 @@ export interface TemplateResponse {
   name: string;
   description: string;
   prefix: string;
+  isCustom?: boolean;
+  category?: string | null;
+  icon?: string | null;
 }
 
 export interface LeaveTypeResponse {
