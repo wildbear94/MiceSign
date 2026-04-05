@@ -50,7 +50,7 @@ Exceptions: Touch targets at 44px (h-11) for standard inputs, 36px (h-9) for tab
 | Body | 14px (text-sm) | 400 (font-normal) | 1.5 (leading-normal) |
 | Label | 14px (text-sm) | 600 (font-semibold) | 1.5 (leading-normal) |
 | Field value (read-only) | 14px (text-sm) | 400 (font-normal) | 1.5 (leading-normal) |
-| Template badge | 12px (text-xs) | 500 (font-medium) | 1.4 |
+| Template badge | 12px (text-xs) | 400 (font-normal) | 1.4 |
 
 Source: Extracted from GeneralForm.tsx, ExpenseForm.tsx existing patterns.
 
@@ -80,6 +80,8 @@ Additional semantic colors (from existing codebase):
 ### DynamicForm (Edit Mode)
 
 8 field type components, all within a single-column stack layout (D-07).
+
+**Visual hierarchy:** First visible field is the primary visual anchor — auto-focused on mount, positioned at top of the single-column stack. Fields flow top-to-bottom in schema-defined order.
 
 | Field Type | Input Control | Specs |
 |------------|---------------|-------|
@@ -186,7 +188,7 @@ Existing modal extended to show dynamic templates below hardcoded ones (D-03). D
 | Element | Copy |
 |---------|------|
 | Primary CTA | "임시저장" (Save Draft) -- existing, managed by DocumentEditorPage |
-| Template badge | "{templateName}" in text-xs font-medium text-gray-500 |
+| Template badge | "{templateName}" in text-xs font-normal text-gray-500 |
 | Empty field (read-only) | "---" (em dash, D-12) |
 | Validation: required | "{label}을(를) 입력해주세요" |
 | Validation: minLength | "{label}은(는) {min}자 이상이어야 합니다" |
