@@ -16,12 +16,12 @@ CREATE TABLE option_set (
 CREATE TABLE option_item (
   id BIGINT NOT NULL AUTO_INCREMENT,
   option_set_id BIGINT NOT NULL,
-  value VARCHAR(100) NOT NULL,
+  "value" VARCHAR(100) NOT NULL,
   label VARCHAR(200) NOT NULL,
   sort_order INT NOT NULL DEFAULT 0,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   PRIMARY KEY (id),
   CONSTRAINT fk_option_item_set FOREIGN KEY (option_set_id)
     REFERENCES option_set(id) ON DELETE CASCADE,
-  CONSTRAINT uk_option_item_value UNIQUE (option_set_id, value)
+  CONSTRAINT uk_option_item_value UNIQUE (option_set_id, "value")
 );
