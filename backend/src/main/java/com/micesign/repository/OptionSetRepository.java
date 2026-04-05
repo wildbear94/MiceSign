@@ -8,4 +8,6 @@ import java.util.List;
 public interface OptionSetRepository extends JpaRepository<OptionSet, Long> {
 
     List<OptionSet> findByIsActiveTrueOrderByNameAsc();
+
+    boolean existsByName(String name);
 }
