@@ -3,8 +3,8 @@
 ## Milestones
 
 - ~~**v1.0 MVP**~~ - Phases 1-8 (shipped 2026-04-03)
-- **v1.1 Extended Features** - Phases 9-11 (in progress)
-- **v1.2 Custom Template Builder** - Planned (evaluate after v1.1)
+- ~~**v1.1 Extended Features**~~ - Phases 9-11 (shipped 2026-04-04)
+- **v1.2 Custom Template Builder** - Phases 12-17 (in progress)
 
 ## Phases
 
@@ -152,15 +152,12 @@ Plans:
 
 </details>
 
-### v1.1 Extended Features (In Progress)
-
-**Milestone Goal:** SMTP 이메일 알림, 추가 양식 템플릿, 문서 검색/필터로 전자결재 시스템의 실용성 확장
+<details>
+<summary>v1.1 Extended Features (Phases 9-11) - SHIPPED 2026-04-04</summary>
 
 - [x] **Phase 9: SMTP Email Notifications** - Event-driven email notifications for all document state changes with retry and delivery logging (completed 2026-04-03)
 - [x] **Phase 10: Additional Form Templates** - Purchase request, business trip report, overtime request forms with validator refactoring (completed 2026-04-04)
 - [x] **Phase 11: Document Search & Filter** - Keyword search, status/date/template filters with role-based access control (completed 2026-04-04)
-
-## Phase Details
 
 ### Phase 9: SMTP Email Notifications
 **Goal**: Users receive email notifications for all approval workflow events so they never miss a pending action or status change
@@ -183,16 +180,16 @@ Plans:
 **Depends on**: Phase 8 (v1.0 complete)
 **Requirements**: TPL-04, TPL-05, TPL-06
 **Success Criteria** (what must be TRUE):
-  1. User can create a purchase request (구매요청서) with item table, auto-sum, and evidence attachments
-  2. User can create a business trip report (출장보고서) with itinerary, expense breakdown, and attachments
-  3. User can create an overtime request (연장근무신청서) with date, hours, reason, and manager selection
-  4. All three new templates work through the full document lifecycle (draft, submit, approve, view read-only) without regressions to existing templates
+  1. User can create a purchase request with item table, auto-sum, and evidence attachments
+  2. User can create a business trip report with itinerary, expense breakdown, and attachments
+  3. User can create an overtime request with date, hours, reason, and manager selection
+  4. All three new templates work through the full document lifecycle without regressions to existing templates
   5. Backend DocumentFormValidator uses strategy pattern instead of switch/case, cleanly supporting 6+ template types
 **Plans:** 3/3 plans complete
 Plans:
-- [ ] 10-01-PLAN.md — Backend: Strategy pattern refactor of DocumentFormValidator, Flyway V7 migration, 3 new form validators (Purchase, BusinessTrip, Overtime)
-- [ ] 10-02-PLAN.md — Frontend foundation: TypeScript types, Zod schemas, i18n keys, OvertimeForm + PurchaseForm components
-- [ ] 10-03-PLAN.md — Frontend: BusinessTripForm (dual tables), template registry wiring, visual verification checkpoint
+- [x] 10-01-PLAN.md — Backend: Strategy pattern refactor of DocumentFormValidator, Flyway V7 migration, 3 new form validators (Purchase, BusinessTrip, Overtime)
+- [x] 10-02-PLAN.md — Frontend foundation: TypeScript types, Zod schemas, i18n keys, OvertimeForm + PurchaseForm components
+- [x] 10-03-PLAN.md — Frontend: BusinessTripForm (dual tables), template registry wiring, visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 11: Document Search & Filter
@@ -210,11 +207,91 @@ Plans:
 - [x] 11-02-PLAN.md — Frontend: tabs, search filters, URL state management, keyword highlighting, DocumentListPage integration, visual checkpoint
 **UI hint**: yes
 
+</details>
+
+### v1.2 Custom Template Builder (In Progress)
+
+**Milestone Goal:** Admin이 코드 없이 드래그&드롭으로 결재 양식을 생성하고, 기존 하드코딩 양식을 JSON 스키마 기반으로 전환
+
+- [ ] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure
+- [ ] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support
+- [ ] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page
+- [ ] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections
+- [ ] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification
+- [ ] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging
+
+## Phase Details
+
+### Phase 12: Schema Foundation
+**Goal**: The system has a stable JSON schema format and DB infrastructure so that templates can be defined, versioned, and validated without any UI — the foundation everything else builds on
+**Depends on**: Phase 11 (v1.1 complete)
+**Requirements**: SCHM-01, SCHM-02, SCHM-03, SCHM-04
+**Success Criteria** (what must be TRUE):
+  1. Admin can create a template via API by providing a JSON schema definition with field definitions (all 8 field types: text, textarea, number, date, select, table, staticText, hidden)
+  2. Editing a template's schema creates a new version automatically, and existing documents retain the schema version they were created with
+  3. Backend rejects form_data submissions that violate the template's JSON schema (missing required fields, wrong types, invalid values)
+  4. Template CRUD API supports create, read, update, deactivate, and list operations with proper ADMIN/SUPER_ADMIN authorization
+**Plans**: TBD
+
+### Phase 13: Dynamic Form Rendering
+**Goal**: Users can fill out and view documents created from dynamic JSON schema templates, with the same quality as hardcoded forms
+**Depends on**: Phase 12
+**Requirements**: RNDR-01, RNDR-02, RNDR-03, RNDR-04
+**Success Criteria** (what must be TRUE):
+  1. User can fill out a form rendered dynamically from a JSON schema — all 8 field types are functional with proper input controls
+  2. User can view a submitted document rendered in read-only mode from the stored schema snapshot and form_data
+  3. Form validation errors appear inline next to the relevant field, generated at runtime from the JSON schema's validation rules
+  4. Table fields support adding and removing rows, with per-cell validation and defined column types
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 14: Builder UI
+**Goal**: Admins can visually create and edit form templates through a drag-and-drop builder without writing any code
+**Depends on**: Phase 13 (renderer required for live preview)
+**Requirements**: BLDR-01, BLDR-02, BLDR-03, BLDR-04, BLDR-05, BLDR-06
+**Success Criteria** (what must be TRUE):
+  1. Admin sees a three-panel layout: field palette (left), form canvas (center), property panel (right)
+  2. Admin can add fields by dragging from the palette to the canvas, or by clicking a field type to append it
+  3. Admin can reorder fields by dragging within the canvas, and configure each field's properties (label, required, placeholder, options) in the property panel
+  4. Admin can toggle live preview to see the form exactly as end-users will see it
+  5. Admin can create new templates, edit existing ones, deactivate templates, and browse all templates in a management list page
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 15: Advanced Logic
+**Goal**: Admins can add conditional visibility rules and calculation fields to templates, enabling smart forms that react to user input
+**Depends on**: Phase 14
+**Requirements**: LOGIC-01, LOGIC-02, LOGIC-03, LOGIC-04
+**Success Criteria** (what must be TRUE):
+  1. Admin can configure a field to show, hide, or become required based on another field's value (e.g., show "Other reason" field when reason select = "Other")
+  2. System detects circular dependencies in conditional rules and prevents saving with a clear error message
+  3. Admin can define calculation fields that auto-compute values using SUM, MULTIPLY, ADD, or COUNT operations on other numeric fields
+  4. Admin can group fields into visual sections with collapsible section headers for form organization
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 16: Template Migration
+**Goal**: All 6 existing hardcoded form templates have JSON schema equivalents, and the system seamlessly renders both legacy and dynamic documents
+**Depends on**: Phase 15 (all dynamic features must work before migration)
+**Requirements**: MIGR-01, MIGR-02, MIGR-03
+**Success Criteria** (what must be TRUE):
+  1. JSON schema equivalents exist for all 6 hardcoded forms (General, Expense, Leave, Purchase, Business Trip, Overtime) with matching field structure
+  2. System uses dual rendering: documents created before migration render with hardcoded components, new documents use dynamic renderer
+  3. All existing documents (drafts and submitted) display correctly after migration without any data modification
+
+### Phase 17: Budget Integration
+**Goal**: Financial approval documents automatically send expense data to the external budget system upon submission, without blocking the approval workflow
+**Depends on**: Phase 12 (needs template schema infrastructure; independent of builder UI)
+**Requirements**: BDGT-01, BDGT-02
+**Success Criteria** (what must be TRUE):
+  1. When a financial document (expense report, purchase request) is submitted, the system sends expense data to the external budget system via REST API
+  2. Failed API calls are retried (up to configured retry count) and all attempts are logged, without blocking or delaying the document submission workflow
+
 ## Progress
 
 **Execution Order:**
-Phase 9 and Phase 10 have no cross-dependency (Wave 1 parallel candidates). Phase 11 follows Phase 10.
-Recommended order: 9 -> 10 -> 11 (or 9 and 10 in parallel if two work streams available)
+Phases 12 through 16 are strictly sequential (each depends on the previous). Phase 17 can start after Phase 12 completes (independent of Phases 13-16).
+Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-16 after Phase 12)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -226,6 +303,12 @@ Recommended order: 9 -> 10 -> 11 (or 9 and 10 in parallel if two work streams av
 | 6. Document Submission & Numbering | v1.0 | 2/2 | Complete | - |
 | 7. Approval Workflow | v1.0 | 5/5 | Complete | - |
 | 8. Dashboard & Audit | v1.0 | 3/3 | Complete | - |
-| 9. SMTP Email Notifications | v1.1 | 3/3 | Complete   | 2026-04-03 |
-| 10. Additional Form Templates | v1.1 | 0/3 | Complete    | 2026-04-04 |
-| 11. Document Search & Filter | v1.1 | 2/2 | Complete    | 2026-04-04 |
+| 9. SMTP Email Notifications | v1.1 | 3/3 | Complete | 2026-04-03 |
+| 10. Additional Form Templates | v1.1 | 3/3 | Complete | 2026-04-04 |
+| 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
+| 12. Schema Foundation | v1.2 | 0/0 | Not started | - |
+| 13. Dynamic Form Rendering | v1.2 | 0/0 | Not started | - |
+| 14. Builder UI | v1.2 | 0/0 | Not started | - |
+| 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
+| 16. Template Migration | v1.2 | 0/0 | Not started | - |
+| 17. Budget Integration | v1.2 | 0/0 | Not started | - |

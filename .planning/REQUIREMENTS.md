@@ -67,7 +67,7 @@ Phase 1-A MVP — all requirements validated.
 
 - [x] **AUD-01**: System records immutable audit log entries for all document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file upload/download, admin edits)
 
-## v1.1 Requirements
+## v1.1 Requirements (Complete)
 
 Milestone v1.1: Extended Features — SMTP notifications, document search/filter, additional form templates.
 
@@ -211,13 +211,36 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TPL-06 | Phase 10: Additional Form Templates | Complete |
 | SRCH-01 | Phase 11: Document Search & Filter | Complete |
 | SRCH-02 | Phase 11: Document Search & Filter | Complete |
+| SCHM-01 | Phase 12: Schema Foundation | Pending |
+| SCHM-02 | Phase 12: Schema Foundation | Pending |
+| SCHM-03 | Phase 12: Schema Foundation | Pending |
+| SCHM-04 | Phase 12: Schema Foundation | Pending |
+| RNDR-01 | Phase 13: Dynamic Form Rendering | Pending |
+| RNDR-02 | Phase 13: Dynamic Form Rendering | Pending |
+| RNDR-03 | Phase 13: Dynamic Form Rendering | Pending |
+| RNDR-04 | Phase 13: Dynamic Form Rendering | Pending |
+| BLDR-01 | Phase 14: Builder UI | Pending |
+| BLDR-02 | Phase 14: Builder UI | Pending |
+| BLDR-03 | Phase 14: Builder UI | Pending |
+| BLDR-04 | Phase 14: Builder UI | Pending |
+| BLDR-05 | Phase 14: Builder UI | Pending |
+| BLDR-06 | Phase 14: Builder UI | Pending |
+| LOGIC-01 | Phase 15: Advanced Logic | Pending |
+| LOGIC-02 | Phase 15: Advanced Logic | Pending |
+| LOGIC-03 | Phase 15: Advanced Logic | Pending |
+| LOGIC-04 | Phase 15: Advanced Logic | Pending |
+| MIGR-01 | Phase 16: Template Migration | Pending |
+| MIGR-02 | Phase 16: Template Migration | Pending |
+| MIGR-03 | Phase 16: Template Migration | Pending |
+| BDGT-01 | Phase 17: Budget Integration | Pending |
+| BDGT-02 | Phase 17: Budget Integration | Pending |
 
 **Coverage:**
 - v1.0 requirements: 36 total (36 complete)
 - v1.1 requirements: 10 total (10 complete)
-- v1.2 requirements: 21 total (0 complete)
-- Unmapped: 21 ⚠️ (pending roadmap creation)
+- v1.2 requirements: 21 total (0 complete, 21 mapped)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-05 -- v1.2 requirements defined*
+*Last updated: 2026-04-05 -- v1.2 roadmap created, all 21 requirements mapped to phases 12-17*
