@@ -9,6 +9,8 @@ import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
 import UserListPage from './features/admin/pages/UserListPage';
 import UserDetailPage from './features/admin/pages/UserDetailPage';
+import TemplateListPage from './features/admin/pages/TemplateListPage';
+import TemplateBuilderPage from './features/admin/pages/TemplateBuilderPage';
 import DocumentListPage from './features/document/pages/DocumentListPage';
 import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
 import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
@@ -69,6 +71,8 @@ function App() {
             <Route path="positions" element={<PositionPage />} />
             <Route path="users" element={<UserListPage />} />
             <Route path="users/:id" element={<UserDetailPage />} />
+            <Route path="templates" element={<TemplateListPage />} />
+            <Route path="templates/:id/builder" element={<TemplateBuilderPage />} />
           </Route>
         </Route>
       </Route>
