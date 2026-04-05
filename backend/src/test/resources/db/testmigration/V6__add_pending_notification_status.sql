@@ -1,0 +1,2 @@
+-- V6: notification_log status is VARCHAR in H2 test schema, no ENUM modification needed
+-- This migration is a no-op for H2 (MariaDB version modifies ENUM)
