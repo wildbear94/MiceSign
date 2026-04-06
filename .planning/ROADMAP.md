@@ -216,7 +216,7 @@ Plans:
 - [x] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure (completed 2026-04-05)
 - [x] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support (completed 2026-04-05)
 - [x] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page (completed 2026-04-05)
-- [ ] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections
+- [x] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections (completed 2026-04-06)
 - [ ] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification
 - [ ] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging
 
@@ -281,11 +281,11 @@ Plans:
   2. System detects circular dependencies in conditional rules and prevents saving with a clear error message
   3. Admin can define calculation fields that auto-compute values using SUM, MULTIPLY, ADD, or COUNT operations on other numeric fields
   4. Admin can group fields into visual sections with collapsible section headers for form organization
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 15-01-PLAN.md — Types, pure utility functions (evaluateConditions, executeCalculations, detectCircularDeps), schemaToZod extension
-- [ ] 15-02-PLAN.md — Builder UI: PropertyConditionsTab, calculation config, section palette, circular dep save check
-- [ ] 15-03-PLAN.md — Runtime integration: DynamicForm condition/calculation engine, DynamicSectionField, backend CircularDependencyValidator
+- [x] 15-01-PLAN.md — Types, pure utility functions (evaluateConditions, executeCalculations, detectCircularDeps), schemaToZod extension
+- [x] 15-02-PLAN.md — Builder UI: PropertyConditionsTab, calculation config, section palette, circular dep save check
+- [x] 15-03-PLAN.md — Runtime integration: DynamicForm condition/calculation engine, DynamicSectionField, backend CircularDependencyValidator
 **UI hint**: yes
 
 ### Phase 16: Template Migration
@@ -296,6 +296,11 @@ Plans:
   1. JSON schema equivalents exist for all 6 hardcoded forms (General, Expense, Leave, Purchase, Business Trip, Overtime) with matching field structure
   2. System uses dual rendering: documents created before migration render with hardcoded components, new documents use dynamic renderer
   3. All existing documents (drafts and submitted) display correctly after migration without any data modification
+**Plans:** 2 plans
+Plans:
+- [ ] 16-01-PLAN.md — Backend: Flyway V12 schema seeding for 6 templates, DocumentContent entity fix, DocumentFormValidator dynamic fallback, snapshot pipeline
+- [ ] 16-02-PLAN.md — Frontend: dual rendering branching logic, DynamicReadOnly integration, visual verification checkpoint
+
 
 ### Phase 17: Budget Integration
 **Goal**: Financial approval documents automatically send expense data to the external budget system upon submission, without blocking the approval workflow
@@ -327,6 +332,6 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
-| 15. Advanced Logic | v1.2 | 0/3 | Planning complete | - |
-| 16. Template Migration | v1.2 | 0/0 | Not started | - |
+| 15. Advanced Logic | v1.2 | 3/3 | Complete   | 2026-04-06 |
+| 16. Template Migration | v1.2 | 0/2 | Planned | - |
 | 17. Budget Integration | v1.2 | 0/0 | Not started | - |
