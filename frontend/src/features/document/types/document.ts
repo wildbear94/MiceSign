@@ -21,6 +21,7 @@ export interface DocumentDetailResponse extends DocumentResponse {
   drafter: DrafterInfo;
   bodyHtml: string | null;
   formData: string | null; // JSON string, parsed on frontend
+  schemaDefinitionSnapshot: string | null; // JSON schema snapshot from template at creation time
   submittedAt: string | null;
   completedAt: string | null;
 }

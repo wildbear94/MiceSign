@@ -5,6 +5,7 @@ import { ArrowLeft, Trash2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import DynamicForm from '../components/templates/DynamicForm';
 import {
   useDocumentDetail,
   useCreateDocument,
@@ -112,7 +113,15 @@ export default function DocumentEditorPage() {
   }, [savedDocId, deleteMutation, navigate, t]);
 
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
-  if (!templateEntry && !isEditMode) {
+
+  // Dual rendering logic (per D-01):
+  // - Existing DRAFT (pre-migration, no schemaDefinitionSnapshot): hardcoded editor
+  // - New document or existing with snapshot: DynamicForm
+  const useHardcodedEditor = isEditMode
+    ? (!!templateEntry && !existingDoc?.schemaDefinitionSnapshot)
+    : false;
+
+  if (!templateEntry && !isEditMode && !resolvedTemplateCode) {
     return (
       <div className="text-center py-12 text-gray-500">
         Unknown template: {resolvedTemplateCode}
@@ -134,7 +143,8 @@ export default function DocumentEditorPage() {
     );
   }
 
-  const EditComponent = templateEntry?.editComponent;
+  const EditComponent = useHardcodedEditor ? templateEntry?.editComponent : undefined;
+  const isDynamicTemplate = !useHardcodedEditor;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -181,7 +191,7 @@ export default function DocumentEditorPage() {
 
       {/* Form container */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-        {EditComponent && (
+        {EditComponent ? (
           <EditComponent
             documentId={savedDocId}
             initialData={
@@ -195,7 +205,22 @@ export default function DocumentEditorPage() {
             }
             onSave={handleSave}
           />
-        )}
+        ) : isDynamicTemplate ? (
+          <DynamicForm
+            templateCode={resolvedTemplateCode}
+            documentId={savedDocId}
+            initialData={
+              existingDoc
+                ? {
+                    title: existingDoc.title,
+                    bodyHtml: existingDoc.bodyHtml ?? undefined,
+                    formData: existingDoc.formData ?? undefined,
+                  }
+                : undefined
+            }
+            onSave={handleSave}
+          />
+        ) : null}
       </div>
 
       {/* Delete confirmation */}

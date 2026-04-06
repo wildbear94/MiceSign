@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import DynamicReadOnly from '../components/templates/DynamicReadOnly';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
 
@@ -100,11 +101,16 @@ export default function DocumentDetailPage() {
 
       {/* Content */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
-        {ReadOnlyComponent ? (
+        {ReadOnlyComponent && !doc.schemaDefinitionSnapshot ? (
           <ReadOnlyComponent
             title={doc.title}
             bodyHtml={doc.bodyHtml}
             formData={doc.formData}
+          />
+        ) : doc.schemaDefinitionSnapshot ? (
+          <DynamicReadOnly
+            formData={doc.formData}
+            schemaDefinitionSnapshot={doc.schemaDefinitionSnapshot}
           />
         ) : (
           <p className="text-sm text-gray-400">알 수 없는 양식입니다.</p>
