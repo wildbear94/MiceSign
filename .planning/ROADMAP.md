@@ -215,7 +215,7 @@ Plans:
 
 - [x] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure (completed 2026-04-05)
 - [x] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support (completed 2026-04-05)
-- [ ] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page
+- [x] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page (completed 2026-04-05)
 - [ ] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections
 - [ ] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification
 - [ ] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging
@@ -263,13 +263,13 @@ Plans:
   3. Admin can reorder fields by dragging within the canvas, and configure each field's properties (label, required, placeholder, options) in the property panel
   4. Admin can toggle live preview to see the form exactly as end-users will see it
   5. Admin can create new templates, edit existing ones, deactivate templates, and browse all templates in a management list page
-**Plans:** 5 plans (4 executed, 1 gap closure)
+**Plans:** 5/1 plans complete
 Plans:
 - [x] 14-01-PLAN.md — Infrastructure: types, API client, builder reducer, routing, sidebar, i18n, width support
 - [x] 14-02-PLAN.md — Template management list page with create modal and deactivate
 - [x] 14-03-PLAN.md — Builder core: 3-panel layout, palette, canvas, DnD, toolbar, preview
 - [x] 14-04-PLAN.md — Property panel (3 tabs), select options editor, table columns editor, JSON import
-- [ ] 14-05-PLAN.md — Gap closure: restore routes, sidebar, TemplateListPage, package.json deps
+- [x] 14-05-PLAN.md — Gap closure: restore routes, sidebar, TemplateListPage, package.json deps
 **UI hint**: yes
 
 ### Phase 15: Advanced Logic
@@ -322,7 +322,7 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
 | 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete    | 2026-04-05 |
-| 14. Builder UI | v1.2 | 4/5 | In Progress|  |
+| 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
 | 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
 | 16. Template Migration | v1.2 | 0/0 | Not started | - |
 | 17. Budget Integration | v1.2 | 0/0 | Not started | - |
