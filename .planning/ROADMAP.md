@@ -281,7 +281,11 @@ Plans:
   2. System detects circular dependencies in conditional rules and prevents saving with a clear error message
   3. Admin can define calculation fields that auto-compute values using SUM, MULTIPLY, ADD, or COUNT operations on other numeric fields
   4. Admin can group fields into visual sections with collapsible section headers for form organization
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 15-01-PLAN.md — Types, pure utility functions (evaluateConditions, executeCalculations, detectCircularDeps), schemaToZod extension
+- [ ] 15-02-PLAN.md — Builder UI: PropertyConditionsTab, calculation config, section palette, circular dep save check
+- [ ] 15-03-PLAN.md — Runtime integration: DynamicForm condition/calculation engine, DynamicSectionField, backend CircularDependencyValidator
 **UI hint**: yes
 
 ### Phase 16: Template Migration
@@ -323,6 +327,6 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
-| 15. Advanced Logic | v1.2 | 0/0 | Not started | - |
+| 15. Advanced Logic | v1.2 | 0/3 | Planning complete | - |
 | 16. Template Migration | v1.2 | 0/0 | Not started | - |
 | 17. Budget Integration | v1.2 | 0/0 | Not started | - |
