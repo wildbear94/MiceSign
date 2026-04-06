@@ -171,7 +171,7 @@ Accent reserved for:
 - Separator: `border-t border-gray-200 dark:border-gray-700 pt-4 mt-4`
 - Operation select: standard `<select>` with options: SUM, ADD, MULTIPLY, COUNT
 - Source fields: grouped list with checkboxes -- "숫자 필드" group header + "테이블 칼럼" group header
-- When calculation is configured, field becomes readonly in form -- show `bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded` badge "자동 계산" next to field label in canvas
+- When calculation is configured, field becomes readonly in form -- show `bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded` badge "자동 계산" next to field label in canvas
 
 ### DynamicSectionField Layout (User Form)
 
@@ -200,7 +200,7 @@ Accent reserved for:
 ```
 
 - Section card in canvas: same FieldCard styling but with `border-l-4 border-blue-400` left accent to distinguish from regular fields
-- Badge: `text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded`
+- Badge: `text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded`
 
 ### Circular Dependency Error Toast
 
@@ -254,6 +254,7 @@ Accent reserved for:
 | Conditional required indicator | 조건부 필수 |
 | Error: save failed (circular) | 템플릿에 순환 의존성이 있어 저장할 수 없습니다. 규칙을 확인해 주세요. |
 | Error: generic save failure | 템플릿 저장에 실패했습니다. 잠시 후 다시 시도해 주세요. |
+| Error: deleted source field | 삭제된 소스 필드입니다. 해당 규칙을 삭제하거나 소스 필드를 다시 선택하세요. |
 
 No destructive actions in this phase. Condition/rule deletion uses inline icon button without confirmation dialog (lightweight, easily re-added).
 
@@ -327,7 +328,7 @@ No destructive actions in this phase. Condition/rule deletion uses inline icon b
 |-----------|---------------|
 | Circular dependency | Red toast at top-center, 8s auto-dismiss, includes cycle path in monospace |
 | Template save failure | Red toast with generic error message, 5s auto-dismiss |
-| Invalid condition (deleted source field) | Source field dropdown shows "삭제된 필드" in red text; rule is visually flagged |
+| Invalid condition (deleted source field) | Source field dropdown shows "삭제된 소스 필드입니다. 해당 규칙을 삭제하거나 소스 필드를 다시 선택하세요." in red text; rule is visually flagged |
 
 ---
 
