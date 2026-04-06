@@ -14,6 +14,7 @@ import PropertyPanel from '../components/builder/PropertyPanel';
 import JsonImportModal from '../components/builder/JsonImportModal';
 import { useBuilderReducer } from '../components/builder/useBuilderReducer';
 import { useAdminTemplate, useUpdateTemplate } from '../hooks/useAdminTemplates';
+import { detectCircularDeps } from '../../document/utils/detectCircularDeps';
 import { PALETTE_ITEMS } from '../types/builder';
 import type { FieldType, SchemaDefinition } from '../types/builder';
 
@@ -57,11 +58,21 @@ export default function TemplateBuilderPage() {
   const updateMutation = useUpdateTemplate();
 
   const handleSave = useCallback(async () => {
+    // Circular dependency check before save
+    const cyclePath = detectCircularDeps(state.conditionalRules, state.calculationRules);
+    if (cyclePath) {
+      const pathStr = cyclePath.join(' \u2192 ');
+      window.alert(
+        `${t('templates.circularDepError', '순환 의존성이 감지되었습니다')}\n${t('templates.circularDepPath', { path: pathStr, defaultValue: `순환 경로: ${pathStr}` })}\n${t('templates.circularDepSaveBlocked', '순환 의존성을 해결한 후 저장해 주세요.')}`,
+      );
+      return;
+    }
+
     const schema: SchemaDefinition = {
       version: state.schemaVersion,
       fields: state.fields,
-      conditionalRules: [],
-      calculationRules: [],
+      conditionalRules: state.conditionalRules,
+      calculationRules: state.calculationRules,
     };
     try {
       await updateMutation.mutateAsync({
@@ -129,8 +140,8 @@ export default function TemplateBuilderPage() {
     const schema: SchemaDefinition = {
       version: state.schemaVersion,
       fields: state.fields,
-      conditionalRules: [],
-      calculationRules: [],
+      conditionalRules: state.conditionalRules,
+      calculationRules: state.calculationRules,
     };
     const blob = new Blob([JSON.stringify(schema, null, 2)], {
       type: 'application/json',
@@ -223,7 +234,10 @@ export default function TemplateBuilderPage() {
                 state.fields.find((f) => f.id === state.selectedFieldId) ??
                 null
               }
+              allFields={state.fields}
               templateSettings={state.templateSettings}
+              conditionalRules={state.conditionalRules}
+              calculationRules={state.calculationRules}
               onUpdateField={(id, changes) =>
                 dispatch({ type: 'UPDATE_FIELD', fieldId: id, changes })
               }
@@ -237,6 +251,7 @@ export default function TemplateBuilderPage() {
               onUpdateTemplateSettings={(changes) =>
                 dispatch({ type: 'UPDATE_TEMPLATE_SETTINGS', changes })
               }
+              onDispatch={dispatch}
             />
           </div>
         }

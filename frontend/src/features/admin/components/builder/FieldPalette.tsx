@@ -8,6 +8,7 @@ import {
   Table2,
   FileText,
   EyeOff,
+  Rows3,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +25,7 @@ const iconMap: Record<string, LucideIcon> = {
   Table: Table2,
   FileText,
   EyeOff,
+  Rows3,
 };
 
 interface FieldPaletteProps {
