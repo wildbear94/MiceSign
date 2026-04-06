@@ -8,6 +8,7 @@ import DynamicSelectField from './DynamicSelectField';
 import DynamicTableField from './DynamicTableField';
 import DynamicStaticText from './DynamicStaticText';
 import DynamicHiddenField from './DynamicHiddenField';
+import DynamicSectionField from './DynamicSectionField';
 
 interface DynamicFieldRendererProps {
   fieldDef: FieldDefinition;
@@ -15,6 +16,8 @@ interface DynamicFieldRendererProps {
   register: UseFormRegister<Record<string, unknown>>;
   setValue: UseFormSetValue<Record<string, unknown>>;
   errors: FieldErrors;
+  isConditionallyRequired?: boolean;
+  isCalculated?: boolean;
 }
 
 export default function DynamicFieldRenderer({
@@ -23,6 +26,8 @@ export default function DynamicFieldRenderer({
   register,
   setValue,
   errors,
+  isConditionallyRequired,
+  isCalculated,
 }: DynamicFieldRendererProps) {
   const fieldError = errors[fieldDef.id];
   const errorMessage =
@@ -37,6 +42,7 @@ export default function DynamicFieldRenderer({
           fieldDef={fieldDef}
           register={register}
           error={errorMessage}
+          isConditionallyRequired={isConditionallyRequired}
         />
       );
 
@@ -46,6 +52,7 @@ export default function DynamicFieldRenderer({
           fieldDef={fieldDef}
           register={register}
           error={errorMessage}
+          isConditionallyRequired={isConditionallyRequired}
         />
       );
 
@@ -55,6 +62,8 @@ export default function DynamicFieldRenderer({
           fieldDef={fieldDef}
           register={register}
           error={errorMessage}
+          isCalculated={isCalculated}
+          isConditionallyRequired={isConditionallyRequired}
         />
       );
 
@@ -64,6 +73,7 @@ export default function DynamicFieldRenderer({
           fieldDef={fieldDef}
           control={control}
           error={errorMessage}
+          isConditionallyRequired={isConditionallyRequired}
         />
       );
 
@@ -73,6 +83,7 @@ export default function DynamicFieldRenderer({
           fieldDef={fieldDef}
           control={control}
           error={errorMessage}
+          isConditionallyRequired={isConditionallyRequired}
         />
       );
 
@@ -97,6 +108,9 @@ export default function DynamicFieldRenderer({
           setValue={setValue}
         />
       );
+
+    case 'section':
+      return <DynamicSectionField fieldDef={fieldDef} />;
 
     default:
       return null;

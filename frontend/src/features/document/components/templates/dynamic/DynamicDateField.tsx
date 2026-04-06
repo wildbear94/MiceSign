@@ -13,6 +13,7 @@ interface DynamicDateFieldProps {
   fieldDef: FieldDefinition;
   control: Control<Record<string, unknown>>;
   error?: string;
+  isConditionallyRequired?: boolean;
 }
 
 const DATE_FORMAT = 'yyyy-MM-dd';
@@ -21,6 +22,7 @@ export default function DynamicDateField({
   fieldDef,
   control,
   error,
+  isConditionallyRequired,
 }: DynamicDateFieldProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,6 +45,7 @@ export default function DynamicDateField({
       required={fieldDef.required}
       error={error}
       htmlFor={fieldDef.id}
+      isConditionallyRequired={isConditionallyRequired}
     >
       <Controller
         name={fieldDef.id}

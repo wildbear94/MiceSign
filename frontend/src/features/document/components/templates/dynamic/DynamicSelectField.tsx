@@ -15,12 +15,14 @@ interface DynamicSelectFieldProps {
   fieldDef: FieldDefinition;
   control: Control<Record<string, unknown>>;
   error?: string;
+  isConditionallyRequired?: boolean;
 }
 
 export default function DynamicSelectField({
   fieldDef,
   control,
   error,
+  isConditionallyRequired,
 }: DynamicSelectFieldProps) {
   const [query, setQuery] = useState('');
   const options: OptionItem[] = fieldDef.config?.options ?? [];
@@ -41,6 +43,7 @@ export default function DynamicSelectField({
       required={fieldDef.required}
       error={error}
       htmlFor={fieldDef.id}
+      isConditionallyRequired={isConditionallyRequired}
     >
       <Controller
         name={fieldDef.id}

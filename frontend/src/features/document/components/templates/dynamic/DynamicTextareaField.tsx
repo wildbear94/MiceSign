@@ -6,12 +6,14 @@ interface DynamicTextareaFieldProps {
   fieldDef: FieldDefinition;
   register: UseFormRegister<Record<string, unknown>>;
   error?: string;
+  isConditionallyRequired?: boolean;
 }
 
 export default function DynamicTextareaField({
   fieldDef,
   register,
   error,
+  isConditionallyRequired,
 }: DynamicTextareaFieldProps) {
   return (
     <DynamicFieldWrapper
@@ -19,6 +21,7 @@ export default function DynamicTextareaField({
       required={fieldDef.required}
       error={error}
       htmlFor={fieldDef.id}
+      isConditionallyRequired={isConditionallyRequired}
     >
       <textarea
         id={fieldDef.id}
