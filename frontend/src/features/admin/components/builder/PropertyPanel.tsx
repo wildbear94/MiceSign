@@ -4,10 +4,13 @@ import type {
   FieldDefinition,
   FieldConfig,
   TemplateSettings,
+  BuilderAction,
 } from '../../types/builder';
+import type { ConditionalRule, CalculationRule } from '../../../document/types/dynamicForm';
 import PropertyBasicTab from './PropertyBasicTab';
 import PropertyValidationTab from './PropertyValidationTab';
 import PropertyAdvancedTab from './PropertyAdvancedTab';
+import PropertyConditionsTab from './PropertyConditionsTab';
 import TemplateSettingsPanel from './TemplateSettingsPanel';
 import SelectOptionsEditor from './SelectOptionsEditor';
 import TableColumnsEditor from './TableColumnsEditor';
@@ -21,11 +24,15 @@ const FIELD_TYPE_BADGES: Record<string, string> = {
   table: 'table',
   staticText: 'static',
   hidden: 'hidden',
+  section: 'section',
 };
 
 interface PropertyPanelProps {
   selectedField: FieldDefinition | null;
+  allFields: FieldDefinition[];
   templateSettings: TemplateSettings;
+  conditionalRules: ConditionalRule[];
+  calculationRules: CalculationRule[];
   onUpdateField: (
     fieldId: string,
     changes: Partial<FieldDefinition>,
@@ -35,14 +42,19 @@ interface PropertyPanelProps {
     config: Partial<FieldConfig>,
   ) => void;
   onUpdateTemplateSettings: (changes: Partial<TemplateSettings>) => void;
+  onDispatch: (action: BuilderAction) => void;
 }
 
 export default function PropertyPanel({
   selectedField,
+  allFields,
   templateSettings,
+  conditionalRules,
+  calculationRules,
   onUpdateField,
   onUpdateFieldConfig,
   onUpdateTemplateSettings,
+  onDispatch,
 }: PropertyPanelProps) {
   const { t } = useTranslation('admin');
 
@@ -107,6 +119,17 @@ export default function PropertyPanel({
           >
             {t('templates.tabAdvanced', '고급')}
           </Tab>
+          <Tab
+            className={({ selected }) =>
+              `px-4 py-2 text-sm font-semibold border-b-2 outline-none ${
+                selected
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`
+            }
+          >
+            {t('templates.tabConditions', '조건')}
+          </Tab>
         </TabList>
         <TabPanels className="p-4 flex-1 overflow-y-auto">
           <TabPanel>
@@ -125,7 +148,18 @@ export default function PropertyPanel({
           <TabPanel>
             <PropertyAdvancedTab
               field={selectedField}
+              allFields={allFields}
+              calculationRules={calculationRules}
               onUpdateFieldConfig={onUpdateFieldConfig}
+              onDispatch={onDispatch}
+            />
+          </TabPanel>
+          <TabPanel>
+            <PropertyConditionsTab
+              field={selectedField}
+              allFields={allFields}
+              conditionalRules={conditionalRules}
+              onDispatch={onDispatch}
             />
           </TabPanel>
         </TabPanels>
