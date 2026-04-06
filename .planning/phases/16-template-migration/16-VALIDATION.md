@@ -2,8 +2,8 @@
 phase: 16
 slug: template-migration
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-06
 ---
 
@@ -38,10 +38,11 @@ created: 2026-04-06
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 16-01-01 | 01 | 1 | MIGR-01 | — | N/A | integration | `./gradlew test --tests "*SchemaSeeding*"` | ❌ W0 | ⬜ pending |
-| 16-01-02 | 01 | 1 | MIGR-01 | — | N/A | unit | `./gradlew test --tests "*DynamicFormValidator*"` | ✅ | ⬜ pending |
-| 16-02-01 | 02 | 2 | MIGR-02 | — | N/A | integration | `./gradlew test --tests "*DocumentService*"` | ✅ | ⬜ pending |
-| 16-02-02 | 02 | 2 | MIGR-03 | — | N/A | e2e | `npx vitest run --reporter=verbose` | ✅ | ⬜ pending |
+| 16-01-01 | 01 | 1 | MIGR-01 | — | N/A | unit | `./gradlew test --tests "*TemplateSchema*"` | ✅ W0 (Plan 01 Task 1) | ⬜ pending |
+| 16-01-02 | 01 | 1 | MIGR-01 | — | N/A | integration | `./gradlew test --tests "*TemplateSchema*"` | ✅ W0 (Plan 01 Task 1) | ⬜ pending |
+| 16-01-03 | 01 | 1 | MIGR-02, MIGR-03 | T-16-01 | N/A | unit | `./gradlew test --tests "*DynamicFormValidator*"` | ✅ | ⬜ pending |
+| 16-02-01 | 02 | 2 | MIGR-02 | — | N/A | integration | `npx tsc --noEmit` | ✅ | ⬜ pending |
+| 16-02-02 | 02 | 2 | MIGR-03 | — | N/A | e2e | Manual verification checkpoint | N/A | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,10 +50,10 @@ created: 2026-04-06
 
 ## Wave 0 Requirements
 
-- [ ] Schema seeding integration test stubs
+- [x] Schema field structure test (`TemplateSchemaTest.java`) — Plan 01 Task 1 creates this
 - [ ] Existing test infrastructure covers most phase requirements
 
-*Existing infrastructure covers most phase requirements. Only schema-seeding-specific tests needed.*
+*Wave 0 test file is created by Plan 01 Task 1 (tdd="true"), which writes failing tests first. Plan 01 Task 2 (V12 migration) makes them pass.*
 
 ---
 
@@ -67,11 +68,11 @@ created: 2026-04-06
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
 - [ ] No watch-mode flags
 - [ ] Feedback latency < 45s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending

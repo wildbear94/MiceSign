@@ -348,27 +348,31 @@ import DynamicReadOnly from '../components/templates/DynamicReadOnly';
 | A4 | PURCHASE/BUSINESS_TRIP/OVERTIME 필드 구조는 PRD/FSD에서 추출 필요 | 스키마 분석 | 필드 사양이 부정확할 수 있음 |
 | A5 | 신규 GENERAL/EXPENSE/LEAVE 문서를 동적 렌더러로 전환하려면 분기 로직 변경 필요 | Architecture | 현재 registry 기반 분기로는 하드코딩 컴포넌트가 항상 우선 |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **General 폼의 리치 텍스트 처리 방안**
+1. **General 폼의 리치 텍스트 처리 방안** -- RESOLVED
    - What we know: General은 bodyHtml (Tiptap)을 사용. DynamicForm textarea는 plain text
    - What's unclear: 신규 General 문서에서 리치 텍스트 지원이 필수인지
    - Recommendation: General은 스키마만 생성하되, 실제 동적 전환은 DynamicFieldRenderer에 richText 타입 추가 후로 미루거나, textarea로 수용
+   - **Resolution:** Plan 16-01 Task 2에서 General 스키마를 bodyText=textarea로 생성. 기능 격차(Tiptap -> plain textarea)는 수용. 기존 General 문서는 D-01에 따라 하드코딩 렌더러 유지.
 
-2. **Leave 폼의 동적 옵션 및 일수 계산**
+2. **Leave 폼의 동적 옵션 및 일수 계산** -- RESOLVED
    - What we know: leaveTypes는 API에서 로드, 일수 계산은 calculateLeaveDays 유틸
    - What's unclear: DynamicForm의 select가 서버 옵션을 로드하는지, 날짜 차이 계산이 가능한지
    - Recommendation: 조건부 규칙으로 반차/연차 필드 분기는 구현 가능. 일수 계산은 hidden 필드 + 프론트엔드 커스텀 로직으로 보완하거나, 수동 입력으로 전환
+   - **Resolution:** Plan 16-01 Task 2에서 Leave 스키마를 정적 select options로 생성 (연차/반차/병가/경조). 일수는 수동 입력 number 필드로 처리. conditionalRules로 반차/연차 필드 분기 설정.
 
-3. **분기 로직 변경 범위**
+3. **분기 로직 변경 범위** -- RESOLVED
    - What we know: 현재 registry 기반 분기. D-01은 하드코딩 유지
    - What's unclear: 신규 문서만 동적으로 전환하려면 어떤 기준으로 분기할지
    - Recommendation: 가장 안전한 방법은 "문서 생성 시 schema_definition이 존재하면 schemaDefinitionSnapshot을 저장"하고, "snapshot 존재 여부"로 읽기 전용 분기. 편집 모드는 "template에 schema 존재 + registry에도 등록" 경우 선택 기준 필요
+   - **Resolution:** Plan 16-01 Task 3에서 DocumentService가 schema_definition 존재 시 snapshot 저장. Plan 16-02 Task 1에서 편집 모드 분기를 "기존 DRAFT(snapshot 없음) = 하드코딩, 신규 문서 = 동적" 패턴으로 구현. 읽기 전용은 snapshot 존재 여부로 분기.
 
-4. **DocumentFormValidator 동적 폴백 구현 방식**
+4. **DocumentFormValidator 동적 폴백 구현 방식** -- RESOLVED
    - What we know: 현재 switch문에 3개만 처리. DynamicFormValidator 클래스 미존재
    - What's unclear: 동적 스키마 기반 백엔드 밸리데이션을 어디까지 구현할지
    - Recommendation: switch default에서 template의 schema_definition이 존재하면 스키마 기반 밸리데이션, 없으면 예외
+   - **Resolution:** Plan 16-01 Task 3에서 DocumentFormValidator의 validate 메서드에 schemaDefinition 파라미터 추가. default 케이스에서 schemaDefinition != null이면 required 필드 존재 + table minRows 검증, null이면 TPL_UNKNOWN 예외 유지.
 
 ## Project Constraints (from CLAUDE.md)
 
