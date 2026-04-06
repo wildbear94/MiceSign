@@ -1,3 +1,7 @@
+import type { ConditionalRule, CalculationRule } from '../../document/types/dynamicForm';
+
+export type { ConditionalRule, CalculationRule } from '../../document/types/dynamicForm';
+
 export interface AdminTemplateResponse {
   id: number;
   name: string;
@@ -56,6 +60,9 @@ export interface FieldConfig {
   content?: string;
   defaultValue?: string;
   width?: 'full' | 'half';
+  // calculation (number fields only)
+  calculationType?: 'SUM' | 'MULTIPLY' | 'ADD' | 'COUNT';
+  calculationSourceFields?: string[];
 }
 
 export interface OptionItem {
@@ -63,7 +70,7 @@ export interface OptionItem {
   label: string;
 }
 
-export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'select' | 'table' | 'staticText' | 'hidden';
+export type FieldType = 'text' | 'textarea' | 'number' | 'date' | 'select' | 'table' | 'staticText' | 'hidden' | 'section';
 
 export interface FieldDefinition {
   id: string;
@@ -76,8 +83,8 @@ export interface FieldDefinition {
 export interface SchemaDefinition {
   version: number;
   fields: FieldDefinition[];
-  conditionalRules: unknown[];
-  calculationRules: unknown[];
+  conditionalRules: ConditionalRule[];
+  calculationRules: CalculationRule[];
 }
 
 export interface BuilderState {
@@ -86,6 +93,8 @@ export interface BuilderState {
   templateSettings: TemplateSettings;
   isDirty: boolean;
   schemaVersion: number;
+  conditionalRules: ConditionalRule[];
+  calculationRules: CalculationRule[];
 }
 
 export type BuilderAction =
@@ -99,7 +108,15 @@ export type BuilderAction =
   | { type: 'UPDATE_FIELD_CONFIG'; fieldId: string; config: Partial<FieldConfig> }
   | { type: 'UPDATE_TEMPLATE_SETTINGS'; changes: Partial<TemplateSettings> }
   | { type: 'IMPORT_SCHEMA'; schema: SchemaDefinition }
-  | { type: 'MARK_SAVED' };
+  | { type: 'MARK_SAVED' }
+  | { type: 'SET_CONDITIONAL_RULES'; rules: ConditionalRule[] }
+  | { type: 'ADD_CONDITIONAL_RULE'; rule: ConditionalRule }
+  | { type: 'UPDATE_CONDITIONAL_RULE'; index: number; rule: ConditionalRule }
+  | { type: 'REMOVE_CONDITIONAL_RULE'; index: number }
+  | { type: 'SET_CALCULATION_RULES'; rules: CalculationRule[] }
+  | { type: 'ADD_CALCULATION_RULE'; rule: CalculationRule }
+  | { type: 'UPDATE_CALCULATION_RULE'; index: number; rule: CalculationRule }
+  | { type: 'REMOVE_CALCULATION_RULE'; index: number };
 
 export interface OptionSetResponse {
   id: number;
@@ -117,6 +134,7 @@ export const PALETTE_ITEMS: { type: FieldType; labelKey: string; icon: string }[
   { type: 'table', labelKey: 'table', icon: 'Table' },
   { type: 'staticText', labelKey: 'staticText', icon: 'FileText' },
   { type: 'hidden', labelKey: 'hidden', icon: 'EyeOff' },
+  { type: 'section', labelKey: 'section', icon: 'Rows3' },
 ];
 
 export const FIELD_TYPE_DEFAULTS: Record<FieldType, Omit<FieldDefinition, 'id'>> = {
@@ -128,4 +146,5 @@ export const FIELD_TYPE_DEFAULTS: Record<FieldType, Omit<FieldDefinition, 'id'>>
   table: { type: 'table', label: '테이블', required: false, config: { columns: [] } },
   staticText: { type: 'staticText', label: '안내 텍스트', required: false, config: { content: '' } },
   hidden: { type: 'hidden', label: '숨김 필드', required: false, config: { defaultValue: '' } },
+  section: { type: 'section', label: '새 섹션', required: false, config: {} },
 };
