@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { TemplateReadOnlyProps } from './templateRegistry';
 import type { SchemaDefinition, FieldDefinition } from '../../types/dynamicForm';
+import DynamicSectionField from './dynamic/DynamicSectionField';
 
 interface DynamicReadOnlyProps extends TemplateReadOnlyProps {
   schemaDefinitionSnapshot?: string | null;
@@ -43,11 +44,57 @@ export default function DynamicReadOnly({
 
   return (
     <div className="space-y-4">
-      {schema.fields.map((field) => (
-        <ReadOnlyField key={field.id} field={field} data={data} />
-      ))}
+      <ReadOnlyFields fields={schema.fields} data={data} />
     </div>
   );
+}
+
+// --- Section-aware field grouping for read-only ---
+
+function ReadOnlyFields({
+  fields,
+  data,
+}: {
+  fields: FieldDefinition[];
+  data: Record<string, unknown>;
+}) {
+  const elements: React.ReactNode[] = [];
+  let currentSectionField: FieldDefinition | null = null;
+  let sectionChildren: React.ReactNode[] = [];
+
+  const flushSection = () => {
+    if (currentSectionField) {
+      elements.push(
+        <DynamicSectionField key={currentSectionField.id} fieldDef={currentSectionField} isReadOnly>
+          {sectionChildren}
+        </DynamicSectionField>
+      );
+      sectionChildren = [];
+      currentSectionField = null;
+    }
+  };
+
+  for (const field of fields) {
+    if (field.type === 'section') {
+      flushSection();
+      currentSectionField = field;
+      continue;
+    }
+
+    // Skip hidden fields — they have no data in read-only view
+    if (field.type === 'hidden') continue;
+
+    // Only render fields that have data present (hidden fields excluded from submission)
+    const fieldEl = <ReadOnlyField key={field.id} field={field} data={data} />;
+
+    if (currentSectionField) {
+      sectionChildren.push(fieldEl);
+    } else {
+      elements.push(fieldEl);
+    }
+  }
+  flushSection(); // Flush last section
+  return <>{elements}</>;
 }
 
 // --- Internal components ---
