@@ -1,22 +1,36 @@
 import { z } from 'zod';
 import type { FieldDefinition, FieldConfig } from '../types/dynamicForm';
+import type { FieldVisibility } from './evaluateConditions';
 
 /**
  * JSON 스키마의 fields 배열을 Zod v4 스키마로 런타임 변환
- * staticText 필드는 display-only이므로 스키마에서 제외
+ * staticText/section 필드는 display-only이므로 스키마에서 제외
  * hidden 필드는 항상 optional string
+ * fieldVisibility가 제공되면 숨겨진 필드는 스키마에서 제외하고,
+ * conditionallyRequired 필드는 필수로 처리 (D-04, D-07)
  */
-export function schemaToZod(fields: FieldDefinition[]): z.ZodObject<Record<string, z.ZodType>> {
+export function schemaToZod(
+  fields: FieldDefinition[],
+  fieldVisibility?: Map<string, FieldVisibility>,
+): z.ZodObject<Record<string, z.ZodType>> {
   const shape: Record<string, z.ZodType> = {};
 
   for (const field of fields) {
     if (field.type === 'staticText') continue; // display only
+    if (field.type === 'section') continue; // structural only
+
+    // 숨겨진 필드는 유효성 검사에서 제외 (D-04)
+    const visibility = fieldVisibility?.get(field.id);
+    if (visibility && !visibility.visible) continue;
+
     if (field.type === 'hidden') {
       shape[field.id] = z.string().optional();
       continue;
     }
 
-    shape[field.id] = buildFieldZod(field);
+    // 유효 필수 상태: field.required OR conditionallyRequired (D-07, OR 관계)
+    const effectiveRequired = field.required || (visibility?.conditionallyRequired ?? false);
+    shape[field.id] = buildFieldZod({ ...field, required: effectiveRequired });
   }
 
   return z.object(shape);
