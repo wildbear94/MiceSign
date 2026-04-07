@@ -19,21 +19,15 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] Admin-managed organization structure (departments, positions, users)
-- [ ] RBAC with three roles (SUPER_ADMIN, ADMIN, USER)
-- [ ] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE)
-- [ ] Flexible approval line selection (APPROVE, AGREE, REFERENCE types)
-- [ ] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
-- [ ] Document immutability after submission (locked body, attachments, approval line)
-- [ ] Document numbering system (prefix-year-sequence, assigned at submission)
-- [ ] File attachments via Google Drive API (Service Account)
-- [ ] Audit trail logging for all document state changes
-- [ ] Dashboard showing pending approvals and recent documents
+- [ ] 로그인 화면에서 사용자 자가 등록 신청 (이름, 이메일, 비밀번호)
+- [ ] SUPER_ADMIN이 등록 신청을 승인 또는 거부할 수 있는 관리 화면
+- [ ] 승인 시 자동 계정 생성 (부서/직급은 관리자가 이후 설정)
+- [ ] 등록 신청/승인/거부 시 이메일 알림 발송
 
 ### Out of Scope
 
-- SMTP email notifications — deferred to Phase 1-B
-- Document search/filtering — deferred to Phase 1-B
+- SMTP email notifications — ✓ Shipped in v1.1 Phase 9
+- Document search/filtering — ✓ Shipped in v1.1 Phase 11
 - Audit log query UI — deferred to Phase 1-C
 - Statistics/reports — deferred to Phase 1-C
 - Handover features — deferred to Phase 1-C
@@ -72,6 +66,16 @@ Employees can submit approval documents and get them approved/rejected through a
 | Korean/English mixed code | Matches team culture and domain terminology | — Pending |
 | Phase 1-A MVP scope only | Ship minimal viable approval flow first | — Pending |
 
+## Current Milestone: v1.3 사용자 등록 신청
+
+**Goal:** 로그인 화면에서 사용자가 직접 계정을 신청하고, SUPER_ADMIN이 승인/거부할 수 있는 셀프 등록 시스템
+
+**Target features:**
+- 로그인 화면에서 사용자 자가 등록 신청 (이름, 이메일, 비밀번호)
+- SUPER_ADMIN 관리 화면에서 신청 목록 조회 및 승인/거부 처리
+- 승인 시 자동 계정 생성 (부서/직급은 관리자가 이후 설정)
+- 신청/승인/거부 시 이메일 알림 발송 (기존 Phase 9 이메일 인프라 재활용)
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -90,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after Phase 2 (Authentication) completion*
+*Last updated: 2026-04-07 after Milestone v1.3 started*

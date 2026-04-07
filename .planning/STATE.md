@@ -1,42 +1,40 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Custom Template Builder
-status: phase-complete
-stopped_at: Phase 17 verified and complete
-last_updated: "2026-04-07T02:54:52.661Z"
+milestone: v1.3
+milestone_name: 사용자 등록 신청
+status: defining-requirements
+stopped_at: Milestone v1.3 started
+last_updated: "2026-04-07T12:00:00.000Z"
 last_activity: 2026-04-07
 progress:
-  total_phases: 6
-  completed_phases: 2
-  total_plans: 1
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-05)
+See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 17 — Budget Integration
+**Current focus:** Defining requirements for v1.3 사용자 등록 신청
 
 ## Current Position
 
-Phase: 17 (Budget Integration) — COMPLETE
-Plan: 3 of 3 (all complete)
-Status: Verified and complete
-Last activity: 2026-04-07 -- Phase 17 verified, all gaps closed
-
-Progress: [==========================..........] 73% (v1.0+v1.1 complete, v1.2 starting)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-07 — Milestone v1.3 started
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 46 (v1.0: 30, v1.1: 5)
+- Total plans completed: 46 (v1.0: 30, v1.1: 5, v1.2: 11)
 - Average duration: ~5.5 min
 - Total execution time: ~3.2 hours
 
@@ -54,15 +52,9 @@ Progress: [==========================..........] 73% (v1.0+v1.1 complete, v1.2 s
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap v1.2]: 6 phases derived from 21 requirements across 6 categories (SCHM, RNDR, BLDR, LOGIC, MIGR, BDGT)
-- [Roadmap v1.2]: Schema Foundation must come first — JSON schema format lock-in is the highest-risk decision
-- [Roadmap v1.2]: Dynamic Rendering before Builder UI — builder preview requires working renderer
-- [Roadmap v1.2]: Migration is phase 16 (near-last) — 6 hardcoded templates already work, migration carries regression risk
-- [Roadmap v1.2]: Budget Integration (Phase 17) is independent after Phase 12, can parallelize with 13-16
-- [Research]: Dual rendering path — schema_definition IS NULL means hardcoded, non-null means dynamic
-- [Research]: expr-eval for safe calculation fields, NOT eval()/new Function()
-- [Research]: Reuse @hello-pangea/dnd (already installed) for builder drag-and-drop
-- [Phase 17]: Budget events published for all documents; filtering by template handled in BudgetIntegrationService
+- [v1.2 complete]: All 6 phases shipped — schema foundation, dynamic rendering, builder UI, advanced logic, migration, budget integration
+- [v1.3]: Self-registration with minimal info (name, email, password), admin sets department/position after approval
+- [v1.3]: Reuse existing Phase 9 email infrastructure for registration notifications
 
 ### Pending Todos
 
@@ -70,12 +62,10 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 12: JSON schema format design is the highest-risk decision — changing it after Phase 13 requires rewriting renderer and builder
-- Phase 15: Conditional logic + react-hook-form watch() interaction has edge cases needing careful design
-- Phase 16: Migration carries regression risk for all 6 existing templates — defer indefinitely if no operational need
+None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07T02:54:52.658Z
-Stopped at: Completed 17-03-PLAN.md
+Last session: 2026-04-07
+Stopped at: Milestone v1.3 initialization
 Resume file: None
