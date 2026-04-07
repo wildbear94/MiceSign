@@ -1,0 +1,15 @@
+{
+  "title": "대시보드",
+  "newDocument": "새 문서 작성",
+  "pending": "결재 대기",
+  "drafts": "임시저장",
+  "completed": "완료",
+  "pendingList": "결재 대기 목록",
+  "recentDocuments": "최근 문서",
+  "viewAll": "더보기",
+  "emptyPending": "대기 중인 결재가 없습니다",
+  "emptyPendingDesc": "결재 요청이 들어오면 여기에 표시됩니다.",
+  "emptyRecent": "아직 작성한 문서가 없습니다",
+  "emptyRecentDesc": "새 문서를 작성하여 결재를 요청해 보세요.",
+  "error": "데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요."
+}
