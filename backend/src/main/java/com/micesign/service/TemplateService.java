@@ -212,9 +212,9 @@ public class TemplateService {
 
     @Transactional
     public AdminTemplateDetailResponse updateTemplate(Long id, UpdateTemplateRequest request, Long userId) {
-        ApprovalTemplate template = templateRepository.findByIdAndIsCustomTrue(id)
+        ApprovalTemplate template = templateRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND",
-                        "커스텀 양식을 찾을 수 없습니다.", 404));
+                        "양식을 찾을 수 없습니다.", 404));
 
         if (request.name() != null) template.setName(request.name());
         if (request.description() != null) template.setDescription(request.description());
@@ -224,11 +224,20 @@ public class TemplateService {
         if (request.sortOrder() != null) template.setSortOrder(request.sortOrder());
         if (request.budgetEnabled() != null) template.setBudgetEnabled(request.budgetEnabled());
 
-        // Schema change: increment version
+        // Schema change: increment version and save history
         if (request.schemaDefinition() != null) {
-            SchemaDefinition schema = objectMapper.convertValue(
-                    request.schemaDefinition(), SchemaDefinition.class);
-            schemaService.updateSchema(template, schema);
+            String schemaJson = request.schemaDefinition();
+            int newVersion = template.getSchemaVersion() + 1;
+
+            template.setSchemaDefinition(schemaJson);
+            template.setSchemaVersion(newVersion);
+
+            TemplateSchemaVersion version = new TemplateSchemaVersion();
+            version.setTemplate(template);
+            version.setVersion(newVersion);
+            version.setSchemaDefinition(schemaJson);
+            version.setChangeDescription("스키마 업데이트 v" + newVersion);
+            schemaService.saveVersion(version);
         }
 
         templateRepository.save(template);
@@ -241,9 +250,9 @@ public class TemplateService {
 
     @Transactional
     public void deactivateTemplate(Long id) {
-        ApprovalTemplate template = templateRepository.findByIdAndIsCustomTrue(id)
+        ApprovalTemplate template = templateRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND",
-                        "커스텀 양식을 찾을 수 없습니다.", 404));
+                        "양식을 찾을 수 없습니다.", 404));
         template.setActive(false);
         templateRepository.save(template);
     }

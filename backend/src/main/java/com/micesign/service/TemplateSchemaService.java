@@ -131,6 +131,13 @@ public class TemplateSchemaService {
         }
     }
 
+    /**
+     * Save a schema version entity directly.
+     */
+    public void saveVersion(TemplateSchemaVersion version) {
+        schemaVersionRepository.save(version);
+    }
+
     // ──────────────────────────────────────────────
     // resolveSchemaWithOptions
     // ──────────────────────────────────────────────
