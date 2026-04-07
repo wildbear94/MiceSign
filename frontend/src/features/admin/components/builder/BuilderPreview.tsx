@@ -25,7 +25,7 @@ export default function BuilderPreview({ fields }: BuilderPreviewProps) {
           </p>
         )}
 
-        <div className="space-y-4">
+        <div className="flex flex-wrap gap-4">
           {fields.map((field) => (
             <PreviewField key={field.id} field={field} />
           ))}
@@ -38,9 +38,9 @@ export default function BuilderPreview({ fields }: BuilderPreviewProps) {
 function PreviewField({ field }: { field: FieldDefinition }) {
   const widthClass =
     field.width === 'third'
-      ? 'w-1/3'
+      ? 'w-[calc(33.333%-0.667rem)]'
       : field.width === 'half'
-        ? 'w-1/2'
+        ? 'w-[calc(50%-0.5rem)]'
         : 'w-full';
 
   if (field.type === 'section') {
@@ -50,7 +50,7 @@ function PreviewField({ field }: { field: FieldDefinition }) {
           {field.label}
         </h3>
         {field.children && field.children.length > 0 && (
-          <div className="mt-3 ml-4 space-y-3">
+          <div className="mt-3 ml-4 flex flex-wrap gap-3">
             {field.children.map((child) => (
               <PreviewField key={child.id} field={child} />
             ))}
