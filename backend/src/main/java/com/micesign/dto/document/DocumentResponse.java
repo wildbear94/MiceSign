@@ -10,7 +10,10 @@ public record DocumentResponse(
     String title,
     String status,
     String drafterName,
-    String drafterDepartmentName,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    String departmentName,
+    String positionName,
+    Long drafterId,
+    LocalDateTime submittedAt,
+    LocalDateTime completedAt,
+    LocalDateTime createdAt
 ) {}

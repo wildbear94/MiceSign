@@ -6,7 +6,10 @@ public record TemplateResponse(
     String name,
     String description,
     String prefix,
+    boolean isActive,
+    int sortOrder,
     boolean isCustom,
     String category,
-    String icon
+    String icon,
+    boolean budgetEnabled
 ) {}

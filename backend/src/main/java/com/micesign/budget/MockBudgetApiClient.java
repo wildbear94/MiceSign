@@ -5,6 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mock budget API client for non-production environments.
+ * Always returns success.
+ */
 @Component
 @Profile("!prod")
 public class MockBudgetApiClient implements BudgetApiClient {
@@ -14,22 +18,15 @@ public class MockBudgetApiClient implements BudgetApiClient {
     @Override
     public BudgetApiResponse sendExpenseData(BudgetExpenseRequest request) {
         log.info("[MOCK] Budget API sendExpenseData called: docNumber={}, templateCode={}, totalAmount={}",
-                request.getDocumentNumber(), request.getTemplateCode(), request.getTotalAmount());
-        BudgetApiResponse response = new BudgetApiResponse();
-        response.setSuccess(true);
-        response.setMessage("Mock success");
-        response.setReferenceId("MOCK-" + System.currentTimeMillis());
-        return response;
+                request.docNumber(), request.templateCode(), request.totalAmount());
+        return new BudgetApiResponse(true, "Mock success", "MOCK-" + System.currentTimeMillis());
     }
 
     @Override
     public BudgetApiResponse sendCancellation(BudgetCancellationRequest request) {
-        log.info("[MOCK] Budget API sendCancellation called: docNumber={}, reason={}",
-                request.getDocumentNumber(), request.getReason());
-        BudgetApiResponse response = new BudgetApiResponse();
-        response.setSuccess(true);
-        response.setMessage("Mock cancellation success");
-        response.setReferenceId("MOCK-CANCEL-" + System.currentTimeMillis());
-        return response;
+        log.info("[MOCK] Budget API sendCancellation called: docNumber={}, templateCode={}",
+                request.docNumber(), request.templateCode());
+        return new BudgetApiResponse(true, "Mock cancellation success",
+                "MOCK-CANCEL-" + System.currentTimeMillis());
     }
 }

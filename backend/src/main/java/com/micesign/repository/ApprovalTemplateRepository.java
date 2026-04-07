@@ -16,5 +16,7 @@ public interface ApprovalTemplateRepository extends JpaRepository<ApprovalTempla
 
     boolean existsByPrefixAndIdNot(String prefix, Long id);
 
+    boolean existsByCode(String code);
+
     Optional<ApprovalTemplate> findByIdAndIsCustomTrue(Long id);
 }

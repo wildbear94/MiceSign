@@ -11,11 +11,21 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface DocumentRepository extends JpaRepository<Document, Long> {
+public interface DocumentRepository extends JpaRepository<Document, Long>, DocumentRepositoryCustom {
+
+    Optional<Document> findByIdAndDrafterId(Long id, Long drafterId);
+
+    List<Document> findByDrafterIdAndStatusOrderByCreatedAtDesc(Long drafterId, DocumentStatus status);
+
+    List<Document> findByDrafterIdOrderByCreatedAtDesc(Long drafterId);
+
+    Page<Document> findByDrafterId(Long drafterId, Pageable pageable);
+
+    Optional<Document> findByDocNumber(String docNumber);
 
     Page<Document> findByDrafterIdAndStatusIn(Long drafterId, List<DocumentStatus> statuses, Pageable pageable);
 
-    Page<Document> findByDrafterId(Long drafterId, Pageable pageable);
+    long countByDrafterIdAndStatus(Long drafterId, DocumentStatus status);
 
     @Query("SELECT d FROM Document d JOIN FETCH d.drafter WHERE d.id = :id")
     Optional<Document> findByIdWithDrafter(@Param("id") Long id);

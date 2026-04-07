@@ -9,6 +9,11 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * Strategy-based form validation dispatcher.
+ * Routes validation to hardcoded validators by template code,
+ * or falls back to DynamicFormValidator for custom/dynamic templates.
+ */
 @Component
 public class DocumentFormValidator {
 
@@ -18,20 +23,27 @@ public class DocumentFormValidator {
     public DocumentFormValidator(List<FormValidationStrategy> strategyList,
                                  DynamicFormValidator dynamicFormValidator) {
         this.strategies = strategyList.stream()
-            .collect(Collectors.toMap(
-                FormValidationStrategy::getTemplateCode,
-                Function.identity()
-            ));
+                .collect(Collectors.toMap(
+                        FormValidationStrategy::getTemplateCode,
+                        Function.identity()
+                ));
         this.dynamicFormValidator = dynamicFormValidator;
     }
 
+    /**
+     * Validate form data for a given template.
+     *
+     * @param templateCode  the template code (e.g., GENERAL, EXPENSE, LEAVE)
+     * @param bodyHtml      the document body HTML (used by some validators like GENERAL)
+     * @param formDataJson  the form data JSON string
+     */
     public void validate(String templateCode, String bodyHtml, String formDataJson) {
         FormValidationStrategy strategy = strategies.get(templateCode);
         if (strategy != null) {
-            // 기존 하드코딩 양식: 기존 검증 그대로 사용
+            // Hardcoded form: use registered validator
             strategy.validate(bodyHtml, formDataJson);
         } else {
-            // 동적 템플릿: DynamicFormValidator로 fallback
+            // Dynamic template: delegate to DynamicFormValidator
             dynamicFormValidator.validate(templateCode, formDataJson);
         }
     }

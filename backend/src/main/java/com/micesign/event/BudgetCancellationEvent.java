@@ -1,20 +1,19 @@
 package com.micesign.event;
 
+/**
+ * Event for budget cancellation on document withdrawal or rejection.
+ * Published after transaction commit; consumed by BudgetIntegrationService.
+ */
 public class BudgetCancellationEvent {
 
     private final Long documentId;
     private final String templateCode;
     private final String docNumber;
-    private final Long actorUserId;
-    private final String reason; // "REJECTED" or "WITHDRAWN"
 
-    public BudgetCancellationEvent(Long documentId, String templateCode, String docNumber,
-                                    Long actorUserId, String reason) {
+    public BudgetCancellationEvent(Long documentId, String templateCode, String docNumber) {
         this.documentId = documentId;
         this.templateCode = templateCode;
         this.docNumber = docNumber;
-        this.actorUserId = actorUserId;
-        this.reason = reason;
     }
 
     public Long getDocumentId() {
@@ -27,13 +26,5 @@ public class BudgetCancellationEvent {
 
     public String getDocNumber() {
         return docNumber;
-    }
-
-    public Long getActorUserId() {
-        return actorUserId;
-    }
-
-    public String getReason() {
-        return reason;
     }
 }

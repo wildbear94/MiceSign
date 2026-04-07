@@ -1,14 +1,17 @@
 import { useCallback, useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 interface FileDropZoneProps {
   onFilesSelected: (files: File[]) => void;
-  disabled: boolean;
+  disabled?: boolean;
+  maxFiles?: number;
 }
 
-export default function FileDropZone({ onFilesSelected, disabled }: FileDropZoneProps) {
-  const { t } = useTranslation('document');
+export default function FileDropZone({
+  onFilesSelected,
+  disabled = false,
+  maxFiles,
+}: FileDropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -47,7 +50,6 @@ export default function FileDropZone({ onFilesSelected, disabled }: FileDropZone
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(e.target.files ?? []);
       if (files.length > 0) onFilesSelected(files);
-      // Reset so the same file can be re-selected
       e.target.value = '';
     },
     [onFilesSelected],
@@ -67,18 +69,18 @@ export default function FileDropZone({ onFilesSelected, disabled }: FileDropZone
     <div
       role="button"
       tabIndex={0}
-      aria-label={t('attachment.dropZone.text') + ' ' + t('attachment.dropZone.browse') + t('attachment.dropZone.browseSuffix')}
+      aria-label="파일 업로드 영역"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className={`border-2 border-dashed rounded-lg py-12 px-6 text-center flex flex-col items-center justify-center cursor-pointer transition-colors ${
+      className={`border-2 border-dashed rounded-lg py-10 px-6 text-center flex flex-col items-center justify-center cursor-pointer transition-colors ${
         disabled
-          ? 'opacity-50 cursor-not-allowed border-gray-300'
+          ? 'opacity-50 cursor-not-allowed border-gray-300 dark:border-gray-600'
           : isDragging
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/10'
-            : 'border-gray-300 bg-transparent hover:border-gray-400'
+            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
       }`}
     >
       <input
@@ -90,24 +92,23 @@ export default function FileDropZone({ onFilesSelected, disabled }: FileDropZone
         tabIndex={-1}
       />
 
-      <Upload className="h-10 w-10 text-gray-400 mb-3" />
+      <Upload className="h-8 w-8 text-gray-400 mb-2" />
 
       {isDragging ? (
-        <p className="text-sm font-medium text-blue-600">
-          {t('attachment.dropZone.dragOver')}
-        </p>
+        <p className="text-sm font-medium text-blue-600">여기에 놓으세요</p>
       ) : (
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {t('attachment.dropZone.text')}{' '}
-          <span className="text-sm font-semibold text-blue-600 hover:text-blue-700 cursor-pointer">
-            {t('attachment.dropZone.browse')}
+          파일을 드래그하거나{' '}
+          <span className="font-semibold text-blue-600 hover:text-blue-700">
+            클릭하여 선택
           </span>
-          {t('attachment.dropZone.browseSuffix')}
+          하세요
         </p>
       )}
 
-      <p className="text-xs text-gray-400 mt-2">
-        {t('attachment.dropZone.constraints')}
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+        PDF, DOC, XLS, PPT, HWP, JPG, PNG, ZIP (최대 50MB/파일
+        {maxFiles ? `, ${maxFiles}개` : ''})
       </p>
     </div>
   );

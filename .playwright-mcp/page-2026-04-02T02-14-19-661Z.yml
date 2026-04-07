@@ -1,0 +1,19 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - heading "MiceSign" [level=1] [ref=e7]
+    - paragraph [ref=e8]: 전자 결재 시스템
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: 이메일
+      - textbox "이메일" [active] [ref=e12]:
+        - /placeholder: name@company.com
+    - generic [ref=e13]:
+      - generic [ref=e14]: 비밀번호
+      - generic [ref=e15]:
+        - textbox "비밀번호" [ref=e16]
+        - button "비밀번호 표시" [ref=e17] [cursor=pointer]:
+          - img [ref=e18]
+    - generic [ref=e21]:
+      - checkbox "로그인 상태 유지" [ref=e22]
+      - generic [ref=e23]: 로그인 상태 유지
+    - button "로그인" [ref=e24] [cursor=pointer]

@@ -1,38 +1,56 @@
-import { useEffect, useRef } from 'react';
-import { FileText, Receipt, CalendarDays } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { useTemplates } from '../hooks/useTemplates';
-import type { TemplateResponse } from '../types/document';
+import { useEffect, useRef, useState } from 'react';
+import {
+  FileText,
+  Receipt,
+  CalendarDays,
+  ShoppingCart,
+  Plane,
+  Clock,
+  X,
+} from 'lucide-react';
+import type { Template } from '../types/document';
 
 interface TemplateSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (templateCode: string) => void;
+  onSelect: (template: Template) => void;
+  templates: Template[];
 }
 
 const TEMPLATE_ICONS: Record<string, React.ReactNode> = {
-  GENERAL: <FileText className="h-8 w-8 text-gray-400 mx-auto" />,
-  EXPENSE: <Receipt className="h-8 w-8 text-gray-400 mx-auto" />,
-  LEAVE: <CalendarDays className="h-8 w-8 text-gray-400 mx-auto" />,
+  GENERAL: <FileText className="h-8 w-8" />,
+  EXPENSE: <Receipt className="h-8 w-8" />,
+  LEAVE: <CalendarDays className="h-8 w-8" />,
+  PURCHASE: <ShoppingCart className="h-8 w-8" />,
+  BUSINESS_TRIP: <Plane className="h-8 w-8" />,
+  OVERTIME: <Clock className="h-8 w-8" />,
 };
 
 export default function TemplateSelectionModal({
   isOpen,
   onClose,
   onSelect,
+  templates,
 }: TemplateSelectionModalProps) {
-  const { t } = useTranslation('document');
-  const { data: templates } = useTemplates();
   const modalRef = useRef<HTMLDivElement>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Extract unique categories
+  const categories = Array.from(
+    new Set(templates.map((t) => t.category).filter(Boolean)),
+  ) as string[];
+  const hasCategories = categories.length > 0;
+
+  const filteredTemplates = selectedCategory
+    ? templates.filter((t) => t.category === selectedCategory)
+    : templates;
 
   // Escape key to close
   useEffect(() => {
     if (!isOpen) return;
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     }
 
     document.addEventListener('keydown', handleKeyDown);
@@ -71,12 +89,12 @@ export default function TemplateSelectionModal({
     return () => modal.removeEventListener('keydown', handleTab);
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  // Reset category when modal opens
+  useEffect(() => {
+    if (isOpen) setSelectedCategory(null);
+  }, [isOpen]);
 
-  function handleCardClick(template: TemplateResponse) {
-    onSelect(template.code);
-    onClose();
-  }
+  if (!isOpen) return null;
 
   return (
     <div
@@ -91,36 +109,89 @@ export default function TemplateSelectionModal({
         className="bg-white dark:bg-gray-900 rounded-xl shadow-lg max-w-lg w-full mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2
-          id="template-modal-title"
-          className="text-lg font-semibold text-gray-900 dark:text-gray-50"
-        >
-          {t('templateModal.title')}
-        </h2>
-        <p className="text-sm text-gray-500 mt-1 mb-6">
-          {t('templateModal.subtitle')}
+        {/* Header */}
+        <div className="flex items-center justify-between mb-1">
+          <h2
+            id="template-modal-title"
+            className="text-lg font-semibold text-gray-900 dark:text-gray-50"
+          >
+            양식 선택
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+          작성할 문서의 양식을 선택해주세요.
         </p>
 
-        <div className="grid grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-          {templates?.map((template) => (
+        {/* Category filter tabs */}
+        {hasCategories && (
+          <div className="flex gap-2 mb-4 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setSelectedCategory(null)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                selectedCategory === null
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              }`}
+            >
+              전체
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Template grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {filteredTemplates.map((template) => (
             <button
               key={template.id}
               type="button"
-              onClick={() => handleCardClick(template)}
-              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors text-center"
+              onClick={() => onSelect(template)}
+              className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors text-center group"
             >
-              {TEMPLATE_ICONS[template.code] ?? (
-                <FileText className="h-8 w-8 text-gray-400 mx-auto" />
-              )}
+              <div className="text-gray-400 group-hover:text-blue-500 transition-colors mx-auto w-fit">
+                {TEMPLATE_ICONS[template.code] ?? (
+                  <FileText className="h-8 w-8" />
+                )}
+              </div>
               <div className="text-sm font-semibold text-gray-900 dark:text-gray-50 mt-3">
                 {template.name}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {template.description}
-              </div>
+              {template.description && (
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                  {template.description}
+                </div>
+              )}
             </button>
           ))}
         </div>
+
+        {filteredTemplates.length === 0 && (
+          <div className="text-center py-8 text-sm text-gray-400">
+            사용 가능한 양식이 없습니다.
+          </div>
+        )}
       </div>
     </div>
   );

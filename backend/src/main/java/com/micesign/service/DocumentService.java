@@ -1,23 +1,30 @@
 package com.micesign.service;
 
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.ApprovalLine;
 import com.micesign.domain.ApprovalTemplate;
 import com.micesign.domain.DocSequence;
 import com.micesign.domain.Document;
+import com.micesign.domain.DocumentAttachment;
 import com.micesign.domain.DocumentContent;
 import com.micesign.domain.User;
-import com.micesign.domain.DocumentAttachment;
 import com.micesign.domain.enums.ApprovalLineStatus;
 import com.micesign.domain.enums.ApprovalLineType;
 import com.micesign.domain.enums.DocumentStatus;
-import com.micesign.dto.document.*;
-import com.micesign.common.AuditAction;
-import com.micesign.event.ApprovalNotificationEvent;
-import com.micesign.event.BudgetIntegrationEvent;
-import com.micesign.event.BudgetCancellationEvent;
 import com.micesign.domain.enums.NotificationEventType;
+import com.micesign.domain.enums.UserRole;
+import com.micesign.dto.document.ApprovalLineRequest;
+import com.micesign.dto.document.ApprovalLineResponse;
+import com.micesign.dto.document.AttachmentResponse;
+import com.micesign.dto.document.CreateDocumentRequest;
+import com.micesign.dto.document.DocumentDetailResponse;
+import com.micesign.dto.document.DocumentResponse;
 import com.micesign.dto.document.DocumentSearchCondition;
+import com.micesign.dto.document.UpdateDocumentRequest;
+import com.micesign.event.ApprovalNotificationEvent;
+import com.micesign.event.BudgetCancellationEvent;
+import com.micesign.event.BudgetIntegrationEvent;
 import com.micesign.mapper.DocumentMapper;
 import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
@@ -28,15 +35,17 @@ import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.micesign.service.TemplateSchemaService;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +65,7 @@ public class DocumentService {
     private final DocumentMapper documentMapper;
     private final GoogleDriveService googleDriveService;
     private final AuditLogService auditLogService;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
     private final TemplateSchemaService templateSchemaService;
 
     public DocumentService(DocumentRepository documentRepository,
@@ -70,7 +79,7 @@ public class DocumentService {
                            DocumentMapper documentMapper,
                            GoogleDriveService googleDriveService,
                            AuditLogService auditLogService,
-                           ApplicationEventPublisher applicationEventPublisher,
+                           ApplicationEventPublisher eventPublisher,
                            TemplateSchemaService templateSchemaService) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
@@ -83,26 +92,29 @@ public class DocumentService {
         this.documentMapper = documentMapper;
         this.googleDriveService = googleDriveService;
         this.auditLogService = auditLogService;
-        this.applicationEventPublisher = applicationEventPublisher;
+        this.eventPublisher = eventPublisher;
         this.templateSchemaService = templateSchemaService;
     }
 
-    public DocumentResponse createDocument(Long userId, CreateDocumentRequest req) {
-        // Validate template exists
-        ApprovalTemplate template = approvalTemplateRepository.findByCode(req.templateCode())
-                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."));
+    // ──────────────────────────────────────────────
+    // 1. createDocument
+    // ──────────────────────────────────────────────
 
-        // Validate form data
-        formValidator.validate(req.templateCode(), req.bodyHtml(), req.formData());
+    public DocumentDetailResponse createDocument(CreateDocumentRequest request, Long userId) {
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(request.templateCode())
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
 
-        // Load drafter
+        if (!template.isActive()) {
+            throw new BusinessException("TPL_INACTIVE", "비활성화된 양식입니다.");
+        }
+
         User drafter = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "사용자를 찾을 수 없습니다.", 404));
 
-        // Create document
+        // Create document entity
         Document document = new Document();
-        document.setTemplateCode(req.templateCode());
-        document.setTitle(req.title());
+        document.setTemplateCode(request.templateCode());
+        document.setTitle(request.title());
         document.setDrafter(drafter);
         document.setStatus(DocumentStatus.DRAFT);
         document = documentRepository.save(document);
@@ -110,97 +122,157 @@ public class DocumentService {
         // Create content
         DocumentContent content = new DocumentContent();
         content.setDocument(document);
-        content.setBodyHtml(req.bodyHtml());
-        content.setFormData(req.formData());
+        content.setBodyHtml(request.bodyHtml());
+        content.setFormData(request.formData());
 
-        // 동적 템플릿인 경우 스키마 스냅샷 저장 (D-10, D-08)
+        // Dynamic template: snapshot schema_version and schema_definition
         if (template.getSchemaDefinition() != null) {
             content.setSchemaVersion(template.getSchemaVersion());
             String resolvedSchema = templateSchemaService.resolveSchemaWithOptions(
-                template.getSchemaDefinition());
+                    template.getSchemaDefinition());
             content.setSchemaDefinitionSnapshot(resolvedSchema);
         }
 
         documentContentRepository.save(content);
 
         // Save approval lines if provided
-        if (req.approvalLines() != null && !req.approvalLines().isEmpty()) {
-            saveApprovalLines(document, req.approvalLines());
+        if (request.approvalLines() != null && !request.approvalLines().isEmpty()) {
+            saveApprovalLines(document, request.approvalLines());
         }
 
-        auditLogService.log(userId, AuditAction.DOCUMENT_CREATE, "DOCUMENT", document.getId(),
-                "{\"template\": \"" + req.templateCode() + "\"}");
+        auditLogService.log(userId, AuditAction.DOC_CREATE, "DOCUMENT", document.getId(),
+                "{\"templateCode\":\"" + request.templateCode() + "\"}");
 
-        return documentMapper.toResponse(document, template.getName());
+        return buildDetailResponse(document);
     }
 
-    public DocumentResponse updateDocument(Long userId, Long documentId, UpdateDocumentRequest req) {
-        Document document = loadAndVerifyOwnerDraft(userId, documentId);
+    // ──────────────────────────────────────────────
+    // 2. updateDocument
+    // ──────────────────────────────────────────────
 
-        // Validate form data
-        formValidator.validate(document.getTemplateCode(), req.bodyHtml(), req.formData());
+    public DocumentDetailResponse updateDocument(Long docId, UpdateDocumentRequest request, Long userId) {
+        Document document = loadAndVerifyOwnerDraft(docId, userId);
 
-        // Update document
-        document.setTitle(req.title());
+        // Update document fields
+        document.setTitle(request.title());
         documentRepository.save(document);
 
         // Update content
-        DocumentContent content = documentContentRepository.findByDocumentId(documentId)
-                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
-        content.setBodyHtml(req.bodyHtml());
-        content.setFormData(req.formData());
+        DocumentContent content = documentContentRepository.findByDocumentId(docId)
+                .orElseThrow(() -> new BusinessException("DOC_CONTENT_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
+        content.setBodyHtml(request.bodyHtml());
+        content.setFormData(request.formData());
 
-        // 동적 템플릿인 경우 최신 스키마 스냅샷 반영
+        // Refresh schema snapshot for dynamic templates
         ApprovalTemplate template = approvalTemplateRepository.findByCode(document.getTemplateCode())
                 .orElse(null);
         if (template != null && template.getSchemaDefinition() != null) {
             content.setSchemaVersion(template.getSchemaVersion());
             String resolvedSchema = templateSchemaService.resolveSchemaWithOptions(
-                template.getSchemaDefinition());
+                    template.getSchemaDefinition());
             content.setSchemaDefinitionSnapshot(resolvedSchema);
         }
 
         documentContentRepository.save(content);
 
-        // Update approval lines if provided (delete all, re-insert)
-        if (req.approvalLines() != null) {
-            approvalLineRepository.deleteByDocumentId(documentId);
-            if (!req.approvalLines().isEmpty()) {
-                saveApprovalLines(document, req.approvalLines());
+        // Replace approval lines (delete old, save new)
+        if (request.approvalLines() != null) {
+            approvalLineRepository.deleteByDocumentId(docId);
+            if (!request.approvalLines().isEmpty()) {
+                saveApprovalLines(document, request.approvalLines());
             }
         }
 
-        String templateName = getTemplateName(document.getTemplateCode());
-        return documentMapper.toResponse(document, templateName);
+        return buildDetailResponse(document);
     }
 
-    public void deleteDocument(Long userId, Long documentId) {
-        Document document = loadAndVerifyOwnerDraft(userId, documentId);
+    // ──────────────────────────────────────────────
+    // 3. getDocument
+    // ──────────────────────────────────────────────
 
-        // Delete approval lines first
-        approvalLineRepository.deleteByDocumentId(documentId);
+    @Transactional(readOnly = true)
+    public DocumentDetailResponse getDocument(Long docId, Long userId, UserRole role, Long departmentId) {
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다.", 404));
 
-        // Delete content, then document
-        documentContentRepository.findByDocumentId(documentId)
+        // Check view permission
+        boolean isDrafter = document.getDrafter().getId().equals(userId);
+        boolean isApprovalParticipant = approvalLineRepository.existsByDocumentIdAndApproverId(docId, userId);
+        boolean isAdminSameDept = role == UserRole.ADMIN
+                && departmentId != null
+                && departmentId.equals(document.getDrafter().getDepartmentId());
+        boolean isSuperAdmin = role == UserRole.SUPER_ADMIN;
+
+        if (!isDrafter && !isApprovalParticipant && !isAdminSameDept && !isSuperAdmin) {
+            throw new BusinessException("DOC_ACCESS_DENIED", "문서 조회 권한이 없습니다.", 403);
+        }
+
+        auditLogService.log(userId, AuditAction.DOC_VIEW, "DOCUMENT", docId, null);
+
+        return buildDetailResponse(document);
+    }
+
+    // ──────────────────────────────────────────────
+    // 4. deleteDocument
+    // ──────────────────────────────────────────────
+
+    public void deleteDocument(Long docId, Long userId) {
+        Document document = loadAndVerifyOwnerDraft(docId, userId);
+
+        // Delete attachments from Google Drive
+        List<DocumentAttachment> attachments = attachmentRepository.findByDocumentId(docId);
+        for (DocumentAttachment attachment : attachments) {
+            try {
+                googleDriveService.deleteFile(attachment.getGdriveFileId());
+            } catch (Exception e) {
+                log.warn("Failed to delete attachment from Google Drive: fileId={}, error={}",
+                        attachment.getGdriveFileId(), e.getMessage());
+            }
+        }
+        attachmentRepository.deleteAll(attachments);
+
+        // Delete approval lines
+        approvalLineRepository.deleteByDocumentId(docId);
+
+        // Delete content
+        documentContentRepository.findByDocumentId(docId)
                 .ifPresent(documentContentRepository::delete);
+
+        // Delete document
         documentRepository.delete(document);
     }
 
-    public DocumentResponse submitDocument(Long userId, Long documentId) {
-        Document document = loadAndVerifyOwnerDraft(userId, documentId);
+    // ──────────────────────────────────────────────
+    // 5. submitDocument
+    // ──────────────────────────────────────────────
 
-        // Validate form data at submit time
-        DocumentContent content = documentContentRepository.findByDocumentId(documentId)
-                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
-        formValidator.validate(document.getTemplateCode(), content.getBodyHtml(), content.getFormData());
+    public DocumentDetailResponse submitDocument(Long docId, Long userId) {
+        Document document = loadAndVerifyOwnerDraft(docId, userId);
 
-        // Validate at least 1 APPROVE type exists (per D-05)
-        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(documentId);
+        // Validate title
+        if (document.getTitle() == null || document.getTitle().isBlank()) {
+            throw new BusinessException("DOC_TITLE_REQUIRED", "문서 제목이 필요합니다.");
+        }
+
+        // Validate approval lines
+        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
         boolean hasApprover = approvalLines.stream()
                 .anyMatch(line -> line.getLineType() == ApprovalLineType.APPROVE);
         if (!hasApprover) {
             throw new BusinessException("APR_NO_APPROVER", "최소 1명의 승인자(승인 유형)를 추가해주세요.");
         }
+
+        // Drafter must not be in approval line
+        boolean drafterInLine = approvalLines.stream()
+                .anyMatch(line -> line.getApprover().getId().equals(userId));
+        if (drafterInLine) {
+            throw new BusinessException("APR_SELF_NOT_ALLOWED", "기안자는 결재선에 포함될 수 없습니다.");
+        }
+
+        // Run form validation
+        DocumentContent content = documentContentRepository.findByDocumentId(docId)
+                .orElseThrow(() -> new BusinessException("DOC_CONTENT_NOT_FOUND", "문서 내용을 찾을 수 없습니다."));
+        formValidator.validate(document.getTemplateCode(), content.getBodyHtml(), content.getFormData());
 
         // Generate document number
         String docNumber = generateDocNumber(document.getTemplateCode());
@@ -209,87 +281,57 @@ public class DocumentService {
         document.setDocNumber(docNumber);
         document.setStatus(DocumentStatus.SUBMITTED);
         document.setSubmittedAt(LocalDateTime.now());
-        document.setCurrentStep(1); // First sequential step
+
+        // Set currentStep to first non-REFERENCE step
+        int firstStep = approvalLines.stream()
+                .filter(line -> line.getLineType() != ApprovalLineType.REFERENCE)
+                .mapToInt(ApprovalLine::getStepOrder)
+                .min()
+                .orElse(1);
+        document.setCurrentStep(firstStep);
         documentRepository.save(document);
 
         // Move attachments from draft folder to permanent folder
-        moveAttachmentsToPermanentFolder(documentId, docNumber);
+        moveAttachmentsToPermanentFolder(docId, docNumber);
 
-        auditLogService.log(userId, AuditAction.DOCUMENT_SUBMIT, "DOCUMENT", documentId,
-                "{\"docNumber\": \"" + document.getDocNumber() + "\"}");
+        auditLogService.log(userId, AuditAction.DOC_SUBMIT, "DOCUMENT", docId,
+                "{\"docNumber\":\"" + docNumber + "\"}");
 
-        applicationEventPublisher.publishEvent(
-                new ApprovalNotificationEvent(document, NotificationEventType.SUBMIT, userId, null));
+        // Publish notification event
+        eventPublisher.publishEvent(
+                new ApprovalNotificationEvent(docId, NotificationEventType.SUBMIT.name(), userId));
 
-        // Budget integration event (async, non-blocking)
-        applicationEventPublisher.publishEvent(
-                new BudgetIntegrationEvent(document.getId(), document.getTemplateCode(),
-                        document.getDocNumber(), userId));
-
-        String templateName = getTemplateName(document.getTemplateCode());
-        return documentMapper.toResponse(document, templateName);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<DocumentResponse> getMyDocuments(Long userId, List<DocumentStatus> statuses, Pageable pageable) {
-        Page<Document> documents;
-        if (statuses != null && !statuses.isEmpty()) {
-            documents = documentRepository.findByDrafterIdAndStatusIn(userId, statuses, pageable);
-        } else {
-            documents = documentRepository.findByDrafterId(userId, pageable);
-        }
-
-        // Build template name lookup
-        Map<String, String> templateNameMap = approvalTemplateRepository.findByIsActiveTrueOrderBySortOrder()
-                .stream()
-                .collect(Collectors.toMap(ApprovalTemplate::getCode, ApprovalTemplate::getName));
-
-        return documents.map(doc -> documentMapper.toResponse(doc,
-                templateNameMap.getOrDefault(doc.getTemplateCode(), doc.getTemplateCode())));
-    }
-
-    @Transactional(readOnly = true)
-    public DocumentDetailResponse getDocumentDetail(Long userId, Long documentId) {
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다."));
-
-        // Access control: drafter or approval line participant
-        boolean isDrafter = document.getDrafter().getId().equals(userId);
-        boolean isApprovalParticipant = approvalLineRepository.existsByDocumentIdAndApproverId(documentId, userId);
-        if (!isDrafter && !isApprovalParticipant) {
-            throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 조회할 수 있습니다.");
-        }
-
-        DocumentContent content = documentContentRepository.findByDocumentId(documentId)
+        // Budget integration event if template.budgetEnabled
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(document.getTemplateCode())
                 .orElse(null);
+        if (template != null && template.isBudgetEnabled()) {
+            eventPublisher.publishEvent(
+                    new BudgetIntegrationEvent(document.getId(), document.getTemplateCode(),
+                            document.getDocNumber(), userId));
+        }
 
-        // Load and map approval lines
-        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(documentId);
-        List<ApprovalLineResponse> approvalLineResponses = approvalLines.stream()
-                .map(documentMapper::toApprovalLineResponse)
-                .toList();
-
-        String templateName = getTemplateName(document.getTemplateCode());
-        return documentMapper.toDetailResponse(document, content, templateName, approvalLineResponses);
+        return buildDetailResponse(document);
     }
 
-    public DocumentResponse withdrawDocument(Long userId, Long documentId) {
-        Document document = documentRepository.findById(documentId)
+    // ──────────────────────────────────────────────
+    // 6. withdrawDocument
+    // ──────────────────────────────────────────────
+
+    public DocumentDetailResponse withdrawDocument(Long docId, Long userId) {
+        Document document = documentRepository.findById(docId)
                 .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다.", 404));
 
-        // Only drafter can withdraw
         if (!document.getDrafter().getId().equals(userId)) {
             throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 회수할 수 있습니다.", 403);
         }
 
-        // Only SUBMITTED documents can be withdrawn
         if (document.getStatus() != DocumentStatus.SUBMITTED) {
             throw new BusinessException("DOC_NOT_SUBMITTED", "제출 상태의 문서만 회수할 수 있습니다.");
         }
 
-        // Check if current step approver(s) have already acted (per D-21, FSD)
+        // Check current step approvers are all PENDING
         List<ApprovalLine> currentStepLines = approvalLineRepository
-                .findByDocumentIdAndStepOrder(documentId, document.getCurrentStep());
+                .findByDocumentIdAndStepOrder(docId, document.getCurrentStep());
         boolean anyActed = currentStepLines.stream()
                 .anyMatch(line -> line.getStatus() != ApprovalLineStatus.PENDING);
         if (anyActed) {
@@ -297,14 +339,13 @@ public class DocumentService {
                     "이미 결재가 진행되어 회수할 수 없습니다.");
         }
 
-        // Set document to WITHDRAWN (per D-23)
+        // Set document WITHDRAWN
         document.setStatus(DocumentStatus.WITHDRAWN);
         document.setCompletedAt(LocalDateTime.now());
         documentRepository.save(document);
 
-        // Change all PENDING approval lines to SKIPPED (per D-24)
-        List<ApprovalLine> allLines = approvalLineRepository
-                .findByDocumentIdOrderByStepOrderAsc(documentId);
+        // Skip all PENDING approval lines
+        List<ApprovalLine> allLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
         for (ApprovalLine line : allLines) {
             if (line.getStatus() == ApprovalLineStatus.PENDING) {
                 line.setStatus(ApprovalLineStatus.SKIPPED);
@@ -312,32 +353,37 @@ public class DocumentService {
             }
         }
 
-        auditLogService.log(userId, AuditAction.DOCUMENT_WITHDRAW, "DOCUMENT", documentId, null);
+        auditLogService.log(userId, AuditAction.DOC_WITHDRAW, "DOCUMENT", docId, null);
 
-        applicationEventPublisher.publishEvent(
-                new ApprovalNotificationEvent(document, NotificationEventType.WITHDRAW, userId, null));
+        eventPublisher.publishEvent(
+                new ApprovalNotificationEvent(docId, NotificationEventType.WITHDRAW.name(), userId));
 
-        // Budget cancellation event (async, non-blocking)
-        applicationEventPublisher.publishEvent(
-                new BudgetCancellationEvent(document.getId(), document.getTemplateCode(),
-                        document.getDocNumber(), userId, "WITHDRAWN"));
+        // Budget cancellation if enabled
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(document.getTemplateCode())
+                .orElse(null);
+        if (template != null && template.isBudgetEnabled()) {
+            eventPublisher.publishEvent(
+                    new BudgetCancellationEvent(document.getId(), document.getTemplateCode(),
+                            document.getDocNumber()));
+        }
 
-        String templateName = getTemplateName(document.getTemplateCode());
-        return documentMapper.toResponse(document, templateName);
+        return buildDetailResponse(document);
     }
 
-    public DocumentResponse rewriteDocument(Long userId, Long documentId) {
-        Document sourceDoc = documentRepository.findById(documentId)
+    // ──────────────────────────────────────────────
+    // 7. rewriteDocument
+    // ──────────────────────────────────────────────
+
+    public DocumentDetailResponse rewriteDocument(Long docId, Long userId) {
+        Document sourceDoc = documentRepository.findById(docId)
                 .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다.", 404));
 
-        // Only drafter can resubmit
         if (!sourceDoc.getDrafter().getId().equals(userId)) {
             throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 재기안할 수 있습니다.", 403);
         }
 
-        // Only REJECTED or WITHDRAWN documents can be resubmitted (per D-27)
-        if (sourceDoc.getStatus() != DocumentStatus.REJECTED &&
-            sourceDoc.getStatus() != DocumentStatus.WITHDRAWN) {
+        if (sourceDoc.getStatus() != DocumentStatus.REJECTED
+                && sourceDoc.getStatus() != DocumentStatus.WITHDRAWN) {
             throw new BusinessException("DOC_CANNOT_REWRITE",
                     "반려 또는 회수된 문서만 재기안할 수 있습니다.");
         }
@@ -345,18 +391,17 @@ public class DocumentService {
         User drafter = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "사용자를 찾을 수 없습니다."));
 
-        // Create new document copying content (per D-25)
+        // Create new DRAFT document
         Document newDoc = new Document();
         newDoc.setTemplateCode(sourceDoc.getTemplateCode());
         newDoc.setTitle(sourceDoc.getTitle());
         newDoc.setDrafter(drafter);
         newDoc.setStatus(DocumentStatus.DRAFT);
-        newDoc.setSourceDocId(documentId); // per D-26
+        newDoc.setSourceDocId(docId);
         newDoc = documentRepository.save(newDoc);
 
         // Copy content
-        DocumentContent sourceContent = documentContentRepository.findByDocumentId(documentId)
-                .orElse(null);
+        DocumentContent sourceContent = documentContentRepository.findByDocumentId(docId).orElse(null);
         if (sourceContent != null) {
             DocumentContent newContent = new DocumentContent();
             newContent.setDocument(newDoc);
@@ -365,9 +410,8 @@ public class DocumentService {
             documentContentRepository.save(newContent);
         }
 
-        // Copy approval line (per D-25) -- copy approver list and types, reset status to PENDING
-        List<ApprovalLine> sourceLines = approvalLineRepository
-                .findByDocumentIdOrderByStepOrderAsc(documentId);
+        // Copy approval lines (reset status to PENDING)
+        List<ApprovalLine> sourceLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
         for (ApprovalLine sourceLine : sourceLines) {
             ApprovalLine newLine = new ApprovalLine();
             newLine.setDocument(newDoc);
@@ -378,35 +422,77 @@ public class DocumentService {
             approvalLineRepository.save(newLine);
         }
 
-        // Note: Attachments NOT copied per D-25
-
-        String templateName = getTemplateName(newDoc.getTemplateCode());
-        return documentMapper.toResponse(newDoc, templateName);
+        return buildDetailResponse(newDoc);
     }
 
+    // ──────────────────────────────────────────────
+    // 8. searchDocuments
+    // ──────────────────────────────────────────────
+
     @Transactional(readOnly = true)
-    public Page<DocumentResponse> searchDocuments(DocumentSearchCondition condition, Long userId, Pageable pageable) {
-        Page<Document> documents = documentRepository.searchDocuments(condition, userId, pageable);
+    public Page<DocumentResponse> searchDocuments(DocumentSearchCondition condition, Long userId,
+                                                   UserRole role, Long departmentId, Pageable pageable) {
+        return documentRepository.searchDocuments(condition, userId, role.name(), departmentId, pageable);
+    }
 
-        Map<String, String> templateNameMap = approvalTemplateRepository.findByIsActiveTrueOrderBySortOrder()
-                .stream()
-                .collect(Collectors.toMap(ApprovalTemplate::getCode, ApprovalTemplate::getName));
+    // ──────────────────────────────────────────────
+    // 9. getMyDocuments (convenience)
+    // ──────────────────────────────────────────────
 
+    @Transactional(readOnly = true)
+    public Page<DocumentResponse> getMyDocuments(Long userId, List<DocumentStatus> statuses, Pageable pageable) {
+        Page<Document> documents;
+        if (statuses != null && !statuses.isEmpty()) {
+            documents = documentRepository.findByDrafterIdAndStatusIn(userId, statuses, pageable);
+        } else {
+            documents = documentRepository.findByDrafterId(userId, pageable);
+        }
+
+        Map<String, String> templateNameMap = buildTemplateNameMap();
         return documents.map(doc -> documentMapper.toResponse(doc,
                 templateNameMap.getOrDefault(doc.getTemplateCode(), doc.getTemplateCode())));
     }
 
-    // --- Private helpers ---
+    // ──────────────────────────────────────────────
+    // generateDocNumber
+    // ──────────────────────────────────────────────
+
+    String generateDocNumber(String templateCode) {
+        int currentYear = LocalDateTime.now().getYear();
+
+        ApprovalTemplate template = approvalTemplateRepository.findByCode(templateCode)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."));
+        String prefix = template.getPrefix();
+
+        // Pessimistic lock on sequence row
+        DocSequence seq = docSequenceRepository.findByTemplateCodeAndYearForUpdate(templateCode, currentYear)
+                .orElseGet(() -> {
+                    DocSequence newSeq = new DocSequence();
+                    newSeq.setTemplateCode(templateCode);
+                    newSeq.setYear(currentYear);
+                    newSeq.setLastSequence(0);
+                    return docSequenceRepository.save(newSeq);
+                });
+
+        seq.setLastSequence(seq.getLastSequence() + 1);
+        docSequenceRepository.save(seq);
+
+        return String.format("%s-%d-%04d", prefix, currentYear, seq.getLastSequence());
+    }
+
+    // ──────────────────────────────────────────────
+    // Private helpers
+    // ──────────────────────────────────────────────
 
     private void saveApprovalLines(Document document, List<ApprovalLineRequest> requests) {
-        // Validate: no self-addition (per D-06)
+        // No self-addition
         for (ApprovalLineRequest req : requests) {
             if (req.approverId().equals(document.getDrafter().getId())) {
                 throw new BusinessException("APR_SELF_NOT_ALLOWED", "본인은 결재선에 추가할 수 없습니다.");
             }
         }
 
-        // Validate: no duplicates (per D-07)
+        // No duplicates
         Set<Long> approverIds = new HashSet<>();
         for (ApprovalLineRequest req : requests) {
             if (!approverIds.add(req.approverId())) {
@@ -414,8 +500,7 @@ public class DocumentService {
             }
         }
 
-        // Compute step_order server-side (per D-08)
-        // REFERENCE always gets 0, APPROVE/AGREE get sequential 1, 2, 3...
+        // REFERENCE gets stepOrder=0, APPROVE/AGREE get sequential 1, 2, 3...
         int sequentialStep = 1;
         for (ApprovalLineRequest req : requests) {
             ApprovalLine line = new ApprovalLine();
@@ -424,10 +509,12 @@ public class DocumentService {
             User approver = userRepository.findById(req.approverId())
                     .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "결재자를 찾을 수 없습니다."));
             line.setApprover(approver);
-            line.setLineType(req.lineType());
+
+            ApprovalLineType lineType = ApprovalLineType.valueOf(req.lineType());
+            line.setLineType(lineType);
             line.setStatus(ApprovalLineStatus.PENDING);
 
-            if (req.lineType() == ApprovalLineType.REFERENCE) {
+            if (lineType == ApprovalLineType.REFERENCE) {
                 line.setStepOrder(0);
             } else {
                 line.setStepOrder(sequentialStep++);
@@ -437,19 +524,41 @@ public class DocumentService {
         }
     }
 
-    private Document loadAndVerifyOwnerDraft(Long userId, Long documentId) {
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다."));
+    private Document loadAndVerifyOwnerDraft(Long docId, Long userId) {
+        Document document = documentRepository.findById(docId)
+                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다.", 404));
 
         if (!document.getDrafter().getId().equals(userId)) {
-            throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 수정할 수 있습니다.");
+            throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 수정할 수 있습니다.", 403);
         }
 
         if (document.getStatus() != DocumentStatus.DRAFT) {
-            throw new BusinessException("DOC_NOT_DRAFT", "임시저장 상태의 문서만 수정할 수 있습니다.", 403);
+            throw new BusinessException("DOC_NOT_DRAFT", "임시저장 상태의 문서만 수정할 수 있습니다.");
         }
 
         return document;
+    }
+
+    private DocumentDetailResponse buildDetailResponse(Document document) {
+        DocumentContent content = documentContentRepository.findByDocumentId(document.getId())
+                .orElse(null);
+
+        List<ApprovalLine> approvalLines = approvalLineRepository
+                .findByDocumentIdOrderByStepOrderAsc(document.getId());
+        List<ApprovalLineResponse> approvalLineResponses = approvalLines.stream()
+                .map(documentMapper::toApprovalLineResponse)
+                .toList();
+
+        List<DocumentAttachment> attachmentEntities = attachmentRepository
+                .findByDocumentId(document.getId());
+        List<AttachmentResponse> attachmentResponses = attachmentEntities.stream()
+                .map(a -> new AttachmentResponse(a.getId(), a.getDocumentId(), a.getOriginalName(),
+                        a.getFileSize(), a.getMimeType(), a.getGdriveFileId(), a.getCreatedAt()))
+                .toList();
+
+        String templateName = getTemplateName(document.getTemplateCode());
+        return documentMapper.toDetailResponse(document, content, templateName,
+                approvalLineResponses, attachmentResponses);
     }
 
     private void moveAttachmentsToPermanentFolder(Long documentId, String docNumber) {
@@ -477,34 +586,15 @@ public class DocumentService {
         }
     }
 
-    private String generateDocNumber(String templateCode) {
-        int currentYear = LocalDateTime.now().getYear();
-
-        // Look up template prefix
-        ApprovalTemplate template = approvalTemplateRepository.findByCode(templateCode)
-                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."));
-        String prefix = template.getPrefix();
-
-        // Pessimistic lock on sequence row
-        DocSequence seq = docSequenceRepository.findByTemplateCodeAndYearForUpdate(templateCode, currentYear)
-                .orElseGet(() -> {
-                    DocSequence newSeq = new DocSequence();
-                    newSeq.setTemplateCode(templateCode);
-                    newSeq.setYear(currentYear);
-                    newSeq.setLastSequence(0);
-                    return docSequenceRepository.save(newSeq);
-                });
-
-        // Increment sequence
-        seq.setLastSequence(seq.getLastSequence() + 1);
-        docSequenceRepository.save(seq);
-
-        return String.format("%s-%d-%04d", prefix, currentYear, seq.getLastSequence());
-    }
-
     private String getTemplateName(String templateCode) {
         return approvalTemplateRepository.findByCode(templateCode)
                 .map(ApprovalTemplate::getName)
                 .orElse(templateCode);
+    }
+
+    private Map<String, String> buildTemplateNameMap() {
+        return approvalTemplateRepository.findByIsActiveTrueOrderBySortOrder()
+                .stream()
+                .collect(Collectors.toMap(ApprovalTemplate::getCode, ApprovalTemplate::getName));
     }
 }

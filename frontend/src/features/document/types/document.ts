@@ -1,7 +1,33 @@
-import type { ApprovalLineRequest, ApprovalLineResponse } from '../../approval/types/approval';
+// === Enums / Union Types ===
+export type DocumentStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
+export type ApprovalLineType = 'APPROVE' | 'AGREE' | 'REFERENCE';
+export type ApprovalLineStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SKIPPED';
 
-// === Response Types (from backend) ===
-export interface DocumentResponse {
+// === Template (from backend TemplateResponse) ===
+export interface Template {
+  id: number;
+  code: string;
+  name: string;
+  description: string | null;
+  prefix: string;
+  isActive: boolean;
+  sortOrder: number;
+  isCustom: boolean;
+  category: string | null;
+  icon: string | null;
+  budgetEnabled: boolean;
+}
+
+export interface TemplateDetail extends Template {
+  schemaDefinition: string | null;
+  schemaVersion: number;
+  createdBy: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// === Document List Item ===
+export interface DocumentListItem {
   id: number;
   docNumber: string | null;
   templateCode: string;
@@ -9,67 +35,115 @@ export interface DocumentResponse {
   title: string;
   status: DocumentStatus;
   drafterName: string;
-  drafterDepartmentName: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface DrafterInfo {
-  id: number;
-  name: string;
   departmentName: string;
-  positionName: string | null;
-}
-
-export interface DocumentDetailResponse extends DocumentResponse {
-  drafter: DrafterInfo;
-  bodyHtml: string | null;
-  formData: string | null; // JSON string, parsed on frontend
-  approvalLines: ApprovalLineResponse[];
-  sourceDocId: number | null;
-  currentStep: number | null;
-  schemaDefinitionSnapshot: string | null; // JSON schema snapshot from template at creation time
+  positionName: string;
+  drafterId: number;
   submittedAt: string | null;
   completedAt: string | null;
+  createdAt: string;
 }
 
-export interface TemplateResponse {
+// === Approval Line ===
+export interface ApprovalLine {
   id: number;
-  code: string;
-  name: string;
-  description: string;
-  prefix: string;
-  isCustom?: boolean;
-  category?: string | null;
-  icon?: string | null;
+  approverId: number;
+  approverName: string;
+  departmentName: string;
+  positionName: string;
+  lineType: ApprovalLineType;
+  stepOrder: number;
+  status: ApprovalLineStatus;
+  comment: string | null;
+  actedAt: string | null;
 }
 
-export interface LeaveTypeResponse {
+// === Attachment ===
+export interface Attachment {
   id: number;
-  code: string;
-  name: string;
-  isHalfDay: boolean;
-  sortOrder: number;
+  documentId: number;
+  originalName: string;
+  fileSize: number;
+  mimeType: string;
+  gdriveFileId: string;
+  createdAt: string;
+}
+
+// === Document Detail ===
+export interface DocumentDetail {
+  id: number;
+  docNumber: string | null;
+  templateCode: string;
+  templateName: string;
+  title: string;
+  status: DocumentStatus;
+  drafterId: number;
+  drafterName: string;
+  departmentName: string;
+  positionName: string;
+  currentStep: number | null;
+  sourceDocId: number | null;
+  bodyHtml: string | null;
+  formData: string | null; // JSON string
+  schemaVersion: number | null;
+  schemaDefinitionSnapshot: string | null;
+  approvalLines: ApprovalLine[];
+  attachments: Attachment[];
+  submittedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
 }
 
 // === Request Types ===
 export interface CreateDocumentRequest {
   templateCode: string;
   title: string;
-  bodyHtml?: string | null;
-  formData?: string | null;
-  approvalLines?: ApprovalLineRequest[] | null;
+  bodyHtml?: string;
+  formData?: string;
+  approvalLines?: ApprovalLineRequest[];
 }
 
 export interface UpdateDocumentRequest {
   title: string;
-  bodyHtml?: string | null;
-  formData?: string | null;
-  approvalLines?: ApprovalLineRequest[] | null;
+  bodyHtml?: string;
+  formData?: string;
+  approvalLines?: ApprovalLineRequest[];
 }
 
-// === Enums ===
-export type DocumentStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'WITHDRAWN';
+export interface ApprovalLineRequest {
+  approverId: number;
+  lineType: ApprovalLineType;
+  stepOrder: number;
+}
+
+export interface ApprovalActionRequest {
+  comment?: string;
+}
+
+// === Search ===
+export interface DocumentSearchParams {
+  keyword?: string;
+  status?: DocumentStatus;
+  templateCode?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  tab?: 'my' | 'department' | 'all';
+  page?: number;
+  size?: number;
+}
+
+// === Pending Approval ===
+export interface PendingApproval {
+  approvalLineId: number;
+  documentId: number;
+  docNumber: string | null;
+  templateCode: string;
+  title: string;
+  drafterName: string;
+  departmentName: string;
+  stepOrder: number;
+  lineType: ApprovalLineType;
+  createdAt: string;
+}
 
 // === Form Data Types (parsed from formData JSON string) ===
 export interface ExpenseItem {
@@ -97,7 +171,6 @@ export interface LeaveFormData {
   emergencyContact?: string;
 }
 
-// === Purchase Request Form Data (per D-04) ===
 export interface PurchaseItem {
   name: string;
   spec: string;
@@ -115,7 +188,6 @@ export interface PurchaseFormData {
   totalAmount: number;
 }
 
-// === Business Trip Report Form Data (per D-09) ===
 export interface ItineraryItem {
   date: string;
   location: string;
@@ -139,7 +211,6 @@ export interface BusinessTripFormData {
   totalExpense: number;
 }
 
-// === Overtime Request Form Data (per D-14) ===
 export interface OvertimeFormData {
   workDate: string;
   startTime: string;
@@ -148,44 +219,14 @@ export interface OvertimeFormData {
   reason: string;
 }
 
-// === Query Params ===
-export interface MyDocumentParams {
-  page?: number;
-  size?: number;
-  status?: DocumentStatus;
-}
-
-// === Attachment Types ===
-export interface AttachmentResponse {
-  id: number;
-  documentId: number;
-  originalName: string;
-  fileSize: number;
-  mimeType: string;
-  createdAt: string;
-}
-
+// === Upload Types (client-side only) ===
 export type UploadStatus = 'pending' | 'uploading' | 'complete' | 'error';
 
-// === Search Types ===
-export type SearchTab = 'MY' | 'APPROVAL' | 'ALL';
-
-export interface DocumentSearchParams {
-  tab: SearchTab;
-  keyword?: string;
-  status?: DocumentStatus;
-  templateCode?: string;
-  startDate?: string;
-  endDate?: string;
-  page?: number;
-  size?: number;
-}
-
 export interface FileUploadItem {
-  id: string;            // temporary client-side ID (crypto.randomUUID())
+  id: string;
   file: File;
   status: UploadStatus;
-  progress: number;      // 0-100
+  progress: number;
   error?: string;
-  attachment?: AttachmentResponse;  // populated after successful upload
+  attachment?: Attachment;
 }

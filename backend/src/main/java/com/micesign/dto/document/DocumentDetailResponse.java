@@ -10,22 +10,19 @@ public record DocumentDetailResponse(
     String templateName,
     String title,
     String status,
-    DrafterInfo drafter,
+    Long drafterId,
+    String drafterName,
+    String departmentName,
+    String positionName,
+    Integer currentStep,
+    Long sourceDocId,
     String bodyHtml,
     String formData,
+    Integer schemaVersion,
+    String schemaDefinitionSnapshot,
     List<ApprovalLineResponse> approvalLines,
-    Long sourceDocId,
-    Integer currentStep,
+    List<AttachmentResponse> attachments,
     LocalDateTime submittedAt,
     LocalDateTime completedAt,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt,
-    String schemaDefinitionSnapshot
-) {
-    public record DrafterInfo(
-        Long id,
-        String name,
-        String departmentName,
-        String positionName
-    ) {}
-}
+    LocalDateTime createdAt
+) {}

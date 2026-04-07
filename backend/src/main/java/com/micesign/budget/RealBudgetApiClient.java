@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+/**
+ * Real budget API client for production.
+ * Uses RestClient with @Retryable (maxAttempts=3, exponential backoff).
+ */
 @Component
 @Profile("prod")
 public class RealBudgetApiClient implements BudgetApiClient {
@@ -30,49 +34,51 @@ public class RealBudgetApiClient implements BudgetApiClient {
 
     @Override
     @Retryable(
-        label = "sendExpenseData",
-        retryFor = {RestClientException.class},
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 2000, multiplier = 1.5)
+            label = "sendExpenseData",
+            retryFor = {RestClientException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000, multiplier = 1.5)
     )
     public BudgetApiResponse sendExpenseData(BudgetExpenseRequest request) {
-        log.info("Sending expense data to budget API: docNumber={}", request.getDocumentNumber());
+        log.info("Sending expense data to budget API: docNumber={}", request.docNumber());
         return budgetRestClient.post()
-            .uri("/api/budget/expenses")
-            .header("X-API-Key", apiKey)
-            .body(request)
-            .retrieve()
-            .body(BudgetApiResponse.class);
+                .uri("/api/budget/expenses")
+                .header("X-API-Key", apiKey)
+                .body(request)
+                .retrieve()
+                .body(BudgetApiResponse.class);
     }
 
     @Recover
-    public BudgetApiResponse recoverSendExpenseData(RestClientException e, BudgetExpenseRequest request) {
+    public BudgetApiResponse recoverSendExpenseData(RestClientException e,
+                                                     BudgetExpenseRequest request) {
         log.error("Budget API sendExpenseData failed after all retries: docNumber={}, error={}",
-                request.getDocumentNumber(), e.getMessage());
-        return null; // caller handles null as failure
+                request.docNumber(), e.getMessage());
+        return null; // Caller handles null as failure
     }
 
     @Override
     @Retryable(
-        label = "sendCancellation",
-        retryFor = {RestClientException.class},
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 2000, multiplier = 1.5)
+            label = "sendCancellation",
+            retryFor = {RestClientException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000, multiplier = 1.5)
     )
     public BudgetApiResponse sendCancellation(BudgetCancellationRequest request) {
-        log.info("Sending cancellation to budget API: docNumber={}", request.getDocumentNumber());
+        log.info("Sending cancellation to budget API: docNumber={}", request.docNumber());
         return budgetRestClient.post()
-            .uri("/api/budget/cancellations")
-            .header("X-API-Key", apiKey)
-            .body(request)
-            .retrieve()
-            .body(BudgetApiResponse.class);
+                .uri("/api/budget/cancellations")
+                .header("X-API-Key", apiKey)
+                .body(request)
+                .retrieve()
+                .body(BudgetApiResponse.class);
     }
 
     @Recover
-    public BudgetApiResponse recoverSendCancellation(RestClientException e, BudgetCancellationRequest request) {
+    public BudgetApiResponse recoverSendCancellation(RestClientException e,
+                                                      BudgetCancellationRequest request) {
         log.error("Budget API sendCancellation failed after all retries: docNumber={}, error={}",
-                request.getDocumentNumber(), e.getMessage());
+                request.docNumber(), e.getMessage());
         return null;
     }
 }

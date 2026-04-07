@@ -1,41 +1,35 @@
 import apiClient from '../../../api/client';
 import type { ApiResponse, PageResponse } from '../../../types/api';
 import type {
-  DocumentResponse,
-  DocumentDetailResponse,
+  DocumentDetail,
+  DocumentListItem,
   CreateDocumentRequest,
   UpdateDocumentRequest,
-  MyDocumentParams,
   DocumentSearchParams,
 } from '../types/document';
 
-const BASE = '/documents';
-
 export const documentApi = {
-  getMyDocuments: (params: MyDocumentParams) =>
-    apiClient.get<ApiResponse<PageResponse<DocumentResponse>>>(`${BASE}/my`, { params }),
+  create: (req: CreateDocumentRequest) =>
+    apiClient.post<ApiResponse<DocumentDetail>>('/documents', req).then(r => r.data.data!),
+
+  update: (id: number, req: UpdateDocumentRequest) =>
+    apiClient.put<ApiResponse<DocumentDetail>>(`/documents/${id}`, req).then(r => r.data.data!),
 
   getById: (id: number) =>
-    apiClient.get<ApiResponse<DocumentDetailResponse>>(`${BASE}/${id}`),
-
-  create: (data: CreateDocumentRequest) =>
-    apiClient.post<ApiResponse<DocumentResponse>>(BASE, data),
-
-  update: (id: number, data: UpdateDocumentRequest) =>
-    apiClient.put<ApiResponse<DocumentResponse>>(`${BASE}/${id}`, data),
+    apiClient.get<ApiResponse<DocumentDetail>>(`/documents/${id}`).then(r => r.data.data!),
 
   delete: (id: number) =>
-    apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`),
-
-  searchDocuments: (params: DocumentSearchParams) =>
-    apiClient.get<ApiResponse<PageResponse<DocumentResponse>>>(`${BASE}/search`, { params }),
+    apiClient.delete(`/documents/${id}`),
 
   submit: (id: number) =>
-    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/submit`),
+    apiClient.post<ApiResponse<DocumentDetail>>(`/documents/${id}/submit`).then(r => r.data.data!),
 
   withdraw: (id: number) =>
-    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/withdraw`),
+    apiClient.post<ApiResponse<DocumentDetail>>(`/documents/${id}/withdraw`).then(r => r.data.data!),
 
   rewrite: (id: number) =>
-    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/rewrite`),
+    apiClient.post<ApiResponse<DocumentDetail>>(`/documents/${id}/rewrite`).then(r => r.data.data!),
+
+  search: (params: DocumentSearchParams) =>
+    apiClient.get<ApiResponse<PageResponse<DocumentListItem>>>('/documents/search', { params }).then(r => r.data.data!),
 };

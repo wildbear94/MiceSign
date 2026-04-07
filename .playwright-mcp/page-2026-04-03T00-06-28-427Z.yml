@@ -1,0 +1,75 @@
+- generic [ref=e25]:
+  - banner [ref=e26]:
+    - link "MiceSign" [ref=e27] [cursor=pointer]:
+      - /url: /
+    - navigation [ref=e28]:
+      - link "내 문서" [ref=e29] [cursor=pointer]:
+        - /url: /documents/my
+      - link "결재 대기" [ref=e30] [cursor=pointer]:
+        - /url: /approvals/pending
+      - link "완료된 문서" [ref=e31] [cursor=pointer]:
+        - /url: /approvals/completed
+      - link "관리" [ref=e32] [cursor=pointer]:
+        - /url: /admin/departments
+        - img [ref=e33]
+        - text: 관리
+    - generic [ref=e36]:
+      - generic [ref=e37]: 시스템관리자
+      - button "로그아웃" [ref=e38] [cursor=pointer]:
+        - img [ref=e39]
+  - main [ref=e42]:
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - heading "내 문서" [level=1] [ref=e45]
+        - button "새 문서" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+          - text: 새 문서
+      - table [ref=e49]:
+        - rowgroup [ref=e50]:
+          - row "제목 문서번호 양식 상태 작성일" [ref=e51]:
+            - columnheader "제목" [ref=e52]
+            - columnheader "문서번호" [ref=e53]
+            - columnheader "양식" [ref=e54]
+            - columnheader "상태" [ref=e55]
+            - columnheader "작성일" [ref=e56]
+        - rowgroup [ref=e57]:
+          - row "휴가 테스트 LVE-2026-0001 휴가 신청서 제출됨 2026. 04. 02." [ref=e58] [cursor=pointer]:
+            - cell "휴가 테스트" [ref=e59]
+            - cell "LVE-2026-0001" [ref=e60]
+            - cell "휴가 신청서" [ref=e61]:
+              - generic [ref=e62]: 휴가 신청서
+            - cell "제출됨" [ref=e63]:
+              - generic [ref=e64]: 제출됨
+            - cell "2026. 04. 02." [ref=e65]
+          - row "지출 결의서 test EXP-2026-0001 지출 결의서 제출됨 2026. 04. 02." [ref=e66] [cursor=pointer]:
+            - cell "지출 결의서 test" [ref=e67]
+            - cell "EXP-2026-0001" [ref=e68]
+            - cell "지출 결의서" [ref=e69]:
+              - generic [ref=e70]: 지출 결의서
+            - cell "제출됨" [ref=e71]:
+              - generic [ref=e72]: 제출됨
+            - cell "2026. 04. 02." [ref=e73]
+          - row "test GEN-2026-0001 일반 업무 기안 제출됨 2026. 04. 02." [ref=e74] [cursor=pointer]:
+            - cell "test" [ref=e75]
+            - cell "GEN-2026-0001" [ref=e76]
+            - cell "일반 업무 기안" [ref=e77]:
+              - generic [ref=e78]: 일반 업무 기안
+            - cell "제출됨" [ref=e79]:
+              - generic [ref=e80]: 제출됨
+            - cell "2026. 04. 02." [ref=e81]
+          - row "test - 일반 업무 기안 임시저장 2026. 04. 02." [ref=e82] [cursor=pointer]:
+            - cell "test" [ref=e83]
+            - cell "-" [ref=e84]
+            - cell "일반 업무 기안" [ref=e85]:
+              - generic [ref=e86]: 일반 업무 기안
+            - cell "임시저장" [ref=e87]:
+              - generic [ref=e88]: 임시저장
+            - cell "2026. 04. 02." [ref=e89]
+          - row "test - 일반 업무 기안 임시저장 2026. 04. 02." [ref=e90] [cursor=pointer]:
+            - cell "test" [ref=e91]
+            - cell "-" [ref=e92]
+            - cell "일반 업무 기안" [ref=e93]:
+              - generic [ref=e94]: 일반 업무 기안
+            - cell "임시저장" [ref=e95]:
+              - generic [ref=e96]: 임시저장
+            - cell "2026. 04. 02." [ref=e97]

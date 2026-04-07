@@ -32,6 +32,12 @@ public class ApprovalTemplate {
     @Column(name = "budget_enabled", nullable = false)
     private boolean budgetEnabled = false;
 
+    @Column(name = "schema_definition", columnDefinition = "LONGTEXT")
+    private String schemaDefinition;
+
+    @Column(name = "schema_version", nullable = false)
+    private int schemaVersion = 0;
+
     @Column(name = "is_custom", nullable = false)
     private boolean isCustom = false;
 
@@ -134,6 +140,18 @@ public class ApprovalTemplate {
 
     public String getSchemaDefinition() {
         return schemaDefinition;
+    }
+
+    public void setSchemaDefinition(String schemaDefinition) {
+        this.schemaDefinition = schemaDefinition;
+    }
+
+    public int getSchemaVersion() {
+        return schemaVersion;
+    }
+
+    public void setSchemaVersion(int schemaVersion) {
+        this.schemaVersion = schemaVersion;
     }
 
     public void setBudgetEnabled(boolean budgetEnabled) {

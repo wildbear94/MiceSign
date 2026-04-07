@@ -11,4 +11,6 @@ public interface BudgetIntegrationLogRepository extends JpaRepository<BudgetInte
     List<BudgetIntegrationLog> findByDocumentId(Long documentId);
 
     Optional<BudgetIntegrationLog> findByDocumentIdAndEventType(Long documentId, String eventType);
+
+    Optional<BudgetIntegrationLog> findTopByDocumentIdAndEventTypeOrderByCreatedAtDesc(Long documentId, String eventType);
 }

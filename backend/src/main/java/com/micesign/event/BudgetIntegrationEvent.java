@@ -1,5 +1,9 @@
 package com.micesign.event;
 
+/**
+ * Event for budget integration on document submission.
+ * Published after transaction commit; consumed by BudgetIntegrationService.
+ */
 public class BudgetIntegrationEvent {
 
     private final Long documentId;
@@ -7,7 +11,8 @@ public class BudgetIntegrationEvent {
     private final String docNumber;
     private final Long drafterId;
 
-    public BudgetIntegrationEvent(Long documentId, String templateCode, String docNumber, Long drafterId) {
+    public BudgetIntegrationEvent(Long documentId, String templateCode,
+                                  String docNumber, Long drafterId) {
         this.documentId = documentId;
         this.templateCode = templateCode;
         this.docNumber = docNumber;

@@ -52,6 +52,9 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.3")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
+    // NanoID (for custom template code generation)
+    implementation("com.aventrix.jnanoid:jnanoid:2.0.0")
+
     // Spring Retry + AOP (for @Retryable budget API calls)
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-aop")

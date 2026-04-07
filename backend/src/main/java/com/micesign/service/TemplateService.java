@@ -5,6 +5,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.ApprovalTemplate;
+import com.micesign.domain.TemplateSchemaVersion;
+import com.micesign.domain.User;
+import com.micesign.dto.template.AdminTemplateDetailResponse;
+import com.micesign.dto.template.AdminTemplateResponse;
 import com.micesign.dto.template.CreateTemplateRequest;
 import com.micesign.dto.template.SchemaDefinition;
 import com.micesign.dto.template.TemplateDetailResponse;
@@ -12,6 +16,7 @@ import com.micesign.dto.template.TemplateResponse;
 import com.micesign.dto.template.UpdateTemplateRequest;
 import com.micesign.mapper.TemplateMapper;
 import com.micesign.repository.ApprovalTemplateRepository;
+import com.micesign.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,120 +27,233 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class TemplateService {
 
-    private final ApprovalTemplateRepository approvalTemplateRepository;
+    private final ApprovalTemplateRepository templateRepository;
     private final TemplateMapper templateMapper;
     private final TemplateSchemaService schemaService;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
-    public TemplateService(ApprovalTemplateRepository approvalTemplateRepository,
+    public TemplateService(ApprovalTemplateRepository templateRepository,
                            TemplateMapper templateMapper,
                            TemplateSchemaService schemaService,
+                           UserRepository userRepository,
                            ObjectMapper objectMapper) {
-        this.approvalTemplateRepository = approvalTemplateRepository;
+        this.templateRepository = templateRepository;
         this.templateMapper = templateMapper;
         this.schemaService = schemaService;
+        this.userRepository = userRepository;
         this.objectMapper = objectMapper;
     }
 
-    /**
-     * 활성 템플릿 목록 조회 (기존 API - 하위 호환)
-     */
-    public List<TemplateResponse> getActiveTemplates() {
-        return approvalTemplateRepository.findByIsActiveTrueOrderBySortOrder()
+    // ──────────────────────────────────────────────
+    // listActiveTemplates
+    // ──────────────────────────────────────────────
+
+    public List<TemplateResponse> listActiveTemplates() {
+        return templateRepository.findByIsActiveTrueOrderBySortOrder()
                 .stream()
                 .map(templateMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     /**
-     * 전체 템플릿 목록 조회 (Admin용)
+     * Backward-compat alias for listActiveTemplates.
      */
-    public List<TemplateResponse> getAllTemplates() {
-        return approvalTemplateRepository.findAll().stream()
-                .map(templateMapper::toResponse)
+    public List<TemplateResponse> getActiveTemplates() {
+        return listActiveTemplates();
+    }
+
+    // ──────────────────────────────────────────────
+    // getTemplateByCode
+    // ──────────────────────────────────────────────
+
+    /**
+     * Returns TemplateResponse (used by public controller).
+     */
+    public TemplateResponse getTemplateByCode(String code) {
+        ApprovalTemplate template = templateRepository.findByCode(code)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
+        return templateMapper.toResponse(template);
+    }
+
+    /**
+     * Returns TemplateDetailResponse (full detail by code).
+     */
+    public TemplateDetailResponse getTemplateDetailByCode(String code) {
+        ApprovalTemplate template = templateRepository.findByCode(code)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
+        return toDetailResponse(template);
+    }
+
+    // ──────────────────────────────────────────────
+    // getTemplateById (Admin -- with version history)
+    // ──────────────────────────────────────────────
+
+    public AdminTemplateDetailResponse getTemplateById(Long id) {
+        ApprovalTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
+
+        List<TemplateSchemaVersion> versions = schemaService.getVersionHistory(id);
+        List<AdminTemplateDetailResponse.SchemaVersionResponse> versionHistory = versions.stream()
+                .map(v -> new AdminTemplateDetailResponse.SchemaVersionResponse(
+                        v.getVersion(), v.getChangeDescription(), v.getCreatedAt()))
+                .toList();
+
+        return new AdminTemplateDetailResponse(
+                template.getId(), template.getCode(), template.getName(),
+                template.getDescription(), template.getPrefix(),
+                template.isActive(), template.getSortOrder(),
+                template.getSchemaDefinition(), template.getSchemaVersion(),
+                template.isCustom(), template.getCategory(), template.getIcon(),
+                template.getCreatedBy() != null ? template.getCreatedBy().getId() : null,
+                template.isBudgetEnabled(),
+                versionHistory,
+                template.getCreatedAt(), template.getUpdatedAt()
+        );
+    }
+
+    /**
+     * Backward-compat alias used by existing controllers.
+     */
+    public TemplateDetailResponse getTemplateDetail(Long id) {
+        ApprovalTemplate template = templateRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
+        return toDetailResponse(template);
+    }
+
+    // ──────────────────────────────────────────────
+    // listAllTemplates (Admin)
+    // ──────────────────────────────────────────────
+
+    public List<AdminTemplateResponse> listAllTemplates() {
+        return templateRepository.findAll().stream()
+                .map(t -> new AdminTemplateResponse(
+                        t.getId(), t.getCode(), t.getName(), t.getDescription(),
+                        t.getPrefix(), t.isActive(), t.getSortOrder(),
+                        t.getSchemaVersion(), t.isCustom(), t.getCategory(), t.getIcon(),
+                        t.getCreatedBy() != null ? t.getCreatedBy().getId() : null,
+                        t.isBudgetEnabled(),
+                        t.getCreatedAt(), t.getUpdatedAt()))
                 .collect(Collectors.toList());
     }
 
     /**
-     * 템플릿 상세 조회
+     * Backward-compat alias returning TemplateResponse list.
      */
-    public TemplateDetailResponse getTemplateDetail(Long id) {
-        ApprovalTemplate template = approvalTemplateRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."));
-        return toDetailResponse(template);
+    public List<TemplateResponse> getAllTemplates() {
+        return templateRepository.findAll().stream()
+                .map(templateMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
+    // ──────────────────────────────────────────────
+    // createTemplate (Admin)
+    // ──────────────────────────────────────────────
+
     /**
-     * 커스텀 템플릿 생성 (Admin)
+     * Backward-compat overload: (userId, request) order used by existing controllers.
      */
     @Transactional
-    public TemplateDetailResponse createTemplate(Long userId, CreateTemplateRequest req) {
-        // prefix 중복 검증
-        if (approvalTemplateRepository.existsByPrefix(req.prefix().toUpperCase())) {
-            throw new BusinessException("TPL_PREFIX_DUPLICATE", "이미 사용 중인 접두사입니다: " + req.prefix());
+    public TemplateDetailResponse createTemplate(Long userId, CreateTemplateRequest request) {
+        AdminTemplateDetailResponse admin = createTemplate(request, userId);
+        return toDetailResponse(templateRepository.findById(admin.id()).orElseThrow());
+    }
+
+    @Transactional
+    public AdminTemplateDetailResponse createTemplate(CreateTemplateRequest request, Long userId) {
+        // Prefix duplicate check
+        if (templateRepository.existsByPrefix(request.prefix().toUpperCase())) {
+            throw new BusinessException("TPL_PREFIX_DUPLICATE",
+                    "이미 사용 중인 접두사입니다: " + request.prefix());
         }
 
-        // code 자동 생성: CUSTOM_ + nanoid 12자
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "사용자를 찾을 수 없습니다."));
+
+        // Generate unique code
         String code = "CUSTOM_" + NanoIdUtils.randomNanoId(
                 NanoIdUtils.DEFAULT_NUMBER_GENERATOR, NanoIdUtils.DEFAULT_ALPHABET, 12);
 
         ApprovalTemplate template = new ApprovalTemplate();
         template.setCode(code);
-        template.setName(req.name());
-        template.setDescription(req.description());
-        template.setPrefix(req.prefix().toUpperCase());
+        template.setName(request.name());
+        template.setDescription(request.description());
+        template.setPrefix(request.prefix().toUpperCase());
         template.setCustom(true);
-        template.setCategory(req.category());
-        template.setIcon(req.icon());
+        template.setCategory(request.category());
+        template.setIcon(request.icon());
+        template.setCreatedBy(creator);
 
-        // 먼저 template을 persist해야 schema version FK가 유효함
-        approvalTemplateRepository.save(template);
+        // Persist first so schema version FK is valid
+        templateRepository.save(template);
 
-        // 스키마 저장 + 버전 1 생성 (D-09, D-11)
-        schemaService.updateSchema(template, req.schemaDefinition());
-
-        return toDetailResponse(template);
-    }
-
-    /**
-     * 커스텀 템플릿 수정 (Admin)
-     */
-    @Transactional
-    public TemplateDetailResponse updateTemplate(Long id, UpdateTemplateRequest req) {
-        ApprovalTemplate template = approvalTemplateRepository.findByIdAndIsCustomTrue(id)
-                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "커스텀 양식을 찾을 수 없습니다."));
-
-        if (req.name() != null) template.setName(req.name());
-        if (req.description() != null) template.setDescription(req.description());
-        if (req.category() != null) template.setCategory(req.category());
-        if (req.icon() != null) template.setIcon(req.icon());
-
-        // 스키마 변경 시 자동 버전 증가 (D-11)
-        if (req.schemaDefinition() != null) {
-            schemaService.updateSchema(template, req.schemaDefinition());
+        // Save schema + version 1
+        if (request.schemaDefinition() != null) {
+            SchemaDefinition schema = objectMapper.convertValue(
+                    request.schemaDefinition(), SchemaDefinition.class);
+            schemaService.updateSchema(template, schema);
         }
 
-        approvalTemplateRepository.save(template);
-        return toDetailResponse(template);
+        return getTemplateById(template.getId());
     }
 
+    // ──────────────────────────────────────────────
+    // updateTemplate (Admin)
+    // ──────────────────────────────────────────────
+
     /**
-     * 커스텀 템플릿 비활성화 (Admin)
+     * Backward-compat overload: 2-param version used by existing controllers.
      */
     @Transactional
-    public void deactivateTemplate(Long id) {
-        ApprovalTemplate template = approvalTemplateRepository.findByIdAndIsCustomTrue(id)
-                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "커스텀 양식을 찾을 수 없습니다."));
-        template.setActive(false);
-        approvalTemplateRepository.save(template);
+    public TemplateDetailResponse updateTemplate(Long id, UpdateTemplateRequest request) {
+        AdminTemplateDetailResponse admin = updateTemplate(id, request, null);
+        return toDetailResponse(templateRepository.findById(admin.id()).orElseThrow());
     }
 
-    /**
-     * 공개 스키마 조회 — 템플릿 코드로 활성 커스텀 템플릿의 스키마를 반환
-     * 하드코딩 양식(schemaDefinition == null)이나 비활성/존재하지 않는 템플릿은 404
-     */
+    @Transactional
+    public AdminTemplateDetailResponse updateTemplate(Long id, UpdateTemplateRequest request, Long userId) {
+        ApprovalTemplate template = templateRepository.findByIdAndIsCustomTrue(id)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND",
+                        "커스텀 양식을 찾을 수 없습니다.", 404));
+
+        if (request.name() != null) template.setName(request.name());
+        if (request.description() != null) template.setDescription(request.description());
+        if (request.category() != null) template.setCategory(request.category());
+        if (request.icon() != null) template.setIcon(request.icon());
+        if (request.isActive() != null) template.setActive(request.isActive());
+        if (request.sortOrder() != null) template.setSortOrder(request.sortOrder());
+        if (request.budgetEnabled() != null) template.setBudgetEnabled(request.budgetEnabled());
+
+        // Schema change: increment version
+        if (request.schemaDefinition() != null) {
+            SchemaDefinition schema = objectMapper.convertValue(
+                    request.schemaDefinition(), SchemaDefinition.class);
+            schemaService.updateSchema(template, schema);
+        }
+
+        templateRepository.save(template);
+        return getTemplateById(template.getId());
+    }
+
+    // ──────────────────────────────────────────────
+    // deactivateTemplate (Admin)
+    // ──────────────────────────────────────────────
+
+    @Transactional
+    public void deactivateTemplate(Long id) {
+        ApprovalTemplate template = templateRepository.findByIdAndIsCustomTrue(id)
+                .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND",
+                        "커스텀 양식을 찾을 수 없습니다.", 404));
+        template.setActive(false);
+        templateRepository.save(template);
+    }
+
+    // ──────────────────────────────────────────────
+    // getTemplateSchemaByCode (public schema query)
+    // ──────────────────────────────────────────────
+
     public SchemaDefinition getTemplateSchemaByCode(String code) {
-        ApprovalTemplate template = approvalTemplateRepository.findByCode(code)
+        ApprovalTemplate template = templateRepository.findByCode(code)
                 .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다.", 404));
 
         if (!template.isActive()) {
@@ -143,10 +261,10 @@ public class TemplateService {
         }
 
         if (template.getSchemaDefinition() == null) {
-            throw new BusinessException("TPL_NOT_FOUND", "해당 양식에는 스키마가 정의되어 있지 않습니다.", 404);
+            throw new BusinessException("TPL_NO_SCHEMA",
+                    "해당 양식에는 스키마가 정의되어 있지 않습니다.", 404);
         }
 
-        // 옵션 세트 resolve 후 SchemaDefinition으로 역직렬화
         String resolvedJson = schemaService.resolveSchemaWithOptions(template.getSchemaDefinition());
         try {
             return objectMapper.readValue(resolvedJson, SchemaDefinition.class);
@@ -156,19 +274,19 @@ public class TemplateService {
         }
     }
 
+    // ──────────────────────────────────────────────
+    // Private helpers
+    // ──────────────────────────────────────────────
+
     private TemplateDetailResponse toDetailResponse(ApprovalTemplate t) {
-        SchemaDefinition schema = null;
-        if (t.getSchemaDefinition() != null) {
-            try {
-                schema = objectMapper.readValue(t.getSchemaDefinition(), SchemaDefinition.class);
-            } catch (JsonProcessingException e) {
-                throw new BusinessException("SCHEMA_PARSE_ERROR",
-                        "스키마 역직렬화에 실패했습니다: " + e.getMessage());
-            }
-        }
         return new TemplateDetailResponse(
                 t.getId(), t.getCode(), t.getName(), t.getDescription(),
-                t.getPrefix(), t.isActive(), t.isCustom(), t.getSchemaVersion(),
-                t.getCategory(), t.getIcon(), schema, t.getCreatedAt(), t.getUpdatedAt());
+                t.getPrefix(), t.isActive(), t.getSortOrder(),
+                t.getSchemaDefinition(), t.getSchemaVersion(),
+                t.isCustom(), t.getCategory(), t.getIcon(),
+                t.getCreatedBy() != null ? t.getCreatedBy().getId() : null,
+                t.isBudgetEnabled(),
+                t.getCreatedAt(), t.getUpdatedAt()
+        );
     }
 }

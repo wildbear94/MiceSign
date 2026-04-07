@@ -27,6 +27,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Budget integration service.
+ * Listens for BudgetIntegrationEvent and BudgetCancellationEvent after transaction commit.
+ * Extracts expense data from the document, calls the budget API, and logs the result.
+ * On final failure, notifies SUPER_ADMIN users.
+ */
 @Service
 public class BudgetIntegrationService {
 
@@ -62,49 +68,56 @@ public class BudgetIntegrationService {
         this.objectMapper = objectMapper;
     }
 
+    // ──────────────────────────────────────────────
+    // Handle budget integration (submit)
+    // ──────────────────────────────────────────────
+
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
     public void handleBudgetEvent(BudgetIntegrationEvent event) {
         try {
-            // 1. Check if template has budget_enabled
-            ApprovalTemplate template = templateRepository.findByCode(event.getTemplateCode()).orElse(null);
+            // Check if template has budget_enabled
+            ApprovalTemplate template = templateRepository.findByCode(event.getTemplateCode())
+                    .orElse(null);
             if (template == null || !template.isBudgetEnabled()) {
                 log.debug("Skipping budget integration for template: {}", event.getTemplateCode());
                 return;
             }
 
-            // 2. Re-fetch document with drafter (avoid LazyInitializationException)
-            Document document = documentRepository.findByIdWithDrafter(event.getDocumentId()).orElse(null);
+            // Re-fetch document with drafter (avoid LazyInitializationException)
+            Document document = documentRepository.findByIdWithDrafter(event.getDocumentId())
+                    .orElse(null);
             if (document == null) {
                 log.warn("Document not found for budget integration: id={}", event.getDocumentId());
                 return;
             }
 
-            // 3. Get document content for formData
-            DocumentContent content = documentContentRepository.findByDocumentId(event.getDocumentId()).orElse(null);
+            // Get document content for formData
+            DocumentContent content = documentContentRepository.findByDocumentId(event.getDocumentId())
+                    .orElse(null);
             if (content == null || content.getFormData() == null) {
                 log.warn("Document content/formData not found: documentId={}", event.getDocumentId());
                 return;
             }
 
-            // 4. Extract budget data
+            // Extract budget data
             User drafter = document.getDrafter();
-            String departmentName = drafter.getDepartment() != null ? drafter.getDepartment().getName() : "";
+            String departmentName = drafter.getDepartment() != null
+                    ? drafter.getDepartment().getName() : "";
             BudgetExpenseRequest request = budgetDataExtractor.extract(
                     event.getTemplateCode(),
                     content.getFormData(),
                     event.getDocNumber(),
-                    drafter.getEmployeeNo(),
                     drafter.getName(),
                     departmentName,
                     document.getSubmittedAt()
             );
 
-            // 5. Call budget API (@Retryable is on BudgetApiClient, not here)
+            // Call budget API (@Retryable is on BudgetApiClient)
             String requestJson = objectMapper.writeValueAsString(request);
             BudgetApiResponse response = budgetApiClient.sendExpenseData(request);
 
-            // 6. Log result
+            // Log result
             BudgetIntegrationLog budgetLog = new BudgetIntegrationLog();
             budgetLog.setDocumentId(event.getDocumentId());
             budgetLog.setTemplateCode(event.getTemplateCode());
@@ -112,57 +125,48 @@ public class BudgetIntegrationService {
             budgetLog.setEventType("SUBMIT");
             budgetLog.setRequestPayload(requestJson);
 
-            if (response != null && response.isSuccess()) {
+            if (response != null && response.success()) {
                 budgetLog.setStatus("SUCCESS");
                 budgetLog.setResponsePayload(objectMapper.writeValueAsString(response));
                 budgetLog.setAttemptCount(1);
             } else {
                 budgetLog.setStatus("FAILED");
-                budgetLog.setErrorMessage(response != null ? response.getMessage() : "No response (null) - all retries exhausted");
-                budgetLog.setResponsePayload(response != null ? objectMapper.writeValueAsString(response) : null);
-                // Send failure notification to SUPER_ADMINs
+                budgetLog.setErrorMessage(response != null
+                        ? response.message() : "No response (null) - all retries exhausted");
+                budgetLog.setResponsePayload(response != null
+                        ? objectMapper.writeValueAsString(response) : null);
                 notifySuperAdmins(event.getDocNumber(), event.getTemplateCode(),
-                        response != null ? response.getMessage() : "All retries exhausted");
+                        response != null ? response.message() : "All retries exhausted");
             }
             budgetLog.setCompletedAt(LocalDateTime.now());
             logRepository.save(budgetLog);
 
         } catch (Exception e) {
-            // Catch all exceptions to prevent @Async thread exception loss
             log.error("Budget integration failed: documentId={}, templateCode={}, error={}",
                     event.getDocumentId(), event.getTemplateCode(), e.getMessage(), e);
-            try {
-                BudgetIntegrationLog errorLog = new BudgetIntegrationLog();
-                errorLog.setDocumentId(event.getDocumentId());
-                errorLog.setTemplateCode(event.getTemplateCode());
-                errorLog.setDocNumber(event.getDocNumber());
-                errorLog.setEventType("SUBMIT");
-                errorLog.setStatus("FAILED");
-                errorLog.setErrorMessage(e.getMessage());
-                errorLog.setCompletedAt(LocalDateTime.now());
-                logRepository.save(errorLog);
-                notifySuperAdmins(event.getDocNumber(), event.getTemplateCode(), e.getMessage());
-            } catch (Exception logError) {
-                log.error("Failed to save budget integration error log: {}", logError.getMessage());
-            }
+            saveErrorLog(event.getDocumentId(), event.getTemplateCode(),
+                    event.getDocNumber(), "SUBMIT", e.getMessage());
+            notifySuperAdmins(event.getDocNumber(), event.getTemplateCode(), e.getMessage());
         }
     }
+
+    // ──────────────────────────────────────────────
+    // Handle budget cancellation (withdraw/reject)
+    // ──────────────────────────────────────────────
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
     public void handleCancellationEvent(BudgetCancellationEvent event) {
         try {
             // Check budget_enabled
-            ApprovalTemplate template = templateRepository.findByCode(event.getTemplateCode()).orElse(null);
+            ApprovalTemplate template = templateRepository.findByCode(event.getTemplateCode())
+                    .orElse(null);
             if (template == null || !template.isBudgetEnabled()) {
                 return;
             }
 
-            BudgetCancellationRequest request = new BudgetCancellationRequest();
-            request.setDocumentNumber(event.getDocNumber());
-            request.setTemplateCode(event.getTemplateCode());
-            request.setReason(event.getReason());
-            request.setCancelledAt(LocalDateTime.now());
+            BudgetCancellationRequest request = new BudgetCancellationRequest(
+                    event.getDocNumber(), event.getTemplateCode());
 
             String requestJson = objectMapper.writeValueAsString(request);
             BudgetApiResponse response = budgetApiClient.sendCancellation(request);
@@ -174,14 +178,16 @@ public class BudgetIntegrationService {
             budgetLog.setEventType("CANCEL");
             budgetLog.setRequestPayload(requestJson);
 
-            if (response != null && response.isSuccess()) {
+            if (response != null && response.success()) {
                 budgetLog.setStatus("SUCCESS");
                 budgetLog.setResponsePayload(objectMapper.writeValueAsString(response));
             } else {
                 budgetLog.setStatus("FAILED");
-                budgetLog.setErrorMessage(response != null ? response.getMessage() : "All retries exhausted");
+                budgetLog.setErrorMessage(response != null
+                        ? response.message() : "All retries exhausted");
                 notifySuperAdmins(event.getDocNumber(), event.getTemplateCode(),
-                        "Cancellation failed: " + (response != null ? response.getMessage() : "All retries exhausted"));
+                        "Cancellation failed: " + (response != null
+                                ? response.message() : "All retries exhausted"));
             }
             budgetLog.setCompletedAt(LocalDateTime.now());
             logRepository.save(budgetLog);
@@ -189,25 +195,37 @@ public class BudgetIntegrationService {
         } catch (Exception e) {
             log.error("Budget cancellation failed: documentId={}, error={}",
                     event.getDocumentId(), e.getMessage(), e);
-            try {
-                BudgetIntegrationLog errorLog = new BudgetIntegrationLog();
-                errorLog.setDocumentId(event.getDocumentId());
-                errorLog.setTemplateCode(event.getTemplateCode());
-                errorLog.setDocNumber(event.getDocNumber());
-                errorLog.setEventType("CANCEL");
-                errorLog.setStatus("FAILED");
-                errorLog.setErrorMessage(e.getMessage());
-                errorLog.setCompletedAt(LocalDateTime.now());
-                logRepository.save(errorLog);
-            } catch (Exception logError) {
-                log.error("Failed to save cancellation error log: {}", logError.getMessage());
-            }
+            saveErrorLog(event.getDocumentId(), event.getTemplateCode(),
+                    event.getDocNumber(), "CANCEL", e.getMessage());
+            notifySuperAdmins(event.getDocNumber(), event.getTemplateCode(), e.getMessage());
+        }
+    }
+
+    // ──────────────────────────────────────────────
+    // Private helpers
+    // ──────────────────────────────────────────────
+
+    private void saveErrorLog(Long documentId, String templateCode, String docNumber,
+                              String eventType, String errorMessage) {
+        try {
+            BudgetIntegrationLog errorLog = new BudgetIntegrationLog();
+            errorLog.setDocumentId(documentId);
+            errorLog.setTemplateCode(templateCode);
+            errorLog.setDocNumber(docNumber);
+            errorLog.setEventType(eventType);
+            errorLog.setStatus("FAILED");
+            errorLog.setErrorMessage(errorMessage);
+            errorLog.setCompletedAt(LocalDateTime.now());
+            logRepository.save(errorLog);
+        } catch (Exception logError) {
+            log.error("Failed to save budget integration error log: {}", logError.getMessage());
         }
     }
 
     private void notifySuperAdmins(String docNumber, String templateCode, String errorMessage) {
         try {
-            List<User> superAdmins = userRepository.findByRoleAndStatus(UserRole.SUPER_ADMIN, UserStatus.ACTIVE);
+            List<User> superAdmins = userRepository.findByRoleAndStatus(
+                    UserRole.SUPER_ADMIN, UserStatus.ACTIVE);
             Map<String, Object> variables = Map.of(
                     "docNumber", docNumber != null ? docNumber : "N/A",
                     "templateCode", templateCode,
@@ -217,10 +235,11 @@ public class BudgetIntegrationService {
             for (User admin : superAdmins) {
                 try {
                     emailService.sendEmail(admin.getEmail(),
-                            "[MiceSign] \uc608\uc0b0 \uc2dc\uc2a4\ud15c \uc5f0\ub3d9 \uc2e4\ud328 - " + docNumber,
+                            "[MiceSign] 예산 시스템 연동 실패 - " + docNumber,
                             "budget-failure-notification", variables);
                 } catch (Exception e) {
-                    log.error("Failed to send budget failure notification to {}: {}", admin.getEmail(), e.getMessage());
+                    log.error("Failed to send budget failure notification to {}: {}",
+                            admin.getEmail(), e.getMessage());
                 }
             }
         } catch (Exception e) {

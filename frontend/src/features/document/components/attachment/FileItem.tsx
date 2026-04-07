@@ -1,28 +1,24 @@
 import { useState } from 'react';
 import { X, Check, AlertCircle, Loader2, Download } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import type { AttachmentResponse, FileUploadItem } from '../../types/document';
+import type { Attachment, FileUploadItem } from '../../types/document';
 import { getFileIcon } from './fileIcons';
 import { formatFileSize } from './fileValidation';
 
 interface FileItemProps {
-  attachment?: AttachmentResponse;
+  attachment?: Attachment;
   uploadItem?: FileUploadItem;
-  readOnly: boolean;
-  onDelete?: (id: number) => void;
-  onDownload?: (id: number) => void;
-  onCancelUpload?: (clientId: string) => void;
+  onDownload?: () => void;
+  onDelete?: () => void;
+  isUploading?: boolean;
+  progress?: number;
 }
 
 export default function FileItem({
   attachment,
   uploadItem,
-  readOnly,
-  onDelete,
   onDownload,
-  onCancelUpload,
+  onDelete,
 }: FileItemProps) {
-  const { t } = useTranslation('document');
   const [isDownloading, setIsDownloading] = useState(false);
 
   const filename = attachment?.originalName ?? uploadItem?.file.name ?? '';
@@ -34,10 +30,10 @@ export default function FileItem({
   const isError = uploadItem?.status === 'error';
 
   const handleDownload = async () => {
-    if (!attachment || !onDownload) return;
+    if (!onDownload) return;
     setIsDownloading(true);
     try {
-      onDownload(attachment.id);
+      onDownload();
     } finally {
       setIsDownloading(false);
     }
@@ -50,7 +46,7 @@ export default function FileItem({
     >
       {/* File type icon */}
       <FileIcon
-        className="h-5 w-5 text-gray-500 dark:text-gray-400 flex-shrink-0"
+        className="h-5 w-5 text-gray-500 dark:text-gray-400 shrink-0"
         aria-label={iconLabel}
       />
 
@@ -59,11 +55,8 @@ export default function FileItem({
         <p className="text-sm text-gray-900 dark:text-gray-50 truncate">{filename}</p>
 
         {/* Upload progress bar */}
-        {isUploading && (
-          <div
-            className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full mt-1"
-            aria-live="polite"
-          >
+        {isUploading && uploadItem && (
+          <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full mt-1">
             <div
               className="h-1 bg-blue-600 rounded-full transition-all duration-300"
               style={{ width: `${uploadItem.progress}%` }}
@@ -78,57 +71,41 @@ export default function FileItem({
       </div>
 
       {/* File size */}
-      <span className="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+      <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
         {formatFileSize(fileSize)}
       </span>
 
-      {/* Status icons / action buttons */}
-      {isComplete && (
-        <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
-      )}
+      {/* Status icons */}
+      {isComplete && <Check className="h-4 w-4 text-green-600 shrink-0" />}
+      {isError && <AlertCircle className="h-4 w-4 text-red-600 shrink-0" />}
 
-      {isError && (
-        <AlertCircle className="h-4 w-4 text-red-600 flex-shrink-0" />
-      )}
-
-      {/* Cancel upload button */}
-      {isUploading && onCancelUpload && uploadItem && (
+      {/* Delete button */}
+      {onDelete && !isUploading && (
         <button
           type="button"
-          onClick={() => onCancelUpload(uploadItem.id)}
-          className="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-red-500 flex-shrink-0"
-          aria-label={t('attachment.action.delete')}
+          onClick={onDelete}
+          className="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-red-500 shrink-0"
+          aria-label="파일 삭제"
         >
           <X className="h-4 w-4" />
         </button>
       )}
 
-      {/* Delete button (editor mode) */}
-      {!readOnly && attachment && onDelete && !uploadItem && (
-        <button
-          type="button"
-          onClick={() => onDelete(attachment.id)}
-          className="h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-red-500 flex-shrink-0"
-          aria-label={t('attachment.action.delete')}
-        >
-          <X className="h-4 w-4" />
-        </button>
-      )}
-
-      {/* Download button (read-only mode) */}
-      {readOnly && attachment && onDownload && (
+      {/* Download button */}
+      {onDownload && !uploadItem && (
         <button
           type="button"
           onClick={handleDownload}
           disabled={isDownloading}
-          className="text-xs text-blue-600 hover:text-blue-700 font-medium flex-shrink-0 flex items-center gap-1"
+          className="text-xs text-blue-600 hover:text-blue-700 font-medium shrink-0 flex items-center gap-1"
+          aria-label="파일 다운로드"
         >
           {isDownloading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Download className="h-4 w-4" />
           )}
-          {t('attachment.action.download')}
+          다운로드
         </button>
       )}
     </div>

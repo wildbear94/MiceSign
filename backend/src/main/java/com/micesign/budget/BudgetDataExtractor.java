@@ -6,108 +6,117 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+/**
+ * Utility to extract budget expense data from document formData JSON.
+ * Parses formData by template code to build BudgetExpenseRequest.
+ */
 @Component
 public class BudgetDataExtractor {
 
     private static final Logger log = LoggerFactory.getLogger(BudgetDataExtractor.class);
     private final ObjectMapper objectMapper;
 
-    @FunctionalInterface
-    interface BudgetDataMapper {
-        void extract(Map<String, Object> formData, BudgetExpenseRequest request);
-    }
-
-    private final Map<String, BudgetDataMapper> mappers = Map.of(
-        "EXPENSE", this::extractExpense,
-        "PURCHASE", this::extractPurchase,
-        "BUSINESS_TRIP", this::extractBusinessTrip,
-        "OVERTIME", this::extractOvertime
-    );
-
     public BudgetDataExtractor(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Extract budget expense data from a document's formData.
+     *
+     * @param templateCode   the template code (EXPENSE, PURCHASE, BUSINESS_TRIP, etc.)
+     * @param formDataJson   the form data JSON string
+     * @param docNumber      the document number
+     * @param drafterName    the drafter's name
+     * @param departmentName the drafter's department name
+     * @param submittedAt    when the document was submitted
+     * @return a BudgetExpenseRequest; never null (returns zeroed data on parse failure)
+     */
     public BudgetExpenseRequest extract(String templateCode, String formDataJson,
-                                         String docNumber, String drafterEmployeeNo,
-                                         String drafterName, String departmentName,
-                                         LocalDateTime submittedAt) {
-        BudgetExpenseRequest request = new BudgetExpenseRequest();
-        request.setDocumentNumber(docNumber);
-        request.setTemplateCode(templateCode);
-        request.setDrafterEmployeeNo(drafterEmployeeNo);
-        request.setDrafterName(drafterName);
-        request.setDepartmentName(departmentName);
-        request.setSubmittedAt(submittedAt);
-
+                                         String docNumber, String drafterName,
+                                         String departmentName, LocalDateTime submittedAt) {
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> formData = objectMapper.readValue(formDataJson, Map.class);
-            BudgetDataMapper mapper = mappers.get(templateCode);
-            if (mapper != null) {
-                mapper.extract(formData, request);
-            } else {
-                log.warn("No budget data mapper found for templateCode: {}", templateCode);
-                request.setTotalAmount(0L);
-                request.setDetails(Map.of());
+
+            long totalAmount = 0L;
+            List<BudgetExpenseRequest.ExpenseItem> items = List.of();
+
+            switch (templateCode) {
+                case "EXPENSE" -> {
+                    totalAmount = toLong(formData.get("totalAmount"));
+                    items = extractExpenseItems(formData);
+                }
+                case "PURCHASE" -> {
+                    totalAmount = toLong(formData.get("totalAmount"));
+                    items = extractExpenseItems(formData);
+                }
+                case "BUSINESS_TRIP" -> {
+                    totalAmount = toLong(formData.get("totalExpense"));
+                    items = extractExpenseItems(formData);
+                }
+                case "OVERTIME" -> {
+                    // OVERTIME has no monetary total
+                    totalAmount = 0L;
+                }
+                default -> log.warn("No budget data mapper found for templateCode: {}", templateCode);
             }
+
+            return new BudgetExpenseRequest(docNumber, templateCode, drafterName,
+                    departmentName, items, totalAmount, submittedAt);
+
         } catch (Exception e) {
-            log.error("Failed to extract budget data: templateCode={}, error={}", templateCode, e.getMessage());
-            request.setTotalAmount(0L);
-            request.setDetails(Map.of("error", e.getMessage()));
+            log.error("Failed to extract budget data: templateCode={}, error={}",
+                    templateCode, e.getMessage());
+            return new BudgetExpenseRequest(docNumber, templateCode, drafterName,
+                    departmentName, List.of(), 0L, submittedAt);
         }
-
-        return request;
     }
 
-    private void extractExpense(Map<String, Object> formData, BudgetExpenseRequest request) {
-        request.setTotalAmount(toLong(formData.get("totalAmount")));
-        Map<String, Object> details = new HashMap<>();
-        details.put("items", formData.get("items"));
-        request.setDetails(details);
+    // ──────────────────────────────────────────────
+    // Private helpers
+    // ──────────────────────────────────────────────
+
+    @SuppressWarnings("unchecked")
+    private List<BudgetExpenseRequest.ExpenseItem> extractExpenseItems(Map<String, Object> formData) {
+        Object itemsObj = formData.get("items");
+        if (itemsObj instanceof List<?> rawItems) {
+            return rawItems.stream()
+                    .filter(item -> item instanceof Map)
+                    .map(item -> {
+                        Map<String, Object> m = (Map<String, Object>) item;
+                        return new BudgetExpenseRequest.ExpenseItem(
+                                (String) m.getOrDefault("description",
+                                        m.getOrDefault("name", "")),
+                                toInt(m.get("quantity")),
+                                toLong(m.get("unitPrice")),
+                                toLong(m.get("amount"))
+                        );
+                    })
+                    .toList();
+        }
+        return List.of();
     }
 
-    private void extractPurchase(Map<String, Object> formData, BudgetExpenseRequest request) {
-        request.setTotalAmount(toLong(formData.get("totalAmount")));
-        Map<String, Object> details = new HashMap<>();
-        details.put("items", formData.get("items"));
-        details.put("supplier", formData.get("supplier"));
-        details.put("deliveryDate", formData.get("deliveryDate"));
-        request.setDetails(details);
-    }
-
-    private void extractBusinessTrip(Map<String, Object> formData, BudgetExpenseRequest request) {
-        request.setTotalAmount(toLong(formData.get("totalExpense")));
-        Map<String, Object> details = new HashMap<>();
-        details.put("expenses", formData.get("expenses"));
-        details.put("destination", formData.get("destination"));
-        details.put("startDate", formData.get("startDate"));
-        details.put("endDate", formData.get("endDate"));
-        request.setDetails(details);
-    }
-
-    private void extractOvertime(Map<String, Object> formData, BudgetExpenseRequest request) {
-        // OVERTIME has no totalAmount field in formData (Pitfall 4)
-        // Send hours only; budget system calculates cost
-        request.setTotalAmount(null);
-        Map<String, Object> details = new HashMap<>();
-        details.put("hours", formData.get("hours"));
-        details.put("workDate", formData.get("workDate"));
-        details.put("startTime", formData.get("startTime"));
-        details.put("endTime", formData.get("endTime"));
-        request.setDetails(details);
-    }
-
-    private Long toLong(Object value) {
+    private long toLong(Object value) {
         if (value == null) return 0L;
-        if (value instanceof Number) return ((Number) value).longValue();
+        if (value instanceof Number n) return n.longValue();
         try {
             return Long.parseLong(value.toString());
         } catch (NumberFormatException e) {
             return 0L;
+        }
+    }
+
+    private int toInt(Object value) {
+        if (value == null) return 0;
+        if (value instanceof Number n) return n.intValue();
+        try {
+            return Integer.parseInt(value.toString());
+        } catch (NumberFormatException e) {
+            return 0;
         }
     }
 }
