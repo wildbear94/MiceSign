@@ -4,7 +4,8 @@
 
 - ~~**v1.0 MVP**~~ - Phases 1-8 (shipped 2026-04-03)
 - ~~**v1.1 Extended Features**~~ - Phases 9-11 (shipped 2026-04-04)
-- **v1.2 Custom Template Builder** - Phases 12-17 (in progress)
+- ~~**v1.2 Custom Template Builder**~~ - Phases 12-17 (shipped 2026-04-07)
+- **v1.3 사용자 등록 신청** - Phases 18-21 (in progress)
 
 ## Phases
 
@@ -209,9 +210,8 @@ Plans:
 
 </details>
 
-### v1.2 Custom Template Builder (In Progress)
-
-**Milestone Goal:** Admin이 코드 없이 드래그&드롭으로 결재 양식을 생성하고, 기존 하드코딩 양식을 JSON 스키마 기반으로 전환
+<details>
+<summary>v1.2 Custom Template Builder (Phases 12-17) - SHIPPED 2026-04-07</summary>
 
 - [x] **Phase 12: Schema Foundation** - JSON schema format design, DB migration, template CRUD API, backend validation, versioning infrastructure (completed 2026-04-05)
 - [x] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support (completed 2026-04-05)
@@ -219,8 +219,6 @@ Plans:
 - [x] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections (completed 2026-04-06)
 - [x] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification (completed 2026-04-06)
 - [x] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging (completed 2026-04-07)
-
-## Phase Details
 
 ### Phase 12: Schema Foundation
 **Goal**: The system has a stable JSON schema format and DB infrastructure so that templates can be defined, versioned, and validated without any UI — the foundation everything else builds on
@@ -315,11 +313,69 @@ Plans:
 - [x] 17-02-PLAN.md — Integration wiring: BudgetIntegrationService, event publishing in DocumentService/ApprovalService, failure email, unit + integration tests
 - [x] 17-03-PLAN.md — Gap closure: event publishing wiring in DocumentService, @Retryable label fix, REQUIREMENTS.md update
 
+</details>
+
+### v1.3 사용자 등록 신청 (In Progress)
+
+**Milestone Goal:** 로그인 화면에서 사용자가 직접 계정을 신청하고, SUPER_ADMIN이 승인/거부할 수 있는 셀프 등록 시스템
+
+- [ ] **Phase 18: Registration Backend** - registration_request 테이블, 등록 신청 API, 이메일 중복 검증, 승인 시 자동 계정 생성
+- [ ] **Phase 19: Registration Email Notifications** - 등록 이벤트 이메일 인프라 확장, 신청/승인/거부 이메일 발송, SUPER_ADMIN 알림
+- [ ] **Phase 20: Admin Registration Management UI** - SUPER_ADMIN 등록 신청 목록, 부서/직급 지정 승인, 거부 사유 입력
+- [ ] **Phase 21: Registration Frontend & Security** - 로그인 화면 등록 신청 폼, 신청 상태 조회 페이지, rate limiting
+
+## Phase Details
+
+### Phase 18: Registration Backend
+**Goal**: The system has a complete backend for user self-registration: anyone can submit a registration request, and approving it safely creates a user account
+**Depends on**: Phase 17 (v1.2 complete)
+**Requirements**: REG-01, REG-02, REG-03, ADM-04
+**Success Criteria** (what must be TRUE):
+  1. An unauthenticated user can submit a registration request via API with name, email, and password
+  2. The system rejects registration if the email already exists in either the user table or a pending registration_request
+  3. A previously rejected email can be used to submit a new registration request
+  4. When a registration request is approved, a user account is created with the correct password hash (no double-hashing) and status ACTIVE
+  5. The registration_request table stores requests independently from the user table (separate entity with its own lifecycle)
+**Plans**: TBD
+
+### Phase 19: Registration Email Notifications
+**Goal**: All registration lifecycle events trigger appropriate email notifications so applicants know their status and admins know about new requests
+**Depends on**: Phase 18
+**Requirements**: MAIL-01, MAIL-02, MAIL-03, MAIL-04
+**Success Criteria** (what must be TRUE):
+  1. The existing email infrastructure supports non-document events (registration is not tied to document_id in notification_log)
+  2. Applicant receives a confirmation email immediately after submitting a registration request
+  3. Applicant receives a result email when their request is approved or rejected (rejection includes the reason)
+  4. All SUPER_ADMIN users receive a notification email when a new registration request is submitted
+
+### Phase 20: Admin Registration Management UI
+**Goal**: SUPER_ADMIN can review, approve, and reject registration requests through a dedicated admin page
+**Depends on**: Phase 19
+**Requirements**: ADM-01, ADM-02, ADM-03
+**Success Criteria** (what must be TRUE):
+  1. SUPER_ADMIN can view a list of registration requests with status filtering (pending, approved, rejected)
+  2. SUPER_ADMIN can approve a request by assigning a department and position, triggering automatic account creation
+  3. SUPER_ADMIN can reject a request with a mandatory rejection reason
+  4. The registration management page is accessible from the admin sidebar
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 21: Registration Frontend & Security
+**Goal**: Users can self-register from the login screen, check their application status, and the system is protected against abuse
+**Depends on**: Phase 20
+**Requirements**: REG-04, SEC-01
+**Success Criteria** (what must be TRUE):
+  1. The login page has a visible link/button to access the registration form
+  2. User can fill out and submit a registration form (name, email, password with confirmation) without logging in
+  3. User can check their registration status (pending/approved/rejected) and see rejection reason if applicable
+  4. Public registration endpoints are rate-limited to prevent abuse (e.g., brute-force submissions)
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases 12 through 16 are strictly sequential (each depends on the previous). Phase 17 can start after Phase 12 completes (independent of Phases 13-16).
-Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-16 after Phase 12)
+Phases 18 through 21 are strictly sequential (each depends on the previous).
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -334,9 +390,13 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 9. SMTP Email Notifications | v1.1 | 3/3 | Complete | 2026-04-03 |
 | 10. Additional Form Templates | v1.1 | 3/3 | Complete | 2026-04-04 |
 | 11. Document Search & Filter | v1.1 | 2/2 | Complete | 2026-04-04 |
-| 12. Schema Foundation | v1.2 | 3/3 | Complete    | 2026-04-05 |
-| 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete    | 2026-04-05 |
-| 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
-| 15. Advanced Logic | v1.2 | 3/3 | Complete   | 2026-04-06 |
-| 16. Template Migration | v1.2 | 2/2 | Complete   | 2026-04-06 |
-| 17. Budget Integration | v1.2 | 3/1 | Complete   | 2026-04-07 |
+| 12. Schema Foundation | v1.2 | 3/3 | Complete | 2026-04-05 |
+| 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete | 2026-04-05 |
+| 14. Builder UI | v1.2 | 5/1 | Complete | 2026-04-06 |
+| 15. Advanced Logic | v1.2 | 3/3 | Complete | 2026-04-06 |
+| 16. Template Migration | v1.2 | 2/2 | Complete | 2026-04-06 |
+| 17. Budget Integration | v1.2 | 3/1 | Complete | 2026-04-07 |
+| 18. Registration Backend | v1.3 | 0/0 | Not started | - |
+| 19. Registration Email Notifications | v1.3 | 0/0 | Not started | - |
+| 20. Admin Registration Management UI | v1.3 | 0/0 | Not started | - |
+| 21. Registration Frontend & Security | v1.3 | 0/0 | Not started | - |

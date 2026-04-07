@@ -194,12 +194,28 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUD-01 | Phase 8: Dashboard & Audit | Pending |
 | BDGT-01 | Phase 17: Budget Integration | Complete |
 | BDGT-02 | Phase 17: Budget Integration | Complete |
+| REG-01 | Phase 18: Registration Backend | Pending |
+| REG-02 | Phase 18: Registration Backend | Pending |
+| REG-03 | Phase 18: Registration Backend | Pending |
+| REG-04 | Phase 21: Registration Frontend & Security | Pending |
+| ADM-01 | Phase 20: Admin Registration Management UI | Pending |
+| ADM-02 | Phase 20: Admin Registration Management UI | Pending |
+| ADM-03 | Phase 20: Admin Registration Management UI | Pending |
+| ADM-04 | Phase 18: Registration Backend | Pending |
+| MAIL-01 | Phase 19: Registration Email Notifications | Pending |
+| MAIL-02 | Phase 19: Registration Email Notifications | Pending |
+| MAIL-03 | Phase 19: Registration Email Notifications | Pending |
+| MAIL-04 | Phase 19: Registration Email Notifications | Pending |
+| SEC-01 | Phase 21: Registration Frontend & Security | Pending |
 
 **Coverage:**
 - v1 requirements: 38 total
 - Mapped to phases: 38
 - Unmapped: 0
+- v1.3 requirements: 13 total
+- Mapped to phases: 13
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-03-31 after roadmap creation*
+*Last updated: 2026-04-07 after v1.3 roadmap creation*
