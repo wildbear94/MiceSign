@@ -32,7 +32,7 @@ export interface CreateTemplateRequest {
   description?: string;
   category?: string;
   icon?: string;
-  schemaDefinition?: SchemaDefinition;
+  schemaDefinition?: string; // JSON stringified SchemaDefinition
 }
 
 export interface UpdateTemplateRequest {
@@ -40,7 +40,7 @@ export interface UpdateTemplateRequest {
   description?: string;
   category?: string;
   icon?: string;
-  schemaDefinition?: SchemaDefinition;
+  schemaDefinition?: string; // JSON stringified SchemaDefinition
 }
 
 // === Palette ===

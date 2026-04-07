@@ -68,12 +68,10 @@ export default function TemplateBuilderPage() {
         description: template.description ?? undefined,
         category: template.category ?? undefined,
         icon: template.icon ?? undefined,
-        schemaDefinition: {
+        schemaDefinition: JSON.stringify({
           version: (template.schemaVersion ?? 0) + 1,
           fields,
-          conditionalRules: [],
-          calculationRules: [],
-        },
+        }),
       };
 
       updateMutation.mutate(
