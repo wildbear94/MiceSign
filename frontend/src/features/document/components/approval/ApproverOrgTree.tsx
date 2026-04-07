@@ -31,7 +31,8 @@ function DepartmentSection({
   excludeUserIds,
   searchQuery,
 }: DepartmentSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Auto-expand top-level departments (level 0) by default
+  const [isExpanded, setIsExpanded] = useState(level === 0);
 
   const membersQuery = useQuery({
     queryKey: ['departments', dept.id, 'members'],
