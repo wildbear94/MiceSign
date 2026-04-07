@@ -105,6 +105,35 @@ Deferred to future releases (Phase 1-B, 1-C, Phase 2).
 
 - **AI-01**: AI-assisted document drafting based on accumulated data
 
+## v1.3 Requirements
+
+Requirements for v1.3 사용자 등록 신청 milestone. Each maps to roadmap phases.
+
+### 등록 신청 (Registration)
+
+- [ ] **REG-01**: 사용자가 로그인 화면에서 이름, 이메일, 비밀번호를 입력하여 계정을 신청할 수 있다
+- [ ] **REG-02**: 시스템이 user 테이블과 registration_request 테이블에서 이메일 중복을 검증한다
+- [ ] **REG-03**: 거부된 이메일로 재신청이 가능하다
+- [ ] **REG-04**: 신청자가 신청 상태(대기/승인/거부)와 거부 사유를 확인할 수 있다
+
+### 관리자 승인 (Admin Approval)
+
+- [ ] **ADM-01**: SUPER_ADMIN이 등록 신청 목록을 조회할 수 있다
+- [ ] **ADM-02**: SUPER_ADMIN이 신청을 승인하면서 부서와 직급을 지정할 수 있다
+- [ ] **ADM-03**: SUPER_ADMIN이 신청을 거부하면서 거부 사유를 입력할 수 있다
+- [ ] **ADM-04**: 승인 시 자동으로 사용자 계정이 생성된다 (비밀번호 해시 안전 전달)
+
+### 이메일 알림 (Email Notifications)
+
+- [ ] **MAIL-01**: 기존 스텁 EmailService를 실제 SMTP 발송으로 교체한다
+- [ ] **MAIL-02**: 신청 접수 시 신청자에게 확인 이메일을 발송한다
+- [ ] **MAIL-03**: 승인/거부 시 신청자에게 결과 이메일을 발송한다
+- [ ] **MAIL-04**: 새 신청이 접수되면 SUPER_ADMIN에게 알림 이메일을 발송한다
+
+### 보안 (Security)
+
+- [ ] **SEC-01**: 공개 등록 엔드포인트에 rate limiting을 적용한다
+
 ## Out of Scope
 
 | Feature | Reason |
