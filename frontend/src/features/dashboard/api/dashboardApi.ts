@@ -4,5 +4,5 @@ import type { DashboardSummary } from '../types/dashboard';
 
 export const dashboardApi = {
   getSummary: () =>
-    apiClient.get<ApiResponse<DashboardSummary>>('/dashboard/summary'),
+    apiClient.get<ApiResponse<DashboardSummary>>('/dashboard'),
 };

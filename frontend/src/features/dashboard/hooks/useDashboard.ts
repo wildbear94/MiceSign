@@ -8,7 +8,7 @@ import type { DocumentResponse } from '../../document/types/document';
 export function useDashboardSummary() {
   return useQuery({
     queryKey: ['dashboard', 'summary'],
-    queryFn: () => dashboardApi.getSummary().then((res) => res.data.data!),
+    queryFn: () => dashboardApi.getSummary().then((res) => res.data),
     refetchInterval: 60_000,
   });
 }
@@ -26,8 +26,8 @@ export function useRecentDocuments() {
     queryKey: ['documents', 'my', 0, 5],
     queryFn: () =>
       apiClient
-        .get<ApiResponse<PageResponse<DocumentResponse>>>('/documents/my', {
-          params: { page: 0, size: 5 },
+        .get<ApiResponse<PageResponse<DocumentResponse>>>('/documents/search', {
+          params: { tab: 'my', page: 0, size: 5 },
         })
         .then((res) => res.data.data!),
     refetchInterval: 60_000,
