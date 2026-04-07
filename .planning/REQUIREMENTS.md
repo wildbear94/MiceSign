@@ -96,6 +96,11 @@ Deferred to future releases (Phase 1-B, 1-C, Phase 2).
 - **TPL-05**: Business trip report form (출장 보고서)
 - **TPL-06**: Overtime request form (연장 근무 신청서)
 
+### Budget Integration (v1.2)
+
+- [x] **BDGT-01**: 재무 문서(지출 결의, 구매 요청) 제출 시 외부 예산 시스템에 REST API로 지출 데이터를 자동 전송
+- [x] **BDGT-02**: API 호출 실패 시 설정된 횟수만큼 재시도하고 모든 시도를 로깅하며, 문서 제출 워크플로를 차단하지 않음
+
 ### AI (Phase 2)
 
 - **AI-01**: AI-assisted document drafting based on accumulated data
@@ -158,10 +163,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Pending |
 | DASH-03 | Phase 8: Dashboard & Audit | Pending |
 | AUD-01 | Phase 8: Dashboard & Audit | Pending |
+| BDGT-01 | Phase 17: Budget Integration | Complete |
+| BDGT-02 | Phase 17: Budget Integration | Complete |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36
+- v1 requirements: 38 total
+- Mapped to phases: 38
 - Unmapped: 0
 
 ---

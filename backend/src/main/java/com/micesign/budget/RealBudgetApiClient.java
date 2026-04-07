@@ -30,6 +30,7 @@ public class RealBudgetApiClient implements BudgetApiClient {
 
     @Override
     @Retryable(
+        label = "sendExpenseData",
         retryFor = {RestClientException.class},
         maxAttempts = 3,
         backoff = @Backoff(delay = 2000, multiplier = 1.5)
@@ -53,6 +54,7 @@ public class RealBudgetApiClient implements BudgetApiClient {
 
     @Override
     @Retryable(
+        label = "sendCancellation",
         retryFor = {RestClientException.class},
         maxAttempts = 3,
         backoff = @Backoff(delay = 2000, multiplier = 1.5)
