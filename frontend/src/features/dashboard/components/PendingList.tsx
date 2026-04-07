@@ -54,7 +54,7 @@ export default function PendingList() {
                   </p>
                 </div>
                 <span className="text-xs text-gray-400 dark:text-gray-500 ml-4 shrink-0">
-                  {new Date(item.submittedAt).toLocaleDateString()}
+                  {new Date(item.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </button>
