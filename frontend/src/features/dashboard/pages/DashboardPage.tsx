@@ -2,14 +2,17 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Clock, FileEdit, CheckCircle2, Plus } from 'lucide-react';
 import { useDashboardSummary } from '../hooks/useDashboard';
+import { useActiveTemplates } from '../../document/hooks/useTemplates';
 import CountCard from '../components/CountCard';
 import PendingList from '../components/PendingList';
 import RecentDocumentsList from '../components/RecentDocumentsList';
 import TemplateSelectionModal from '../../document/components/TemplateSelectionModal';
+import type { Template } from '../../document/types/document';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { data: summary, isLoading } = useDashboardSummary();
+  const { data: templates } = useActiveTemplates();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
 
   const handleNavigate = useCallback(
@@ -70,8 +73,13 @@ export default function DashboardPage() {
 
       {/* Template Selection Modal */}
       <TemplateSelectionModal
-        open={showTemplateModal}
+        isOpen={showTemplateModal}
         onClose={() => setShowTemplateModal(false)}
+        templates={templates ?? []}
+        onSelect={(template: Template) => {
+          setShowTemplateModal(false);
+          navigate(`/documents/new/${template.code}`);
+        }}
       />
     </div>
   );

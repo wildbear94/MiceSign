@@ -36,14 +36,15 @@ export default function TemplateSelectionModal({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // Extract unique categories
+  const safeTemplates = templates ?? [];
   const categories = Array.from(
-    new Set(templates.map((t) => t.category).filter(Boolean)),
+    new Set(safeTemplates.map((t) => t.category).filter(Boolean)),
   ) as string[];
   const hasCategories = categories.length > 0;
 
   const filteredTemplates = selectedCategory
-    ? templates.filter((t) => t.category === selectedCategory)
-    : templates;
+    ? safeTemplates.filter((t) => t.category === selectedCategory)
+    : safeTemplates;
 
   // Escape key to close
   useEffect(() => {
