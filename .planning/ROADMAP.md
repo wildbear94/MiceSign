@@ -217,7 +217,7 @@ Plans:
 - [x] **Phase 13: Dynamic Form Rendering** - JSON schema-driven form rendering in edit and read-only modes, runtime Zod generation, table field support (completed 2026-04-05)
 - [x] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page (completed 2026-04-05)
 - [x] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections (completed 2026-04-06)
-- [ ] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification
+- [x] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification (completed 2026-04-06)
 - [ ] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging
 
 ## Phase Details
@@ -296,10 +296,10 @@ Plans:
   1. JSON schema equivalents exist for all 6 hardcoded forms (General, Expense, Leave, Purchase, Business Trip, Overtime) with matching field structure
   2. System uses dual rendering: documents created before migration render with hardcoded components, new documents use dynamic renderer
   3. All existing documents (drafts and submitted) display correctly after migration without any data modification
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 16-01-PLAN.md — Backend: Flyway V12 schema seeding for 6 templates, DocumentContent entity fix, DocumentFormValidator dynamic fallback, snapshot pipeline
-- [ ] 16-02-PLAN.md — Frontend: dual rendering branching logic, DynamicReadOnly integration, visual verification checkpoint
+- [x] 16-01-PLAN.md — Backend: Flyway V12 schema seeding for 6 templates, DocumentContent entity fix, DocumentFormValidator dynamic fallback, snapshot pipeline
+- [x] 16-02-PLAN.md — Frontend: dual rendering branching logic, DynamicReadOnly integration, visual verification checkpoint
 
 
 ### Phase 17: Budget Integration
@@ -309,6 +309,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. When a financial document (expense report, purchase request) is submitted, the system sends expense data to the external budget system via REST API
   2. Failed API calls are retried (up to configured retry count) and all attempts are logged, without blocking or delaying the document submission workflow
+**Plans:** 2 plans
+Plans:
+- [ ] 17-01-PLAN.md — Infrastructure: Flyway V12 migration, dependencies, config, DTOs, events, BudgetApiClient (Mock/Real), BudgetDataExtractor
+- [ ] 17-02-PLAN.md — Integration wiring: BudgetIntegrationService, event publishing in DocumentService/ApprovalService, failure email, unit + integration tests
 
 ## Progress
 
@@ -333,5 +337,5 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 13. Dynamic Form Rendering | v1.2 | 3/3 | Complete    | 2026-04-05 |
 | 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
 | 15. Advanced Logic | v1.2 | 3/3 | Complete   | 2026-04-06 |
-| 16. Template Migration | v1.2 | 0/2 | Planned | - |
-| 17. Budget Integration | v1.2 | 0/0 | Not started | - |
+| 16. Template Migration | v1.2 | 2/2 | Complete   | 2026-04-06 |
+| 17. Budget Integration | v1.2 | 0/2 | Planning complete | - |
