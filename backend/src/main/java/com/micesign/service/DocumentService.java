@@ -14,6 +14,8 @@ import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.*;
 import com.micesign.common.AuditAction;
 import com.micesign.event.ApprovalNotificationEvent;
+import com.micesign.event.BudgetIntegrationEvent;
+import com.micesign.event.BudgetCancellationEvent;
 import com.micesign.domain.enums.NotificationEventType;
 import com.micesign.dto.document.DocumentSearchCondition;
 import com.micesign.mapper.DocumentMapper;
@@ -219,6 +221,11 @@ public class DocumentService {
         applicationEventPublisher.publishEvent(
                 new ApprovalNotificationEvent(document, NotificationEventType.SUBMIT, userId, null));
 
+        // Budget integration event (async, non-blocking)
+        applicationEventPublisher.publishEvent(
+                new BudgetIntegrationEvent(document.getId(), document.getTemplateCode(),
+                        document.getDocNumber(), userId));
+
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);
     }
@@ -309,6 +316,11 @@ public class DocumentService {
 
         applicationEventPublisher.publishEvent(
                 new ApprovalNotificationEvent(document, NotificationEventType.WITHDRAW, userId, null));
+
+        // Budget cancellation event (async, non-blocking)
+        applicationEventPublisher.publishEvent(
+                new BudgetCancellationEvent(document.getId(), document.getTemplateCode(),
+                        document.getDocNumber(), userId, "WITHDRAWN"));
 
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toResponse(document, templateName);
