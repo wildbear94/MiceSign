@@ -25,16 +25,25 @@ export default function TemplateBuilderPage() {
 
   const [state, dispatch] = useBuilderReducer();
   const [showJsonImport, setShowJsonImport] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  // Initialize from loaded template
+  // Initialize from loaded template (only once)
   useEffect(() => {
-    if (!template) return;
+    if (!template || initialized) return;
 
-    const schema = template.schemaDefinition;
-    if (schema && schema.fields) {
-      dispatch({ type: 'LOAD_SCHEMA', fields: schema.fields });
+    const raw = template.schemaDefinition;
+    if (raw) {
+      try {
+        const schema = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (schema && Array.isArray(schema.fields)) {
+          dispatch({ type: 'LOAD_SCHEMA', fields: schema.fields });
+        }
+      } catch {
+        // Invalid schema JSON, start with empty canvas
+      }
     }
-  }, [template, dispatch]);
+    setInitialized(true);
+  }, [template, initialized, dispatch]);
 
   // Unsaved changes warning
   useEffect(() => {
