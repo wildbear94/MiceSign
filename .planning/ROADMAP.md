@@ -309,10 +309,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. When a financial document (expense report, purchase request) is submitted, the system sends expense data to the external budget system via REST API
   2. Failed API calls are retried (up to configured retry count) and all attempts are logged, without blocking or delaying the document submission workflow
-**Plans:** 2 plans
+**Plans:** 3 plans
 Plans:
 - [ ] 17-01-PLAN.md — Infrastructure: Flyway V12 migration, dependencies, config, DTOs, events, BudgetApiClient (Mock/Real), BudgetDataExtractor
 - [ ] 17-02-PLAN.md — Integration wiring: BudgetIntegrationService, event publishing in DocumentService/ApprovalService, failure email, unit + integration tests
+- [ ] 17-03-PLAN.md — Gap closure: event publishing wiring in DocumentService, @Retryable label fix, REQUIREMENTS.md update
 
 ## Progress
 
@@ -338,4 +339,4 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
 | 15. Advanced Logic | v1.2 | 3/3 | Complete   | 2026-04-06 |
 | 16. Template Migration | v1.2 | 2/2 | Complete   | 2026-04-06 |
-| 17. Budget Integration | v1.2 | 0/2 | Planning complete | - |
+| 17. Budget Integration | v1.2 | 0/3 | Executing | - |
