@@ -13,6 +13,17 @@ interface BuilderCanvasProps {
   isPreview: boolean;
 }
 
+function getWidthClass(width?: string): string {
+  switch (width) {
+    case 'half':
+      return 'w-[calc(50%-4px)]';
+    case 'third':
+      return 'w-[calc(33.333%-5px)]';
+    default:
+      return 'w-full';
+  }
+}
+
 export default function BuilderCanvas({
   fields,
   selectedFieldId,
@@ -48,7 +59,7 @@ export default function BuilderCanvas({
               </div>
             )}
 
-            <div className="space-y-1.5">
+            <div className="flex flex-wrap gap-1.5">
               {fields.map((field, index) => (
                 <Draggable
                   key={field.id}
@@ -60,6 +71,7 @@ export default function BuilderCanvas({
                       ref={dragProvided.innerRef}
                       {...dragProvided.draggableProps}
                       {...dragProvided.dragHandleProps}
+                      className={getWidthClass(field.width)}
                     >
                       <FieldCard
                         field={field}
