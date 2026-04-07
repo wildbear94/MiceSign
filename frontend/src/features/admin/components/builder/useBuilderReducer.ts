@@ -18,6 +18,7 @@ export interface BuilderState {
 
 export type BuilderAction =
   | { type: 'ADD_FIELD'; field: FieldDefinition }
+  | { type: 'INSERT_FIELD'; field: FieldDefinition; index: number }
   | { type: 'REMOVE_FIELD'; fieldId: string }
   | { type: 'UPDATE_FIELD'; fieldId: string; updates: Partial<FieldDefinition> }
   | { type: 'REORDER_FIELDS'; sourceIndex: number; destIndex: number }
@@ -130,6 +131,17 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
       return {
         ...state,
         fields: [...state.fields, action.field],
+        selectedFieldId: action.field.id,
+        isDirty: true,
+      };
+    }
+
+    case 'INSERT_FIELD': {
+      const fields = [...state.fields];
+      fields.splice(action.index, 0, action.field);
+      return {
+        ...state,
+        fields,
         selectedFieldId: action.field.id,
         isDirty: true,
       };

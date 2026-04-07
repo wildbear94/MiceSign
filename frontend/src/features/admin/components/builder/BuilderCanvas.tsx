@@ -25,7 +25,7 @@ export default function BuilderCanvas({
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <Droppable droppableId="canvas">
+      <Droppable droppableId="canvas" type="FIELD">
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}

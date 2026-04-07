@@ -31,11 +31,7 @@ export default function BuilderLayout({
     if (source.droppableId === 'palette' && destination.droppableId === 'canvas') {
       const fieldType = source.draggableId.replace('palette-', '') as FieldType;
       const newField = createField(fieldType);
-      // Insert at destination index
-      const fields = [...state.fields];
-      fields.splice(destination.index, 0, newField);
-      dispatch({ type: 'LOAD_SCHEMA', fields });
-      dispatch({ type: 'SELECT_FIELD', fieldId: newField.id });
+      dispatch({ type: 'INSERT_FIELD', field: newField, index: destination.index });
       return;
     }
 

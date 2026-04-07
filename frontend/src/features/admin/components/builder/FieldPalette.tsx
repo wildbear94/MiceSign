@@ -69,7 +69,7 @@ export default function FieldPalette({ dispatch }: FieldPaletteProps) {
 
   return (
     <div className="p-3">
-      <Droppable droppableId="palette" isDropDisabled>
+      <Droppable droppableId="palette" isDropDisabled type="FIELD">
         {(provided) => (
           <div ref={provided.innerRef} {...provided.droppableProps}>
             {PALETTE_GROUPS.map((group) => (
