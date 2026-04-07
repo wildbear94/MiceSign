@@ -1,6 +1,5 @@
 import { NavLink } from 'react-router';
-import { Building2, Award, Users, LayoutTemplate, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Building2, Award, Users, LayoutTemplate, ScrollText, Bell, X } from 'lucide-react';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -8,23 +7,23 @@ interface AdminSidebarProps {
 }
 
 const navItems = [
-  { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
-  { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
-  { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
-  { to: '/admin/templates', icon: LayoutTemplate, labelKey: 'sidebar.templates' },
+  { to: '/admin/departments', icon: Building2, label: '부서 관리' },
+  { to: '/admin/positions', icon: Award, label: '직급 관리' },
+  { to: '/admin/users', icon: Users, label: '사용자 관리' },
+  { to: '/admin/templates', icon: LayoutTemplate, label: '양식 관리' },
+  { to: '/admin/audit-logs', icon: ScrollText, label: '감사 로그' },
+  { to: '/admin/notifications', icon: Bell, label: '알림 로그' },
 ] as const;
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
-  const { t } = useTranslation('admin');
-
   const navContent = (
     <nav className="flex flex-col gap-1 p-3">
-      {navItems.map(({ to, icon: Icon, labelKey }) => (
+      {navItems.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}
           to={to}
           onClick={onClose}
-          title={t(labelKey)}
+          title={label}
           className={({ isActive }) =>
             `px-4 py-4 flex items-center gap-2 rounded-lg text-sm transition-colors ${
               isActive
@@ -34,7 +33,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           }
         >
           <Icon className="h-5 w-5 shrink-0" />
-          <span className="hidden xl:inline">{t(labelKey)}</span>
+          <span className="hidden xl:inline">{label}</span>
         </NavLink>
       ))}
     </nav>
@@ -42,7 +41,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Desktop sidebar: hidden below lg, icon-only on lg, full on xl+ */}
+      {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-16 xl:w-60 flex-col bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shrink-0">
         {navContent}
       </aside>
@@ -65,7 +64,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </button>
             </div>
             <nav className="flex flex-col gap-1 px-3">
-              {navItems.map(({ to, icon: Icon, labelKey }) => (
+              {navItems.map(({ to, icon: Icon, label }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -79,7 +78,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                   }
                 >
                   <Icon className="h-5 w-5 shrink-0" />
-                  <span>{t(labelKey)}</span>
+                  <span>{label}</span>
                 </NavLink>
               ))}
             </nav>
