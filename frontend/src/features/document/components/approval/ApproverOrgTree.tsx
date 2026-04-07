@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, Loader2, Search, UserPlus } from 'lucide-react';
-import { departmentApi } from '../../../admin/api/departmentApi';
-import type { DepartmentTreeNode } from '../../../../types/admin';
+import apiClient from '../../../../api/client';
+import type { ApiResponse } from '../../../../types/api';
+import type { DepartmentTreeNode, DepartmentMember } from '../../../../types/admin';
 
 interface OrgUser {
   id: number;
@@ -36,7 +37,7 @@ function DepartmentSection({
 
   const membersQuery = useQuery({
     queryKey: ['departments', dept.id, 'members'],
-    queryFn: () => departmentApi.getMembers(dept.id).then((res) => res.data.data!),
+    queryFn: () => apiClient.get<ApiResponse<DepartmentMember[]>>(`/organization/departments/${dept.id}/members`).then((res) => res.data.data!),
     enabled: isExpanded,
   });
 
@@ -145,7 +146,7 @@ export default function ApproverOrgTree({
 
   const departmentsQuery = useQuery({
     queryKey: ['departments', 'tree'],
-    queryFn: () => departmentApi.getTree().then((res) => res.data.data!),
+    queryFn: () => apiClient.get<ApiResponse<DepartmentTreeNode[]>>('/organization/departments').then((res) => res.data.data!),
   });
 
   if (departmentsQuery.isLoading) {
