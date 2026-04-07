@@ -52,7 +52,7 @@ public class DocumentService {
                 .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND", "양식을 찾을 수 없습니다."));
 
         // Validate form data
-        formValidator.validate(req.templateCode(), req.bodyHtml(), req.formData(), template.getSchemaDefinition());
+        formValidator.validate(req.templateCode(), req.bodyHtml(), req.formData());
 
         // Load drafter
         User drafter = userRepository.findById(userId)
@@ -71,13 +71,6 @@ public class DocumentService {
         content.setDocument(document);
         content.setBodyHtml(req.bodyHtml());
         content.setFormData(req.formData());
-
-        // Save schema snapshot if template has schema definition
-        if (template.getSchemaDefinition() != null) {
-            content.setSchemaVersion(template.getSchemaVersion());
-            content.setSchemaDefinitionSnapshot(template.getSchemaDefinition());
-        }
-
         documentContentRepository.save(content);
 
         return documentMapper.toResponse(document, template.getName());
@@ -86,13 +79,8 @@ public class DocumentService {
     public DocumentResponse updateDocument(Long userId, Long documentId, UpdateDocumentRequest req) {
         Document document = loadAndVerifyOwnerDraft(userId, documentId);
 
-        // Load template for schema definition
-        String schemaDefinition = approvalTemplateRepository.findByCode(document.getTemplateCode())
-                .map(ApprovalTemplate::getSchemaDefinition)
-                .orElse(null);
-
         // Validate form data
-        formValidator.validate(document.getTemplateCode(), req.bodyHtml(), req.formData(), schemaDefinition);
+        formValidator.validate(document.getTemplateCode(), req.bodyHtml(), req.formData());
 
         // Update document
         document.setTitle(req.title());

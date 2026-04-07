@@ -55,3 +55,11 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+# Budget API Integration
+budget:
+  api:
+    base-url: ${BUDGET_API_BASE_URL:http://localhost:8090}
+    connect-timeout: 3
+    read-timeout: 5
+    api-key: ${BUDGET_API_KEY:mock-api-key}

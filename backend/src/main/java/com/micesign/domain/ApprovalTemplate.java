@@ -29,11 +29,8 @@ public class ApprovalTemplate {
     @Column(name = "sort_order", nullable = false)
     private int sortOrder = 0;
 
-    @Column(name = "schema_definition", columnDefinition = "LONGTEXT")
-    private String schemaDefinition;
-
-    @Column(name = "schema_version", nullable = false)
-    private int schemaVersion = 0;
+    @Column(name = "budget_enabled", nullable = false)
+    private boolean budgetEnabled = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -110,20 +107,12 @@ public class ApprovalTemplate {
         this.sortOrder = sortOrder;
     }
 
-    public String getSchemaDefinition() {
-        return schemaDefinition;
+    public boolean isBudgetEnabled() {
+        return budgetEnabled;
     }
 
-    public void setSchemaDefinition(String schemaDefinition) {
-        this.schemaDefinition = schemaDefinition;
-    }
-
-    public int getSchemaVersion() {
-        return schemaVersion;
-    }
-
-    public void setSchemaVersion(int schemaVersion) {
-        this.schemaVersion = schemaVersion;
+    public void setBudgetEnabled(boolean budgetEnabled) {
+        this.budgetEnabled = budgetEnabled;
     }
 
     public LocalDateTime getCreatedAt() {

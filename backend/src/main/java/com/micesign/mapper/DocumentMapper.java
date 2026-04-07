@@ -18,7 +18,6 @@ public interface DocumentMapper {
     @Mapping(target = "templateName", source = "templateName")
     @Mapping(target = "bodyHtml", source = "content.bodyHtml")
     @Mapping(target = "formData", source = "content.formData")
-    @Mapping(target = "schemaDefinitionSnapshot", source = "content.schemaDefinitionSnapshot")
     @Mapping(target = "drafter", source = "document.drafter")
     @Mapping(target = "id", source = "document.id")
     @Mapping(target = "docNumber", source = "document.docNumber")

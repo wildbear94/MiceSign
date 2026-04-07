@@ -15,73 +15,12 @@ public class DocumentFormValidator {
         this.objectMapper = objectMapper;
     }
 
-    public void validate(String templateCode, String bodyHtml, String formDataJson, String schemaDefinition) {
+    public void validate(String templateCode, String bodyHtml, String formDataJson) {
         switch (templateCode) {
             case "GENERAL" -> validateGeneralFormData(bodyHtml);
             case "EXPENSE" -> validateExpenseFormData(formDataJson);
             case "LEAVE" -> validateLeaveFormData(formDataJson);
-            default -> {
-                if (schemaDefinition != null) {
-                    validateDynamicFormData(templateCode, formDataJson, schemaDefinition);
-                } else {
-                    throw new BusinessException("TPL_UNKNOWN", "알 수 없는 양식 코드입니다: " + templateCode);
-                }
-            }
-        }
-    }
-
-    private void validateDynamicFormData(String templateCode, String formDataJson, String schemaDefinition) {
-        if (!StringUtils.hasText(formDataJson)) {
-            throw new BusinessException("DOC_INVALID_FORM_DATA", templateCode + " 양식은 양식 데이터가 필요합니다.");
-        }
-
-        JsonNode schema;
-        JsonNode formData;
-        try {
-            schema = objectMapper.readTree(schemaDefinition);
-            formData = objectMapper.readTree(formDataJson);
-        } catch (Exception e) {
-            throw new BusinessException("DOC_INVALID_FORM_DATA", "JSON 파싱에 실패했습니다.");
-        }
-
-        JsonNode fields = schema.get("fields");
-        if (fields == null || !fields.isArray()) {
-            return; // No fields to validate
-        }
-
-        for (JsonNode field : fields) {
-            boolean required = field.has("required") && field.get("required").asBoolean(false);
-            if (!required) continue;
-
-            String fieldId = field.get("id").asText();
-            String fieldType = field.get("type").asText();
-            JsonNode value = formData.get(fieldId);
-
-            if ("table".equals(fieldType)) {
-                // Table: must be array with minRows
-                if (value == null || !value.isArray()) {
-                    throw new BusinessException("DOC_INVALID_FORM_DATA",
-                            fieldId + " 필드는 배열이어야 합니다.");
-                }
-                int minRows = 0;
-                if (field.has("config") && field.get("config").has("minRows")) {
-                    minRows = field.get("config").get("minRows").asInt(0);
-                }
-                if (value.size() < minRows) {
-                    throw new BusinessException("DOC_INVALID_FORM_DATA",
-                            fieldId + " 필드는 최소 " + minRows + "개 행이 필요합니다.");
-                }
-            } else {
-                // Non-table required field: must exist and not be empty string
-                if (value == null || value.isNull()) {
-                    throw new BusinessException("DOC_INVALID_FORM_DATA",
-                            fieldId + " 필드는 필수입니다.");
-                }
-                if (value.isTextual() && value.asText().isBlank()) {
-                    throw new BusinessException("DOC_INVALID_FORM_DATA",
-                            fieldId + " 필드는 필수입니다.");
-                }
-            }
+            default -> throw new BusinessException("TPL_UNKNOWN", "알 수 없는 양식 코드입니다: " + templateCode);
         }
     }
 

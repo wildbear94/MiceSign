@@ -12,7 +12,6 @@ public record DocumentDetailResponse(
     DrafterInfo drafter,
     String bodyHtml,
     String formData,
-    String schemaDefinitionSnapshot,
     LocalDateTime submittedAt,
     LocalDateTime completedAt,
     LocalDateTime createdAt,
