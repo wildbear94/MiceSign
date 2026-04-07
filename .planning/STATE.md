@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Custom Template Builder
 status: executing
-stopped_at: Phase 17 context gathered
-last_updated: "2026-04-07T02:14:50.377Z"
-last_activity: 2026-04-07 -- Phase 17 execution started
+stopped_at: Completed 17-03-PLAN.md
+last_updated: "2026-04-07T02:54:52.661Z"
+last_activity: 2026-04-07
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 8
-  completed_plans: 10
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 4
   percent: 100
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 17 (Budget Integration) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 17
-Last activity: 2026-04-07 -- Phase 17 execution started
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-07
 
 Progress: [==========================..........] 73% (v1.0+v1.1 complete, v1.2 starting)
 
@@ -62,6 +62,7 @@ Recent decisions affecting current work:
 - [Research]: Dual rendering path — schema_definition IS NULL means hardcoded, non-null means dynamic
 - [Research]: expr-eval for safe calculation fields, NOT eval()/new Function()
 - [Research]: Reuse @hello-pangea/dnd (already installed) for builder drag-and-drop
+- [Phase 17]: Budget events published for all documents; filtering by template handled in BudgetIntegrationService
 
 ### Pending Todos
 
@@ -75,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T09:00:08.616Z
-Stopped at: Phase 17 context gathered
-Resume file: .planning/phases/17-budget-integration/17-CONTEXT.md
+Last session: 2026-04-07T02:54:52.658Z
+Stopped at: Completed 17-03-PLAN.md
+Resume file: None

@@ -218,7 +218,7 @@ Plans:
 - [x] **Phase 14: Builder UI** - Three-panel drag-and-drop form builder, field palette, property panel, live preview, template management page (completed 2026-04-05)
 - [x] **Phase 15: Advanced Logic** - Conditional show/hide/require rules, calculation fields, circular dependency detection, visual sections (completed 2026-04-06)
 - [x] **Phase 16: Template Migration** - Convert 6 hardcoded forms to JSON schemas, dual rendering mode, backward compatibility verification (completed 2026-04-06)
-- [ ] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging
+- [x] **Phase 17: Budget Integration** - REST API integration with external budget system on financial document submission, retry and logging (completed 2026-04-07)
 
 ## Phase Details
 
@@ -309,11 +309,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. When a financial document (expense report, purchase request) is submitted, the system sends expense data to the external budget system via REST API
   2. Failed API calls are retried (up to configured retry count) and all attempts are logged, without blocking or delaying the document submission workflow
-**Plans:** 3 plans
+**Plans:** 3/1 plans complete
 Plans:
-- [ ] 17-01-PLAN.md — Infrastructure: Flyway V12 migration, dependencies, config, DTOs, events, BudgetApiClient (Mock/Real), BudgetDataExtractor
-- [ ] 17-02-PLAN.md — Integration wiring: BudgetIntegrationService, event publishing in DocumentService/ApprovalService, failure email, unit + integration tests
-- [ ] 17-03-PLAN.md — Gap closure: event publishing wiring in DocumentService, @Retryable label fix, REQUIREMENTS.md update
+- [x] 17-01-PLAN.md — Infrastructure: Flyway V12 migration, dependencies, config, DTOs, events, BudgetApiClient (Mock/Real), BudgetDataExtractor
+- [x] 17-02-PLAN.md — Integration wiring: BudgetIntegrationService, event publishing in DocumentService/ApprovalService, failure email, unit + integration tests
+- [x] 17-03-PLAN.md — Gap closure: event publishing wiring in DocumentService, @Retryable label fix, REQUIREMENTS.md update
 
 ## Progress
 
@@ -339,4 +339,4 @@ Recommended order: 12 -> 13 -> 14 -> 15 -> 16 -> 17 (or 17 in parallel with 13-1
 | 14. Builder UI | v1.2 | 5/1 | Complete    | 2026-04-06 |
 | 15. Advanced Logic | v1.2 | 3/3 | Complete   | 2026-04-06 |
 | 16. Template Migration | v1.2 | 2/2 | Complete   | 2026-04-06 |
-| 17. Budget Integration | v1.2 | 0/3 | Executing | - |
+| 17. Budget Integration | v1.2 | 3/1 | Complete   | 2026-04-07 |
