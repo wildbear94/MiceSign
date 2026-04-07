@@ -336,7 +336,10 @@ Plans:
   3. A previously rejected email can be used to submit a new registration request
   4. When a registration request is approved, a user account is created with the correct password hash (no double-hashing) and status ACTIVE
   5. The registration_request table stores requests independently from the user table (separate entity with its own lifecycle)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 18-01-PLAN.md — Domain foundation: Flyway V14, entity, repository, DTOs, mapper, SecurityConfig
+- [ ] 18-02-PLAN.md — Service + controllers: submit/approve/reject/expiry, public + admin APIs, tests
 
 ### Phase 19: Registration Email Notifications
 **Goal**: All registration lifecycle events trigger appropriate email notifications so applicants know their status and admins know about new requests
@@ -347,6 +350,7 @@ Plans:
   2. Applicant receives a confirmation email immediately after submitting a registration request
   3. Applicant receives a result email when their request is approved or rejected (rejection includes the reason)
   4. All SUPER_ADMIN users receive a notification email when a new registration request is submitted
+**Plans**: TBD
 
 ### Phase 20: Admin Registration Management UI
 **Goal**: SUPER_ADMIN can review, approve, and reject registration requests through a dedicated admin page
@@ -396,7 +400,7 @@ Phases 18 through 21 are strictly sequential (each depends on the previous).
 | 15. Advanced Logic | v1.2 | 3/3 | Complete | 2026-04-06 |
 | 16. Template Migration | v1.2 | 2/2 | Complete | 2026-04-06 |
 | 17. Budget Integration | v1.2 | 3/1 | Complete | 2026-04-07 |
-| 18. Registration Backend | v1.3 | 0/0 | Not started | - |
+| 18. Registration Backend | v1.3 | 0/2 | Planning | - |
 | 19. Registration Email Notifications | v1.3 | 0/0 | Not started | - |
 | 20. Admin Registration Management UI | v1.3 | 0/0 | Not started | - |
 | 21. Registration Frontend & Security | v1.3 | 0/0 | Not started | - |
