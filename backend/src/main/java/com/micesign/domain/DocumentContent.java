@@ -21,6 +21,12 @@ public class DocumentContent {
     @Column(name = "form_data", columnDefinition = "JSON")
     private String formData;
 
+    @Column(name = "schema_version")
+    private Integer schemaVersion;
+
+    @Column(name = "schema_definition_snapshot", columnDefinition = "LONGTEXT")
+    private String schemaDefinitionSnapshot;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -78,5 +84,21 @@ public class DocumentContent {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Integer getSchemaVersion() {
+        return schemaVersion;
+    }
+
+    public void setSchemaVersion(Integer schemaVersion) {
+        this.schemaVersion = schemaVersion;
+    }
+
+    public String getSchemaDefinitionSnapshot() {
+        return schemaDefinitionSnapshot;
+    }
+
+    public void setSchemaDefinitionSnapshot(String schemaDefinitionSnapshot) {
+        this.schemaDefinitionSnapshot = schemaDefinitionSnapshot;
     }
 }

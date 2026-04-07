@@ -32,6 +32,19 @@ public class ApprovalTemplate {
     @Column(name = "budget_enabled", nullable = false)
     private boolean budgetEnabled = false;
 
+    @Column(name = "is_custom", nullable = false)
+    private boolean isCustom = false;
+
+    @Column(name = "category", length = 50)
+    private String category;
+
+    @Column(name = "icon", length = 50)
+    private String icon;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -111,15 +124,51 @@ public class ApprovalTemplate {
         return budgetEnabled;
     }
 
-    public void setBudgetEnabled(boolean budgetEnabled) {
-        this.budgetEnabled = budgetEnabled;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getSchemaDefinition() {
+        return schemaDefinition;
+    }
+
+    public void setBudgetEnabled(boolean budgetEnabled) {
+        this.budgetEnabled = budgetEnabled;
+    }
+
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public void setCustom(boolean custom) {
+        isCustom = custom;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 }

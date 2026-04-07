@@ -34,3 +34,8 @@ logs/
 
 # ===== QueryDSL Generated =====
 backend/src/main/generated/
+
+# ===== Credentials =====
+micesign-*.json
+*.p12
+*.pem

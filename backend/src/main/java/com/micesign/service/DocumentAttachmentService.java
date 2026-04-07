@@ -1,11 +1,13 @@
 package com.micesign.service;
 
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.Document;
 import com.micesign.domain.DocumentAttachment;
 import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.AttachmentResponse;
 import com.micesign.mapper.DocumentAttachmentMapper;
+import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.DocumentAttachmentRepository;
 import com.micesign.repository.DocumentRepository;
 import org.springframework.core.io.InputStreamResource;
@@ -33,16 +35,22 @@ public class DocumentAttachmentService {
     private final DocumentAttachmentRepository attachmentRepository;
     private final GoogleDriveService googleDriveService;
     private final DocumentRepository documentRepository;
+    private final ApprovalLineRepository approvalLineRepository;
     private final DocumentAttachmentMapper attachmentMapper;
+    private final AuditLogService auditLogService;
 
     public DocumentAttachmentService(DocumentAttachmentRepository attachmentRepository,
                                       GoogleDriveService googleDriveService,
                                       DocumentRepository documentRepository,
-                                      DocumentAttachmentMapper attachmentMapper) {
+                                      ApprovalLineRepository approvalLineRepository,
+                                      DocumentAttachmentMapper attachmentMapper,
+                                      AuditLogService auditLogService) {
         this.attachmentRepository = attachmentRepository;
         this.googleDriveService = googleDriveService;
         this.documentRepository = documentRepository;
+        this.approvalLineRepository = approvalLineRepository;
         this.attachmentMapper = attachmentMapper;
+        this.auditLogService = auditLogService;
     }
 
     public List<AttachmentResponse> uploadFiles(Long userId, Long docId, MultipartFile[] files) {
@@ -95,6 +103,8 @@ public class DocumentAttachmentService {
                 attachment.setGdriveFolder(result.folderPath());
                 attachment.setUploadedBy(userId);
                 savedAttachments.add(attachmentRepository.save(attachment));
+                auditLogService.log(userId, AuditAction.FILE_UPLOAD, "DOCUMENT", docId,
+                        "{\"file\": \"" + file.getOriginalFilename() + "\"}");
             } catch (IOException e) {
                 throw new BusinessException("FILE_UPLOAD_FAILED",
                         "파일 업로드 중 오류가 발생했습니다: " + file.getOriginalFilename());
@@ -119,6 +129,10 @@ public class DocumentAttachmentService {
         validateDocumentAccess(userId, attachment.getDocumentId());
 
         InputStream inputStream = googleDriveService.downloadFile(attachment.getGdriveFileId());
+
+        auditLogService.log(userId, AuditAction.FILE_DOWNLOAD, "ATTACHMENT", attachmentId,
+                "{\"file\": \"" + attachment.getOriginalName() + "\"}");
+
         return new InputStreamResource(inputStream);
     }
 
@@ -174,6 +188,10 @@ public class DocumentAttachmentService {
             throw new BusinessException("DOCUMENT_ACCESS_DENIED", "본인의 문서에만 파일을 첨부할 수 있습니다.");
         }
 
+        if (document.getStatus() != DocumentStatus.DRAFT) {
+            throw new BusinessException("DOC_NOT_DRAFT", "제출된 문서에는 파일을 첨부할 수 없습니다.", 403);
+        }
+
         return document;
     }
 
@@ -181,10 +199,17 @@ public class DocumentAttachmentService {
         Document document = documentRepository.findById(docId)
                 .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다."));
 
-        // For now: drafter can access. Approval line access will be added in Phase 7.
-        if (!document.getDrafter().getId().equals(userId)) {
-            throw new BusinessException("DOCUMENT_ACCESS_DENIED", "해당 문서에 대한 접근 권한이 없습니다.");
+        // Drafter can always access
+        if (document.getDrafter().getId().equals(userId)) {
+            return;
         }
+
+        // Approval line participants can download attachments (per D-20)
+        if (approvalLineRepository.existsByDocumentIdAndApproverId(docId, userId)) {
+            return;
+        }
+
+        throw new BusinessException("DOCUMENT_ACCESS_DENIED", "해당 문서에 대한 접근 권한이 없습니다.");
     }
 
     private String buildFolderPath(Document document) {

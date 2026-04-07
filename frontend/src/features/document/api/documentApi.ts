@@ -6,6 +6,7 @@ import type {
   CreateDocumentRequest,
   UpdateDocumentRequest,
   MyDocumentParams,
+  DocumentSearchParams,
 } from '../types/document';
 
 const BASE = '/documents';
@@ -25,4 +26,16 @@ export const documentApi = {
 
   delete: (id: number) =>
     apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`),
+
+  searchDocuments: (params: DocumentSearchParams) =>
+    apiClient.get<ApiResponse<PageResponse<DocumentResponse>>>(`${BASE}/search`, { params }),
+
+  submit: (id: number) =>
+    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/submit`),
+
+  withdraw: (id: number) =>
+    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/withdraw`),
+
+  rewrite: (id: number) =>
+    apiClient.post<ApiResponse<DocumentResponse>>(`${BASE}/${id}/rewrite`),
 };
