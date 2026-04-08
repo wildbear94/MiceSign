@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
+import { Toaster } from 'sonner';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ForcePasswordChangeGuard from './components/ForcePasswordChangeGuard';
@@ -47,6 +48,8 @@ function App() {
   }, [setAuth, clearAuth]);
 
   return (
+    <>
+    <Toaster position="top-right" richColors duration={3000} />
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
@@ -76,6 +79,7 @@ function App() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
 

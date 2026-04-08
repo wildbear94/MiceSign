@@ -2,8 +2,11 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import RegistrationStatusTabs from '../components/RegistrationStatusTabs';
 import RegistrationTable from '../components/RegistrationTable';
+import RegistrationDetailModal from '../components/RegistrationDetailModal';
 import Pagination from '../components/Pagination';
 import { useRegistrationList } from '../hooks/useRegistrations';
+import { useDepartmentTree } from '../hooks/useDepartments';
+import { usePositions } from '../hooks/usePositions';
 import type { RegistrationStatus, RegistrationListItem } from '../../../types/admin';
 
 export default function RegistrationListPage() {
@@ -46,8 +49,8 @@ export default function RegistrationListPage() {
     setPage(0);
   }, []);
 
-  // selectedRegistration will be used in Plan 02 for the detail modal
-  void selectedRegistration;
+  const { data: departments = [] } = useDepartmentTree(false);
+  const { data: positions = [] } = usePositions();
 
   return (
     <div>
@@ -76,6 +79,12 @@ export default function RegistrationListPage() {
           onPageChange={setPage}
         />
       )}
+      <RegistrationDetailModal
+        registration={selectedRegistration}
+        onClose={() => setSelectedRegistration(null)}
+        departments={departments}
+        positions={positions}
+      />
     </div>
   );
 }

@@ -112,6 +112,10 @@ export interface RegistrationListItem {
   rejectionReason: string | null;
   createdAt: string;
   processedAt: string | null;
+  // Assignment info for APPROVED registrations (per D-11)
+  employeeNo: string | null;
+  departmentName: string | null;
+  positionName: string | null;
 }
 
 export interface ApproveRegistrationRequest {
