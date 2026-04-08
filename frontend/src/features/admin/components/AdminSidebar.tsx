@@ -1,20 +1,27 @@
 import { NavLink } from 'react-router';
-import { Building2, Award, Users, X } from 'lucide-react';
+import { Building2, Award, Users, UserPlus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from '../../../stores/authStore';
+import { usePendingRegistrationCount } from '../hooks/useRegistrations';
 
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const navItems = [
-  { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
-  { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
-  { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
-] as const;
-
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const { t } = useTranslation('admin');
+  const { user } = useAuthStore();
+  const { data: pendingCount } = usePendingRegistrationCount();
+
+  const navItems = [
+    { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
+    { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
+    { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
+    ...(user?.role === 'SUPER_ADMIN'
+      ? [{ to: '/admin/registrations', icon: UserPlus, labelKey: 'registration.title' }]
+      : []),
+  ];
 
   const navContent = (
     <nav className="flex flex-col gap-1 p-3">
@@ -34,6 +41,11 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         >
           <Icon className="h-5 w-5 shrink-0" />
           <span className="hidden xl:inline">{t(labelKey)}</span>
+          {to === '/admin/registrations' && pendingCount != null && pendingCount > 0 && (
+            <span className="hidden xl:inline-flex bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 px-1.5 items-center justify-center ml-auto">
+              {pendingCount}
+            </span>
+          )}
         </NavLink>
       ))}
     </nav>
@@ -79,6 +91,11 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <span>{t(labelKey)}</span>
+                  {to === '/admin/registrations' && pendingCount != null && pendingCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 px-1.5 inline-flex items-center justify-center ml-auto">
+                      {pendingCount}
+                    </span>
+                  )}
                 </NavLink>
               ))}
             </nav>
