@@ -12,14 +12,14 @@ public class NotificationLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "recipient_id", nullable = false, insertable = false, updatable = false)
+    @Column(name = "recipient_id", nullable = true, insertable = false, updatable = false)
     private Long recipientId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id", nullable = false)
+    @JoinColumn(name = "recipient_id", nullable = true)
     private User recipient;
 
-    @Column(name = "recipient_email", nullable = false, length = 150)
+    @Column(name = "recipient_email", nullable = true, length = 150)
     private String recipientEmail;
 
     @Column(name = "event_type", nullable = false, length = 50)
@@ -27,6 +27,9 @@ public class NotificationLog {
 
     @Column(name = "document_id")
     private Long documentId;
+
+    @Column(name = "registration_request_id")
+    private Long registrationRequestId;
 
     @Column(name = "subject", nullable = false, length = 500)
     private String subject;
@@ -96,6 +99,14 @@ public class NotificationLog {
 
     public void setDocumentId(Long documentId) {
         this.documentId = documentId;
+    }
+
+    public Long getRegistrationRequestId() {
+        return registrationRequestId;
+    }
+
+    public void setRegistrationRequestId(Long registrationRequestId) {
+        this.registrationRequestId = registrationRequestId;
     }
 
     public String getSubject() {
