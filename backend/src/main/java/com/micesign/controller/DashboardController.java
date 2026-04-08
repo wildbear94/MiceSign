@@ -20,7 +20,7 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
-    @GetMapping
+    @GetMapping({"", "/summary"})
     public ResponseEntity<ApiResponse<DashboardSummaryResponse>> getDashboard(
             @AuthenticationPrincipal CustomUserDetails user) {
         DashboardSummaryResponse summary = dashboardService.getSummary(user.getUserId());

@@ -63,6 +63,9 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    mail:
+      enabled: false
 
 springdoc:
   api-docs:

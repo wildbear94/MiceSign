@@ -56,6 +56,21 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.ok(detail));
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<Page<DocumentResponse>>> getMyDocuments(
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        UserRole role = UserRole.valueOf(user.getRole());
+        DocumentSearchCondition condition = new DocumentSearchCondition(
+                null, status, null, null, null, "my");
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<DocumentResponse> result = documentService.searchDocuments(
+                condition, user.getUserId(), role, user.getDepartmentId(), pageable);
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DocumentDetailResponse>> getDocument(
             @PathVariable Long id,
