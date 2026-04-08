@@ -103,7 +103,7 @@ Plans:
 - [x] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
 - [x] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
 - [x] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
-- [ ] 05-04-PLAN.md — Gap closure: remove gdriveFileId from API, fix audit log injection, parameter swap bug, resource leak, readOnly prop
+- [x] 05-04-PLAN.md — Gap closure: remove gdriveFileId from API, fix audit log injection, parameter swap bug, resource leak, readOnly prop
 
 ### Phase 6: Document Submission & Numbering
 **Goal**: Users can submit drafts, triggering immutable locking and document number assignment with race-condition protection
