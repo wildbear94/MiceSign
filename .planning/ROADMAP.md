@@ -319,7 +319,7 @@ Plans:
 
 **Milestone Goal:** 로그인 화면에서 사용자가 직접 계정을 신청하고, SUPER_ADMIN이 승인/거부할 수 있는 셀프 등록 시스템
 
-- [ ] **Phase 18: Registration Backend** - registration_request 테이블, 등록 신청 API, 이메일 중복 검증, 승인 시 자동 계정 생성
+- [x] **Phase 18: Registration Backend** - registration_request 테이블, 등록 신청 API, 이메일 중복 검증, 승인 시 자동 계정 생성 (completed 2026-04-08)
 - [ ] **Phase 19: Registration Email Notifications** - 등록 이벤트 이메일 인프라 확장, 신청/승인/거부 이메일 발송, SUPER_ADMIN 알림
 - [ ] **Phase 20: Admin Registration Management UI** - SUPER_ADMIN 등록 신청 목록, 부서/직급 지정 승인, 거부 사유 입력
 - [ ] **Phase 21: Registration Frontend & Security** - 로그인 화면 등록 신청 폼, 신청 상태 조회 페이지, rate limiting
@@ -336,10 +336,10 @@ Plans:
   3. A previously rejected email can be used to submit a new registration request
   4. When a registration request is approved, a user account is created with the correct password hash (no double-hashing) and status ACTIVE
   5. The registration_request table stores requests independently from the user table (separate entity with its own lifecycle)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 18-01-PLAN.md — Domain foundation: Flyway V14, entity, repository, DTOs, mapper, SecurityConfig
-- [ ] 18-02-PLAN.md — Service + controllers: submit/approve/reject/expiry, public + admin APIs, tests
+- [x] 18-01-PLAN.md — Domain foundation: Flyway V14, entity, repository, DTOs, mapper, SecurityConfig
+- [x] 18-02-PLAN.md — Service + controllers: submit/approve/reject/expiry, public + admin APIs, tests
 
 ### Phase 19: Registration Email Notifications
 **Goal**: All registration lifecycle events trigger appropriate email notifications so applicants know their status and admins know about new requests
@@ -400,7 +400,7 @@ Phases 18 through 21 are strictly sequential (each depends on the previous).
 | 15. Advanced Logic | v1.2 | 3/3 | Complete | 2026-04-06 |
 | 16. Template Migration | v1.2 | 2/2 | Complete | 2026-04-06 |
 | 17. Budget Integration | v1.2 | 3/1 | Complete | 2026-04-07 |
-| 18. Registration Backend | v1.3 | 0/2 | Planning | - |
+| 18. Registration Backend | v1.3 | 2/2 | Complete    | 2026-04-08 |
 | 19. Registration Email Notifications | v1.3 | 0/0 | Not started | - |
 | 20. Admin Registration Management UI | v1.3 | 0/0 | Not started | - |
 | 21. Registration Frontend & Security | v1.3 | 0/0 | Not started | - |
