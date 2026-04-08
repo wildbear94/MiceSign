@@ -553,7 +553,7 @@ public class DocumentService {
                 .findByDocumentId(document.getId());
         List<AttachmentResponse> attachmentResponses = attachmentEntities.stream()
                 .map(a -> new AttachmentResponse(a.getId(), a.getDocumentId(), a.getOriginalName(),
-                        a.getFileSize(), a.getMimeType(), a.getGdriveFileId(), a.getCreatedAt()))
+                        a.getFileSize(), a.getMimeType(), a.getCreatedAt()))
                 .toList();
 
         String templateName = getTemplateName(document.getTemplateCode());

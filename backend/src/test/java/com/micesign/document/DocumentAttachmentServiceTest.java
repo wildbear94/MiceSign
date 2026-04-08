@@ -56,6 +56,9 @@ class DocumentAttachmentServiceTest {
     @Mock
     AuditLogService auditLogService;
 
+    @Mock
+    com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
     @InjectMocks
     DocumentAttachmentService service;
 

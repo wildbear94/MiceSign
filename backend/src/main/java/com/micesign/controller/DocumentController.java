@@ -186,7 +186,7 @@ public class DocumentController {
     public ResponseEntity<ApiResponse<Void>> deleteAttachment(
             @PathVariable Long attachmentId,
             @AuthenticationPrincipal CustomUserDetails user) {
-        attachmentService.deleteAttachment(user.getUserId(), attachmentId);
+        attachmentService.deleteAttachment(attachmentId, user.getUserId());
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

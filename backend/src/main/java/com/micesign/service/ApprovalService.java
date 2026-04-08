@@ -247,7 +247,7 @@ public class ApprovalService {
         List<AttachmentResponse> attachmentResponses = attachmentRepository
                 .findByDocumentId(document.getId()).stream()
                 .map(a -> new AttachmentResponse(a.getId(), a.getDocumentId(), a.getOriginalName(),
-                        a.getFileSize(), a.getMimeType(), a.getGdriveFileId(), a.getCreatedAt()))
+                        a.getFileSize(), a.getMimeType(), a.getCreatedAt()))
                 .toList();
 
         String templateName = getTemplateName(document.getTemplateCode());

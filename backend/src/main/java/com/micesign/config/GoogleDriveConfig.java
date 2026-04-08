@@ -52,9 +52,9 @@ public class GoogleDriveConfig {
         if (credentialsPath != null && !credentialsPath.isBlank()) {
             java.io.File credFile = new java.io.File(credentialsPath);
             if (credFile.exists()) {
-                try {
+                try (FileInputStream fis = new FileInputStream(credFile)) {
                     GoogleCredentials creds = GoogleCredentials
-                            .fromStream(new FileInputStream(credFile))
+                            .fromStream(fis)
                             .createScoped(SCOPES);
                     log.info("Using service account key file: {}", credentialsPath);
                     return creds;

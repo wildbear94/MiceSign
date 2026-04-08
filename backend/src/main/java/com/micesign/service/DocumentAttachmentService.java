@@ -1,5 +1,7 @@
 package com.micesign.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.Document;
@@ -23,6 +25,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -50,19 +53,22 @@ public class DocumentAttachmentService {
     private final ApprovalLineRepository approvalLineRepository;
     private final DocumentAttachmentMapper attachmentMapper;
     private final AuditLogService auditLogService;
+    private final ObjectMapper objectMapper;
 
     public DocumentAttachmentService(DocumentAttachmentRepository attachmentRepository,
                                       GoogleDriveService googleDriveService,
                                       DocumentRepository documentRepository,
                                       ApprovalLineRepository approvalLineRepository,
                                       DocumentAttachmentMapper attachmentMapper,
-                                      AuditLogService auditLogService) {
+                                      AuditLogService auditLogService,
+                                      ObjectMapper objectMapper) {
         this.attachmentRepository = attachmentRepository;
         this.googleDriveService = googleDriveService;
         this.documentRepository = documentRepository;
         this.approvalLineRepository = approvalLineRepository;
         this.attachmentMapper = attachmentMapper;
         this.auditLogService = auditLogService;
+        this.objectMapper = objectMapper;
     }
 
     // ──────────────────────────────────────────────
@@ -113,7 +119,7 @@ public class DocumentAttachmentService {
             attachment = attachmentRepository.save(attachment);
 
             auditLogService.log(userId, AuditAction.FILE_UPLOAD, "DOCUMENT", docId,
-                    "{\"file\":\"" + file.getOriginalFilename() + "\"}");
+                    toJson(Map.of("file", file.getOriginalFilename())));
 
             return attachmentMapper.toResponse(attachment);
         } catch (IOException e) {
@@ -170,7 +176,7 @@ public class DocumentAttachmentService {
                 savedAttachments.add(attachmentRepository.save(attachment));
 
                 auditLogService.log(userId, AuditAction.FILE_UPLOAD, "DOCUMENT", docId,
-                        "{\"file\":\"" + file.getOriginalFilename() + "\"}");
+                        toJson(Map.of("file", file.getOriginalFilename())));
             } catch (IOException e) {
                 throw new BusinessException("FILE_UPLOAD_FAILED",
                         "파일 업로드 중 오류가 발생했습니다: " + file.getOriginalFilename());
@@ -194,7 +200,7 @@ public class DocumentAttachmentService {
         InputStream inputStream = googleDriveService.downloadFile(attachment.getGdriveFileId());
 
         auditLogService.log(userId, AuditAction.FILE_DOWNLOAD, "ATTACHMENT", attachmentId,
-                "{\"file\":\"" + attachment.getOriginalName() + "\"}");
+                toJson(Map.of("file", attachment.getOriginalName())));
 
         return new InputStreamResource(inputStream);
     }
@@ -274,6 +280,11 @@ public class DocumentAttachmentService {
     // ──────────────────────────────────────────────
 
     private void validateFile(MultipartFile file) {
+        String originalName = file.getOriginalFilename();
+        if (originalName == null || originalName.isBlank()) {
+            throw new BusinessException("FILE_NAME_INVALID", "파일 이름이 없습니다.");
+        }
+
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new BusinessException("FILE_SIZE_EXCEEDED",
                     "파일 크기는 50MB를 초과할 수 없습니다: " + file.getOriginalFilename());
@@ -329,6 +340,18 @@ public class DocumentAttachmentService {
 
     private String buildFolderPath(Document document) {
         return "MiceSign/drafts/DRAFT-" + document.getId() + "/";
+    }
+
+    // Note: MIME type is taken from client-supplied Content-Type header. The extension blocklist
+    // is the primary security gate for dangerous file types. Server-side MIME detection (e.g.,
+    // Apache Tika) would provide defense-in-depth but is out of scope for this phase.
+
+    private String toJson(Map<String, Object> data) {
+        try {
+            return objectMapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            return data.toString(); // fallback
+        }
     }
 
     String getFileExtension(String filename) {
