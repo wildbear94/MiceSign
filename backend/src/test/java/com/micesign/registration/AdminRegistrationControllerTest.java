@@ -41,8 +41,8 @@ class AdminRegistrationControllerTest {
     void getRegistrations_returnsPaginatedList() throws Exception {
         // Insert a test registration request
         jdbcTemplate.update(
-            "INSERT INTO registration_request (name, email, password_hash, status, created_at, updated_at) " +
-            "VALUES ('테스트', 'regtest@example.com', '$2a$10$hash', 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+            "INSERT INTO registration_request (name, email, password_hash, tracking_token, status, created_at, updated_at) " +
+            "VALUES ('테스트', 'regtest@example.com', '$2a$10$hash', 'test-token-1', 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
 
         mockMvc.perform(get("/api/v1/admin/registrations")
                 .header("Authorization", "Bearer " + superAdminToken))
@@ -56,8 +56,8 @@ class AdminRegistrationControllerTest {
     void approveRegistration_returns200() throws Exception {
         // Insert a PENDING registration request
         jdbcTemplate.update(
-            "INSERT INTO registration_request (name, email, password_hash, status, created_at, updated_at) " +
-            "VALUES ('승인대상', 'approve@example.com', '$2a$10$dummyhashvalue123456789012345678901234567890', 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+            "INSERT INTO registration_request (name, email, password_hash, tracking_token, status, created_at, updated_at) " +
+            "VALUES ('승인대상', 'approve@example.com', '$2a$10$dummyhashvalue123456789012345678901234567890', 'test-token-2', 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
         Long regId = jdbcTemplate.queryForObject(
             "SELECT id FROM registration_request WHERE email = 'approve@example.com'", Long.class);
 
@@ -80,8 +80,8 @@ class AdminRegistrationControllerTest {
     void rejectRegistration_returns200() throws Exception {
         // Insert a PENDING registration request
         jdbcTemplate.update(
-            "INSERT INTO registration_request (name, email, password_hash, status, created_at, updated_at) " +
-            "VALUES ('거부대상', 'reject@example.com', '$2a$10$hash', 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+            "INSERT INTO registration_request (name, email, password_hash, tracking_token, status, created_at, updated_at) " +
+            "VALUES ('거부대상', 'reject@example.com', '$2a$10$hash', 'test-token-3', 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
         Long regId = jdbcTemplate.queryForObject(
             "SELECT id FROM registration_request WHERE email = 'reject@example.com'", Long.class);
 
