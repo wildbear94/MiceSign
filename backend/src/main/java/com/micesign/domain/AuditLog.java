@@ -14,6 +14,10 @@ public class AuditLog {
     @Column(name = "user_id")
     private Long userId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
+
     @Column(name = "action", nullable = false, length = 50)
     private String action;
 
@@ -23,7 +27,7 @@ public class AuditLog {
     @Column(name = "target_id")
     private Long targetId;
 
-    @Column(name = "detail", columnDefinition = "TEXT")
+    @Column(name = "detail", columnDefinition = "json")
     private String detail;
 
     @Column(name = "ip_address", length = 50)
@@ -56,6 +60,14 @@ public class AuditLog {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getAction() {

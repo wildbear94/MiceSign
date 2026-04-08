@@ -1,6 +1,7 @@
 package com.micesign.dto.document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record DocumentDetailResponse(
     Long id,
@@ -9,18 +10,19 @@ public record DocumentDetailResponse(
     String templateName,
     String title,
     String status,
-    DrafterInfo drafter,
+    Long drafterId,
+    String drafterName,
+    String departmentName,
+    String positionName,
+    Integer currentStep,
+    Long sourceDocId,
     String bodyHtml,
     String formData,
+    Integer schemaVersion,
+    String schemaDefinitionSnapshot,
+    List<ApprovalLineResponse> approvalLines,
+    List<AttachmentResponse> attachments,
     LocalDateTime submittedAt,
     LocalDateTime completedAt,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
-) {
-    public record DrafterInfo(
-        Long id,
-        String name,
-        String departmentName,
-        String positionName
-    ) {}
-}
+    LocalDateTime createdAt
+) {}
