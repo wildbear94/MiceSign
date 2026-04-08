@@ -83,7 +83,7 @@ Plans:
   3. Expense form supports item table with quantity/unit price/amount and auto-sum calculation
   4. Leave form supports leave type selection, date range, auto-calculated days, and reason
   5. User can view a list of their documents with current status and open any document's detail page
-**Plans:** 3 plans
+**Plans:** 4 plans
 Plans:
 - [x] 04-01-PLAN.md — Backend: V5 migration, JPA entities, DTOs, services, controllers, document CRUD API with form validation, integration tests
 - [x] 04-02-PLAN.md — Frontend infrastructure: Tiptap/date-fns deps, TypeScript types, API clients, hooks, Zod schemas, MainLayout/navbar, routing
@@ -98,11 +98,12 @@ Plans:
   1. User can upload files that are stored in Google Drive via Service Account
   2. User can download attachments only if they are an authorized viewer of the document
   3. System rejects uploads exceeding 50MB per file, 10 files per document, or 200MB total, and blocks disallowed extensions
-**Plans:** 3 plans
+**Plans:** 4 plans
 Plans:
 - [x] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
-- [ ] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
-- [ ] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
+- [x] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
+- [x] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
+- [ ] 05-04-PLAN.md — Gap closure: remove gdriveFileId from API, fix audit log injection, parameter swap bug, resource leak, readOnly prop
 
 ### Phase 6: Document Submission & Numbering
 **Goal**: Users can submit drafts, triggering immutable locking and document number assignment with race-condition protection
