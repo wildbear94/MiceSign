@@ -71,7 +71,6 @@ public class RegistrationEmailService {
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
-    @Transactional(readOnly = true)
     public void handleRegistrationEvent(RegistrationNotificationEvent event) {
         try {
             RegistrationRequest reg = registrationRequestRepository
