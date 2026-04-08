@@ -364,7 +364,10 @@ Plans:
   2. SUPER_ADMIN can approve a request by assigning a department and position, triggering automatic account creation
   3. SUPER_ADMIN can reject a request with a mandatory rejection reason
   4. The registration management page is accessible from the admin sidebar
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 20-01-PLAN.md — 타입, API 레이어, 훅, i18n, 목록 페이지(탭 필터, 정렬, 페이지네이션), 사이드바 메뉴
+- [ ] 20-02-PLAN.md — 통합 모달(승인/거부 워크플로우), sonner 토스트, 시각 검증 체크포인트
 **UI hint**: yes
 
 ### Phase 21: Registration Frontend & Security
@@ -376,7 +379,10 @@ Plans:
   2. User can fill out and submit a registration form (name, email, password with confirmation) without logging in
   3. User can check their registration status (pending/approved/rejected) and see rejection reason if applicable
   4. Public registration endpoints are rate-limited to prevent abuse (e.g., brute-force submissions)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 20-01-PLAN.md — 타입, API 레이어, 훅, i18n, 목록 페이지(탭 필터, 정렬, 페이지네이션), 사이드바 메뉴
+- [ ] 20-02-PLAN.md — 통합 모달(승인/거부 워크플로우), sonner 토스트, 시각 검증 체크포인트
 **UI hint**: yes
 
 ## Progress
