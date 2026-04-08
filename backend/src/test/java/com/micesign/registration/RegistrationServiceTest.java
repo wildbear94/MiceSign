@@ -328,7 +328,7 @@ class RegistrationServiceTest {
         // when/then
         assertThatThrownBy(() -> registrationService.approve(10L, dto, superAdmin()))
                 .isInstanceOf(BusinessException.class)
-                .satisfies(ex -> assertThat(((BusinessException) ex).getCode()).isEqualTo("ORG_NOT_FOUND"));
+                .satisfies(ex -> assertThat(((BusinessException) ex).getCode()).isEqualTo("ORG_DEPARTMENT_NOT_FOUND"));
     }
 
     @Test

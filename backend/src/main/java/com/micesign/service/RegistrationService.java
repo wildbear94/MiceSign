@@ -128,12 +128,12 @@ public class RegistrationService {
         // Validate department
         departmentRepository.findById(dto.departmentId())
                 .filter(d -> d.isActive())
-                .orElseThrow(() -> new BusinessException("ORG_NOT_FOUND", "유효한 부서를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("ORG_DEPARTMENT_NOT_FOUND", "유효한 부서를 찾을 수 없습니다."));
 
         // Validate position
         positionRepository.findById(dto.positionId())
                 .filter(p -> p.isActive())
-                .orElseThrow(() -> new BusinessException("ORG_NOT_FOUND", "유효한 직급을 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("ORG_POSITION_NOT_FOUND", "유효한 직급을 찾을 수 없습니다."));
 
         // Create user with DIRECT password hash transfer (D-07: NO passwordEncoder.encode() call)
         User user = new User();
