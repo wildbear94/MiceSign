@@ -254,7 +254,8 @@ class RegistrationServiceTest {
         // Verify passwordEncoder.encode() was NOT called during approve
         verify(passwordEncoder, never()).encode(any());
 
-        // Verify registration request updated
+        // Verify registration request updated and password hash cleared
+        assertThat(reg.getPasswordHash()).isNull();  // WR-02: cleared after approval
         assertThat(reg.getStatus()).isEqualTo(RegistrationStatus.APPROVED);
         assertThat(reg.getApprovedBy()).isEqualTo(1L);
         assertThat(reg.getProcessedAt()).isNotNull();

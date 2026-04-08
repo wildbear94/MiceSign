@@ -148,7 +148,8 @@ public class RegistrationService {
         user.setMustChangePassword(false);
         user = userRepository.save(user);
 
-        // Update registration request
+        // Update registration request (clear password hash for data minimization)
+        reg.setPasswordHash(null);
         reg.setStatus(RegistrationStatus.APPROVED);
         reg.setApprovedBy(admin.getUserId());
         reg.setProcessedAt(LocalDateTime.now());
