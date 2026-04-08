@@ -1,29 +1,20 @@
-import { useState, useCallback, useRef, useMemo, Suspense } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { ArrowLeft, Save, Send, Trash2, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
-import SubmitConfirmDialog from '../components/SubmitConfirmDialog';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
-import ApprovalLineEditor from '../components/approval/ApprovalLineEditor';
-import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
-import { TEMPLATE_REGISTRY, isHardcodedTemplate } from '../components/templates/templateRegistry';
-import type { TemplateFormProps } from '../components/templates/templateRegistry';
-import DynamicForm from '../components/templates/DynamicForm';
+import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import {
-  useDocument,
+  useDocumentDetail,
   useCreateDocument,
   useUpdateDocument,
   useDeleteDocument,
-  useSubmitDocument,
 } from '../hooks/useDocuments';
-import { useTemplateByCode } from '../hooks/useTemplates';
 import { useAutoSave } from '../hooks/useAutoSave';
-import type {
-  ApprovalLineRequest,
-  UpdateDocumentRequest,
-} from '../types/document';
 
 export default function DocumentEditorPage() {
+  const { t } = useTranslation('document');
   const navigate = useNavigate();
   const { templateCode, id } = useParams<{
     templateCode?: string;
@@ -33,186 +24,107 @@ export default function DocumentEditorPage() {
   const documentId = id ? Number(id) : null;
   const isEditMode = documentId !== null;
 
-  // Saved document ID (null for brand-new, set after first save)
+  // Track the saved document ID (starts null for new, set after first save)
   const [savedDocId, setSavedDocId] = useState<number | null>(documentId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Form state refs for auto-save
-  const titleRef = useRef('');
-  const formDataRef = useRef<string | null>(null);
-  const bodyHtmlRef = useRef<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [approvalLines, setApprovalLines] = useState<ApprovalLineRequest[]>([]);
-
-  // Load existing document (edit mode)
-  const { data: existingDoc, isLoading: isLoadingDoc } = useDocument(documentId);
-
-  // Resolve template code
+  // For new docs, use templateCode from URL; for edits, from loaded document
+  const { data: existingDoc } = useDocumentDetail(documentId);
   const resolvedTemplateCode = templateCode ?? existingDoc?.templateCode ?? '';
 
-  // Load template schema for dynamic templates
-  const { data: templateDetail } = useTemplateByCode(
-    !isHardcodedTemplate(resolvedTemplateCode) ? resolvedTemplateCode : null,
-  );
-
-  // Mutations
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();
-  const submitMutation = useSubmitDocument();
 
-  // Initialize from existing doc
-  const initializedRef = useRef(false);
-  if (existingDoc && !initializedRef.current) {
-    initializedRef.current = true;
-    titleRef.current = existingDoc.title;
-    formDataRef.current = existingDoc.formData;
-    bodyHtmlRef.current = existingDoc.bodyHtml;
-    // Only set state on first load
-    if (!title) {
-      setTitle(existingDoc.title);
+  // Store the latest form data for auto-save
+  const formDataRef = useRef<{
+    title: string;
+    bodyHtml?: string;
+    formData?: string;
+  }>({ title: '' });
+
+  const handleSave = useCallback(
+    async (data: { title: string; bodyHtml?: string; formData?: string }) => {
+      formDataRef.current = data;
+      setErrorMessage(null);
+
+      try {
+        if (savedDocId) {
+          // Update existing
+          await updateMutation.mutateAsync({
+            id: savedDocId,
+            data: {
+              title: data.title,
+              bodyHtml: data.bodyHtml ?? null,
+              formData: data.formData ?? null,
+            },
+          });
+        } else {
+          // Create new
+          const created = await createMutation.mutateAsync({
+            templateCode: resolvedTemplateCode,
+            title: data.title,
+            bodyHtml: data.bodyHtml ?? null,
+            formData: data.formData ?? null,
+          });
+          setSavedDocId(created.id);
+          // Update URL without re-rendering
+          window.history.replaceState(null, '', `/documents/${created.id}`);
+        }
+      } catch {
+        setErrorMessage(t('error.saveFailed'));
+        throw new Error('save failed');
+      }
+    },
+    [savedDocId, resolvedTemplateCode, createMutation, updateMutation, t],
+  );
+
+  // Auto-save: triggered when form data changes
+  const autoSaveFn = useCallback(async () => {
+    if (formDataRef.current.title) {
+      await handleSave(formDataRef.current);
     }
-    if (existingDoc.approvalLines.length > 0 && approvalLines.length === 0) {
-      setApprovalLines(
-        existingDoc.approvalLines.map((line) => ({
-          approverId: line.approverId,
-          lineType: line.lineType,
-          stepOrder: line.stepOrder,
-        })),
-      );
-    }
-  }
+  }, [handleSave]);
 
-  // Build request data for save
-  const getRequestData = useCallback((): UpdateDocumentRequest | null => {
-    if (!titleRef.current) return null;
-    return {
-      title: titleRef.current,
-      bodyHtml: bodyHtmlRef.current ?? undefined,
-      formData: formDataRef.current ?? undefined,
-      approvalLines: approvalLines.length > 0 ? approvalLines : undefined,
-    };
-  }, [approvalLines]);
-
-  // Auto-save hook
   const { status: autoSaveStatus, saveNow } = useAutoSave(
-    savedDocId,
-    getRequestData,
+    autoSaveFn,
+    [formDataRef.current],
     30000,
   );
 
-  // Handle form data changes from template components
-  const handleFormChange = useCallback(
-    (data: { formData?: string; bodyHtml?: string }) => {
-      if (data.formData !== undefined) formDataRef.current = data.formData;
-      if (data.bodyHtml !== undefined) bodyHtmlRef.current = data.bodyHtml;
-    },
-    [],
-  );
-
-  // Handle title change
-  const handleTitleChange = useCallback((value: string) => {
-    setTitle(value);
-    titleRef.current = value;
+  const handleManualSave = useCallback(async () => {
+    // Trigger the form's submit which calls onSave
+    const form = document.getElementById('document-form') as HTMLFormElement;
+    if (form) {
+      form.requestSubmit();
+    }
   }, []);
 
-  // Save draft
-  const handleSave = useCallback(async () => {
-    setErrorMessage(null);
-    const currentTitle = titleRef.current || title;
-    if (!currentTitle.trim()) {
-      setErrorMessage('제목을 입력해주세요.');
-      return;
-    }
-
-    try {
-      if (savedDocId) {
-        await updateMutation.mutateAsync({
-          id: savedDocId,
-          req: {
-            title: currentTitle,
-            bodyHtml: bodyHtmlRef.current ?? undefined,
-            formData: formDataRef.current ?? undefined,
-            approvalLines: approvalLines.length > 0 ? approvalLines : undefined,
-          },
-        });
-      } else {
-        const created = await createMutation.mutateAsync({
-          templateCode: resolvedTemplateCode,
-          title: currentTitle,
-          bodyHtml: bodyHtmlRef.current ?? undefined,
-          formData: formDataRef.current ?? undefined,
-          approvalLines: approvalLines.length > 0 ? approvalLines : undefined,
-        });
-        setSavedDocId(created.id);
-        window.history.replaceState(null, '', `/documents/${created.id}/edit`);
-      }
-    } catch {
-      setErrorMessage('저장에 실패했습니다. 다시 시도해주세요.');
-    }
-  }, [savedDocId, title, resolvedTemplateCode, approvalLines, createMutation, updateMutation]);
-
-  // Submit document
-  const handleSubmit = useCallback(async () => {
-    if (!savedDocId) {
-      // Must save first
-      await handleSave();
-    }
-    const docIdToSubmit = savedDocId;
-    if (!docIdToSubmit) return;
-
-    try {
-      await submitMutation.mutateAsync(docIdToSubmit);
-      navigate(`/documents/${docIdToSubmit}`);
-    } catch {
-      setErrorMessage('상신에 실패했습니다. 다시 시도해주세요.');
-    }
-  }, [savedDocId, handleSave, submitMutation, navigate]);
-
-  // Delete draft
   const handleDelete = useCallback(async () => {
     if (!savedDocId) return;
     try {
       await deleteMutation.mutateAsync(savedDocId);
       navigate('/documents/my');
     } catch {
-      setErrorMessage('삭제에 실패했습니다.');
+      setErrorMessage(t('error.deleteFailed'));
     }
-  }, [savedDocId, deleteMutation, navigate]);
-
-  // Handle attachments change (trigger refetch)
-  const handleAttachmentsChange = useCallback(() => {
-    // Query invalidation is handled by the attachment hooks
-  }, []);
-
-  // Determine rendering mode
-  const useHardcoded = isEditMode
-    ? isHardcodedTemplate(resolvedTemplateCode) && !existingDoc?.schemaDefinitionSnapshot
-    : isHardcodedTemplate(resolvedTemplateCode);
+  }, [savedDocId, deleteMutation, navigate, t]);
 
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
+  if (!templateEntry && !isEditMode) {
+    return (
+      <div className="text-center py-12 text-gray-500">
+        Unknown template: {resolvedTemplateCode}
+      </div>
+    );
+  }
 
-  // Resolve schema definition for dynamic form
-  const schemaDefinition = useMemo(() => {
-    if (useHardcoded) return null;
-    // For existing documents with snapshot, use snapshot
-    if (existingDoc?.schemaDefinitionSnapshot) {
-      return existingDoc.schemaDefinitionSnapshot;
-    }
-    // For new documents, use template's current schema
-    if (templateDetail?.schemaDefinition) {
-      return templateDetail.schemaDefinition;
-    }
-    return null;
-  }, [useHardcoded, existingDoc, templateDetail]);
-
-  // Loading state for existing document
-  if (isEditMode && isLoadingDoc) {
+  // While loading existing document
+  if (isEditMode && !existingDoc) {
     return (
       <div className="max-w-4xl mx-auto space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
             className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"
@@ -222,24 +134,7 @@ export default function DocumentEditorPage() {
     );
   }
 
-  // Unknown template
-  if (!resolvedTemplateCode) {
-    return (
-      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-        <p className="text-lg font-medium">알 수 없는 양식입니다.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/documents/my')}
-          className="mt-4 text-sm text-blue-600 hover:text-blue-700"
-        >
-          목록으로 돌아가기
-        </button>
-      </div>
-    );
-  }
-
-  const FormComponent = useHardcoded ? templateEntry?.form : null;
-  const isSaving = createMutation.isPending || updateMutation.isPending;
+  const EditComponent = templateEntry?.editComponent;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -250,49 +145,30 @@ export default function DocumentEditorPage() {
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mb-4"
       >
         <ArrowLeft className="h-4 w-4" />
-        목록으로
+        {t('backToList')}
       </button>
 
       {/* Action bar */}
       <div className="flex items-center justify-between mb-4">
         <AutoSaveIndicator status={autoSaveStatus} />
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleManualSave}
+            className="inline-flex items-center gap-2 h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
+          >
+            {t('save')}
+          </button>
           {savedDocId && (
             <button
               type="button"
               onClick={() => setShowDeleteConfirm(true)}
-              className="inline-flex items-center gap-2 h-10 px-4 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 text-sm font-medium rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              className="inline-flex items-center gap-2 h-11 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg"
             >
               <Trash2 className="h-4 w-4" />
-              삭제
+              {t('delete')}
             </button>
           )}
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="inline-flex items-center gap-2 h-10 px-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
-          >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            저장
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowSubmitConfirm(true)}
-            disabled={!title.trim() || submitMutation.isPending}
-            className="inline-flex items-center gap-2 h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-          >
-            {submitMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-            상신
-          </button>
         </div>
       </div>
 
@@ -303,84 +179,33 @@ export default function DocumentEditorPage() {
         </div>
       )}
 
-      {/* Title input */}
-      <div className="mb-4">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => handleTitleChange(e.target.value)}
-          placeholder="문서 제목을 입력하세요"
-          className="w-full h-12 px-4 text-lg font-medium rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
       {/* Form container */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-            </div>
-          }
-        >
-          {FormComponent ? (
-            <FormComponent
-              formData={formDataRef.current}
-              bodyHtml={bodyHtmlRef.current}
-              onChange={handleFormChange}
-            />
-          ) : schemaDefinition ? (
-            <DynamicForm
-              schemaDefinition={schemaDefinition}
-              formData={formDataRef.current}
-              onChange={(fd) => handleFormChange({ formData: fd })}
-            />
-          ) : (
-            <div className="text-center py-8 text-sm text-gray-400">
-              양식을 불러오는 중입니다...
-            </div>
-          )}
-        </Suspense>
-      </div>
-
-      {/* Approval line editor */}
-      <div className="mb-6">
-        <ApprovalLineEditor
-          approvalLines={approvalLines}
-          onChange={setApprovalLines}
-        />
-      </div>
-
-      {/* File attachments */}
-      {savedDocId && (
-        <div className="mb-6">
-          <FileAttachmentArea
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+        {EditComponent && (
+          <EditComponent
             documentId={savedDocId}
-            attachments={existingDoc?.attachments ?? []}
-            editable
-            onAttachmentsChange={handleAttachmentsChange}
+            initialData={
+              existingDoc
+                ? {
+                    title: existingDoc.title,
+                    bodyHtml: existingDoc.bodyHtml ?? undefined,
+                    formData: existingDoc.formData ?? undefined,
+                  }
+                : undefined
+            }
+            onSave={handleSave}
           />
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Submit confirmation dialog */}
-      <SubmitConfirmDialog
-        isOpen={showSubmitConfirm}
-        onConfirm={handleSubmit}
-        onCancel={() => setShowSubmitConfirm(false)}
-        title={title || '(제목 없음)'}
-        approvalLineCount={approvalLines.length}
-        isLoading={submitMutation.isPending}
-      />
-
-      {/* Delete confirmation dialog */}
+      {/* Delete confirmation */}
       <ConfirmDialog
         open={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="문서 삭제"
-        message="임시저장된 문서를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
-        confirmLabel="삭제"
+        title={t('deleteConfirm.title')}
+        message={t('deleteConfirm.message')}
+        confirmLabel={t('deleteConfirm.confirm')}
         confirmVariant="danger"
         isLoading={deleteMutation.isPending}
       />

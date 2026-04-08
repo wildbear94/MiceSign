@@ -1,170 +1,146 @@
-# Feature Landscape: Self-Registration (사용자 등록 신청)
+# Feature Landscape
 
-**Domain:** Corporate internal system self-registration with admin approval
-**Researched:** 2026-04-07
-**Scope:** NEW features only for v1.3 milestone (self-registration). Existing system features are already shipped.
+**Domain:** Electronic Approval System (전자 결재) for in-house use (~50 employees)
+**Researched:** 2026-03-31
+**Confidence:** HIGH (based on PRD v2.0, FSD v1.0, and domain expertise in Korean corporate workflow systems)
 
 ## Table Stakes
 
-Features users expect. Missing = feature feels incomplete or unusable.
+Features users expect from any electronic approval system. Missing any of these means the system cannot replace Docswave.
 
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|-------------|
-| Registration form on login page | Users need a visible way to request an account without contacting admin | Low | LoginPage.tsx — add link; new RegistrationPage |
-| Minimal input: name, email, password | PROJECT.md specifies these 3 fields; matches milestone scope | Low | None new — reuses existing validation patterns |
-| Password confirmation field | Standard UX for any registration form; prevents typo lockout | Low | Frontend only |
-| Email uniqueness check (real-time) | Prevents frustrating submit-then-fail; email is unique in `user` table | Low | New public API endpoint: `GET /api/registration/check-email` |
-| Submission success feedback | User must know their request was received and is pending | Low | Frontend toast or success page |
-| SUPER_ADMIN approval/rejection UI | Core requirement — admin must be able to act on requests | Med | New admin page in existing admin sidebar layout |
-| Request list with status filter | Admin needs to see pending/approved/rejected requests | Low | Pagination reuses existing patterns (UserManagementService) |
-| Rejection reason field | Admin should explain why a request was denied; user sees it in email | Low | Single text field on rejection modal |
-| Email notification on submission (to SUPER_ADMIN) | Admin must know there is a pending request to review | Low | Reuses existing EmailService infrastructure |
-| Email notification on approval (to applicant) | Applicant must know they can now log in | Low | Reuses existing EmailService |
-| Email notification on rejection (to applicant) | Applicant must know they were denied and why | Low | Reuses existing EmailService |
-| Duplicate request prevention | Same email should not have multiple PENDING requests | Low | Service-level check + DB unique constraint on (email, status=PENDING) |
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Authentication (login/logout/token refresh)** | Cannot use system without it | Medium | JWT stateless auth already spec'd. Account lockout (5 fails / 15min) is important for corporate security posture. |
+| **Document drafting with form templates** | Core purpose of the system | Medium | 3 MVP forms (GENERAL, EXPENSE, LEAVE). Hardcoded React components -- correct for MVP, avoids dynamic form builder complexity. |
+| **Draft save (임시저장)** | Users expect to save work-in-progress before submitting | Low | DRAFT state with no doc number. Essential -- users will lose trust if work disappears. |
+| **Approval line selection (결재선 지정)** | Defining who approves is the fundamental workflow act | High | This is the hardest UX component. Org tree browser + search + drag-and-drop ordering + type assignment (APPROVE/AGREE/REFERENCE). Invest heavily here. |
+| **Sequential approval processing** | Core workflow engine | High | State machine: DRAFT -> SUBMITTED -> APPROVED/REJECTED/WITHDRAWN. Must handle edge cases (withdrawals, rejections, re-drafting). |
+| **Document immutability after submission** | Legal and audit requirement in Korean corporate culture | Low | Lock body + attachments + approval line after SUBMITTED. Non-negotiable. |
+| **Approve/Reject with comments** | Approvers need to provide reasoning, especially on rejections | Low | Reject comment should be mandatory. Approve comment optional. |
+| **Document withdrawal (회수)** | Drafters need to pull back mistaken submissions | Medium | Only before next approver acts. Creates WITHDRAWN state (not revert to DRAFT). |
+| **Re-draft from rejected/withdrawn (재기안)** | Users should not re-type entire documents | Low | Copy content to new document with fresh doc number. Essential UX. |
+| **Document numbering (채번)** | Corporate traceability requirement | Low | Format: PREFIX-YEAR-SEQUENCE. Assigned at submission, not draft. |
+| **File attachments** | Most approval docs need supporting evidence | Medium | Google Drive API integration. 50MB per file, 200MB per doc, 10 files max. |
+| **My Documents inbox (내 문서함)** | Users need to find their own submissions | Low | Filter by status (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN). |
+| **Pending approvals inbox (결재 대기함)** | Approvers must see what needs their action | Low | Most critical inbox -- this drives daily workflow. Badge count on nav. |
+| **Completed approvals inbox (결재 완료함)** | Approvers need to review past decisions | Low | Historical reference. |
+| **Reference documents inbox (참조 문서함)** | CC'd users need access to referenced documents | Low | Read-only access, no action required. |
+| **Dashboard (대시보드)** | Landing page showing actionable summary | Medium | Pending count, recent docs, quick links. First thing users see. |
+| **Organization management (부서/직급/사용자)** | Admin must configure org structure before anyone can use the system | Medium | Department tree, position hierarchy, user CRUD. Prerequisite for everything else. |
+| **RBAC (역할 기반 접근 제어)** | Corporate systems require role-based permissions | Medium | SUPER_ADMIN / ADMIN / USER. Controls who sees what. |
+| **Password management** | Users must change passwords; admins must reset them | Low | Self-service change + admin reset with temp password. |
+| **Audit trail (감사 로그 기록)** | Corporate compliance -- all actions must be traceable | Medium | Backend logging of all state changes. UI for querying is Phase 1-C, but recording starts in Phase 1-A. |
+| **Document viewing permissions** | Confidential docs must not leak to unauthorized users | Medium | Drafter, approval line members, REFERENCE targets, ADMIN (dept scope), SUPER_ADMIN (all). |
 
 ## Differentiators
 
-Features that improve quality but are not strictly required for the feature to function.
+Features that elevate the system beyond basic approval. Not strictly required for MVP, but create real value for a small company.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Password strength indicator | Visual feedback during registration helps users pick strong passwords | Low | Frontend-only; reuses existing password rules from PasswordService |
-| Request status check page | Applicant can return to check request status without contacting admin | Med | Needs token-based lookup or email lookup; adds public endpoint complexity |
-| Auto-generated employee number on approval | Reduces admin manual work when approving | Low | Sequential `EMP-YYYY-NNNN` generation; easy to implement |
-| Admin can set department/position during approval | One-step approval instead of approve-then-edit | Med | Adds org tree selector to approval modal; reduces admin steps from 2 to 1 |
+| Feature | Value Proposition | Complexity | Phase | Notes |
+|---------|-------------------|------------|-------|-------|
+| **Email notifications (SMTP)** | Users don't have to constantly check the system for pending items | Medium | 1-B | Event-driven async. High impact for adoption -- without this, approvals stall because people forget to check. |
+| **Document search/filtering** | Find any document by keyword, date range, template type, status | Medium | 1-B | Essential once document volume grows past ~100 docs. Not needed for first week of use. |
+| **Approval line favorites (자주 쓰는 결재선)** | Save commonly used approval chains; huge time-saver for repetitive forms | Low | P2 | Low effort, high UX value. Consider pulling into Phase 1-B. |
+| **Statistics and reports** | Approval turnaround times, rejection rates, department volumes | Medium | 1-C | Valuable for management oversight. Shows the system is more than just Docswave replacement. |
+| **Audit log query UI** | SUPER_ADMIN can investigate any action with filters | Medium | 1-C | Backend already logging in P1A; this just adds the frontend. |
+| **Retirement/handover processing** | Clean handling of departing employees' pending approvals | Medium | 1-C | Bulk WITHDRAWN for drafter exits, SKIPPED for approver exits. Small company but still needed. |
+| **Additional form templates** | Purchase request, business trip report, overtime request | Low each | 1-B | Each is a new React component. Hardcoded approach makes adding forms straightforward. |
+| **Forced password change on first login** | Security best practice after admin creates temp password | Low | 1-B | Small effort, meaningful security improvement. |
+| **Read/unread status for reference docs** | Users know which reference docs they haven't read yet | Low | 1-B | Simple boolean flag per user per doc. Nice quality-of-life feature. |
+| **AI-assisted document drafting** | Auto-generate initial draft based on historical documents | High | P2 | The long-term differentiator. Requires substantial document corpus first. Only meaningful after 6+ months of data. |
+| **Proxy approval (대결/위임)** | Designated person approves on behalf of absent approver | Medium | P2 | Common in Korean corporate systems. Important for vacation coverage, but adds complexity to the state machine. |
+| **PDF export/print template** | Generate printable document with approval stamps | Medium | P2 | Some departments want physical records. Korean corporate culture still values printed approvals for certain docs. |
+| **In-app real-time notifications (WebSocket/SSE)** | Instant notification without email dependency | High | P2 | Over-engineering for 50 users. Email + dashboard badge is sufficient. |
+| **Parallel approval (병렬 합의)** | Multiple agreers process simultaneously instead of sequentially | Medium | P2 | Adds significant state machine complexity. Sequential is simpler and adequate for ~50 users. |
 
 ## Anti-Features
 
-Features to explicitly NOT build for this milestone.
+Features to explicitly NOT build. Each would add complexity without proportional value for a 50-person company.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Email verification (confirmation link) | Overkill for internal company system; admin approval is the gate | Admin approval serves as the verification step |
-| CAPTCHA on registration form | Internal network; ~50 employees; no public internet attack surface | Rate limiting on the endpoint is sufficient |
-| Self-service department/position selection | Applicant does not know their org placement; admin assigns post-approval | Admin sets department/position via existing user edit page after approval |
-| Social login / SSO for registration | Out of scope; no SSO infrastructure exists | Keep simple email+password |
-| Registration invitation codes | Adds friction without benefit for small company | Open registration + admin approval is simpler |
-| Applicant can edit pending request | Complexity not worth it; withdraw and resubmit is cleaner | Allow withdrawal of pending request if needed |
-| Auto-approval rules | Contradicts manual-approval philosophy of the entire system | Keep SUPER_ADMIN manual approval only |
-| Bulk approval/rejection | Unnecessary for ~50 person company; requests come in one at a time | Single approval/rejection workflow |
-
-## Critical Design Constraint: Database Schema
-
-**This is the most important finding.** The existing `user` table has hard constraints:
-- `employee_no VARCHAR(20) NOT NULL UNIQUE` — applicant does not know their employee number
-- `department_id BIGINT NOT NULL` — applicant does not select a department
-
-Self-registration CANNOT write directly to the `user` table.
-
-**Recommended solution: Separate `registration_request` table.**
-
-| Approach | Pros | Cons | Verdict |
-|----------|------|------|---------|
-| **New `registration_request` table** | Clean separation; zero schema changes to `user`; no ripple effects | New entity + migration | **Use this** |
-| Add PENDING status to user + nullable columns | Fewer tables | Breaks NOT NULL constraints; forces changes to every user query; risky | Reject |
-| Sentinel values in user table | No schema changes | Dirty data everywhere; fragile | Reject |
-
-### `registration_request` table design
-
-```sql
-CREATE TABLE registration_request (
-    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name          VARCHAR(50)  NOT NULL,
-    email         VARCHAR(150) NOT NULL,
-    password      VARCHAR(255) NOT NULL,  -- bcrypt hashed
-    status        VARCHAR(20)  NOT NULL DEFAULT 'PENDING',  -- PENDING, APPROVED, REJECTED
-    reject_reason VARCHAR(500) NULL,
-    reviewed_by   BIGINT       NULL,  -- FK to user.id (SUPER_ADMIN who reviewed)
-    reviewed_at   DATETIME     NULL,
-    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_email_pending (email, status)  -- or handled in service layer
-);
-```
+| **Dynamic form builder** | Massive complexity (drag-and-drop field editor, validation engine, conditional logic). Only justified at 500+ users or SaaS product. | Hardcoded React components per template. Adding a new form is a developer task (~2-4 hours), not an admin task. Perfectly acceptable at this scale. |
+| **Automatic approval routing rules** | Rule engines (if amount > X then add department head, etc.) add tremendous complexity and edge cases. Korean corporate culture values explicit human decision on approval lines. | 100% manual approval line selection by drafter. This is already the spec and it is correct. |
+| **Mobile native app** | React Native or Flutter app for ~50 users is unjustifiable cost. | Responsive web. Desktop-first, but ensure approve/reject works on mobile browser for P1A. |
+| **SSO / OAuth / LDAP integration** | Over-engineering for a small company that doesn't have an identity provider. | Simple email + password with JWT. Revisit only if company adopts Google Workspace or similar. |
+| **Document versioning** | Tracking diffs between versions adds storage and UI complexity. | Immutable-after-submission model. Need changes? Withdraw and re-draft. Clean and auditable. |
+| **Complex notification preferences** | Per-user notification channel/frequency settings. | Send email for all approval events. No opt-out needed at this scale -- approvals are mandatory workflows. |
+| **Multi-language support (i18n)** | All users are Korean speakers in a Korean company. | Korean UI only. Mixed Korean/English in code is fine per project conventions. |
+| **Data migration from Docswave** | Legacy data is messy and the effort to map old schemas exceeds the value. | Fresh start (clean start). Already confirmed in PRD. Old data stays in Docswave for historical reference. |
+| **Workflow branching / conditional steps** | "If rejected by step 2, skip to step 5" type logic adds enormous state machine complexity. | Linear sequential approval only. Rejection terminates the workflow. Re-draft if needed. |
+| **Bulk approval (일괄 결재)** | Approving multiple documents at once encourages rubber-stamping and defeats the purpose of review. | One-at-a-time approval with mandatory review of document content. |
+| **Docker containerization** | Added infrastructure complexity with no benefit for a single-server deployment. | Native deployment: Spring Boot JAR via systemd, React static via Nginx. Simple and sufficient. |
 
 ## Feature Dependencies
 
 ```
-Registration Form (public, no auth)
-  --> RegistrationRequest entity + table (Flyway migration)
-  --> Email uniqueness check (checks both user.email AND registration_request.email where PENDING)
-  --> Email notification to SUPER_ADMIN(s) on submit
+Organization Management (departments, positions, users)
+  --> Authentication (users must exist to log in)
+    --> Dashboard (landing page after login)
+    --> Document Drafting (logged-in user creates documents)
+      --> Approval Line Selection (select approvers from org tree)
+        --> Document Submission (lock + number + start workflow)
+          --> Approval Processing (approve/reject by approvers)
+            --> Document Completion (APPROVED/REJECTED terminal states)
+          --> Document Withdrawal (drafter pulls back before next step)
+        --> Re-draft (copy rejected/withdrawn content to new draft)
+      --> File Attachments (attach to draft before submission)
 
-Admin Approval UI (SUPER_ADMIN only)
-  --> Registration request list/detail endpoints
-  --> Approve action:
-      --> Create User (reuse pattern from UserManagementService.createUser)
-      --> Auto-generate employee_no OR admin enters it
-      --> Set default department (admin reassigns later) OR admin picks during approval
-      --> Set role=USER, status=ACTIVE, mustChangePassword=true
-      --> Email notification to applicant (approved)
-  --> Reject action:
-      --> Update request status + reject_reason
-      --> Email notification to applicant (rejected)
-
-Email Notifications
-  --> Existing EmailService.sendEmail() method
-  --> New NotificationEventType values: REGISTRATION_SUBMIT, REGISTRATION_APPROVE, REGISTRATION_REJECT
-  --> New email templates (subject + body patterns)
+Audit Trail Recording (P1A) --> Audit Trail Query UI (P1C)
+Email Notifications (P1B) --> depends on Authentication + Approval Processing
+Document Search (P1B) --> depends on Documents existing (data volume)
+Statistics (P1C) --> depends on sufficient approval history data
 ```
 
-**Dependency on existing infrastructure:**
-- `EmailService` (Phase 9) — reuse `sendEmail()` for all 3 notification types
-- `SecurityConfig` — must whitelist `/api/registration/**` as public endpoints
-- `UserManagementService.createUser` pattern — reuse for user creation on approval
-- Admin sidebar/layout — add registration management menu item
-- `LoginPage.tsx` — add "계정 신청" link
+**Critical path for MVP:** Organization setup -> Auth -> Document drafting + Approval line editor -> Submission + Approval workflow -> Dashboard
+
+The approval line editor (FN-APR-005) is the most complex single UI component and sits on the critical path. It depends on the organization tree being populated, so org management must be built first.
 
 ## MVP Recommendation
 
-**Must build (all table stakes):**
+### Must ship in Phase 1-A (34 functions per FSD):
 
-1. **Flyway migration** for `registration_request` table
-2. **RegistrationRequest** entity, repository, service, controller
-3. **Public API endpoints** (no auth required):
-   - `POST /api/registration` — submit registration request
-   - `GET /api/registration/check-email?email=...` — check email availability
-4. **Admin API endpoints** (SUPER_ADMIN only):
-   - `GET /api/admin/registration-requests` — list with status filter + pagination
-   - `GET /api/admin/registration-requests/{id}` — detail
-   - `POST /api/admin/registration-requests/{id}/approve` — approve and create user
-   - `POST /api/admin/registration-requests/{id}/reject` — reject with reason
-5. **Registration form page** linked from login page ("계정 신청" link)
-6. **Admin registration management page** in admin section sidebar
-7. **Three email notifications** via existing EmailService:
-   - To SUPER_ADMIN on new request
-   - To applicant on approval (include login instructions)
-   - To applicant on rejection (include reason)
+1. **Authentication** -- FN-AUTH-001 through FN-AUTH-005
+2. **Organization management** -- FN-ORG-001 through FN-ORG-008
+3. **Form templates** -- FN-TPL-001, FN-TPL-003 (GENERAL, EXPENSE, LEAVE)
+4. **Document lifecycle** -- FN-DOC-001 through FN-DOC-009
+5. **Approval processing** -- FN-APR-001 through FN-APR-005
+6. **File management** -- FN-FILE-001 through FN-FILE-003
+7. **Dashboard** -- FN-DASH-001
+8. **Audit logging (backend)** -- FN-AUD-001
 
-**Defer (not needed for MVP):**
-- Request status check page — applicant gets email notification, no need to poll
-- Auto-generated employee number — admin can enter manually or set later
-- Department/position selection during approval — admin uses existing user edit page
+### Defer to Phase 1-B:
 
-## Phasing Suggestion
+- **Email notifications** (FN-NTF-001): High impact but not blocking. Users can check dashboard manually for the first week.
+- **Document search** (FN-SEARCH-001): Not needed until document volume grows.
+- **Additional templates**: PURCHASE, BUSINESS_TRIP, OVERTIME -- add incrementally.
+- **Password change enforcement on first login**: Security improvement, low effort.
 
-| Phase | Scope | Rationale |
-|-------|-------|-----------|
-| 1 | DB migration + backend entity/service/controller | Foundation; can test with API calls |
-| 2 | Frontend registration form + login page link | User-facing; depends on backend APIs |
-| 3 | Frontend admin management page + approve/reject | Admin-facing; depends on backend APIs |
-| 4 | Email notifications + polish | Wiring up events; end-to-end testing |
+### Defer to Phase 1-C:
 
-## Complexity Assessment
+- **Audit log query UI** (FN-AUD-002): Backend is already logging; frontend can wait.
+- **Statistics/reports**: Needs data to be useful.
+- **Retirement/handover processing** (FN-ORG-009): Edge case that can be handled manually initially.
 
-| Component | Estimated Effort | Risk |
-|-----------|-----------------|------|
-| DB migration | 30 min | Low — straightforward new table |
-| Backend entity/repository/service | 2-3 hours | Low — follows existing patterns exactly |
-| Backend controller + security config | 1-2 hours | Low — public endpoints + SUPER_ADMIN endpoints |
-| Frontend registration form | 2-3 hours | Low — simple form with 3-4 fields |
-| Frontend admin management page | 3-4 hours | Med — list + approve/reject modals |
-| Email notifications | 1-2 hours | Low — reuses existing EmailService |
-| **Total** | **~10-15 hours** | **Low overall** |
+### Defer to Phase 2 or later:
+
+- **AI document assistance**: Requires 6+ months of document corpus.
+- **Proxy/delegation approval**: Complex state machine changes.
+- **PDF export**: Nice-to-have, not urgent.
+- **Approval line favorites**: Low complexity -- consider pulling to 1-B if time allows.
+
+## Risk Notes
+
+| Feature Area | Risk | Mitigation |
+|--------------|------|------------|
+| Approval line editor UX | Most complex frontend component. Bad UX here kills adoption. | Prototype and test with 2-3 actual users before building all other features. Org tree search must be fast and intuitive. |
+| Google Drive API reliability | External dependency for file storage. API rate limits, outages. | Retry with exponential backoff (already in spec). Ensure approval flow works without attachments. |
+| Document state machine edge cases | Concurrent actions (withdraw while approver is approving), race conditions | Optimistic locking on document status. Backend must validate state transitions strictly. |
+| Form template extensibility | Hardcoded components mean developer effort for each new form | Acceptable at this scale. Create a clear pattern/boilerplate so new forms take 2-4 hours, not days. |
 
 ## Sources
 
-- Existing codebase: `User.java` (entity with NOT NULL constraints), `UserManagementService.java` (createUser pattern), `EmailService.java` (notification infrastructure), `LoginPage.tsx` (entry point for registration link), `V1__create_schema.sql` (schema constraints)
-- `PROJECT.md` milestone v1.3 requirements
-- Domain knowledge: Korean corporate system registration patterns — admin-gated registration is standard for internal tools
+- PRD v2.0: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/docs/PRD_MiceSign_v2.0.md`
+- FSD v1.0: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/docs/FSD_MiceSign_v1.0.md`
+- PROJECT.md: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/.planning/PROJECT.md`
+- Domain knowledge: Korean corporate electronic approval systems (전자 결재) are a well-established domain with consistent feature expectations across products like Docswave, Hiworks, Groupware solutions (Hancom, Daou), and enterprise systems (Samsung SDS Brity Works, LG CNS). The table stakes listed above reflect consensus features across these products.

@@ -9,14 +9,12 @@ interface TiptapEditorProps {
   content: string;
   onChange: (html: string) => void;
   editable?: boolean;
-  placeholder?: string;
 }
 
 export default function TiptapEditor({
   content,
   onChange,
   editable = true,
-  placeholder,
 }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -33,20 +31,19 @@ export default function TiptapEditor({
     onUpdate: ({ editor: e }) => {
       onChange(e.getHTML());
     },
-    editorProps: {
-      attributes: {
-        class: 'min-h-[300px] p-4 prose prose-sm max-w-none dark:prose-invert focus:outline-none',
-        ...(placeholder ? { 'data-placeholder': placeholder } : {}),
-      },
-    },
   });
 
   if (!editor) return null;
 
   return (
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div>
       {editable && <TiptapToolbar editor={editor} />}
-      <EditorContent editor={editor} />
+      <div className="border border-gray-200 dark:border-gray-700 rounded-b-lg">
+        <EditorContent
+          editor={editor}
+          className="min-h-[300px] p-4 prose prose-sm max-w-none dark:prose-invert"
+        />
+      </div>
     </div>
   );
 }

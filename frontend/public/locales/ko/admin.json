@@ -105,5 +105,61 @@
     "userCreated": "사용자가 추가되었습니다.",
     "userUpdated": "사용자 정보가 수정되었습니다.",
     "userDeactivated": "사용자가 비활성화되었습니다."
+  },
+  "registration": {
+    "title": "등록 신청 관리",
+    "tabs": {
+      "all": "전체",
+      "pending": "대기중",
+      "approved": "승인",
+      "rejected": "거부",
+      "expired": "만료",
+      "cancelled": "취소"
+    },
+    "table": {
+      "name": "신청자명",
+      "email": "이메일",
+      "createdAt": "신청일",
+      "processedAt": "처리일",
+      "status": "상태"
+    },
+    "modal": {
+      "title": "등록 신청 상세",
+      "applicantInfo": "신청자 정보",
+      "assignInfo": "배정 정보",
+      "employeeNo": "사원번호",
+      "department": "부서",
+      "position": "직급",
+      "rejectionReason": "거부 사유",
+      "rejectionReasonPlaceholder": "거부 사유를 입력해주세요 (10자 이상)"
+    },
+    "action": {
+      "approve": "승인",
+      "reject": "거부",
+      "confirmReject": "거부 확인",
+      "rejectConfirmTitle": "신청 거부",
+      "rejectConfirmMessage": "이 신청을 거부하시겠습니까?",
+      "cancel": "취소"
+    },
+    "status": {
+      "PENDING": "대기중",
+      "APPROVED": "승인",
+      "REJECTED": "거부",
+      "EXPIRED": "만료",
+      "CANCELLED": "취소"
+    },
+    "emptyList": "등록 신청이 없습니다.",
+    "toast": {
+      "approved": "등록 신청이 승인되었습니다.",
+      "rejected": "등록 신청이 거부되었습니다.",
+      "alreadyProcessed": "이미 처리된 신청입니다.",
+      "error": "처리 중 오류가 발생했습니다."
+    },
+    "validation": {
+      "departmentRequired": "부서를 선택해주세요.",
+      "positionRequired": "직급을 선택해주세요.",
+      "employeeNoRequired": "사원번호를 입력해주세요.",
+      "rejectionReasonMinLength": "거부 사유는 10자 이상 입력해주세요."
+    }
   }
 }

@@ -1,19 +1,17 @@
 import { z } from 'zod';
 
 export const expenseItemSchema = z.object({
-  description: z.string().min(1, '항목명을 입력해주세요'),
-  quantity: z.number().int().min(1, '수량은 1 이상이어야 합니다'),
-  unitPrice: z.number().int().min(0, '단가는 0 이상이어야 합니다'),
-  amount: z.number().int(),
-  note: z.string().optional(),
+  name: z.string().min(1, { error: '항목명을 입력해주세요' }),
+  quantity: z.number().int().min(1, { error: '수량을 올바르게 입력해주세요' }),
+  unitPrice: z.number().int().min(0, { error: '단가를 올바르게 입력해주세요' }),
+  amount: z.number().int().min(0),
 });
 
 export const expenseFormSchema = z.object({
-  items: z
-    .array(expenseItemSchema)
-    .min(1, '최소 1개의 항목이 필요합니다'),
-  totalAmount: z.number().int(),
-  paymentMethod: z.string().min(1, '결제 방법을 선택해주세요'),
+  title: z.string().min(1, { error: '제목을 입력해주세요' }).max(300),
+  items: z.array(expenseItemSchema).min(1, { error: '항목을 1개 이상 추가해주세요' }),
+  totalAmount: z.number().int().min(0),
+  paymentMethod: z.string().optional(),
   accountInfo: z.string().optional(),
 });
 

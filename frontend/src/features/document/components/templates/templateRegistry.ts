@@ -1,89 +1,56 @@
-import { lazy, type ComponentType } from 'react';
+import type { ComponentType } from 'react';
+import GeneralForm from './GeneralForm';
+import ExpenseForm from './ExpenseForm';
+import LeaveForm from './LeaveForm';
+import GeneralReadOnly from './GeneralReadOnly';
+import ExpenseReadOnly from './ExpenseReadOnly';
+import LeaveReadOnly from './LeaveReadOnly';
 
-// ---------------------------------------------------------------------------
-// Prop interfaces for template form components
-// ---------------------------------------------------------------------------
-
-/**
- * Props for editable template form components.
- * Title is handled by the parent (DocumentEditorPage), not by the form.
- */
-export interface TemplateFormProps {
-  /** JSON string of form-specific data (parsed internally) */
-  formData: string | null;
-  /** HTML body content (used by GENERAL template) */
-  bodyHtml: string | null;
-  /** Callback fired whenever the form data changes */
-  onChange: (data: { formData?: string; bodyHtml?: string }) => void;
-  /** When true, all inputs become read-only */
-  disabled?: boolean;
+export interface TemplateEditProps {
+  documentId: number | null;
+  initialData?: { title: string; bodyHtml?: string; formData?: string };
+  onSave: (data: { title: string; bodyHtml?: string; formData?: string }) => Promise<void>;
+  readOnly?: boolean;
 }
 
-/**
- * Props for read-only template display components.
- */
 export interface TemplateReadOnlyProps {
-  formData: string | null;
-  bodyHtml: string | null;
+  title: string;
+  bodyHtml?: string | null;
+  formData?: string | null;
 }
 
-// ---------------------------------------------------------------------------
-// Registry entry
-// ---------------------------------------------------------------------------
-
-interface TemplateRegistryEntry {
-  form: ComponentType<TemplateFormProps>;
-  readOnly: ComponentType<TemplateReadOnlyProps>;
+export interface TemplateEntry {
+  editComponent: ComponentType<TemplateEditProps>;
+  readOnlyComponent: ComponentType<TemplateReadOnlyProps>;
   label: string;
+  description: string;
+  icon: string; // lucide-react icon name
 }
 
-// ---------------------------------------------------------------------------
-// Lazy imports for code splitting
-// ---------------------------------------------------------------------------
-
-const TEMPLATE_REGISTRY: Record<string, TemplateRegistryEntry> = {
+export const TEMPLATE_REGISTRY: Record<string, TemplateEntry> = {
   GENERAL: {
-    form: lazy(() => import('./GeneralForm')),
-    readOnly: lazy(() => import('./GeneralReadOnly')),
+    editComponent: GeneralForm,
+    readOnlyComponent: GeneralReadOnly,
     label: '일반 업무 기안',
+    description: '일반적인 업무 기안 및 보고에 사용합니다.',
+    icon: 'FileText',
   },
   EXPENSE: {
-    form: lazy(() => import('./ExpenseForm')),
-    readOnly: lazy(() => import('./ExpenseReadOnly')),
+    editComponent: ExpenseForm,
+    readOnlyComponent: ExpenseReadOnly,
     label: '지출 결의서',
+    description: '지출 내역을 보고하고 승인을 요청합니다.',
+    icon: 'Receipt',
   },
   LEAVE: {
-    form: lazy(() => import('./LeaveForm')),
-    readOnly: lazy(() => import('./LeaveReadOnly')),
+    editComponent: LeaveForm,
+    readOnlyComponent: LeaveReadOnly,
     label: '휴가 신청서',
-  },
-  PURCHASE: {
-    form: lazy(() => import('./PurchaseForm')),
-    readOnly: lazy(() => import('./PurchaseReadOnly')),
-    label: '구매 요청서',
-  },
-  BUSINESS_TRIP: {
-    form: lazy(() => import('./BusinessTripForm')),
-    readOnly: lazy(() => import('./BusinessTripReadOnly')),
-    label: '출장 보고서',
-  },
-  OVERTIME: {
-    form: lazy(() => import('./OvertimeForm')),
-    readOnly: lazy(() => import('./OvertimeReadOnly')),
-    label: '초과근무 신청서',
+    description: '휴가를 신청합니다.',
+    icon: 'CalendarDays',
   },
 };
 
-// ---------------------------------------------------------------------------
-// Public helpers
-// ---------------------------------------------------------------------------
-
-export function getTemplateEntry(code: string): TemplateRegistryEntry | null {
-  return TEMPLATE_REGISTRY[code] ?? null;
+export function getTemplateEntry(code: string): TemplateEntry | undefined {
+  return TEMPLATE_REGISTRY[code];
 }
-
-export function isHardcodedTemplate(code: string): boolean {
-  return code in TEMPLATE_REGISTRY;
-}
-
-export { TEMPLATE_REGISTRY };

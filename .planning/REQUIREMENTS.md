@@ -96,43 +96,9 @@ Deferred to future releases (Phase 1-B, 1-C, Phase 2).
 - **TPL-05**: Business trip report form (출장 보고서)
 - **TPL-06**: Overtime request form (연장 근무 신청서)
 
-### Budget Integration (v1.2)
-
-- [x] **BDGT-01**: 재무 문서(지출 결의, 구매 요청) 제출 시 외부 예산 시스템에 REST API로 지출 데이터를 자동 전송
-- [x] **BDGT-02**: API 호출 실패 시 설정된 횟수만큼 재시도하고 모든 시도를 로깅하며, 문서 제출 워크플로를 차단하지 않음
-
 ### AI (Phase 2)
 
 - **AI-01**: AI-assisted document drafting based on accumulated data
-
-## v1.3 Requirements
-
-Requirements for v1.3 사용자 등록 신청 milestone. Each maps to roadmap phases.
-
-### 등록 신청 (Registration)
-
-- [ ] **REG-01**: 사용자가 로그인 화면에서 이름, 이메일, 비밀번호를 입력하여 계정을 신청할 수 있다
-- [ ] **REG-02**: 시스템이 user 테이블과 registration_request 테이블에서 이메일 중복을 검증한다
-- [ ] **REG-03**: 거부된 이메일로 재신청이 가능하다
-- [ ] **REG-04**: 신청자가 신청 상태(대기/승인/거부)와 거부 사유를 확인할 수 있다
-
-### 관리자 승인 (Admin Approval)
-
-- [ ] **ADM-01**: SUPER_ADMIN이 등록 신청 목록을 조회할 수 있다
-- [ ] **ADM-02**: SUPER_ADMIN이 신청을 승인하면서 부서와 직급을 지정할 수 있다
-- [ ] **ADM-03**: SUPER_ADMIN이 신청을 거부하면서 거부 사유를 입력할 수 있다
-- [ ] **ADM-04**: 승인 시 자동으로 사용자 계정이 생성된다 (비밀번호 해시 안전 전달)
-
-### 이메일 알림 (Email Notifications)
-
-- [ ] **MAIL-01**: 기존 스텁 EmailService를 실제 SMTP 발송으로 교체한다
-- [ ] **MAIL-02**: 신청 접수 시 신청자에게 확인 이메일을 발송한다
-- [ ] **MAIL-03**: 승인/거부 시 신청자에게 결과 이메일을 발송한다
-- [ ] **MAIL-04**: 새 신청이 접수되면 SUPER_ADMIN에게 알림 이메일을 발송한다
-
-### 보안 (Security)
-
-- [ ] **SEC-01**: 공개 등록 엔드포인트에 rate limiting을 적용한다
 
 ## Out of Scope
 
@@ -192,30 +158,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Pending |
 | DASH-03 | Phase 8: Dashboard & Audit | Pending |
 | AUD-01 | Phase 8: Dashboard & Audit | Pending |
-| BDGT-01 | Phase 17: Budget Integration | Complete |
-| BDGT-02 | Phase 17: Budget Integration | Complete |
-| REG-01 | Phase 18: Registration Backend | Pending |
-| REG-02 | Phase 18: Registration Backend | Pending |
-| REG-03 | Phase 18: Registration Backend | Pending |
-| REG-04 | Phase 21: Registration Frontend & Security | Pending |
-| ADM-01 | Phase 20: Admin Registration Management UI | Pending |
-| ADM-02 | Phase 20: Admin Registration Management UI | Pending |
-| ADM-03 | Phase 20: Admin Registration Management UI | Pending |
-| ADM-04 | Phase 18: Registration Backend | Pending |
-| MAIL-01 | Phase 19: Registration Email Notifications | Pending |
-| MAIL-02 | Phase 19: Registration Email Notifications | Pending |
-| MAIL-03 | Phase 19: Registration Email Notifications | Pending |
-| MAIL-04 | Phase 19: Registration Email Notifications | Pending |
-| SEC-01 | Phase 21: Registration Frontend & Security | Pending |
 
 **Coverage:**
-- v1 requirements: 38 total
-- Mapped to phases: 38
-- Unmapped: 0
-- v1.3 requirements: 13 total
-- Mapped to phases: 13
+- v1 requirements: 36 total
+- Mapped to phases: 36
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-07 after v1.3 roadmap creation*
+*Last updated: 2026-03-31 after roadmap creation*

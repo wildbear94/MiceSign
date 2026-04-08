@@ -8,6 +8,5 @@ public record AttachmentResponse(
     String originalName,
     Long fileSize,
     String mimeType,
-    String gdriveFileId,
     LocalDateTime createdAt
 ) {}

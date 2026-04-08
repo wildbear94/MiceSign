@@ -3,27 +3,21 @@ import {
   Bold,
   Italic,
   Underline,
-  Strikethrough,
   Heading1,
   Heading2,
   Heading3,
   List,
   ListOrdered,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
   Quote,
   Table,
   Image,
 } from 'lucide-react';
 
 interface TiptapToolbarProps {
-  editor: Editor | null;
+  editor: Editor;
 }
 
 export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
-  if (!editor) return null;
-
   function btn(
     active: boolean,
     onClick: () => void,
@@ -35,7 +29,7 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         type="button"
         onClick={onClick}
         aria-label={ariaLabel}
-        className={`h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
+        className={`h-8 w-8 flex items-center justify-center rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${
           active
             ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
             : 'text-gray-600 dark:text-gray-400'
@@ -46,8 +40,13 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
     );
   }
 
-  function divider() {
-    return <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />;
+  function divider(key: string) {
+    return (
+      <div
+        key={key}
+        className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"
+      />
+    );
   }
 
   function handleInsertImage() {
@@ -58,8 +57,8 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 p-2 border border-b-0 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
-      {/* Text formatting */}
+    <div className="flex flex-wrap gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+      {/* Text group */}
       {btn(
         editor.isActive('bold'),
         () => editor.chain().focus().toggleBold().run(),
@@ -78,16 +77,10 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         '밑줄',
         <Underline className="h-4 w-4" />,
       )}
-      {btn(
-        editor.isActive('strike'),
-        () => editor.chain().focus().toggleStrike().run(),
-        '취소선',
-        <Strikethrough className="h-4 w-4" />,
-      )}
 
-      {divider()}
+      {divider('d1')}
 
-      {/* Headings */}
+      {/* Heading group */}
       {btn(
         editor.isActive('heading', { level: 1 }),
         () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
@@ -107,9 +100,9 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         <Heading3 className="h-4 w-4" />,
       )}
 
-      {divider()}
+      {divider('d2')}
 
-      {/* Lists */}
+      {/* List group */}
       {btn(
         editor.isActive('bulletList'),
         () => editor.chain().focus().toggleBulletList().run(),
@@ -123,31 +116,9 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         <ListOrdered className="h-4 w-4" />,
       )}
 
-      {divider()}
+      {divider('d3')}
 
-      {/* Text alignment - uses native CSS text-align via class */}
-      {btn(
-        false,
-        () => editor.chain().focus().run(),
-        '왼쪽 정렬',
-        <AlignLeft className="h-4 w-4" />,
-      )}
-      {btn(
-        false,
-        () => editor.chain().focus().run(),
-        '가운데 정렬',
-        <AlignCenter className="h-4 w-4" />,
-      )}
-      {btn(
-        false,
-        () => editor.chain().focus().run(),
-        '오른쪽 정렬',
-        <AlignRight className="h-4 w-4" />,
-      )}
-
-      {divider()}
-
-      {/* Blockquote */}
+      {/* Block group */}
       {btn(
         editor.isActive('blockquote'),
         () => editor.chain().focus().toggleBlockquote().run(),
@@ -155,7 +126,7 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         <Quote className="h-4 w-4" />,
       )}
 
-      {divider()}
+      {divider('d4')}
 
       {/* Table */}
       {btn(
@@ -170,7 +141,9 @@ export default function TiptapToolbar({ editor }: TiptapToolbarProps) {
         <Table className="h-4 w-4" />,
       )}
 
-      {/* Image */}
+      {divider('d5')}
+
+      {/* Media */}
       {btn(false, handleInsertImage, '이미지 삽입', <Image className="h-4 w-4" />)}
     </div>
   );

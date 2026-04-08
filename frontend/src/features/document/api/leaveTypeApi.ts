@@ -1,14 +1,8 @@
 import apiClient from '../../../api/client';
 import type { ApiResponse } from '../../../types/api';
-
-export interface LeaveType {
-  id: number;
-  code: string;
-  name: string;
-  isHalfDay: boolean;
-}
+import type { LeaveTypeResponse } from '../types/document';
 
 export const leaveTypeApi = {
-  list: () =>
-    apiClient.get<ApiResponse<LeaveType[]>>('/leave-types').then(r => r.data.data!),
+  getActiveTypes: () =>
+    apiClient.get<ApiResponse<LeaveTypeResponse[]>>('/leave-types'),
 };

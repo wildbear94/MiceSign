@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { attachmentApi } from '../../api/attachmentApi';
 import { validateFile } from './fileValidation';
-import type { Attachment, FileUploadItem } from '../../types/document';
+import type { AttachmentResponse, FileUploadItem } from '../../types/document';
 
 interface UseFileUploadOptions {
   documentId: number;
-  existingAttachments: Attachment[];
+  existingAttachments: AttachmentResponse[];
   onUploadComplete: () => void;
 }
 
@@ -50,27 +50,38 @@ export function useFileUpload({
   // Add files with validation
   const addFiles = useCallback(
     (files: File[]) => {
+      const activeUploads = uploadItems.filter(
+        (item) => item.status !== 'error',
+      );
+      let currentCount = existingAttachments.length + activeUploads.length;
+      let currentTotalSize =
+        existingAttachments.reduce((sum, a) => sum + a.fileSize, 0) +
+        activeUploads.reduce((sum, item) => sum + item.file.size, 0);
+
       const newItems: FileUploadItem[] = [];
 
       for (const file of files) {
-        const error = validateFile(file, existingAttachments);
+        const error = validateFile(file, currentCount, currentTotalSize);
         if (error) {
           setValidationError(error);
           continue;
         }
-        newItems.push({
+        const item: FileUploadItem = {
           id: crypto.randomUUID(),
           file,
           status: 'pending',
           progress: 0,
-        });
+        };
+        newItems.push(item);
+        currentCount++;
+        currentTotalSize += file.size;
       }
 
       if (newItems.length > 0) {
         setUploadItems((prev) => [...prev, ...newItems]);
       }
     },
-    [existingAttachments],
+    [existingAttachments, uploadItems],
   );
 
   // Cancel an upload
@@ -104,7 +115,7 @@ export function useFileUpload({
       abortControllers.current.set(pendingItem.id, controller);
 
       try {
-        const attachment = await attachmentApi.upload(
+        const attachments = await attachmentApi.upload(
           documentId,
           pendingItem.file,
           (percent) => {
@@ -121,7 +132,7 @@ export function useFileUpload({
         setUploadItems((prev) =>
           prev.map((item) =>
             item.id === pendingItem.id
-              ? { ...item, status: 'complete' as const, progress: 100, attachment }
+              ? { ...item, status: 'complete' as const, progress: 100, attachment: attachments[0] }
               : item,
           ),
         );
@@ -134,6 +145,7 @@ export function useFileUpload({
           setUploadItems((prev) => prev.filter((item) => item.id !== pendingItem.id));
         }, 2000);
       } catch (err) {
+        // Ignore aborted requests (user cancelled)
         if (err instanceof DOMException && err.name === 'AbortError') {
           return;
         }

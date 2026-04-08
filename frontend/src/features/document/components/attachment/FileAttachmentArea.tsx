@@ -1,84 +1,96 @@
 import { useCallback } from 'react';
-import { Paperclip } from 'lucide-react';
-import type { Attachment } from '../../types/document';
-import { useDeleteAttachment, downloadAttachment } from '../../hooks/useAttachments';
+import { useTranslation } from 'react-i18next';
+import type { DocumentStatus } from '../../types/document';
+import { useAttachments, useDeleteAttachment } from '../../hooks/useAttachments';
 import { useFileUpload } from './useFileUpload';
-import { formatFileSize, MAX_FILES_PER_DOC, MAX_TOTAL_SIZE } from './fileValidation';
+import { attachmentApi } from '../../api/attachmentApi';
+import { formatFileSize, MAX_FILES, MAX_TOTAL_SIZE } from './fileValidation';
 import FileDropZone from './FileDropZone';
 import FileItem from './FileItem';
 
 interface FileAttachmentAreaProps {
   documentId: number;
-  attachments: Attachment[];
-  editable: boolean;
-  onAttachmentsChange?: () => void;
+  documentStatus: DocumentStatus;
+  readOnly: boolean;
 }
 
 export default function FileAttachmentArea({
   documentId,
-  attachments,
-  editable,
-  onAttachmentsChange,
+  documentStatus: _documentStatus,
+  readOnly,
 }: FileAttachmentAreaProps) {
+  const { t } = useTranslation('document');
+  const { data: existingAttachments = [], refetch } = useAttachments(documentId);
   const deleteAttachment = useDeleteAttachment(documentId);
 
   const { uploadItems, addFiles, cancelUpload, validationError } = useFileUpload({
     documentId,
-    existingAttachments: attachments,
+    existingAttachments,
     onUploadComplete: () => {
-      onAttachmentsChange?.();
+      refetch();
     },
   });
 
   // Calculate usage
   const totalCount =
-    attachments.length +
+    existingAttachments.length +
     uploadItems.filter((item) => item.status !== 'error').length;
   const totalSize =
-    attachments.reduce((sum, a) => sum + a.fileSize, 0) +
+    existingAttachments.reduce((sum, a) => sum + a.fileSize, 0) +
     uploadItems
       .filter((item) => item.status !== 'error')
       .reduce((sum, item) => sum + item.file.size, 0);
 
-  const isAtFileLimit = totalCount >= MAX_FILES_PER_DOC;
+  const isAtFileLimit = totalCount >= MAX_FILES;
   const isAtSizeLimit = totalSize >= MAX_TOTAL_SIZE;
 
+  // Download handler
   const handleDownload = useCallback(async (attachmentId: number) => {
     try {
-      await downloadAttachment(attachmentId);
+      const { blob, filename } = await attachmentApi.download(attachmentId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch {
-      // Error handling in API layer
+      // Error handling is in the API layer
     }
   }, []);
 
+  // Delete handler (no confirmation per D-09)
   const handleDelete = useCallback(
     (attachmentId: number) => {
-      deleteAttachment.mutate(attachmentId, {
-        onSuccess: () => onAttachmentsChange?.(),
-      });
+      deleteAttachment.mutate(attachmentId);
     },
-    [deleteAttachment, onAttachmentsChange],
+    [deleteAttachment],
   );
 
   return (
     <section className="space-y-3">
       {/* Section heading */}
-      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-        <Paperclip className="h-4 w-4" />
-        첨부파일
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
+        {t('attachment.title')}
       </h3>
 
-      {/* Drop zone (editor mode only) */}
-      {editable && (
+      {/* Editor mode */}
+      {!readOnly && (
         <>
           <FileDropZone
             onFilesSelected={addFiles}
             disabled={isAtFileLimit}
-            maxFiles={MAX_FILES_PER_DOC}
           />
 
+          {/* Validation error */}
           {validationError && (
-            <p className="text-xs text-red-600" role="alert">
+            <p
+              className="text-xs text-red-600"
+              aria-live="assertive"
+              role="alert"
+            >
               {validationError}
             </p>
           )}
@@ -86,52 +98,73 @@ export default function FileAttachmentArea({
       )}
 
       {/* File list */}
-      {(attachments.length > 0 || uploadItems.length > 0) && (
+      {(existingAttachments.length > 0 || uploadItems.length > 0) && (
         <div role="list" className="space-y-2">
           {/* Uploading files first */}
           {uploadItems.map((item) => (
             <FileItem
               key={item.id}
               uploadItem={item}
-              onDelete={item.status === 'uploading' ? () => cancelUpload(item.id) : undefined}
+              readOnly={readOnly}
+              onCancelUpload={cancelUpload}
             />
           ))}
 
           {/* Existing attachments */}
-          {attachments.map((attachment) => (
+          {existingAttachments.map((attachment) => (
             <FileItem
               key={attachment.id}
               attachment={attachment}
-              onDelete={editable ? () => handleDelete(attachment.id) : undefined}
-              onDownload={!editable ? () => handleDownload(attachment.id) : undefined}
+              readOnly={readOnly}
+              onDelete={!readOnly ? handleDelete : undefined}
+              onDownload={readOnly ? handleDownload : undefined}
             />
           ))}
         </div>
       )}
 
       {/* Empty state (read-only) */}
-      {!editable && attachments.length === 0 && uploadItems.length === 0 && (
+      {readOnly && existingAttachments.length === 0 && uploadItems.length === 0 && (
         <p className="text-sm text-gray-400 dark:text-gray-500">
-          첨부파일이 없습니다.
+          {t('attachment.status.empty')}
         </p>
       )}
 
-      {/* Usage status */}
-      {editable && (
+      {/* Usage status line */}
+      {!readOnly && (
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          <span className={isAtFileLimit ? 'text-red-600' : ''}>
-            {totalCount}/{MAX_FILES_PER_DOC}개
-          </span>
-          {' / '}
-          <span className={isAtSizeLimit ? 'text-red-600' : ''}>
-            {formatFileSize(totalSize)}/{formatFileSize(MAX_TOTAL_SIZE)}
-          </span>
+          {t('attachment.status.editor', {
+            count: totalCount,
+            size: formatFileSize(totalSize),
+          }).split('/').map((part, index) => {
+            // Highlight count or size in red when at limit
+            if (index === 0 && isAtFileLimit) {
+              return <span key={index} className="text-red-600">{part}/</span>;
+            }
+            if (index === 1) {
+              const [before, after] = part.split('200MB');
+              if (isAtSizeLimit) {
+                return (
+                  <span key={index}>
+                    {before}<span className="text-red-600">200MB</span>{after}
+                    {index < 2 ? '/' : ''}
+                  </span>
+                );
+              }
+            }
+            return <span key={index}>{part}{index < 2 ? '/' : ''}</span>;
+          })}
         </p>
       )}
 
-      {!editable && attachments.length > 0 && (
+      {readOnly && existingAttachments.length > 0 && (
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {attachments.length}개 파일 ({formatFileSize(attachments.reduce((sum, a) => sum + a.fileSize, 0))})
+          {t('attachment.status.readOnly', {
+            count: existingAttachments.length,
+            size: formatFileSize(
+              existingAttachments.reduce((sum, a) => sum + a.fileSize, 0),
+            ),
+          })}
         </p>
       )}
     </section>

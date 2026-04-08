@@ -1,38 +1,69 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import TiptapEditor from '../TiptapEditor';
 import { generalFormSchema, type GeneralFormValues } from '../../validations/generalSchema';
-import type { TemplateFormProps } from './templateRegistry';
+import type { TemplateEditProps } from './templateRegistry';
 
 export default function GeneralForm({
-  bodyHtml,
-  onChange,
-  disabled = false,
-}: TemplateFormProps) {
+  initialData,
+  onSave,
+  readOnly = false,
+}: TemplateEditProps) {
+  const { t } = useTranslation('document');
+
   const {
+    register,
     control,
-    watch,
+    handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<GeneralFormValues>({
     resolver: zodResolver(generalFormSchema),
     defaultValues: {
-      bodyHtml: bodyHtml ?? '',
+      title: initialData?.title ?? '',
+      bodyHtml: initialData?.bodyHtml ?? '',
     },
   });
 
-  const watchedBodyHtml = watch('bodyHtml');
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        title: initialData.title,
+        bodyHtml: initialData.bodyHtml ?? '',
+      });
+    }
+  }, [initialData, reset]);
 
-  // Notify parent on changes
-  const handleEditorChange = useCallback(
-    (html: string) => {
-      onChange({ bodyHtml: html });
-    },
-    [onChange],
-  );
+  const onSubmit = async (values: GeneralFormValues) => {
+    await onSave({
+      title: values.title,
+      bodyHtml: values.bodyHtml,
+      formData: undefined,
+    });
+  };
 
   return (
-    <div className="space-y-4">
+    <form id="document-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+        {t('template.GENERAL')}
+      </div>
+
+      {/* Title */}
+      <div>
+        <input
+          {...register('title')}
+          type="text"
+          placeholder={t('validation.titleRequired')}
+          readOnly={readOnly}
+          className="w-full h-11 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-base font-semibold focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50"
+        />
+        {errors.title && (
+          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+        )}
+      </div>
+
       {/* Tiptap Editor */}
       <div>
         <Controller
@@ -41,11 +72,8 @@ export default function GeneralForm({
           render={({ field }) => (
             <TiptapEditor
               content={field.value}
-              onChange={(html) => {
-                field.onChange(html);
-                handleEditorChange(html);
-              }}
-              editable={!disabled}
+              onChange={field.onChange}
+              editable={!readOnly}
             />
           )}
         />
@@ -53,6 +81,11 @@ export default function GeneralForm({
           <p className="mt-1 text-sm text-red-600">{errors.bodyHtml.message}</p>
         )}
       </div>
-    </div>
+
+      {/* Attachment placeholder */}
+      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
+        {t('placeholder.attachments')}
+      </div>
+    </form>
   );
 }

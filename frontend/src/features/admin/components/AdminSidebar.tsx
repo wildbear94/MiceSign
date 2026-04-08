@@ -1,5 +1,6 @@
-import { NavLink, Link } from 'react-router';
-import { Building2, Award, Users, LayoutTemplate, ScrollText, Bell, X, ArrowLeft } from 'lucide-react';
+import { NavLink } from 'react-router';
+import { Building2, Award, Users, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -7,30 +8,22 @@ interface AdminSidebarProps {
 }
 
 const navItems = [
-  { to: '/admin/departments', icon: Building2, label: '부서 관리' },
-  { to: '/admin/positions', icon: Award, label: '직급 관리' },
-  { to: '/admin/users', icon: Users, label: '사용자 관리' },
-  { to: '/admin/templates', icon: LayoutTemplate, label: '양식 관리' },
-  { to: '/admin/audit-logs', icon: ScrollText, label: '감사 로그' },
-  { to: '/admin/notifications', icon: Bell, label: '알림 로그' },
+  { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
+  { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
+  { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
 ] as const;
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
+  const { t } = useTranslation('admin');
+
   const navContent = (
     <nav className="flex flex-col gap-1 p-3">
-      <Link
-        to="/"
-        className="flex items-center gap-2 px-4 py-3 mb-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
-      >
-        <ArrowLeft className="h-4 w-4 shrink-0" />
-        <span className="hidden xl:inline">대시보드로 돌아가기</span>
-      </Link>
-      {navItems.map(({ to, icon: Icon, label }) => (
+      {navItems.map(({ to, icon: Icon, labelKey }) => (
         <NavLink
           key={to}
           to={to}
           onClick={onClose}
-          title={label}
+          title={t(labelKey)}
           className={({ isActive }) =>
             `px-4 py-4 flex items-center gap-2 rounded-lg text-sm transition-colors ${
               isActive
@@ -40,7 +33,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           }
         >
           <Icon className="h-5 w-5 shrink-0" />
-          <span className="hidden xl:inline">{label}</span>
+          <span className="hidden xl:inline">{t(labelKey)}</span>
         </NavLink>
       ))}
     </nav>
@@ -48,7 +41,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   return (
     <>
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar: hidden below lg, icon-only on lg, full on xl+ */}
       <aside className="hidden lg:flex lg:w-16 xl:w-60 flex-col bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full shrink-0">
         {navContent}
       </aside>
@@ -71,15 +64,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </button>
             </div>
             <nav className="flex flex-col gap-1 px-3">
-              <Link
-                to="/"
-                onClick={onClose}
-                className="flex items-center gap-2 px-4 py-3 mb-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
-              >
-                <ArrowLeft className="h-4 w-4 shrink-0" />
-                <span>대시보드로 돌아가기</span>
-              </Link>
-              {navItems.map(({ to, icon: Icon, label }) => (
+              {navItems.map(({ to, icon: Icon, labelKey }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -93,7 +78,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                   }
                 >
                   <Icon className="h-5 w-5 shrink-0" />
-                  <span>{label}</span>
+                  <span>{t(labelKey)}</span>
                 </NavLink>
               ))}
             </nav>

@@ -1,17 +1,14 @@
 package com.micesign.controller;
 
 import com.micesign.common.dto.ApiResponse;
-import com.micesign.dto.template.SchemaDefinition;
 import com.micesign.dto.template.TemplateResponse;
 import com.micesign.service.TemplateService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Public template endpoints for document creation.
- */
 @RestController
 @RequestMapping("/api/v1/templates")
 public class TemplateController {
@@ -23,23 +20,7 @@ public class TemplateController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<TemplateResponse>>> listActiveTemplates() {
-        List<TemplateResponse> templates = templateService.getActiveTemplates();
-        return ResponseEntity.ok(ApiResponse.ok(templates));
-    }
-
-    @GetMapping("/{code}")
-    public ResponseEntity<ApiResponse<TemplateResponse>> getTemplateByCode(
-            @PathVariable String code) {
-        TemplateResponse template = templateService.getTemplateByCode(code);
-        return ResponseEntity.ok(ApiResponse.ok(template));
-    }
-
-    @GetMapping("/{code}/schema")
-    public ResponseEntity<ApiResponse<SchemaDefinition>> getTemplateSchema(
-            @PathVariable String code,
-            @RequestParam(required = false) Integer version) {
-        SchemaDefinition schema = templateService.getTemplateSchemaByCode(code);
-        return ResponseEntity.ok(ApiResponse.ok(schema));
+    public ApiResponse<List<TemplateResponse>> getActiveTemplates() {
+        return ApiResponse.ok(templateService.getActiveTemplates());
     }
 }

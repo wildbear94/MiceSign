@@ -105,5 +105,61 @@
     "userCreated": "User has been added.",
     "userUpdated": "User has been updated.",
     "userDeactivated": "User has been deactivated."
+  },
+  "registration": {
+    "title": "Registration Management",
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "name": "Applicant",
+      "email": "Email",
+      "createdAt": "Applied",
+      "processedAt": "Processed",
+      "status": "Status"
+    },
+    "modal": {
+      "title": "Registration Details",
+      "applicantInfo": "Applicant Info",
+      "assignInfo": "Assignment Info",
+      "employeeNo": "Employee No.",
+      "department": "Department",
+      "position": "Position",
+      "rejectionReason": "Rejection Reason",
+      "rejectionReasonPlaceholder": "Enter rejection reason (min 10 chars)"
+    },
+    "action": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "confirmReject": "Confirm Reject",
+      "rejectConfirmTitle": "Reject Request",
+      "rejectConfirmMessage": "Are you sure you want to reject this request?",
+      "cancel": "Cancel"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
+    },
+    "emptyList": "No registration requests.",
+    "toast": {
+      "approved": "Registration approved.",
+      "rejected": "Registration rejected.",
+      "alreadyProcessed": "Already processed.",
+      "error": "An error occurred."
+    },
+    "validation": {
+      "departmentRequired": "Department is required.",
+      "positionRequired": "Position is required.",
+      "employeeNoRequired": "Employee number is required.",
+      "rejectionReasonMinLength": "Rejection reason must be at least 10 characters."
+    }
   }
 }

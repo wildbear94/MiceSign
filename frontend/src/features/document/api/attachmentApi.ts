@@ -1,25 +1,42 @@
 import apiClient from '../../../api/client';
 import type { ApiResponse } from '../../../types/api';
-import type { Attachment } from '../types/document';
+import type { AttachmentResponse } from '../types/document';
 
 export const attachmentApi = {
-  upload: (docId: number, file: File, onProgress?: (percent: number) => void, signal?: AbortSignal) => {
+  upload: async (
+    documentId: number,
+    file: File,
+    onProgress: (percent: number) => void,
+    signal?: AbortSignal,
+  ): Promise<AttachmentResponse[]> => {
     const formData = new FormData();
-    formData.append('file', file);
-    return apiClient.post<ApiResponse<Attachment>>(`/documents/${docId}/attachments`, formData, {
-      onUploadProgress: (e) => {
-        if (onProgress && e.total) {
-          onProgress(Math.round((e.loaded / e.total) * 100));
-        }
+    formData.append('files', file);
+    const { data } = await apiClient.post<ApiResponse<AttachmentResponse[]>>(
+      `/documents/${documentId}/attachments`,
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (e) => {
+          if (e.total) onProgress(Math.round((e.loaded / e.total) * 100));
+        },
+        signal,
       },
-      signal,
-    }).then(r => r.data.data!);
+    );
+    return data.data!;
+  },
+
+  getByDocumentId: async (documentId: number): Promise<AttachmentResponse[]> => {
+    const { data } = await apiClient.get<ApiResponse<AttachmentResponse[]>>(
+      `/documents/${documentId}/attachments`,
+    );
+    return data.data!;
   },
 
   download: async (attachmentId: number): Promise<{ blob: Blob; filename: string }> => {
     const response = await apiClient.get(`/documents/attachments/${attachmentId}/download`, {
       responseType: 'blob',
     });
+    // Extract filename from Content-Disposition header
     const disposition = response.headers['content-disposition'] ?? '';
     const filenameMatch = disposition.match(/filename\*=UTF-8''(.+)|filename="?(.+?)"?$/);
     const filename = filenameMatch
@@ -28,6 +45,7 @@ export const attachmentApi = {
     return { blob: response.data, filename };
   },
 
-  delete: (attachmentId: number) =>
-    apiClient.delete(`/documents/attachments/${attachmentId}`),
+  delete: async (attachmentId: number): Promise<void> => {
+    await apiClient.delete(`/documents/attachments/${attachmentId}`);
+  },
 };
