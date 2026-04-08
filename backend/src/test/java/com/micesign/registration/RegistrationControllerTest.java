@@ -60,14 +60,20 @@ class RegistrationControllerTest {
         RegistrationSubmitRequest request = new RegistrationSubmitRequest(
                 "상태조회", "statuscheck@example.com", "Password123!");
 
-        mockMvc.perform(post("/api/v1/registration")
+        String submitResponse = mockMvc.perform(post("/api/v1/registration")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
 
-        // Then check status
+        // Extract trackingToken from submit response
+        String trackingToken = objectMapper.readTree(submitResponse)
+                .path("data").path("trackingToken").asText();
+
+        // Then check status with email + trackingToken
         mockMvc.perform(get("/api/v1/registration/status")
-                        .param("email", "statuscheck@example.com"))
+                        .param("email", "statuscheck@example.com")
+                        .param("trackingToken", trackingToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.email").value("statuscheck@example.com"))

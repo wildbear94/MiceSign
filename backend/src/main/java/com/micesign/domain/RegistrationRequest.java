@@ -3,6 +3,7 @@ package com.micesign.domain;
 import com.micesign.domain.enums.RegistrationStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "registration_request")
@@ -18,8 +19,11 @@ public class RegistrationRequest {
     @Column(name = "email", nullable = false, length = 150)
     private String email;
 
-    @Column(name = "password_hash", nullable = false, length = 255)
+    @Column(name = "password_hash", length = 255)
     private String passwordHash;
+
+    @Column(name = "tracking_token", nullable = false, length = 36, unique = true)
+    private String trackingToken;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
@@ -46,6 +50,9 @@ public class RegistrationRequest {
         this.updatedAt = LocalDateTime.now();
         if (this.status == null) {
             this.status = RegistrationStatus.PENDING;
+        }
+        if (this.trackingToken == null) {
+            this.trackingToken = UUID.randomUUID().toString();
         }
     }
 
@@ -86,6 +93,14 @@ public class RegistrationRequest {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getTrackingToken() {
+        return trackingToken;
+    }
+
+    public void setTrackingToken(String trackingToken) {
+        this.trackingToken = trackingToken;
     }
 
     public RegistrationStatus getStatus() {

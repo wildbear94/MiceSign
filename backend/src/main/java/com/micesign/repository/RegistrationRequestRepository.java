@@ -21,6 +21,8 @@ public interface RegistrationRequestRepository extends JpaRepository<Registratio
 
     Optional<RegistrationRequest> findByEmailAndStatus(String email, RegistrationStatus status);
 
+    Optional<RegistrationRequest> findByEmailAndTrackingToken(String email, String trackingToken);
+
     Page<RegistrationRequest> findByStatus(RegistrationStatus status, Pageable pageable);
 
     @Modifying

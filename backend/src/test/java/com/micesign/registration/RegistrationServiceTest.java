@@ -81,7 +81,7 @@ class RegistrationServiceTest {
         when(registrationRequestRepository.save(any(RegistrationRequest.class))).thenReturn(saved);
 
         RegistrationStatusResponse expectedResponse = new RegistrationStatusResponse(
-                1L, "홍길동", "hong@example.com", RegistrationStatus.PENDING, null, null, null);
+                1L, "홍길동", "hong@example.com", RegistrationStatus.PENDING, null, null, null, null);
         when(registrationMapper.toStatusResponse(any())).thenReturn(expectedResponse);
 
         // when
@@ -142,7 +142,7 @@ class RegistrationServiceTest {
         saved.setStatus(RegistrationStatus.PENDING);
         when(registrationRequestRepository.save(any())).thenReturn(saved);
         when(registrationMapper.toStatusResponse(any())).thenReturn(
-                new RegistrationStatusResponse(2L, "홍길동", "rejected@example.com", RegistrationStatus.PENDING, null, null, null));
+                new RegistrationStatusResponse(2L, "홍길동", "rejected@example.com", RegistrationStatus.PENDING, null, null, null, null));
 
         // when
         RegistrationStatusResponse result = registrationService.submit(request);
@@ -153,21 +153,22 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void getStatusByEmail_found() {
+    void getStatusByEmailAndToken_found() {
         // given
         RegistrationRequest entity = new RegistrationRequest();
         entity.setId(1L);
         entity.setEmail("test@example.com");
+        entity.setTrackingToken("test-token-uuid");
         entity.setStatus(RegistrationStatus.PENDING);
-        when(registrationRequestRepository.findByEmailOrderByCreatedAtDesc("test@example.com"))
-                .thenReturn(List.of(entity));
+        when(registrationRequestRepository.findByEmailAndTrackingToken("test@example.com", "test-token-uuid"))
+                .thenReturn(Optional.of(entity));
 
         RegistrationStatusResponse expectedResponse = new RegistrationStatusResponse(
-                1L, "테스트", "test@example.com", RegistrationStatus.PENDING, null, null, null);
+                1L, "테스트", "test@example.com", RegistrationStatus.PENDING, null, "test-token-uuid", null, null);
         when(registrationMapper.toStatusResponse(entity)).thenReturn(expectedResponse);
 
         // when
-        RegistrationStatusResponse result = registrationService.getStatusByEmail("test@example.com");
+        RegistrationStatusResponse result = registrationService.getStatusByEmailAndToken("test@example.com", "test-token-uuid");
 
         // then
         assertThat(result).isNotNull();
@@ -175,16 +176,15 @@ class RegistrationServiceTest {
     }
 
     @Test
-    void getStatusByEmail_notFound() {
+    void getStatusByEmailAndToken_notFound() {
         // given
-        when(registrationRequestRepository.findByEmailOrderByCreatedAtDesc("unknown@example.com"))
-                .thenReturn(Collections.emptyList());
+        when(registrationRequestRepository.findByEmailAndTrackingToken("unknown@example.com", "bad-token"))
+                .thenReturn(Optional.empty());
 
-        // when
-        RegistrationStatusResponse result = registrationService.getStatusByEmail("unknown@example.com");
-
-        // then
-        assertThat(result).isNull();
+        // when/then
+        assertThatThrownBy(() -> registrationService.getStatusByEmailAndToken("unknown@example.com", "bad-token"))
+                .isInstanceOf(BusinessException.class)
+                .satisfies(ex -> assertThat(((BusinessException) ex).getCode()).isEqualTo("REG_NOT_FOUND"));
     }
 
     @Test

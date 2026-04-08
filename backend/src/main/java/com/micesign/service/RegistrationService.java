@@ -83,12 +83,11 @@ public class RegistrationService {
         return registrationMapper.toStatusResponse(entity);
     }
 
-    public RegistrationStatusResponse getStatusByEmail(String email) {
-        List<RegistrationRequest> requests = registrationRequestRepository.findByEmailOrderByCreatedAtDesc(email);
-        if (requests.isEmpty()) {
-            return null;
-        }
-        return registrationMapper.toStatusResponse(requests.get(0));
+    public RegistrationStatusResponse getStatusByEmailAndToken(String email, String trackingToken) {
+        RegistrationRequest request = registrationRequestRepository
+                .findByEmailAndTrackingToken(email, trackingToken)
+                .orElseThrow(() -> new BusinessException("REG_NOT_FOUND", "등록 신청을 찾을 수 없습니다."));
+        return registrationMapper.toStatusResponse(request);
     }
 
     public Page<RegistrationListResponse> getRegistrations(RegistrationStatus status, Pageable pageable) {

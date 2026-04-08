@@ -27,7 +27,9 @@ public class RegistrationController {
     }
 
     @GetMapping("/status")
-    public ApiResponse<RegistrationStatusResponse> getStatus(@RequestParam String email) {
-        return ApiResponse.ok(registrationService.getStatusByEmail(email));
+    public ApiResponse<RegistrationStatusResponse> getStatus(
+            @RequestParam String email,
+            @RequestParam String trackingToken) {
+        return ApiResponse.ok(registrationService.getStatusByEmailAndToken(email, trackingToken));
     }
 }

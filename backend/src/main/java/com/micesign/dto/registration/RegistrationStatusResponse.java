@@ -9,6 +9,7 @@ public record RegistrationStatusResponse(
     String email,
     RegistrationStatus status,
     String rejectionReason,
+    String trackingToken,
     LocalDateTime createdAt,
     LocalDateTime processedAt
 ) {}
