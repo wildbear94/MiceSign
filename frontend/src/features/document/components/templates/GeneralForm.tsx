@@ -89,7 +89,7 @@ export default function GeneralForm({
         <FileAttachmentArea
           documentId={documentId}
           documentStatus="DRAFT"
-          readOnly={false}
+          readOnly={readOnly}
         />
       ) : (
         <p className="text-sm text-gray-400 text-center py-4">
