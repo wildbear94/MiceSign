@@ -4,7 +4,9 @@ import com.micesign.domain.RegistrationRequest;
 import com.micesign.domain.enums.RegistrationStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +22,10 @@ public interface RegistrationRequestRepository extends JpaRepository<Registratio
     List<RegistrationRequest> findByEmailOrderByCreatedAtDesc(String email);
 
     Optional<RegistrationRequest> findByEmailAndStatus(String email, RegistrationStatus status);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT r FROM RegistrationRequest r WHERE r.email = :email AND r.status = :status")
+    Optional<RegistrationRequest> findByEmailAndStatusForUpdate(@Param("email") String email, @Param("status") RegistrationStatus status);
 
     Optional<RegistrationRequest> findByEmailAndTrackingToken(String email, String trackingToken);
 

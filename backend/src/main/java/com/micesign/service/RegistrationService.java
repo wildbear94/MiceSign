@@ -63,8 +63,8 @@ public class RegistrationService {
             throw new BusinessException("REG_DUPLICATE_EMAIL", "이미 등록된 이메일입니다.");
         }
 
-        // Check if PENDING request exists for same email (only PENDING per D-03/REG-03)
-        if (registrationRequestRepository.existsByEmailAndStatus(request.email(), RegistrationStatus.PENDING)) {
+        // Check if PENDING request exists for same email with pessimistic lock (prevents race condition)
+        if (registrationRequestRepository.findByEmailAndStatusForUpdate(request.email(), RegistrationStatus.PENDING).isPresent()) {
             throw new BusinessException("REG_DUPLICATE_PENDING", "이미 대기 중인 신청이 있습니다.");
         }
 

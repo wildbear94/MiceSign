@@ -69,7 +69,7 @@ class RegistrationServiceTest {
         // given
         RegistrationSubmitRequest request = new RegistrationSubmitRequest("홍길동", "hong@example.com", "Password123!");
         when(userRepository.findByEmail("hong@example.com")).thenReturn(Optional.empty());
-        when(registrationRequestRepository.existsByEmailAndStatus("hong@example.com", RegistrationStatus.PENDING)).thenReturn(false);
+        when(registrationRequestRepository.findByEmailAndStatusForUpdate("hong@example.com", RegistrationStatus.PENDING)).thenReturn(Optional.empty());
         when(passwordEncoder.encode("Password123!")).thenReturn("$2a$10$hashedValue");
 
         RegistrationRequest saved = new RegistrationRequest();
@@ -120,7 +120,10 @@ class RegistrationServiceTest {
         // given
         RegistrationSubmitRequest request = new RegistrationSubmitRequest("홍길동", "pending@example.com", "Password123!");
         when(userRepository.findByEmail("pending@example.com")).thenReturn(Optional.empty());
-        when(registrationRequestRepository.existsByEmailAndStatus("pending@example.com", RegistrationStatus.PENDING)).thenReturn(true);
+        RegistrationRequest existingPending = new RegistrationRequest();
+        existingPending.setEmail("pending@example.com");
+        existingPending.setStatus(RegistrationStatus.PENDING);
+        when(registrationRequestRepository.findByEmailAndStatusForUpdate("pending@example.com", RegistrationStatus.PENDING)).thenReturn(Optional.of(existingPending));
 
         // when/then
         assertThatThrownBy(() -> registrationService.submit(request))
@@ -133,7 +136,7 @@ class RegistrationServiceTest {
         // given - only REJECTED record exists, no PENDING
         RegistrationSubmitRequest request = new RegistrationSubmitRequest("홍길동", "rejected@example.com", "Password123!");
         when(userRepository.findByEmail("rejected@example.com")).thenReturn(Optional.empty());
-        when(registrationRequestRepository.existsByEmailAndStatus("rejected@example.com", RegistrationStatus.PENDING)).thenReturn(false);
+        when(registrationRequestRepository.findByEmailAndStatusForUpdate("rejected@example.com", RegistrationStatus.PENDING)).thenReturn(Optional.empty());
         when(passwordEncoder.encode("Password123!")).thenReturn("$2a$10$hashedValue");
 
         RegistrationRequest saved = new RegistrationRequest();
