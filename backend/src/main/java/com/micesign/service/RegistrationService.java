@@ -7,6 +7,8 @@ import com.micesign.domain.enums.RegistrationStatus;
 import com.micesign.domain.enums.UserRole;
 import com.micesign.domain.enums.UserStatus;
 import com.micesign.dto.registration.*;
+import com.micesign.event.RegistrationEventType;
+import com.micesign.event.RegistrationNotificationEvent;
 import com.micesign.mapper.RegistrationMapper;
 import com.micesign.repository.DepartmentRepository;
 import com.micesign.repository.PositionRepository;
@@ -15,6 +17,7 @@ import com.micesign.repository.UserRepository;
 import com.micesign.security.CustomUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -39,6 +42,7 @@ public class RegistrationService {
     private final AuditLogService auditLogService;
     private final DepartmentRepository departmentRepository;
     private final PositionRepository positionRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RegistrationService(RegistrationRequestRepository registrationRequestRepository,
                                 UserRepository userRepository,
@@ -46,7 +50,8 @@ public class RegistrationService {
                                 RegistrationMapper registrationMapper,
                                 AuditLogService auditLogService,
                                 DepartmentRepository departmentRepository,
-                                PositionRepository positionRepository) {
+                                PositionRepository positionRepository,
+                                ApplicationEventPublisher eventPublisher) {
         this.registrationRequestRepository = registrationRequestRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -54,6 +59,7 @@ public class RegistrationService {
         this.auditLogService = auditLogService;
         this.departmentRepository = departmentRepository;
         this.positionRepository = positionRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -79,6 +85,10 @@ public class RegistrationService {
         // Audit log with null userId (unauthenticated user)
         auditLogService.log(null, "REGISTRATION_SUBMITTED", "REGISTRATION_REQUEST",
                 entity.getId(), Map.of("email", request.email()));
+
+        eventPublisher.publishEvent(
+            new RegistrationNotificationEvent(entity.getId(), RegistrationEventType.REGISTRATION_SUBMIT)
+        );
 
         return registrationMapper.toStatusResponse(entity);
     }
@@ -158,6 +168,10 @@ public class RegistrationService {
         // Audit log
         auditLogService.log(admin.getUserId(), "REGISTRATION_APPROVED", "REGISTRATION_REQUEST",
                 reg.getId(), Map.of("userId", user.getId(), "email", reg.getEmail()));
+
+        eventPublisher.publishEvent(
+            new RegistrationNotificationEvent(reg.getId(), RegistrationEventType.REGISTRATION_APPROVE)
+        );
     }
 
     @Transactional
@@ -178,5 +192,9 @@ public class RegistrationService {
         // Audit log
         auditLogService.log(admin.getUserId(), "REGISTRATION_REJECTED", "REGISTRATION_REQUEST",
                 reg.getId(), Map.of("email", reg.getEmail(), "reason", dto.rejectionReason()));
+
+        eventPublisher.publishEvent(
+            new RegistrationNotificationEvent(reg.getId(), RegistrationEventType.REGISTRATION_REJECT)
+        );
     }
 }

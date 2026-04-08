@@ -21,6 +21,7 @@ import com.micesign.security.CustomUserDetails;
 import com.micesign.service.AuditLogService;
 import com.micesign.service.RegistrationService;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -47,6 +48,7 @@ class RegistrationServiceTest {
     @Mock private AuditLogService auditLogService;
     @Mock private DepartmentRepository departmentRepository;
     @Mock private PositionRepository positionRepository;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks private RegistrationService registrationService;
 
