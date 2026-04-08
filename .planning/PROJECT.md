@@ -19,9 +19,9 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] 로그인 화면에서 사용자 자가 등록 신청 (이름, 이메일, 비밀번호)
-- [ ] SUPER_ADMIN이 등록 신청을 승인 또는 거부할 수 있는 관리 화면
-- [ ] 승인 시 자동 계정 생성 (부서/직급은 관리자가 이후 설정)
+- [ ] 로그인 화면에서 사용자 자가 등록 신청 (이름, 이메일, 비밀번호) — Backend API validated in Phase 18 (REG-01, REG-02, REG-03); frontend pending Phase 21
+- [ ] SUPER_ADMIN이 등록 신청을 승인 또는 거부할 수 있는 관리 화면 — Backend API validated in Phase 18 (ADM-04); admin UI pending Phase 20
+- [ ] 승인 시 자동 계정 생성 (부서/직급은 관리자가 이후 설정) — Backend logic validated in Phase 18 (direct password hash transfer, user creation on approve)
 - [ ] 등록 신청/승인/거부 시 이메일 알림 발송
 
 ### Out of Scope
@@ -94,4 +94,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Milestone v1.3 started*
+*Last updated: 2026-04-08 after Phase 18 registration-backend complete*
