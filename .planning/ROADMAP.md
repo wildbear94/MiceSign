@@ -350,7 +350,10 @@ Plans:
   2. Applicant receives a confirmation email immediately after submitting a registration request
   3. Applicant receives a result email when their request is approved or rejected (rejection includes the reason)
   4. All SUPER_ADMIN users receive a notification email when a new registration request is submitted
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 19-01-PLAN.md — 이메일 인프라: Gradle 의존성, Flyway 마이그레이션, 설정, 이벤트 타입, RegistrationEmailService, Thymeleaf 템플릿
+- [ ] 19-02-PLAN.md — 이벤트 연결: RegistrationService 이벤트 발행 추가, RegistrationEmailService 단위 테스트
 
 ### Phase 20: Admin Registration Management UI
 **Goal**: SUPER_ADMIN can review, approve, and reject registration requests through a dedicated admin page
@@ -401,6 +404,6 @@ Phases 18 through 21 are strictly sequential (each depends on the previous).
 | 16. Template Migration | v1.2 | 2/2 | Complete | 2026-04-06 |
 | 17. Budget Integration | v1.2 | 3/1 | Complete | 2026-04-07 |
 | 18. Registration Backend | v1.3 | 2/2 | Complete    | 2026-04-08 |
-| 19. Registration Email Notifications | v1.3 | 0/0 | Not started | - |
+| 19. Registration Email Notifications | v1.3 | 0/2 | Not started | - |
 | 20. Admin Registration Management UI | v1.3 | 0/0 | Not started | - |
 | 21. Registration Frontend & Security | v1.3 | 0/0 | Not started | - |
