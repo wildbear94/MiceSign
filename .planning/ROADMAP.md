@@ -128,8 +128,9 @@ Plans:
   3. Approver can approve or reject with optional comment; rejection immediately sets document to REJECTED
   4. Final approval sets document to APPROVED; the complete state machine (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN) works correctly
   5. Drafter can withdraw a submitted document if the next approver has not acted, and can create a new pre-filled document from rejected or withdrawn documents
-**Plans:** 3 plans
+**Plans:** 4 plans
 Plans:
+- [ ] 07-00-PLAN.md — Wave 0: Vitest + testing-library setup + frontend test stubs for approval behaviors
 - [ ] 07-01-PLAN.md — Backend approval validation + integration tests + frontend types/API/hooks/i18n
 - [ ] 07-02-PLAN.md — Approval line editor: org tree picker modal + drag-and-drop editor + editor page integration
 - [ ] 07-03-PLAN.md — Approval processing UI: timeline, action panel, withdraw, resubmit + checkpoint
@@ -160,5 +161,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. Document Core & Templates | 0/3 | Planning complete | - |
 | 5. File Attachments | 0/3 | Planning complete | - |
 | 6. Document Submission & Numbering | 0/TBD | Not started | - |
-| 7. Approval Workflow | 0/TBD | Not started | - |
+| 7. Approval Workflow | 0/4 | Planning complete | - |
 | 8. Dashboard & Audit | 0/TBD | Not started | - |
