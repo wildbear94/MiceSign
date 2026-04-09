@@ -255,18 +255,17 @@ public class DocumentService {
         }
 
         // Validate approval lines
-        // TODO Phase 7: Re-enable approval line validation
-        // List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
-        // boolean hasApprover = approvalLines.stream()
-        //         .anyMatch(line -> line.getLineType() == ApprovalLineType.APPROVE);
-        // if (!hasApprover) {
-        //     throw new BusinessException("APR_NO_APPROVER", "최소 1명의 승인자(승인 유형)를 추가해주세요.");
-        // }
-        // boolean drafterInLine = approvalLines.stream()
-        //         .anyMatch(line -> line.getApprover().getId().equals(userId));
-        // if (drafterInLine) {
-        //     throw new BusinessException("APR_SELF_NOT_ALLOWED", "기안자는 결재선에 포함될 수 없습니다.");
-        // }
+        List<ApprovalLine> approvalLinesForValidation = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
+        boolean hasApprover = approvalLinesForValidation.stream()
+                .anyMatch(line -> line.getLineType() == ApprovalLineType.APPROVE);
+        if (!hasApprover) {
+            throw new BusinessException("APR_NO_APPROVER", "최소 1명의 승인자(승인 유형)를 추가해주세요.");
+        }
+        boolean drafterInLine = approvalLinesForValidation.stream()
+                .anyMatch(line -> line.getApprover().getId().equals(userId));
+        if (drafterInLine) {
+            throw new BusinessException("APR_SELF_NOT_ALLOWED", "기안자는 결재선에 포함될 수 없습니다.");
+        }
 
         // Run form validation
         DocumentContent content = documentContentRepository.findByDocumentId(docId)

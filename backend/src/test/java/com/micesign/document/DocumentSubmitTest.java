@@ -2,6 +2,7 @@ package com.micesign.document;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.admin.TestTokenHelper;
+import com.micesign.dto.document.ApprovalLineRequest;
 import com.micesign.dto.document.CreateDocumentRequest;
 import com.micesign.dto.document.UpdateDocumentRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -45,6 +47,8 @@ class DocumentSubmitTest {
     private String token;
     private int currentYear;
 
+    private static final Long APPROVER_ID = 60L;
+
     @BeforeEach
     void setUp() {
         // Clean document data (order matters due to FK constraints)
@@ -53,6 +57,13 @@ class DocumentSubmitTest {
         jdbcTemplate.update("DELETE FROM document_content");
         jdbcTemplate.update("DELETE FROM document");
         jdbcTemplate.update("DELETE FROM doc_sequence");
+
+        // Clean up and re-insert test approver user
+        jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", APPROVER_ID);
+        jdbcTemplate.update(
+                "INSERT INTO \"user\" (id, employee_no, name, email, password, department_id, position_id, role, status, failed_login_count, must_change_password) " +
+                        "VALUES (?, 'SUBMIT_APR', '제출테스트결재자', 'submitapprover@micesign.com', '$2a$10$07mcjXBfvelJFwjs8DnoJOnEqprFy.dnQL1NdnRvlqEWwwmX62SOW', 2, 3, 'USER', 'ACTIVE', 0, FALSE)",
+                APPROVER_ID);
 
         // Use super admin (userId=1) which is seeded in V2
         token = tokenHelper.superAdminToken();
@@ -66,6 +77,7 @@ class DocumentSubmitTest {
     @Test
     void submitDraft_success() throws Exception {
         Long docId = createGeneralDraft("일반 기안 테스트");
+        addApprovalLine(docId);
 
         mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
                 .header("Authorization", "Bearer " + token))
@@ -84,6 +96,7 @@ class DocumentSubmitTest {
     @Test
     void submitGeneralDocument_numberFormatGEN() throws Exception {
         Long docId = createGeneralDraft("일반 기안");
+        addApprovalLine(docId);
 
         MvcResult result = mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
                 .header("Authorization", "Bearer " + token))
@@ -98,6 +111,7 @@ class DocumentSubmitTest {
     @Test
     void submitExpenseDocument_numberFormatEXP() throws Exception {
         Long docId = createExpenseDraft();
+        addApprovalLine(docId);
 
         MvcResult result = mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
                 .header("Authorization", "Bearer " + token))
@@ -112,6 +126,7 @@ class DocumentSubmitTest {
     @Test
     void submitLeaveDocument_prefixIsLEV() throws Exception {
         Long docId = createLeaveDraft();
+        addApprovalLine(docId);
 
         MvcResult result = mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
                 .header("Authorization", "Bearer " + token))
@@ -130,6 +145,7 @@ class DocumentSubmitTest {
     @Test
     void submitAlreadySubmitted_returns400() throws Exception {
         Long docId = createGeneralDraft("이미 제출된 문서");
+        addApprovalLine(docId);
 
         // Submit once
         mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
@@ -167,6 +183,7 @@ class DocumentSubmitTest {
     @Test
     void submitWithoutTitle_returns400() throws Exception {
         Long docId = createGeneralDraft("임시 제목");
+        addApprovalLine(docId);
 
         // Clear the title to empty via direct DB update (bypassing create validation)
         jdbcTemplate.update("UPDATE document SET title = '' WHERE id = ?", docId);
@@ -184,6 +201,7 @@ class DocumentSubmitTest {
     @Test
     void updateSubmittedDocument_returns400() throws Exception {
         Long docId = createGeneralDraft("제출 후 수정 시도");
+        addApprovalLine(docId);
 
         // Submit
         mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
@@ -209,7 +227,9 @@ class DocumentSubmitTest {
     @Test
     void submitTwice_sequenceIncrements() throws Exception {
         Long docId1 = createGeneralDraft("첫 번째 문서");
+        addApprovalLine(docId1);
         Long docId2 = createGeneralDraft("두 번째 문서");
+        addApprovalLine(docId2);
 
         // Submit first
         MvcResult result1 = mockMvc.perform(post("/api/v1/documents/" + docId1 + "/submit")
@@ -270,6 +290,13 @@ class DocumentSubmitTest {
 
         return objectMapper.readTree(result.getResponse().getContentAsString())
                 .path("data").path("id").asLong();
+    }
+
+    private void addApprovalLine(Long docId) {
+        jdbcTemplate.update(
+                "INSERT INTO approval_line (document_id, approver_id, line_type, step_order, status, created_at) " +
+                        "VALUES (?, ?, 'APPROVE', 1, 'PENDING', CURRENT_TIMESTAMP)",
+                docId, APPROVER_ID);
     }
 
     private Long createLeaveDraft() throws Exception {
