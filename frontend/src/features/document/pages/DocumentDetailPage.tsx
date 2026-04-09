@@ -1,6 +1,7 @@
-import { useParams, useNavigate } from 'react-router';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle, X } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
@@ -14,7 +15,25 @@ export default function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
   const documentId = id ? Number(id) : null;
 
+  const location = useLocation();
   const { data: doc, isLoading } = useDocumentDetail(documentId);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // D-18, D-19: show success message + auto-dismiss after 5s
+  useEffect(() => {
+    const state = location.state as { submitSuccess?: boolean; docNumber?: string } | null;
+    if (state?.submitSuccess && state?.docNumber) {
+      setSuccessMessage(t('submitSuccess', { docNumber: state.docNumber }));
+      // Clear location state to prevent re-showing on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, t]);
+
+  useEffect(() => {
+    if (!successMessage) return;
+    const timer = setTimeout(() => setSuccessMessage(null), 5000);
+    return () => clearTimeout(timer);
+  }, [successMessage]);
 
   // Loading state
   if (isLoading || !doc) {
@@ -62,11 +81,35 @@ export default function DocumentDetailPage() {
         {t('backToList')}
       </button>
 
+      {/* Success message banner */}
+      {successMessage && (
+        <div role="alert" className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+            <span className="text-sm text-green-700 dark:text-green-400">{successMessage}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSuccessMessage(null)}
+            className="h-6 w-6 flex items-center justify-center text-green-400 hover:text-green-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* Meta info section */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-3">
-          {doc.title}
-        </h1>
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-50">
+            {doc.title}
+          </h1>
+          {doc.docNumber && (
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 font-mono">
+              {doc.docNumber}
+            </span>
+          )}
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">양식</span>
