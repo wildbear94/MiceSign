@@ -21,6 +21,7 @@ export interface ApprovalLineResponse {
 export interface ApprovalLineRequest {
   approverId: number;
   lineType: ApprovalLineType;
+  stepOrder: number;
 }
 
 export interface ApprovalActionRequest {

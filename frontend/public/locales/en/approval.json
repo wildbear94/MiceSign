@@ -1,0 +1,65 @@
+{
+  "approvalLine": {
+    "title": "Approval Line",
+    "sequential": "Sequential Approval",
+    "reference": "Reference",
+    "addApprover": "Add Approver",
+    "emptyState": "Please add an approver",
+    "maxWarning": "Up to 10 approvers can be added",
+    "approveRequired": "At least 1 approver of type Approve is required",
+    "alreadyAdded": "Already added",
+    "self": "Self"
+  },
+  "orgPicker": {
+    "title": "Select Approver",
+    "searchPlaceholder": "Search by name or department",
+    "close": "Close"
+  },
+  "type": {
+    "APPROVE": "Approve",
+    "AGREE": "Agree",
+    "REFERENCE": "Reference"
+  },
+  "typeShort": {
+    "APPROVE": "Approve",
+    "AGREE": "Agree",
+    "REFERENCE": "Ref"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "SKIPPED": "Skipped"
+  },
+  "action": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "withdraw": "Withdraw",
+    "resubmit": "Resubmit",
+    "notYourTurn": "Not your turn to approve",
+    "currentApprover": "Current Approver",
+    "commentPlaceholder": "Enter comment (optional)",
+    "rejectCommentPlaceholder": "Please enter the reason for rejection (required)",
+    "rejectCommentRequired": "Comment is required for rejection"
+  },
+  "confirm": {
+    "rejectTitle": "Reject Document",
+    "rejectMessage": "Are you sure you want to reject this document? It will be returned to the drafter.",
+    "rejectConfirm": "Reject",
+    "withdrawTitle": "Withdraw Document",
+    "withdrawMessage": "Withdrawing will cancel the approval process.",
+    "withdrawConfirm": "Withdraw"
+  },
+  "success": {
+    "approved": "Document has been approved",
+    "rejected": "Document has been rejected",
+    "withdrawn": "Document has been withdrawn"
+  },
+  "error": {
+    "approveFailed": "Approval failed. Please try again later.",
+    "withdrawFailed": "Withdrawal failed. Please try again later.",
+    "rewriteFailed": "Resubmission failed. Please try again later.",
+    "alreadyProcessed": "This approval has already been processed",
+    "notAuthorized": "You are not authorized to approve"
+  }
+}
