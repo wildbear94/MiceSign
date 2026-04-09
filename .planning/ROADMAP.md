@@ -113,7 +113,10 @@ Plans:
   1. User can submit a draft document, changing its status from DRAFT to SUBMITTED
   2. Submitted document body, attachments, and approval line are fully locked and cannot be modified
   3. Document number (PREFIX-YYYY-NNNN) is assigned at submission with no duplicates under concurrent submissions
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — Backend: Flyway LEV prefix fix, submitDocument approval line validation removal, integration tests
+- [ ] 06-02-PLAN.md — Frontend: submit API/hook, editor submit button + confirm dialog, success message, doc number display
 
 ### Phase 7: Approval Workflow
 **Goal**: Users can build approval lines, process approvals sequentially, and handle rejections, withdrawals, and resubmissions
