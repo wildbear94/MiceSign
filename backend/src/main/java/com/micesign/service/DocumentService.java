@@ -33,6 +33,8 @@ import com.micesign.repository.DocumentAttachmentRepository;
 import com.micesign.repository.DocumentContentRepository;
 import com.micesign.repository.DocumentRepository;
 import com.micesign.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,6 +55,7 @@ import java.util.stream.Collectors;
 public class DocumentService {
 
     private static final Logger log = LoggerFactory.getLogger(DocumentService.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final DocumentRepository documentRepository;
     private final DocumentContentRepository documentContentRepository;
@@ -140,8 +143,13 @@ public class DocumentService {
             saveApprovalLines(document, request.approvalLines());
         }
 
-        auditLogService.log(userId, AuditAction.DOC_CREATE, "DOCUMENT", document.getId(),
-                "{\"templateCode\":\"" + request.templateCode() + "\"}");
+        try {
+            String detail = objectMapper.writeValueAsString(Map.of("templateCode", request.templateCode()));
+            auditLogService.log(userId, AuditAction.DOC_CREATE, "DOCUMENT", document.getId(), detail);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to serialize audit detail for DOC_CREATE: {}", e.getMessage());
+            auditLogService.log(userId, AuditAction.DOC_CREATE, "DOCUMENT", document.getId(), null);
+        }
 
         return buildDetailResponse(document);
     }
@@ -296,8 +304,13 @@ public class DocumentService {
         // Move attachments from draft folder to permanent folder
         moveAttachmentsToPermanentFolder(docId, docNumber);
 
-        auditLogService.log(userId, AuditAction.DOC_SUBMIT, "DOCUMENT", docId,
-                "{\"docNumber\":\"" + docNumber + "\"}");
+        try {
+            String submitDetail = objectMapper.writeValueAsString(Map.of("docNumber", docNumber));
+            auditLogService.log(userId, AuditAction.DOC_SUBMIT, "DOCUMENT", docId, submitDetail);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to serialize audit detail for DOC_SUBMIT: {}", e.getMessage());
+            auditLogService.log(userId, AuditAction.DOC_SUBMIT, "DOCUMENT", docId, null);
+        }
 
         // Publish notification event only if approval lines exist
         if (!approvalLines.isEmpty()) {
