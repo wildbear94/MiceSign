@@ -128,7 +128,11 @@ Plans:
   3. Approver can approve or reject with optional comment; rejection immediately sets document to REJECTED
   4. Final approval sets document to APPROVED; the complete state machine (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN) works correctly
   5. Drafter can withdraw a submitted document if the next approver has not acted, and can create a new pre-filled document from rejected or withdrawn documents
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 07-01-PLAN.md — Backend approval validation + integration tests + frontend types/API/hooks/i18n
+- [ ] 07-02-PLAN.md — Approval line editor: org tree picker modal + drag-and-drop editor + editor page integration
+- [ ] 07-03-PLAN.md — Approval processing UI: timeline, action panel, withdraw, resubmit + checkpoint
 **UI hint**: yes
 
 ### Phase 8: Dashboard & Audit
