@@ -189,6 +189,8 @@ public class DocumentService {
             if (!request.approvalLines().isEmpty()) {
                 saveApprovalLines(document, request.approvalLines());
             }
+            auditLogService.log(userId, AuditAction.DOC_UPDATE, "DOCUMENT", docId,
+                    "{\"action\":\"approval_lines_updated\"}");
         }
 
         return buildDetailResponse(document);
