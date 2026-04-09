@@ -19,16 +19,18 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] Admin-managed organization structure (departments, positions, users)
-- [ ] RBAC with three roles (SUPER_ADMIN, ADMIN, USER)
-- [ ] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE)
-- [ ] Flexible approval line selection (APPROVE, AGREE, REFERENCE types)
-- [ ] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
-- [ ] Document immutability after submission (locked body, attachments, approval line)
-- [ ] Document numbering system (prefix-year-sequence, assigned at submission)
-- [ ] File attachments via Google Drive API (Service Account)
 - [ ] Audit trail logging for all document state changes
 - [ ] Dashboard showing pending approvals and recent documents
+
+### Validated (Phase 3-7)
+- [x] Admin-managed organization structure (departments, positions, users) — Validated in Phase 3: Organization Management, Phase 20: Admin Registration Management UI
+- [x] RBAC with three roles (SUPER_ADMIN, ADMIN, USER) — Validated in Phase 2-3
+- [x] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE) — Validated in Phase 4: Document Core & Templates
+- [x] Flexible approval line selection (APPROVE, AGREE, REFERENCE types) — Validated in Phase 7: Approval Workflow (APR-01, APR-02)
+- [x] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN) — Validated in Phase 7: Approval Workflow (APR-03 through APR-07)
+- [x] Document immutability after submission (locked body, attachments, approval line) — Validated in Phase 6: Document Submission & Numbering
+- [x] Document numbering system (prefix-year-sequence, assigned at submission) — Validated in Phase 6: Document Submission & Numbering
+- [x] File attachments via Google Drive API (Service Account) — Validated in Phase 5: File Attachments
 
 ### Out of Scope
 
@@ -90,4 +92,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-09 after Phase 6 (Document Submission & Numbering) completion — submit workflow, document immutability, concurrent-safe PREFIX-YYYY-NNNN numbering, LEAVE prefix fix (LEV), frontend submit UI with confirm dialog and success banner*
+*Last updated: 2026-04-09 after Phase 7 (Approval Workflow) completion — approval line editor with org tree picker and DnD, sequential approval processing, approve/reject with comments, withdrawal, resubmission, i18n, 8 backend integration tests*
