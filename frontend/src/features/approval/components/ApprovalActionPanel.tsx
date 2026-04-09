@@ -74,7 +74,7 @@ export default function ApprovalActionPanel({
       onActionComplete();
     } catch {
       setShowRejectConfirm(false);
-      setResultMessage({ type: 'error', text: t('error.approveFailed') });
+      setResultMessage({ type: 'error', text: t('error.rejectFailed') });
     }
   };
 
