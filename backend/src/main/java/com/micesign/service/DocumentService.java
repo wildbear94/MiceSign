@@ -255,19 +255,18 @@ public class DocumentService {
         }
 
         // Validate approval lines
-        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
-        boolean hasApprover = approvalLines.stream()
-                .anyMatch(line -> line.getLineType() == ApprovalLineType.APPROVE);
-        if (!hasApprover) {
-            throw new BusinessException("APR_NO_APPROVER", "최소 1명의 승인자(승인 유형)를 추가해주세요.");
-        }
-
-        // Drafter must not be in approval line
-        boolean drafterInLine = approvalLines.stream()
-                .anyMatch(line -> line.getApprover().getId().equals(userId));
-        if (drafterInLine) {
-            throw new BusinessException("APR_SELF_NOT_ALLOWED", "기안자는 결재선에 포함될 수 없습니다.");
-        }
+        // TODO Phase 7: Re-enable approval line validation
+        // List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
+        // boolean hasApprover = approvalLines.stream()
+        //         .anyMatch(line -> line.getLineType() == ApprovalLineType.APPROVE);
+        // if (!hasApprover) {
+        //     throw new BusinessException("APR_NO_APPROVER", "최소 1명의 승인자(승인 유형)를 추가해주세요.");
+        // }
+        // boolean drafterInLine = approvalLines.stream()
+        //         .anyMatch(line -> line.getApprover().getId().equals(userId));
+        // if (drafterInLine) {
+        //     throw new BusinessException("APR_SELF_NOT_ALLOWED", "기안자는 결재선에 포함될 수 없습니다.");
+        // }
 
         // Run form validation
         DocumentContent content = documentContentRepository.findByDocumentId(docId)
@@ -282,13 +281,17 @@ public class DocumentService {
         document.setStatus(DocumentStatus.SUBMITTED);
         document.setSubmittedAt(LocalDateTime.now());
 
-        // Set currentStep to first non-REFERENCE step
-        int firstStep = approvalLines.stream()
-                .filter(line -> line.getLineType() != ApprovalLineType.REFERENCE)
-                .mapToInt(ApprovalLine::getStepOrder)
-                .min()
-                .orElse(1);
-        document.setCurrentStep(firstStep);
+        // Set currentStep to first non-REFERENCE step (if approval lines exist)
+        List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
+        if (!approvalLines.isEmpty()) {
+            int firstStep = approvalLines.stream()
+                    .filter(line -> line.getLineType() != ApprovalLineType.REFERENCE)
+                    .mapToInt(ApprovalLine::getStepOrder)
+                    .min()
+                    .orElse(1);
+            document.setCurrentStep(firstStep);
+        }
+        // Phase 6: If no approval lines, currentStep stays null
         documentRepository.save(document);
 
         // Move attachments from draft folder to permanent folder
@@ -297,9 +300,11 @@ public class DocumentService {
         auditLogService.log(userId, AuditAction.DOC_SUBMIT, "DOCUMENT", docId,
                 "{\"docNumber\":\"" + docNumber + "\"}");
 
-        // Publish notification event
-        eventPublisher.publishEvent(
-                new ApprovalNotificationEvent(docId, NotificationEventType.SUBMIT.name(), userId));
+        // Publish notification event only if approval lines exist
+        if (!approvalLines.isEmpty()) {
+            eventPublisher.publishEvent(
+                    new ApprovalNotificationEvent(docId, NotificationEventType.SUBMIT.name(), userId));
+        }
 
         // Budget integration event if template.budgetEnabled
         ApprovalTemplate template = approvalTemplateRepository.findByCode(document.getTemplateCode())
