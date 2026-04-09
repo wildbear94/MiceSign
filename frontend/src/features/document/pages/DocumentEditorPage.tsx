@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Trash2, Loader2 } from 'lucide-react';
@@ -6,6 +6,12 @@ import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import ApprovalLineEditor, {
+  toApprovalLineRequests,
+  toApprovalLineItems,
+} from '../../approval/components/ApprovalLineEditor';
+import { useAuthStore } from '../../../stores/authStore';
+import type { ApprovalLineItem } from '../../approval/types/approval';
 import {
   useDocumentDetail,
   useCreateDocument,
@@ -17,6 +23,8 @@ import { useAutoSave } from '../hooks/useAutoSave';
 
 export default function DocumentEditorPage() {
   const { t } = useTranslation('document');
+  const { t: tApproval } = useTranslation('approval');
+  const currentUserId = useAuthStore((s) => s.user?.id);
   const navigate = useNavigate();
   const { templateCode, id } = useParams<{
     templateCode?: string;
@@ -32,6 +40,8 @@ export default function DocumentEditorPage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [uploadState, setUploadState] = useState<{ isUploading: boolean; hasError: boolean }>({ isUploading: false, hasError: false });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [approvalLines, setApprovalLines] = useState<ApprovalLineItem[]>([]);
+  const [approvalLineError, setApprovalLineError] = useState<string | null>(null);
 
   // For new docs, use templateCode from URL; for edits, from loaded document
   const { data: existingDoc } = useDocumentDetail(documentId);
@@ -41,6 +51,13 @@ export default function DocumentEditorPage() {
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();
   const submitMutation = useSubmitDocument();
+
+  // Initialize approval lines from existing document (e.g., resubmitted draft)
+  useEffect(() => {
+    if (existingDoc?.approvalLines && existingDoc.approvalLines.length > 0) {
+      setApprovalLines(toApprovalLineItems(existingDoc.approvalLines));
+    }
+  }, [existingDoc]);
 
   // Store the latest form data for auto-save
   const formDataRef = useRef<{
@@ -56,22 +73,24 @@ export default function DocumentEditorPage() {
 
       try {
         if (savedDocId) {
-          // Update existing
+          // Update existing — D-30: always send approvalLines: null during auto-save/manual save
           await updateMutation.mutateAsync({
             id: savedDocId,
             data: {
               title: data.title,
               bodyHtml: data.bodyHtml ?? null,
               formData: data.formData ?? null,
+              approvalLines: null,
             },
           });
         } else {
-          // Create new
+          // Create new — D-30: approvalLines: null during draft creation
           const created = await createMutation.mutateAsync({
             templateCode: resolvedTemplateCode,
             title: data.title,
             bodyHtml: data.bodyHtml ?? null,
             formData: data.formData ?? null,
+            approvalLines: null,
           });
           setSavedDocId(created.id);
           // Update URL without re-rendering
@@ -118,6 +137,7 @@ export default function DocumentEditorPage() {
 
   const handleSubmitClick = useCallback(() => {
     setErrorMessage(null);
+    setApprovalLineError(null);
 
     // D-14: block if upload has failed files
     if (uploadState.hasError) {
@@ -138,9 +158,16 @@ export default function DocumentEditorPage() {
       return;
     }
 
+    // D-07: validate at least 1 APPROVE type approver
+    const hasApprover = approvalLines.some((l) => l.lineType === 'APPROVE');
+    if (!hasApprover) {
+      setApprovalLineError(tApproval('approvalLine.approveRequired'));
+      return;
+    }
+
     // D-09: show confirm dialog
     setShowSubmitConfirm(true);
-  }, [uploadState, t]);
+  }, [uploadState, t, tApproval, approvalLines]);
 
   const handleSubmitConfirm = useCallback(async () => {
     if (!savedDocId) return;
@@ -148,6 +175,17 @@ export default function DocumentEditorPage() {
     try {
       // D-12: save unsaved changes before submit
       await saveNow();
+
+      // D-30: persist approval lines to DB ONLY at submit time
+      await updateMutation.mutateAsync({
+        id: savedDocId,
+        data: {
+          title: formDataRef.current.title,
+          bodyHtml: formDataRef.current.bodyHtml ?? null,
+          formData: formDataRef.current.formData ?? null,
+          approvalLines: toApprovalLineRequests(approvalLines),
+        },
+      });
 
       // D-05: call submit API
       const result = await submitMutation.mutateAsync(savedDocId);
@@ -171,7 +209,7 @@ export default function DocumentEditorPage() {
       }
       setErrorMessage(t('error.submitFailed'));
     }
-  }, [savedDocId, saveNow, submitMutation, navigate, t]);
+  }, [savedDocId, saveNow, updateMutation, approvalLines, submitMutation, navigate, t]);
 
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
   if (!templateEntry && !isEditMode) {
@@ -285,6 +323,18 @@ export default function DocumentEditorPage() {
             documentStatus="DRAFT"
             readOnly={false}
             onUploadStateChange={setUploadState}
+          />
+        </div>
+      )}
+
+      {/* Approval Line Editor */}
+      {savedDocId && (
+        <div className="mt-8">
+          <ApprovalLineEditor
+            items={approvalLines}
+            onChange={setApprovalLines}
+            drafterId={currentUserId ?? 0}
+            error={approvalLineError}
           />
         </div>
       )}
