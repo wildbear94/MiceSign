@@ -25,4 +25,7 @@ export const documentApi = {
 
   delete: (id: number) =>
     apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`),
+
+  submit: (id: number) =>
+    apiClient.post<ApiResponse<DocumentDetailResponse>>(`${BASE}/${id}/submit`),
 };

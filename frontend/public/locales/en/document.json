@@ -6,6 +6,7 @@
     "subtitle": "Select a form template"
   },
   "save": "Save Draft",
+  "submit": "Submit",
   "delete": "Delete Document",
   "backToList": "Back to List",
   "autoSave": {
@@ -20,8 +21,19 @@
   "error": {
     "saveFailed": "Failed to save document. Please try again.",
     "loadFailed": "Failed to load document. Please try again.",
-    "deleteFailed": "Failed to delete document. Please try again."
+    "deleteFailed": "Failed to delete document. Please try again.",
+    "submitFailed": "Failed to submit document. Please try again later.",
+    "alreadySubmitted": "This document has already been submitted",
+    "uploadInProgress": "File upload is in progress. Please wait and try again.",
+    "uploadFailed": "There are failed uploads. Please remove them and try again."
   },
+  "submitConfirm": {
+    "title": "Submit Document",
+    "message": "You cannot modify the document after submission. Are you sure?",
+    "confirm": "Submit",
+    "cancel": "Cancel"
+  },
+  "submitSuccess": "Document submitted successfully ({{docNumber}})",
   "deleteConfirm": {
     "title": "Delete Document",
     "message": "Are you sure you want to delete this document? This action cannot be undone.",
@@ -31,7 +43,8 @@
     "title": "Title",
     "template": "Template",
     "status": "Status",
-    "createdAt": "Created"
+    "createdAt": "Created",
+    "docNumber": "Doc Number"
   },
   "status": {
     "DRAFT": "Draft",
