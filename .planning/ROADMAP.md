@@ -130,10 +130,10 @@ Plans:
   5. Drafter can withdraw a submitted document if the next approver has not acted, and can create a new pre-filled document from rejected or withdrawn documents
 **Plans:** 4 plans
 Plans:
-- [ ] 07-00-PLAN.md — Wave 0: Vitest + testing-library setup + frontend test stubs for approval behaviors
-- [ ] 07-01-PLAN.md — Backend approval validation + integration tests + frontend types/API/hooks/i18n
-- [ ] 07-02-PLAN.md — Approval line editor: org tree picker modal + drag-and-drop editor + editor page integration
-- [ ] 07-03-PLAN.md — Approval processing UI: timeline, action panel, withdraw, resubmit + checkpoint
+- [x] 07-00-PLAN.md — Wave 0: Vitest + testing-library setup + frontend test stubs for approval behaviors
+- [x] 07-01-PLAN.md — Backend approval validation + integration tests + frontend types/API/hooks/i18n
+- [x] 07-02-PLAN.md — Approval line editor: org tree picker modal + drag-and-drop editor + editor page integration
+- [x] 07-03-PLAN.md — Approval processing UI: timeline, action panel, withdraw, resubmit + checkpoint
 **UI hint**: yes
 
 ### Phase 8: Dashboard & Audit
