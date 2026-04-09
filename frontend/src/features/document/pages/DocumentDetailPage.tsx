@@ -259,13 +259,15 @@ export default function DocumentDetailPage() {
             documentStatus={doc.status}
           />
           {/* Action panel for current approver */}
-          <ApprovalActionPanel
-            lineId={myLine?.id ?? 0}
-            canApprove={canApprove}
-            onActionComplete={() =>
-              queryClient.invalidateQueries({ queryKey: ['documents', documentId] })
-            }
-          />
+          {myLine && (
+            <ApprovalActionPanel
+              lineId={myLine.id}
+              canApprove={canApprove}
+              onActionComplete={() =>
+                queryClient.invalidateQueries({ queryKey: ['documents', documentId] })
+              }
+            />
+          )}
         </div>
       )}
 
