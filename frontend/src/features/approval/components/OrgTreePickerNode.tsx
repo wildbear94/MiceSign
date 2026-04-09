@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +32,13 @@ export default function OrgTreePickerNode({
   const { t } = useTranslation('approval');
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [selectedTypes, setSelectedTypes] = useState<Record<number, ApprovalLineType>>({});
+
+  // Sync expanded state when search causes defaultExpanded to change
+  useEffect(() => {
+    if (defaultExpanded) {
+      setExpanded(true);
+    }
+  }, [defaultExpanded]);
 
   const hasChildren = node.children.length > 0;
 
