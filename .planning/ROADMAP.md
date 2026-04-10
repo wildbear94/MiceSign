@@ -145,10 +145,11 @@ Plans:
   2. User sees their recent documents with current status on the dashboard
   3. Badge counts display for pending approvals, in-progress drafts, and completed documents
   4. All document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file operations, admin edits) are recorded in immutable audit log entries
-**Plans:** 2 plans
+**Plans:** 3 plans
 Plans:
-- [ ] 08-01-PLAN.md — Dashboard verification (DASH-01/02/03) + audit log gap-filling for admin services (AUD-01)
-- [ ] 08-02-PLAN.md — Template management admin page with activate/deactivate toggle, sidebar + routing
+- [x] 08-01-PLAN.md — Dashboard verification (DASH-01/02/03) + audit log gap-filling for admin services (AUD-01)
+- [x] 08-02-PLAN.md — Template management admin page with activate/deactivate toggle, sidebar + routing
+- [ ] 08-03-PLAN.md — Gap closure: USER_LOGIN/USER_LOGOUT audit logging in AuthService (AUD-01)
 **UI hint**: yes
 
 ## Progress
@@ -165,4 +166,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. File Attachments | 0/3 | Planning complete | - |
 | 6. Document Submission & Numbering | 0/TBD | Not started | - |
 | 7. Approval Workflow | 0/4 | Planning complete | - |
-| 8. Dashboard & Audit | 0/2 | Planning complete | - |
+| 8. Dashboard & Audit | 2/3 | In Progress | - |
