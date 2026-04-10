@@ -66,9 +66,30 @@
       "RETIRED": "퇴사"
     }
   },
+  "templates": {
+    "title": "양식 관리",
+    "code": "코드",
+    "name": "이름",
+    "description": "설명",
+    "prefix": "접두어",
+    "status": "상태",
+    "active": "활성",
+    "inactive": "비활성",
+    "confirmDeactivate": "{{name}} 양식을 비활성화하시겠습니까?",
+    "confirmDeactivateDesc": "비활성화된 양식은 새 문서 작성 시 선택할 수 없습니다.",
+    "confirmActivate": "{{name}} 양식을 활성화하시겠습니까?",
+    "deactivateButton": "비활성화",
+    "activateButton": "활성화",
+    "emptyTitle": "등록된 양식이 없습니다",
+    "emptyBody": "양식은 시스템에 의해 관리됩니다.",
+    "toggleError": "양식 상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "activatedSuccess": "양식이 활성화되었습니다",
+    "deactivatedSuccess": "양식이 비활성화되었습니다"
+  },
   "sidebar": {
     "departments": "부서 관리",
     "positions": "직급 관리",
+    "templates": "양식 관리",
     "users": "사용자 관리"
   },
   "common": {
