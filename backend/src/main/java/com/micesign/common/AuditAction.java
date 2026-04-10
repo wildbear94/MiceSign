@@ -16,6 +16,7 @@ public final class AuditAction {
     public static final String DOC_APPROVE = "DOC_APPROVE";
     public static final String DOC_REJECT = "DOC_REJECT";
     public static final String DOC_WITHDRAW = "DOC_WITHDRAW";
+    public static final String DOC_UPDATE = "DOC_UPDATE";
     public static final String DOC_VIEW = "DOC_VIEW";
 
     // File operations

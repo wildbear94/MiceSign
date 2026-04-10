@@ -58,8 +58,10 @@ public class AdminTemplateController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deactivateTemplate(@PathVariable Long id) {
-        templateService.deactivateTemplate(id);
+    public ResponseEntity<ApiResponse<Void>> deactivateTemplate(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        templateService.deactivateTemplate(id, user.getUserId());
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

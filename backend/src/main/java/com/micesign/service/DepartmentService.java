@@ -1,5 +1,6 @@
 package com.micesign.service;
 
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.Department;
 import com.micesign.domain.User;
@@ -11,6 +12,7 @@ import com.micesign.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,13 +23,16 @@ public class DepartmentService {
     private final DepartmentRepository departmentRepository;
     private final UserRepository userRepository;
     private final DepartmentMapper departmentMapper;
+    private final AuditLogService auditLogService;
 
     public DepartmentService(DepartmentRepository departmentRepository,
                              UserRepository userRepository,
-                             DepartmentMapper departmentMapper) {
+                             DepartmentMapper departmentMapper,
+                             AuditLogService auditLogService) {
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.departmentMapper = departmentMapper;
+        this.auditLogService = auditLogService;
     }
 
     public List<DepartmentTreeResponse> getDepartmentTree(boolean includeInactive) {
@@ -57,7 +62,7 @@ public class DepartmentService {
     }
 
     @Transactional
-    public DepartmentTreeResponse createDepartment(CreateDepartmentRequest request) {
+    public DepartmentTreeResponse createDepartment(CreateDepartmentRequest request, Long actingUserId) {
         if (departmentRepository.existsByName(request.name())) {
             throw new BusinessException("ORG_DUPLICATE_NAME", "이미 존재하는 부서명입니다.");
         }
@@ -82,11 +87,14 @@ public class DepartmentService {
 
         department = departmentRepository.save(department);
 
+        auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "DEPARTMENT", department.getId(),
+                Map.of("action", "create", "name", department.getName()));
+
         return departmentMapper.toTreeResponse(department, 0, List.of());
     }
 
     @Transactional
-    public DepartmentTreeResponse updateDepartment(Long id, UpdateDepartmentRequest request) {
+    public DepartmentTreeResponse updateDepartment(Long id, UpdateDepartmentRequest request, Long actingUserId) {
         Department department = departmentRepository.findById(id)
             .orElseThrow(() -> new BusinessException("ORG_NOT_FOUND", "부서를 찾을 수 없습니다."));
 
@@ -114,11 +122,15 @@ public class DepartmentService {
         department = departmentRepository.save(department);
 
         int memberCount = (int) userRepository.countByDepartmentIdAndStatus(id, UserStatus.ACTIVE);
+
+        auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "DEPARTMENT", department.getId(),
+                Map.of("action", "update", "name", department.getName()));
+
         return departmentMapper.toTreeResponse(department, memberCount, List.of());
     }
 
     @Transactional
-    public void deactivateDepartment(Long id) {
+    public void deactivateDepartment(Long id, Long actingUserId) {
         Department department = departmentRepository.findById(id)
             .orElseThrow(() -> new BusinessException("ORG_NOT_FOUND", "부서를 찾을 수 없습니다."));
 
@@ -128,6 +140,9 @@ public class DepartmentService {
 
         department.setActive(false);
         departmentRepository.save(department);
+
+        auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "DEPARTMENT", department.getId(),
+                Map.of("action", "deactivate", "name", department.getName()));
     }
 
     public long getUserCountByDepartment(Long departmentId) {

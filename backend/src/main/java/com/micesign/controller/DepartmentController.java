@@ -2,11 +2,13 @@ package com.micesign.controller;
 
 import com.micesign.common.dto.ApiResponse;
 import com.micesign.dto.department.*;
+import com.micesign.security.CustomUserDetails;
 import com.micesign.service.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,21 +44,25 @@ public class DepartmentController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<DepartmentTreeResponse>> createDepartment(
-            @Valid @RequestBody CreateDepartmentRequest request) {
-        DepartmentTreeResponse response = departmentService.createDepartment(request);
+            @Valid @RequestBody CreateDepartmentRequest request,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        DepartmentTreeResponse response = departmentService.createDepartment(request, user.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(response));
     }
 
     @PutMapping("/{id}")
     public ApiResponse<DepartmentTreeResponse> updateDepartment(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateDepartmentRequest request) {
-        return ApiResponse.ok(departmentService.updateDepartment(id, request));
+            @Valid @RequestBody UpdateDepartmentRequest request,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        return ApiResponse.ok(departmentService.updateDepartment(id, request, user.getUserId()));
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ApiResponse<Void> deactivateDepartment(@PathVariable Long id) {
-        departmentService.deactivateDepartment(id);
+    public ApiResponse<Void> deactivateDepartment(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        departmentService.deactivateDepartment(id, user.getUserId());
         return ApiResponse.ok(null);
     }
 }

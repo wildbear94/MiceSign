@@ -3,6 +3,7 @@ package com.micesign.service;
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.ApprovalTemplate;
 import com.micesign.domain.TemplateSchemaVersion;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,17 +34,20 @@ public class TemplateService {
     private final TemplateSchemaService schemaService;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final AuditLogService auditLogService;
 
     public TemplateService(ApprovalTemplateRepository templateRepository,
                            TemplateMapper templateMapper,
                            TemplateSchemaService schemaService,
                            UserRepository userRepository,
-                           ObjectMapper objectMapper) {
+                           ObjectMapper objectMapper,
+                           AuditLogService auditLogService) {
         this.templateRepository = templateRepository;
         this.templateMapper = templateMapper;
         this.schemaService = schemaService;
         this.userRepository = userRepository;
         this.objectMapper = objectMapper;
+        this.auditLogService = auditLogService;
     }
 
     // ──────────────────────────────────────────────
@@ -194,6 +199,9 @@ public class TemplateService {
             schemaService.updateSchema(template, schema);
         }
 
+        auditLogService.log(userId, AuditAction.ADMIN_ORG_EDIT, "TEMPLATE", template.getId(),
+                Map.of("action", "create", "code", template.getCode()));
+
         return getTemplateById(template.getId());
     }
 
@@ -241,6 +249,12 @@ public class TemplateService {
         }
 
         templateRepository.save(template);
+
+        if (userId != null) {
+            auditLogService.log(userId, AuditAction.ADMIN_ORG_EDIT, "TEMPLATE", template.getId(),
+                    Map.of("action", "update", "code", template.getCode()));
+        }
+
         return getTemplateById(template.getId());
     }
 
@@ -249,12 +263,17 @@ public class TemplateService {
     // ──────────────────────────────────────────────
 
     @Transactional
-    public void deactivateTemplate(Long id) {
+    public void deactivateTemplate(Long id, Long actingUserId) {
         ApprovalTemplate template = templateRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("TPL_NOT_FOUND",
                         "양식을 찾을 수 없습니다.", 404));
         template.setActive(false);
         templateRepository.save(template);
+
+        if (actingUserId != null) {
+            auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "TEMPLATE", template.getId(),
+                    Map.of("action", "deactivate", "code", template.getCode()));
+        }
     }
 
     // ──────────────────────────────────────────────

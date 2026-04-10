@@ -1,5 +1,6 @@
 package com.micesign.service;
 
+import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.User;
 import com.micesign.domain.enums.UserRole;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 @Service
 @Transactional(readOnly = true)
 public class UserManagementService {
@@ -27,17 +30,20 @@ public class UserManagementService {
     private final PositionRepository positionRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     public UserManagementService(UserRepository userRepository,
                                   DepartmentRepository departmentRepository,
                                   PositionRepository positionRepository,
                                   UserMapper userMapper,
-                                  PasswordEncoder passwordEncoder) {
+                                  PasswordEncoder passwordEncoder,
+                                  AuditLogService auditLogService) {
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.positionRepository = positionRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.auditLogService = auditLogService;
     }
 
     public Page<UserListResponse> getUsers(String keyword, Long departmentId,
@@ -93,6 +99,10 @@ public class UserManagementService {
         user.setMustChangePassword(true);
 
         user = userRepository.save(user);
+
+        auditLogService.log(currentUser.getUserId(), AuditAction.ADMIN_USER_EDIT, "USER", user.getId(),
+                Map.of("action", "create", "email", user.getEmail(), "name", user.getName()));
+
         return userMapper.toDetailResponse(user);
     }
 
@@ -149,6 +159,10 @@ public class UserManagementService {
         user.setPhone(request.phone());
 
         user = userRepository.save(user);
+
+        auditLogService.log(currentUser.getUserId(), AuditAction.ADMIN_USER_EDIT, "USER", user.getId(),
+                Map.of("action", "update", "email", user.getEmail()));
+
         return userMapper.toDetailResponse(user);
     }
 
@@ -179,5 +193,8 @@ public class UserManagementService {
 
         user.setStatus(UserStatus.INACTIVE);
         userRepository.save(user);
+
+        auditLogService.log(currentUser.getUserId(), AuditAction.ADMIN_USER_EDIT, "USER", user.getId(),
+                Map.of("action", "deactivate", "email", user.getEmail()));
     }
 }
