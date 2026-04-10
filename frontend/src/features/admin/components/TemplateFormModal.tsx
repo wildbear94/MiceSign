@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,9 +6,11 @@ import { X, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
-import { useCreateTemplate, useUpdateTemplate } from '../hooks/useTemplates';
+import { useCreateTemplate, useUpdateTemplate, useTemplateDetail } from '../hooks/useTemplates';
 import type { TemplateListItem } from '../api/templateApi';
 import type { ApiResponse } from '../../../types/api';
+import SchemaFieldEditor from './SchemaFieldEditor';
+import type { SchemaField } from './SchemaFieldEditor';
 
 const templateSchema = z.object({
   name: z.string().min(1, '양식 이름을 입력해주세요.').max(100),
@@ -37,7 +39,9 @@ export default function TemplateFormModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   const createMutation = useCreateTemplate();
   const updateMutation = useUpdateTemplate();
+  const detailQuery = useTemplateDetail(editingTemplate?.id ?? null);
   const isEdit = !!editingTemplate;
+  const [schemaFields, setSchemaFields] = useState<SchemaField[]>([]);
 
   const {
     register,
@@ -63,9 +67,25 @@ export default function TemplateFormModal({
         });
       } else {
         reset({ name: '', description: '', prefix: '', category: '', icon: '' });
+        setSchemaFields([]);
       }
     }
   }, [open, editingTemplate, reset]);
+
+  // Load schema from detail query when editing
+  useEffect(() => {
+    if (!open || !editingTemplate) return;
+    if (detailQuery.data?.schemaDefinition) {
+      try {
+        const schema = JSON.parse(detailQuery.data.schemaDefinition);
+        setSchemaFields(schema.fields || []);
+      } catch {
+        setSchemaFields([]);
+      }
+    } else if (detailQuery.data && !detailQuery.data.schemaDefinition) {
+      setSchemaFields([]);
+    }
+  }, [open, editingTemplate, detailQuery.data]);
 
   // Focus trap + escape
   useEffect(() => {
@@ -86,6 +106,13 @@ export default function TemplateFormModal({
   if (!open) return null;
 
   const onSubmit = async (data: TemplateFormData) => {
+    const schemaDefinition = JSON.stringify({
+      version: 1,
+      fields: schemaFields,
+      conditionalRules: [],
+      calculationRules: [],
+    });
+
     try {
       if (isEdit && editingTemplate) {
         await updateMutation.mutateAsync({
@@ -95,6 +122,7 @@ export default function TemplateFormModal({
             description: data.description || undefined,
             category: data.category || undefined,
             icon: data.icon || undefined,
+            schemaDefinition,
           },
         });
         toast.success(t('toast.templateUpdated'));
@@ -105,6 +133,7 @@ export default function TemplateFormModal({
           prefix: data.prefix,
           category: data.category || undefined,
           icon: data.icon || undefined,
+          schemaDefinition,
         });
         toast.success(t('toast.templateCreated'));
       }
@@ -138,7 +167,7 @@ export default function TemplateFormModal({
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 w-full max-w-[480px] mx-4"
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto"
       >
         {/* Close button */}
         <button
@@ -238,6 +267,16 @@ export default function TemplateFormModal({
               <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.icon.message}</p>
             )}
           </div>
+
+          {/* Schema field editor */}
+          <hr className="border-gray-200 dark:border-gray-700" />
+          {isEdit && detailQuery.isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+            </div>
+          ) : (
+            <SchemaFieldEditor fields={schemaFields} onChange={setSchemaFields} />
+          )}
 
           {/* Action buttons */}
           <div className="flex gap-3 pt-2">
