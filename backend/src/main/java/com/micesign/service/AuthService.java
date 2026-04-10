@@ -111,7 +111,9 @@ public class AuthService {
         loginAudit.setAction(AuditAction.USER_LOGIN);
         loginAudit.setTargetType("USER");
         loginAudit.setTargetId(user.getId());
-        loginAudit.setDetail("{\"email\":\"" + user.getEmail() + "\",\"deviceInfo\":\"" + (deviceInfo != null ? deviceInfo.replace("\"", "\\\"") : "") + "\"}");
+        String safeEmail = user.getEmail().replace("\\", "\\\\").replace("\"", "\\\"");
+        String safeDevice = deviceInfo != null ? deviceInfo.replace("\\", "\\\\").replace("\"", "\\\"") : "";
+        loginAudit.setDetail("{\"email\":\"" + safeEmail + "\",\"deviceInfo\":\"" + safeDevice + "\"}");
         auditLogRepository.save(loginAudit);
 
         // 6. Generate tokens
