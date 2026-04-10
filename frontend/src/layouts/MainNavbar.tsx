@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut, Settings, ClipboardCheck, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import apiClient from '../api/client';
 
@@ -39,6 +39,32 @@ export default function MainNavbar() {
           }
         >
           내 문서
+        </NavLink>
+        <NavLink
+          to="/approvals/pending"
+          className={({ isActive }) =>
+            `px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              isActive
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`
+          }
+        >
+          <ClipboardCheck className="h-4 w-4" />
+          결재 대기
+        </NavLink>
+        <NavLink
+          to="/approvals/completed"
+          className={({ isActive }) =>
+            `px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              isActive
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`
+          }
+        >
+          <CheckCircle className="h-4 w-4" />
+          완료된 문서
         </NavLink>
         {isAdmin && (
           <NavLink

@@ -12,6 +12,8 @@ import UserDetailPage from './features/admin/pages/UserDetailPage';
 import DocumentListPage from './features/document/pages/DocumentListPage';
 import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
 import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
+import PendingApprovalsPage from './features/approval/pages/PendingApprovalsPage';
+import CompletedDocumentsPage from './features/approval/pages/CompletedDocumentsPage';
 import LoginPage from './features/auth/pages/LoginPage';
 import ChangePasswordPage from './features/auth/pages/ChangePasswordPage';
 import { useAuthStore } from './stores/authStore';
@@ -62,6 +64,8 @@ function App() {
           <Route path="/documents/my" element={<DocumentListPage />} />
           <Route path="/documents/new/:templateCode" element={<DocumentEditorPage />} />
           <Route path="/documents/:id" element={<DocumentDetailPage />} />
+          <Route path="/approvals/pending" element={<PendingApprovalsPage />} />
+          <Route path="/approvals/completed" element={<CompletedDocumentsPage />} />
         </Route>
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
