@@ -55,6 +55,26 @@ public class AuditLogService {
     }
 
     /**
+     * Create an audit log entry without details.
+     */
+    public void log(Long userId, String action, String targetType, Long targetId) {
+        log(userId, action, targetType, targetId, (Map<String, Object>) null);
+    }
+
+    /**
+     * Create an audit log entry with a pre-serialized JSON string for details.
+     */
+    public void log(Long userId, String action, String targetType, Long targetId, String detailsJson) {
+        AuditLog auditLog = new AuditLog();
+        auditLog.setUserId(userId);
+        auditLog.setAction(action);
+        auditLog.setTargetType(targetType);
+        auditLog.setTargetId(targetId);
+        auditLog.setDetail(detailsJson);
+        auditLogRepository.save(auditLog);
+    }
+
+    /**
      * Search audit logs with filters, returning responses with user names resolved.
      * Eliminates N+1 by batch-loading all users for the result page.
      */

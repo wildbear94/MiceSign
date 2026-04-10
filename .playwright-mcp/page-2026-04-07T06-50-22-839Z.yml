@@ -1,0 +1,47 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - navigation [ref=e5]:
+      - link "부서 관리" [ref=e6] [cursor=pointer]:
+        - /url: /admin/departments
+        - img [ref=e7]
+      - link "직급 관리" [ref=e11] [cursor=pointer]:
+        - /url: /admin/positions
+        - img [ref=e12]
+      - link "사용자 관리" [ref=e15] [cursor=pointer]:
+        - /url: /admin/users
+        - img [ref=e16]
+      - link "sidebar.templates" [ref=e21] [cursor=pointer]:
+        - /url: /admin/templates
+        - img [ref=e22]
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - heading "감사 로그" [level=1] [ref=e30]
+        - paragraph [ref=e31]: 시스템의 모든 주요 활동 기록을 확인합니다.
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - generic [ref=e35]: 행동
+            - combobox [ref=e36]:
+              - option "전체" [selected]
+              - option "LOGIN"
+              - option "LOGOUT"
+              - option "DOCUMENT_CREATE"
+              - option "DOCUMENT_SUBMIT"
+              - option "DOCUMENT_APPROVE"
+              - option "DOCUMENT_REJECT"
+              - option "DOCUMENT_WITHDRAW"
+              - option "USER_CREATE"
+              - option "USER_UPDATE"
+          - generic [ref=e37]:
+            - generic [ref=e38]: 사용자 ID
+            - spinbutton [ref=e39]
+          - generic [ref=e40]:
+            - generic [ref=e41]: 시작일
+            - textbox [ref=e42]
+          - generic [ref=e43]:
+            - generic [ref=e44]: 종료일
+            - textbox [ref=e45]
+        - generic [ref=e46]:
+          - button "초기화" [ref=e47] [cursor=pointer]
+          - button "검색" [ref=e48] [cursor=pointer]

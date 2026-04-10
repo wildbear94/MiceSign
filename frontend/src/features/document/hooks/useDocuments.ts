@@ -54,3 +54,39 @@ export function useDeleteDocument() {
     },
   });
 }
+
+export function useSubmitDocument() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      documentApi.submit(id).then((res) => res.data.data!),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['documents', id] });
+    },
+  });
+}
+
+export function useWithdrawDocument() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      documentApi.withdraw(id).then((res) => res.data.data!),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['documents', id] });
+      queryClient.invalidateQueries({ queryKey: ['approvals'] });
+    },
+  });
+}
+
+export function useRewriteDocument() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) =>
+      documentApi.rewrite(id).then((res) => res.data.data!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    },
+  });
+}

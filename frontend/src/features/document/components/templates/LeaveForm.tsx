@@ -255,9 +255,9 @@ export default function LeaveForm({
           readOnly={readOnly}
         />
       ) : (
-        <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
+        <p className="text-sm text-gray-400 text-center py-4">
           문서를 저장한 후 파일을 첨부할 수 있습니다.
-        </div>
+        </p>
       )}
     </form>
   );

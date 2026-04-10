@@ -1,0 +1,30 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "MiceSign" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - navigation [ref=e6]:
+      - link "대시보드" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - link "내 문서" [ref=e8] [cursor=pointer]:
+        - /url: /documents/my
+      - link "결재 대기" [ref=e9] [cursor=pointer]:
+        - /url: /approvals/pending
+      - link "완료된 문서" [ref=e10] [cursor=pointer]:
+        - /url: /approvals/completed
+      - link "관리" [ref=e11] [cursor=pointer]:
+        - /url: /admin/departments
+        - img [ref=e12]
+        - text: 관리
+    - generic [ref=e15]:
+      - generic [ref=e16]: 시스템관리자
+      - button "로그아웃" [ref=e17] [cursor=pointer]:
+        - img [ref=e18]
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - heading "처리 완료 문서" [level=1] [ref=e24]
+        - paragraph [ref=e25]: 내가 결재 처리한 문서 목록입니다.
+      - generic [ref=e26]:
+        - img [ref=e27]
+        - paragraph [ref=e30]: 완료된 문서가 없습니다
+        - paragraph [ref=e31]: 결재를 처리하면 여기에 표시됩니다.

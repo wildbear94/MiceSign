@@ -1,12 +1,14 @@
 import { NavLink, useNavigate } from 'react-router';
-import { LogOut, Settings, ClipboardCheck, CheckCircle, LayoutDashboard } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
+import { useDashboardSummary } from '../features/dashboard/hooks/useDashboard';
 import apiClient from '../api/client';
 
 export default function MainNavbar() {
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
+  const { data: summary } = useDashboardSummary();
 
   const handleLogout = async () => {
     try {
@@ -32,14 +34,13 @@ export default function MainNavbar() {
           to="/"
           end
           className={({ isActive }) =>
-            `px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+            `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`
           }
         >
-          <LayoutDashboard className="h-4 w-4" />
           대시보드
         </NavLink>
         <NavLink
@@ -57,27 +58,33 @@ export default function MainNavbar() {
         <NavLink
           to="/approvals/pending"
           className={({ isActive }) =>
-            `px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+            `relative px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`
           }
+          {...(summary && summary.pendingCount > 0
+            ? { 'aria-label': `결재 대기 ${summary.pendingCount}건` }
+            : {})}
         >
-          <ClipboardCheck className="h-4 w-4" />
           결재 대기
+          {summary && summary.pendingCount > 0 && (
+            <span className="absolute -top-1 -right-3 bg-red-500 text-white text-xs font-normal rounded-full h-5 min-w-[20px] flex items-center justify-center px-1">
+              {summary.pendingCount > 99 ? '99+' : summary.pendingCount}
+            </span>
+          )}
         </NavLink>
         <NavLink
           to="/approvals/completed"
           className={({ isActive }) =>
-            `px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+            `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isActive
                 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`
           }
         >
-          <CheckCircle className="h-4 w-4" />
           완료된 문서
         </NavLink>
         {isAdmin && (

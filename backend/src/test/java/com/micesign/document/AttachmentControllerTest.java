@@ -51,6 +51,7 @@ class AttachmentControllerTest {
     @BeforeEach
     void setUp() {
         // Clean data (order matters due to FK constraints)
+        jdbcTemplate.update("DELETE FROM approval_line");
         jdbcTemplate.update("DELETE FROM document_attachment");
         jdbcTemplate.update("DELETE FROM document_content");
         jdbcTemplate.update("DELETE FROM document");

@@ -1,0 +1,53 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - navigation [ref=e5]:
+      - link "부서 관리" [ref=e6] [cursor=pointer]:
+        - /url: /admin/departments
+        - img [ref=e7]
+      - link "직급 관리" [ref=e11] [cursor=pointer]:
+        - /url: /admin/positions
+        - img [ref=e12]
+      - link "사용자 관리" [ref=e15] [cursor=pointer]:
+        - /url: /admin/users
+        - img [ref=e16]
+      - link "양식 관리" [ref=e21] [cursor=pointer]:
+        - /url: /admin/templates
+        - img [ref=e22]
+      - link "감사 로그" [ref=e26] [cursor=pointer]:
+        - /url: /admin/audit-logs
+        - img [ref=e27]
+      - link "알림 로그" [ref=e30] [cursor=pointer]:
+        - /url: /admin/notifications
+        - img [ref=e31]
+  - main [ref=e35]:
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - heading "알림 로그" [level=1] [ref=e38]
+        - paragraph [ref=e39]: 이메일 알림 발송 내역을 확인하고 실패한 알림을 재발송합니다.
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43]: 상태
+            - combobox [ref=e44]:
+              - option "전체" [selected]
+              - option "대기중"
+              - option "발송완료"
+              - option "실패"
+          - generic [ref=e45]:
+            - generic [ref=e46]: 이벤트
+            - combobox [ref=e47]:
+              - option "전체" [selected]
+              - option "APPROVAL_REQUESTED"
+              - option "DOCUMENT_APPROVED"
+              - option "DOCUMENT_REJECTED"
+              - option "DOCUMENT_WITHDRAWN"
+              - option "REFERENCE_ADDED"
+          - generic [ref=e48]:
+            - generic [ref=e49]: 시작일
+            - textbox [ref=e50]
+          - generic [ref=e51]:
+            - generic [ref=e52]: 종료일
+            - textbox [ref=e53]
+        - generic [ref=e54]:
+          - button "초기화" [ref=e55] [cursor=pointer]
+          - button "검색" [ref=e56] [cursor=pointer]

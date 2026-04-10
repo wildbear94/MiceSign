@@ -1,0 +1,67 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - link "MiceSign" [ref=e5] [cursor=pointer]:
+      - /url: /
+    - navigation [ref=e6]:
+      - link "대시보드" [ref=e7] [cursor=pointer]:
+        - /url: /
+      - link "내 문서" [ref=e8] [cursor=pointer]:
+        - /url: /documents/my
+      - link "결재 대기" [ref=e9] [cursor=pointer]:
+        - /url: /approvals/pending
+      - link "완료된 문서" [ref=e10] [cursor=pointer]:
+        - /url: /approvals/completed
+      - link "관리" [ref=e11] [cursor=pointer]:
+        - /url: /admin/departments
+        - img [ref=e12]
+        - text: 관리
+    - generic [ref=e15]:
+      - generic [ref=e16]: 시스템관리자
+      - button "로그아웃" [ref=e17] [cursor=pointer]:
+        - img [ref=e18]
+  - main [ref=e21]:
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - heading "내 문서" [level=1] [ref=e24]
+        - button "새 문서 작성" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+          - text: 새 문서 작성
+      - generic [ref=e28]:
+        - button "전체" [ref=e29] [cursor=pointer]: 전체
+        - button "부서" [ref=e31] [cursor=pointer]
+        - button "전체 (관리자)" [ref=e32] [cursor=pointer]
+      - generic [ref=e34]:
+        - button "전체" [ref=e35] [cursor=pointer]: 전체
+        - button "임시저장" [ref=e37] [cursor=pointer]
+        - button "상신중" [ref=e38] [cursor=pointer]
+        - button "승인" [ref=e39] [cursor=pointer]
+        - button "반려" [ref=e40] [cursor=pointer]
+        - button "회수" [ref=e41] [cursor=pointer]
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - img [ref=e45]
+          - textbox "문서 제목, 문서번호로 검색..." [ref=e48]
+        - generic [ref=e49]:
+          - combobox [ref=e50]:
+            - option "전체" [selected]
+            - option "임시저장"
+            - option "상신"
+            - option "승인"
+            - option "반려"
+            - option "회수"
+          - combobox [ref=e51]:
+            - option "모든 양식" [selected]
+            - option "행사비 지출 기안"
+            - option "일반 업무 기안"
+            - option "지출 결의서"
+            - option "휴가 신청서"
+            - option "구매 요청서"
+            - option "출장 보고서"
+            - option "연장 근무 신청서"
+          - textbox [ref=e52]
+          - generic [ref=e53]: ~
+          - textbox [ref=e54]
+      - generic [ref=e55]:
+        - img [ref=e56]
+        - paragraph [ref=e59]: 문서가 없습니다
+        - paragraph [ref=e60]: 새 문서를 작성하여 시작해보세요.

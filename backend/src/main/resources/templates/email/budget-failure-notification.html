@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+</head>
+<body style="font-family: 'Malgun Gothic', sans-serif; padding: 20px;">
+    <h2 style="color: #dc2626;">예산 시스템 연동 실패 알림</h2>
+    <table style="border-collapse: collapse; width: 100%; max-width: 600px;">
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">문서번호</td>
+            <td style="padding: 8px; border: 1px solid #ddd;" th:text="${docNumber}">-</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">양식코드</td>
+            <td style="padding: 8px; border: 1px solid #ddd;" th:text="${templateCode}">-</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">오류 내용</td>
+            <td style="padding: 8px; border: 1px solid #ddd; color: #dc2626;" th:text="${errorMessage}">-</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background: #f9f9f9; font-weight: bold;">발생 시각</td>
+            <td style="padding: 8px; border: 1px solid #ddd;" th:text="${timestamp}">-</td>
+        </tr>
+    </table>
+    <p style="margin-top: 16px; color: #666;">이 알림은 MiceSign 시스템에서 자동 발송되었습니다.</p>
+</body>
+</html>

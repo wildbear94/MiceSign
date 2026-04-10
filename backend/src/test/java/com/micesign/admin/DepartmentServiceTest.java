@@ -8,6 +8,7 @@ import com.micesign.dto.department.UpdateDepartmentRequest;
 import com.micesign.mapper.DepartmentMapper;
 import com.micesign.repository.DepartmentRepository;
 import com.micesign.repository.UserRepository;
+import com.micesign.service.AuditLogService;
 import com.micesign.service.DepartmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,12 +29,13 @@ class DepartmentServiceTest {
     @Mock DepartmentRepository departmentRepository;
     @Mock UserRepository userRepository;
     @Mock DepartmentMapper departmentMapper;
+    @Mock AuditLogService auditLogService;
 
     DepartmentService departmentService;
 
     @BeforeEach
     void setUp() {
-        departmentService = new DepartmentService(departmentRepository, userRepository, departmentMapper);
+        departmentService = new DepartmentService(departmentRepository, userRepository, departmentMapper, auditLogService);
     }
 
     @Test
@@ -75,7 +77,7 @@ class DepartmentServiceTest {
         when(departmentRepository.findById(1L)).thenReturn(Optional.of(root));
 
         CreateDepartmentRequest request = new CreateDepartmentRequest("NewDept", 3L, 0);
-        assertThatThrownBy(() -> departmentService.createDepartment(request))
+        assertThatThrownBy(() -> departmentService.createDepartment(request, 1L))
             .isInstanceOf(BusinessException.class)
             .hasFieldOrPropertyWithValue("code", "ORG_DEPTH_EXCEEDED");
     }
@@ -91,7 +93,7 @@ class DepartmentServiceTest {
         when(departmentRepository.findById(2L)).thenReturn(Optional.of(dept2));
 
         UpdateDepartmentRequest request = new UpdateDepartmentRequest("Dept1", 2L, 0);
-        assertThatThrownBy(() -> departmentService.updateDepartment(1L, request))
+        assertThatThrownBy(() -> departmentService.updateDepartment(1L, request, 1L))
             .isInstanceOf(BusinessException.class)
             .hasFieldOrPropertyWithValue("code", "ORG_CIRCULAR_REF");
     }
@@ -102,7 +104,7 @@ class DepartmentServiceTest {
         when(departmentRepository.findById(1L)).thenReturn(Optional.of(dept));
         when(departmentRepository.existsByParentIdAndIsActiveTrue(1L)).thenReturn(true);
 
-        assertThatThrownBy(() -> departmentService.deactivateDepartment(1L))
+        assertThatThrownBy(() -> departmentService.deactivateDepartment(1L, 1L))
             .isInstanceOf(BusinessException.class)
             .hasFieldOrPropertyWithValue("code", "ORG_HAS_ACTIVE_CHILDREN");
     }

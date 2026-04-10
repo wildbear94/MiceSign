@@ -21,6 +21,9 @@ public class Document {
     @Column(name = "title", nullable = false, length = 300)
     private String title;
 
+    @Column(name = "drafter_id", nullable = false, insertable = false, updatable = false)
+    private Long drafterId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drafter_id", nullable = false)
     private User drafter;
@@ -40,6 +43,10 @@ public class Document {
 
     @Column(name = "source_doc_id")
     private Long sourceDocId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_doc_id", insertable = false, updatable = false)
+    private Document sourceDocument;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -92,6 +99,10 @@ public class Document {
         this.title = title;
     }
 
+    public Long getDrafterId() {
+        return drafterId;
+    }
+
     public User getDrafter() {
         return drafter;
     }
@@ -138,6 +149,14 @@ public class Document {
 
     public void setSourceDocId(Long sourceDocId) {
         this.sourceDocId = sourceDocId;
+    }
+
+    public Document getSourceDocument() {
+        return sourceDocument;
+    }
+
+    public void setSourceDocument(Document sourceDocument) {
+        this.sourceDocument = sourceDocument;
     }
 
     public LocalDateTime getCreatedAt() {

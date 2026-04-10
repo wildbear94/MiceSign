@@ -9,6 +9,11 @@ public record DocumentResponse(
     String templateName,
     String title,
     String status,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    String drafterName,
+    String departmentName,
+    String positionName,
+    Long drafterId,
+    LocalDateTime submittedAt,
+    LocalDateTime completedAt,
+    LocalDateTime createdAt
 ) {}
