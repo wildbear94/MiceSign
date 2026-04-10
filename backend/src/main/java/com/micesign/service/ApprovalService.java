@@ -40,26 +40,12 @@ public class ApprovalService {
 
     /**
      * Returns approval lines pending the user's action.
-     * Currently returns empty page — full implementation in Phase 7.
+     * Stub — full implementation with PendingApprovalResponse in Phase 7.
      */
     public Page<?> getPendingApprovals(Long userId, Pageable pageable) {
-        // Find approval lines where this user is the approver and status is PENDING
-        List<ApprovalLine> pendingLines = approvalLineRepository.findByApproverIdAndStatusIn(
-                userId, List.of(ApprovalLineStatus.PENDING));
-
-        if (pendingLines.isEmpty()) {
-            return Page.empty(pageable);
-        }
-
-        // TODO: Phase 7 will return PendingApprovalResponse with document details
-        // For now, return the pending lines as-is so the endpoint doesn't error
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), pendingLines.size());
-        if (start >= pendingLines.size()) {
-            return Page.empty(pageable);
-        }
-        return new org.springframework.data.domain.PageImpl<>(
-                pendingLines.subList(start, end), pageable, pendingLines.size());
+        // Phase 7 will query pending approval lines and map to PendingApprovalResponse DTO.
+        // For now, return empty page to avoid LazyInitializationException from raw entities.
+        return Page.empty(pageable);
     }
 
     /**
