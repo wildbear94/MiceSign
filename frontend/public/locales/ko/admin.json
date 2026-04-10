@@ -117,7 +117,8 @@
       "date": "날짜",
       "select": "선택",
       "staticText": "고정 텍스트",
-      "hidden": "숨김 필드"
+      "hidden": "숨김 필드",
+      "table": "테이블"
     },
     "emptyTitle": "등록된 양식이 없습니다",
     "emptyBody": "양식은 시스템에 의해 관리됩니다.",

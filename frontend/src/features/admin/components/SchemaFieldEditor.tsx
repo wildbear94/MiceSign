@@ -12,6 +12,8 @@ import {
   Trash2,
   Plus,
   ChevronRight,
+  Table,
+  HelpCircle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -24,7 +26,8 @@ export type SchemaFieldType =
   | 'date'
   | 'select'
   | 'staticText'
-  | 'hidden';
+  | 'hidden'
+  | 'table';
 
 export interface SchemaFieldConfig {
   placeholder?: string;
@@ -64,7 +67,10 @@ const FIELD_TYPE_META: Record<
   select: { icon: List, color: 'text-purple-700 dark:text-purple-300', bgColor: 'bg-purple-100 dark:bg-purple-900/40' },
   staticText: { icon: FileText, color: 'text-gray-700 dark:text-gray-300', bgColor: 'bg-gray-100 dark:bg-gray-700' },
   hidden: { icon: EyeOff, color: 'text-rose-700 dark:text-rose-300', bgColor: 'bg-rose-100 dark:bg-rose-900/40' },
+  table: { icon: Table, color: 'text-teal-700 dark:text-teal-300', bgColor: 'bg-teal-100 dark:bg-teal-900/40' },
 };
+
+const FALLBACK_TYPE_META = { icon: HelpCircle, color: 'text-gray-700 dark:text-gray-300', bgColor: 'bg-gray-100 dark:bg-gray-700' };
 
 const FIELD_TYPES: SchemaFieldType[] = [
   'text',
@@ -91,7 +97,7 @@ function toFieldId(label: string): string {
 
 function TypeBadge({ type }: { type: SchemaFieldType }) {
   const { t } = useTranslation('admin');
-  const meta = FIELD_TYPE_META[type];
+  const meta = FIELD_TYPE_META[type] || FALLBACK_TYPE_META;
   const Icon = meta.icon;
   return (
     <span
@@ -540,7 +546,7 @@ export default function SchemaFieldEditor({ fields, onChange }: SchemaFieldEdito
           {dropdownOpen && (
             <div className="absolute right-0 top-full mt-1 z-10 w-56 border border-gray-200 dark:border-gray-700 shadow-lg rounded-lg bg-white dark:bg-gray-800 py-1">
               {FIELD_TYPES.map((type) => {
-                const meta = FIELD_TYPE_META[type];
+                const meta = FIELD_TYPE_META[type] || FALLBACK_TYPE_META;
                 const Icon = meta.icon;
                 return (
                   <button

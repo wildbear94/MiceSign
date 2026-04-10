@@ -117,7 +117,8 @@
       "date": "Date",
       "select": "Select",
       "staticText": "Static Text",
-      "hidden": "Hidden Field"
+      "hidden": "Hidden Field",
+      "table": "Table"
     },
     "emptyTitle": "No templates registered",
     "emptyBody": "Templates are managed by the system.",
