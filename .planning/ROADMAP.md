@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Document Submission & Numbering** - Submit workflow, document immutability, concurrent-safe numbering
 - [ ] **Phase 7: Approval Workflow** - Approval line editor, sequential processing, approve/reject, withdrawal, resubmission
 - [ ] **Phase 8: Dashboard & Audit** - Pending approvals list, recent documents, badge counts, audit trail logging
+- [ ] **Phase 9: Integration Gap Closure** - Cross-phase wiring fixes from v1.0 milestone audit
 
 ## Phase Details
 
@@ -152,18 +153,34 @@ Plans:
 - [x] 08-03-PLAN.md — Gap closure: USER_LOGIN/USER_LOGOUT audit logging in AuthService (AUD-01)
 **UI hint**: yes
 
+### Phase 9: Integration Gap Closure
+**Goal**: Fix cross-phase wiring issues discovered during v1.0 milestone audit — restore core approval workflow for USER role, align frontend/backend type contracts, and complete audit trail coverage
+**Depends on**: Phase 8
+**Requirements**: APR-01, DASH-01, AUD-01
+**Gap Closure**: Closes gaps from v1.0-MILESTONE-AUDIT.md
+**Success Criteria** (what must be TRUE):
+  1. USER-role employee can open OrgTreePickerModal and see the full department/user tree (no 403)
+  2. Pending approvals list renders correct dates and department names (no "Invalid Date")
+  3. "완료된 문서" page returns documents the user approved, not documents the user drafted
+  4. rewriteDocument() (재기안) creates an audit log entry
+  5. AuditLogController uses AuditLogService.search() instead of direct repository access
+  6. ADMIN role cannot navigate to /admin/registrations (frontend sidebar hides menu)
+**Plans:** 0/TBD
+Plans:
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
-| 2. Authentication | 0/4 | Planning complete | - |
-| 3. Organization Management | 2/4 | In Progress|  |
-| 4. Document Core & Templates | 0/3 | Planning complete | - |
-| 5. File Attachments | 0/3 | Planning complete | - |
-| 6. Document Submission & Numbering | 0/TBD | Not started | - |
-| 7. Approval Workflow | 0/4 | Planning complete | - |
-| 8. Dashboard & Audit | 2/3 | In Progress | - |
+| 2. Authentication | 4/4 | Complete | 2026-04-01 |
+| 3. Organization Management | 5/5 | Complete | 2026-04-02 |
+| 4. Document Core & Templates | 3/3 | Complete | 2026-04-02 |
+| 5. File Attachments | 4/4 | Complete | 2026-04-08 |
+| 6. Document Submission & Numbering | 2/2 | Complete | 2026-04-09 |
+| 7. Approval Workflow | 4/4 | Complete | 2026-04-09 |
+| 8. Dashboard & Audit | 3/3 | Complete | 2026-04-10 |
+| 9. Integration Gap Closure | 0/TBD | Not started | - |
