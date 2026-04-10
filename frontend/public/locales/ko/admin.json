@@ -80,6 +80,13 @@
     "confirmActivate": "{{name}} 양식을 활성화하시겠습니까?",
     "deactivateButton": "비활성화",
     "activateButton": "활성화",
+    "addTemplate": "양식 추가",
+    "editTemplate": "양식 수정",
+    "templateName": "양식 이름",
+    "templateDescription": "설명",
+    "templatePrefix": "문서번호 접두어",
+    "templateCategory": "카테고리",
+    "templateIcon": "아이콘",
     "emptyTitle": "등록된 양식이 없습니다",
     "emptyBody": "양식은 시스템에 의해 관리됩니다.",
     "toggleError": "양식 상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.",
@@ -125,7 +132,9 @@
     "positionReordered": "직급 순서가 변경되었습니다.",
     "userCreated": "사용자가 추가되었습니다.",
     "userUpdated": "사용자 정보가 수정되었습니다.",
-    "userDeactivated": "사용자가 비활성화되었습니다."
+    "userDeactivated": "사용자가 비활성화되었습니다.",
+    "templateCreated": "양식이 추가되었습니다.",
+    "templateUpdated": "양식 정보가 수정되었습니다."
   },
   "registration": {
     "title": "등록 신청 관리",

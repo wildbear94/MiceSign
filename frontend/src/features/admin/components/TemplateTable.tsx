@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { Pencil } from 'lucide-react';
 import { useToggleTemplate } from '../hooks/useTemplates';
 import ConfirmDialog from './ConfirmDialog';
 import type { TemplateListItem } from '../api/templateApi';
@@ -8,9 +9,10 @@ import type { TemplateListItem } from '../api/templateApi';
 interface TemplateTableProps {
   templates: TemplateListItem[];
   isLoading: boolean;
+  onEdit?: (template: TemplateListItem) => void;
 }
 
-export default function TemplateTable({ templates, isLoading }: TemplateTableProps) {
+export default function TemplateTable({ templates, isLoading, onEdit }: TemplateTableProps) {
   const { t } = useTranslation('admin');
   const toggleMutation = useToggleTemplate();
   const [confirmTarget, setConfirmTarget] = useState<TemplateListItem | null>(null);
@@ -95,6 +97,9 @@ export default function TemplateTable({ templates, isLoading }: TemplateTablePro
               <th scope="col" className="text-left text-sm font-normal text-gray-500 dark:text-gray-400 px-4 py-3">
                 {t('templates.status')}
               </th>
+              <th scope="col" className="text-left text-sm font-normal text-gray-500 dark:text-gray-400 px-4 py-3">
+                {t('common.edit')}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -146,6 +151,16 @@ export default function TemplateTable({ templates, isLoading }: TemplateTablePro
                       />
                     </div>
                   </div>
+                </td>
+                <td className="px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => onEdit?.(template)}
+                    className="text-gray-400 hover:text-blue-600 p-1 rounded transition-colors"
+                    aria-label={`${template.name} ${t('common.edit')}`}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
                 </td>
               </tr>
             ))}
