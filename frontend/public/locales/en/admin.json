@@ -87,6 +87,8 @@
     "templatePrefix": "Document Number Prefix",
     "templateCategory": "Category",
     "templateIcon": "Icon",
+    "tabInfo": "Basic Info",
+    "tabFields": "Field Configuration",
     "schemaEditor": "Field Configuration",
     "addField": "Add Field",
     "fieldLabel": "Field Label",

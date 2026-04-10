@@ -87,6 +87,8 @@
     "templatePrefix": "문서번호 접두어",
     "templateCategory": "카테고리",
     "templateIcon": "아이콘",
+    "tabInfo": "기본 정보",
+    "tabFields": "필드 구성",
     "schemaEditor": "필드 구성",
     "addField": "필드 추가",
     "fieldLabel": "필드 라벨",

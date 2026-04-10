@@ -29,6 +29,8 @@ interface TemplateFormModalProps {
   onSuccess?: () => void;
 }
 
+type TabKey = 'info' | 'fields';
+
 export default function TemplateFormModal({
   open,
   onClose,
@@ -42,6 +44,7 @@ export default function TemplateFormModal({
   const detailQuery = useTemplateDetail(editingTemplate?.id ?? null);
   const isEdit = !!editingTemplate;
   const [schemaFields, setSchemaFields] = useState<SchemaField[]>([]);
+  const [activeTab, setActiveTab] = useState<TabKey>('info');
 
   const {
     register,
@@ -69,6 +72,7 @@ export default function TemplateFormModal({
         reset({ name: '', description: '', prefix: '', category: '', icon: '' });
         setSchemaFields([]);
       }
+      setActiveTab('info');
     }
   }, [open, editingTemplate, reset]);
 
@@ -183,103 +187,130 @@ export default function TemplateFormModal({
           {isEdit ? t('templates.editTemplate') : t('templates.addTemplate')}
         </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Name */}
-          <div>
-            <label htmlFor="tpl-name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              {t('templates.templateName')}
-            </label>
-            <input
-              id="tpl-name"
-              type="text"
-              {...register('name')}
-              className={inputClassName(!!errors.name)}
-            />
-            {errors.name && (
-              <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.name.message}</p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="tpl-desc" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              {t('templates.templateDescription')}
-            </label>
-            <textarea
-              id="tpl-desc"
-              rows={3}
-              {...register('description')}
-              className={`w-full px-4 py-2 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors resize-none ${
-                errors.description ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4" role="tablist">
+          {([
+            { key: 'info' as TabKey, label: t('templates.tabInfo') },
+            { key: 'fields' as TabKey, label: t('templates.tabFields') },
+          ]).map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.key
+                  ? 'border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
-            />
-            {errors.description && (
-              <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.description.message}</p>
-            )}
-          </div>
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          {/* Prefix (create-only) */}
-          {!isEdit && (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Tab: 기본 정보 */}
+          <div className={activeTab === 'info' ? 'space-y-4' : 'hidden'}>
+            {/* Name */}
             <div>
-              <label htmlFor="tpl-prefix" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                {t('templates.templatePrefix')}
+              <label htmlFor="tpl-name" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                {t('templates.templateName')}
               </label>
               <input
-                id="tpl-prefix"
+                id="tpl-name"
                 type="text"
-                {...register('prefix')}
-                className={inputClassName(!!errors.prefix)}
+                {...register('name')}
+                className={inputClassName(!!errors.name)}
               />
-              {errors.prefix && (
-                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.prefix.message}</p>
+              {errors.name && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.name.message}</p>
               )}
             </div>
-          )}
 
-          {/* Category */}
-          <div>
-            <label htmlFor="tpl-category" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              {t('templates.templateCategory')}
-            </label>
-            <input
-              id="tpl-category"
-              type="text"
-              {...register('category')}
-              className={inputClassName(!!errors.category)}
-            />
-            {errors.category && (
-              <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.category.message}</p>
-            )}
-          </div>
-
-          {/* Icon */}
-          <div>
-            <label htmlFor="tpl-icon" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              {t('templates.templateIcon')}
-            </label>
-            <input
-              id="tpl-icon"
-              type="text"
-              {...register('icon')}
-              className={inputClassName(!!errors.icon)}
-            />
-            {errors.icon && (
-              <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.icon.message}</p>
-            )}
-          </div>
-
-          {/* Schema field editor */}
-          <hr className="border-gray-200 dark:border-gray-700" />
-          {isEdit && detailQuery.isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+            {/* Description */}
+            <div>
+              <label htmlFor="tpl-desc" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                {t('templates.templateDescription')}
+              </label>
+              <textarea
+                id="tpl-desc"
+                rows={3}
+                {...register('description')}
+                className={`w-full px-4 py-2 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors resize-none ${
+                  errors.description ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+                }`}
+              />
+              {errors.description && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.description.message}</p>
+              )}
             </div>
-          ) : (
-            <SchemaFieldEditor fields={schemaFields} onChange={setSchemaFields} />
-          )}
+
+            {/* Prefix (create-only) */}
+            {!isEdit && (
+              <div>
+                <label htmlFor="tpl-prefix" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                  {t('templates.templatePrefix')}
+                </label>
+                <input
+                  id="tpl-prefix"
+                  type="text"
+                  {...register('prefix')}
+                  className={inputClassName(!!errors.prefix)}
+                />
+                {errors.prefix && (
+                  <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.prefix.message}</p>
+                )}
+              </div>
+            )}
+
+            {/* Category */}
+            <div>
+              <label htmlFor="tpl-category" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                {t('templates.templateCategory')}
+              </label>
+              <input
+                id="tpl-category"
+                type="text"
+                {...register('category')}
+                className={inputClassName(!!errors.category)}
+              />
+              {errors.category && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.category.message}</p>
+              )}
+            </div>
+
+            {/* Icon */}
+            <div>
+              <label htmlFor="tpl-icon" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                {t('templates.templateIcon')}
+              </label>
+              <input
+                id="tpl-icon"
+                type="text"
+                {...register('icon')}
+                className={inputClassName(!!errors.icon)}
+              />
+              {errors.icon && (
+                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{errors.icon.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Tab: 필드 구성 */}
+          <div className={activeTab === 'fields' ? '' : 'hidden'}>
+            {isEdit && detailQuery.isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+              </div>
+            ) : (
+              <SchemaFieldEditor fields={schemaFields} onChange={setSchemaFields} />
+            )}
+          </div>
 
           {/* Action buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-6">
             <button
               type="button"
               onClick={onClose}
