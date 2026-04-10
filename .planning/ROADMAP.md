@@ -13,13 +13,13 @@ MiceSign delivers a self-hosted electronic approval system for ~50 employees, re
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Project Foundation** - Spring Boot + React scaffolding, database schema, seed data, dev tooling (completed 2026-03-31)
-- [ ] **Phase 2: Authentication** - JWT login/logout, token refresh, account lockout, password management
-- [ ] **Phase 3: Organization Management** - Department/position CRUD, user management, RBAC enforcement
-- [ ] **Phase 4: Document Core & Templates** - Document drafting with three form templates, draft CRUD, document viewing
-- [ ] **Phase 5: File Attachments** - Google Drive integration for upload, download, and validation
-- [ ] **Phase 6: Document Submission & Numbering** - Submit workflow, document immutability, concurrent-safe numbering
-- [ ] **Phase 7: Approval Workflow** - Approval line editor, sequential processing, approve/reject, withdrawal, resubmission
-- [ ] **Phase 8: Dashboard & Audit** - Pending approvals list, recent documents, badge counts, audit trail logging
+- [x] **Phase 2: Authentication** - JWT login/logout, token refresh, account lockout, password management (completed 2026-04-02)
+- [x] **Phase 3: Organization Management** - Department/position CRUD, user management, RBAC enforcement (completed 2026-04-03)
+- [x] **Phase 4: Document Core & Templates** - Document drafting with three form templates, draft CRUD, document viewing (completed 2026-04-05)
+- [x] **Phase 5: File Attachments** - Google Drive integration for upload, download, and validation (completed 2026-04-10)
+- [x] **Phase 6: Document Submission & Numbering** - Submit workflow, document immutability, concurrent-safe numbering (completed 2026-04-10)
+- [x] **Phase 7: Approval Workflow** - Approval line editor, sequential processing, approve/reject, withdrawal, resubmission (completed 2026-04-10)
+- [x] **Phase 8: Dashboard & Audit** - Pending approvals list, recent documents, badge counts, audit trail logging (completed 2026-04-10)
 
 ## Phase Details
 
@@ -49,7 +49,7 @@ Plans:
   3. User can log out and cannot access protected pages afterward
   4. Account locks after 5 consecutive failed login attempts and unlocks after 15 minutes
   5. User can change their own password; admin can reset another user's password
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 Plans:
 - [x] 02-01-PLAN.md — Backend JWT infrastructure: jjwt deps, V3 migration, JPA entities, SecurityConfig, AuthController/AuthService (login/refresh/logout/lockout)
 - [x] 02-02-PLAN.md — Backend password management: PasswordService/Controller + full integration test suite
@@ -65,7 +65,7 @@ Plans:
   2. Admin can create, edit, and deactivate positions with sort ordering
   3. Admin can create and manage user accounts with all required fields (employee no, name, email, department, position, role, status)
   4. SUPER_ADMIN has full access, ADMIN manages org + own dept docs, USER can draft and approve only
-**Plans:** 2/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 - [x] 03-01-PLAN.md — Backend: JPA entities, repositories, DTOs, services, controllers, RBAC logic, integration tests
 - [x] 03-02-PLAN.md — Frontend infrastructure: types, API clients, hooks, admin layout/sidebar, routing, shared components
@@ -83,7 +83,7 @@ Plans:
   3. Expense form supports item table with quantity/unit price/amount and auto-sum calculation
   4. Leave form supports leave type selection, date range, auto-calculated days, and reason
   5. User can view a list of their documents with current status and open any document's detail page
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 04-01-PLAN.md — Backend: V5 migration, JPA entities, DTOs, services, controllers, document CRUD API with form validation, integration tests
 - [x] 04-02-PLAN.md — Frontend infrastructure: Tiptap/date-fns deps, TypeScript types, API clients, hooks, Zod schemas, MainLayout/navbar, routing
@@ -98,7 +98,7 @@ Plans:
   1. User can upload files that are stored in Google Drive via Service Account
   2. User can download attachments only if they are an authorized viewer of the document
   3. System rejects uploads exceeding 50MB per file, 10 files per document, or 200MB total, and blocks disallowed extensions
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
 - [x] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
@@ -112,7 +112,7 @@ Plans:
   1. User can submit a draft document, changing its status from DRAFT to SUBMITTED
   2. Submitted document body, attachments, and approval line are fully locked and cannot be modified
   3. Document number (PREFIX-YYYY-NNNN) is assigned at submission with no duplicates under concurrent submissions
-**Plans**: TBD
+**Plans**: Complete (implemented during Phase 06/09 execution)
 
 ### Phase 7: Approval Workflow
 **Goal**: Users can build approval lines, process approvals sequentially, and handle rejections, withdrawals, and resubmissions
@@ -124,7 +124,7 @@ Plans:
   3. Approver can approve or reject with optional comment; rejection immediately sets document to REJECTED
   4. Final approval sets document to APPROVED; the complete state machine (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN) works correctly
   5. Drafter can withdraw a submitted document if the next approver has not acted, and can create a new pre-filled document from rejected or withdrawn documents
-**Plans**: TBD
+**Plans**: Complete (implemented during Phase 07/09 execution)
 **UI hint**: yes
 
 ### Phase 8: Dashboard & Audit
@@ -136,7 +136,7 @@ Plans:
   2. User sees their recent documents with current status on the dashboard
   3. Badge counts display for pending approvals, in-progress drafts, and completed documents
   4. All document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file operations, admin edits) are recorded in immutable audit log entries
-**Plans**: TBD
+**Plans**: Complete (implemented during Phase 08/09 execution)
 **UI hint**: yes
 
 ## Progress
@@ -146,11 +146,13 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
-| 2. Authentication | 0/4 | Planning complete | - |
-| 3. Organization Management | 2/4 | In Progress|  |
-| 4. Document Core & Templates | 0/3 | Planning complete | - |
-| 5. File Attachments | 0/3 | Planning complete | - |
-| 6. Document Submission & Numbering | 0/TBD | Not started | - |
-| 7. Approval Workflow | 0/TBD | Not started | - |
-| 8. Dashboard & Audit | 0/TBD | Not started | - |
+| 1. Project Foundation | 3/3 | Complete | 2026-03-31 |
+| 2. Authentication | 4/4 | Complete | 2026-04-02 |
+| 3. Organization Management | 4/4 | Complete | 2026-04-03 |
+| 4. Document Core & Templates | 3/3 | Complete | 2026-04-05 |
+| 5. File Attachments | 3/3 | Complete | 2026-04-10 |
+| 6. Document Submission & Numbering | Done | Complete | 2026-04-10 |
+| 7. Approval Workflow | Done | Complete | 2026-04-10 |
+| 8. Dashboard & Audit | Done | Complete | 2026-04-10 |
+
+**Phase 1-A MVP: ALL 36 REQUIREMENTS COMPLETE (2026-04-11 audit confirmed)**
