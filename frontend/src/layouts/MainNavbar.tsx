@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router';
-import { LogOut, Settings, ClipboardCheck, CheckCircle } from 'lucide-react';
+import { LogOut, Settings, ClipboardCheck, CheckCircle, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import apiClient from '../api/client';
 
@@ -28,6 +28,20 @@ export default function MainNavbar() {
 
       {/* Center: Nav links */}
       <nav className="flex items-center gap-1">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            `px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+              isActive
+                ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+            }`
+          }
+        >
+          <LayoutDashboard className="h-4 w-4" />
+          대시보드
+        </NavLink>
         <NavLink
           to="/documents/my"
           className={({ isActive }) =>

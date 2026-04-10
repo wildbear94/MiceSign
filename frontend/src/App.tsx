@@ -12,6 +12,7 @@ import UserDetailPage from './features/admin/pages/UserDetailPage';
 import DocumentListPage from './features/document/pages/DocumentListPage';
 import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
 import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
+import DashboardPage from './features/dashboard/pages/DashboardPage';
 import PendingApprovalsPage from './features/approval/pages/PendingApprovalsPage';
 import CompletedDocumentsPage from './features/approval/pages/CompletedDocumentsPage';
 import LoginPage from './features/auth/pages/LoginPage';
@@ -60,7 +61,7 @@ function App() {
       />
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Navigate to="/documents/my" replace />} />
+          <Route path="/" element={<DashboardPage />} />
           <Route path="/documents/my" element={<DocumentListPage />} />
           <Route path="/documents/new/:templateCode" element={<DocumentEditorPage />} />
           <Route path="/documents/:id" element={<DocumentDetailPage />} />
