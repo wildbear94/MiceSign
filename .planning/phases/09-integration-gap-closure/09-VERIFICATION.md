@@ -1,7 +1,7 @@
 ---
 phase: 09-integration-gap-closure
 verified: 2026-04-10T12:00:00Z
-status: human_needed
+status: gaps_found
 score: 6/6
 overrides_applied: 0
 human_verification:
@@ -112,9 +112,18 @@ Step 7b: SKIPPED (requires running backend/frontend servers with database -- no 
 
 ### Gaps Summary
 
-No automated verification gaps found. All 6 observable truths verified at the code level -- artifacts exist, are substantive, and are properly wired. All old/broken references (`findByDrafterIdAndStatusIn`, `submittedAt`, `drafterDepartmentName`, `departmentApi` in OrgTreePickerModal) have been fully removed.
+**GAP-09-01 (CRITICAL): Approval UI components completely disconnected from application**
 
-Four human verification items remain to confirm end-to-end behavior with live data and running servers.
+All approval-related components exist in the codebase but are orphaned — nothing renders them:
+
+1. **ApprovalLineEditor not integrated into DocumentEditorPage** — the document creation/editing page has no approval line selector. The component was removed during a prior refactor (commit d821780).
+2. **PendingApprovalsPage and CompletedDocumentsPage have no routes** — pages exist in `frontend/src/features/approval/pages/` but are not wired into `App.tsx` routing.
+3. **MainNavbar has no approval menu items** — only "내 문서" (My Documents) link exists; no 결재 (approval) navigation.
+4. **DocumentDetailPage shows placeholder instead of approval line timeline** — line 115 renders `{t('placeholder.approvalLine')}` instead of actual `ApprovalLineTimeline` component.
+
+**Root cause:** Phase 7 (Approval Workflow) frontend integration was stripped during a large refactor and never reconnected. Phase 09's code fixes (organizationApi, type alignment) are correct but untestable because the UI entry points don't exist.
+
+**Impact:** All 4 human verification items are BLOCKED — cannot test OrgTreePickerModal, pending approvals rendering, dashboard list, or DOC_REWRITE workflow without UI access to these features.
 
 ---
 
