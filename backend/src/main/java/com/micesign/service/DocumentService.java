@@ -1,6 +1,5 @@
 package com.micesign.service;
 
-import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.ApprovalTemplate;
 import com.micesign.domain.Document;
@@ -32,22 +31,19 @@ public class DocumentService {
     private final UserRepository userRepository;
     private final DocumentFormValidator formValidator;
     private final DocumentMapper documentMapper;
-    private final AuditLogService auditLogService;
 
     public DocumentService(DocumentRepository documentRepository,
                            DocumentContentRepository documentContentRepository,
                            ApprovalTemplateRepository approvalTemplateRepository,
                            UserRepository userRepository,
                            DocumentFormValidator formValidator,
-                           DocumentMapper documentMapper,
-                           AuditLogService auditLogService) {
+                           DocumentMapper documentMapper) {
         this.documentRepository = documentRepository;
         this.documentContentRepository = documentContentRepository;
         this.approvalTemplateRepository = approvalTemplateRepository;
         this.userRepository = userRepository;
         this.formValidator = formValidator;
         this.documentMapper = documentMapper;
-        this.auditLogService = auditLogService;
     }
 
     public DocumentResponse createDocument(Long userId, CreateDocumentRequest req) {
@@ -143,49 +139,6 @@ public class DocumentService {
 
         String templateName = getTemplateName(document.getTemplateCode());
         return documentMapper.toDetailResponse(document, content, templateName);
-    }
-
-    /**
-     * Rewrite (re-draft) a rejected/withdrawn document as a new DRAFT, copying content.
-     * The original document is referenced via sourceDocId.
-     */
-    public DocumentResponse rewriteDocument(Long userId, Long docId) {
-        Document sourceDoc = documentRepository.findById(docId)
-                .orElseThrow(() -> new BusinessException("DOC_NOT_FOUND", "문서를 찾을 수 없습니다."));
-
-        if (!sourceDoc.getDrafter().getId().equals(userId)) {
-            throw new BusinessException("DOC_NOT_OWNER", "본인의 문서만 재작성할 수 있습니다.");
-        }
-
-        if (sourceDoc.getStatus() != DocumentStatus.REJECTED && sourceDoc.getStatus() != DocumentStatus.WITHDRAWN) {
-            throw new BusinessException("DOC_INVALID_STATUS", "반려 또는 회수된 문서만 재작성할 수 있습니다.");
-        }
-
-        // Create new document as DRAFT
-        Document newDoc = new Document();
-        newDoc.setTemplateCode(sourceDoc.getTemplateCode());
-        newDoc.setTitle(sourceDoc.getTitle());
-        newDoc.setDrafter(sourceDoc.getDrafter());
-        newDoc.setStatus(DocumentStatus.DRAFT);
-        newDoc.setSourceDocId(docId);
-        newDoc = documentRepository.save(newDoc);
-
-        // Audit log for rewrite operation
-        auditLogService.log(userId, AuditAction.DOC_REWRITE, "DOCUMENT", newDoc.getId(),
-                Map.of("sourceDocId", docId, "sourceDocNumber", sourceDoc.getDocNumber() != null ? sourceDoc.getDocNumber() : ""));
-
-        // Copy content from source document
-        DocumentContent sourceContent = documentContentRepository.findByDocumentId(docId).orElse(null);
-        if (sourceContent != null) {
-            DocumentContent newContent = new DocumentContent();
-            newContent.setDocument(newDoc);
-            newContent.setBodyHtml(sourceContent.getBodyHtml());
-            newContent.setFormData(sourceContent.getFormData());
-            documentContentRepository.save(newContent);
-        }
-
-        String templateName = getTemplateName(newDoc.getTemplateCode());
-        return documentMapper.toResponse(newDoc, templateName);
     }
 
     // --- Private helpers ---
