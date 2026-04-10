@@ -40,6 +40,7 @@ export interface CreateTemplateData {
   prefix: string;
   category?: string;
   icon?: string;
+  schemaDefinition?: string;
 }
 
 export interface UpdateTemplateData {
@@ -47,6 +48,7 @@ export interface UpdateTemplateData {
   description?: string;
   category?: string;
   icon?: string;
+  schemaDefinition?: string;
 }
 
 const BASE = '/admin/templates';
