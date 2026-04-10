@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 Phase: 08
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-10 - Completed quick task 260410-ian: 문서 양식 관리 페이지에 신규 등록 및 편집 모달 추가
+Last activity: 2026-04-10 - Completed quick task 260410-imx: 양식 스키마 편집기 UI 추가
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -130,6 +130,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260410-ian | 문서 양식 관리 페이지에 신규 등록 및 편집 모달 추가 | 2026-04-10 | 00afe9d | [260410-ian-template-crud-modal](./quick/260410-ian-template-crud-modal/) |
+| 260410-imx | 양식 스키마 편집기 UI 추가 - 필드 추가/수정/삭제/정렬 기능 | 2026-04-10 | 2b95030 | [260410-imx-schema-editor](./quick/260410-imx-schema-editor/) |
 
 ## Session Continuity
 
