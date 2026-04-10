@@ -34,3 +34,4 @@ logs/
 
 # ===== QueryDSL Generated =====
 backend/src/main/generated/
+.gstack/
