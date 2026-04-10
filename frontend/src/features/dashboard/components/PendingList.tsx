@@ -92,7 +92,7 @@ export default function PendingList() {
                   {item.drafterName}
                 </td>
                 <td className="py-2 text-sm text-gray-500 dark:text-gray-400">
-                  {new Date(item.submittedAt).toLocaleDateString('ko-KR')}
+                  {new Date(item.createdAt).toLocaleDateString('ko-KR')}
                 </td>
               </tr>
             ))}

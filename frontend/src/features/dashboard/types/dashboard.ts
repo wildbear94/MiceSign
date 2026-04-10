@@ -14,7 +14,7 @@ export interface PendingApprovalSummary {
   templateCode: string;
   title: string;
   drafterName: string;
-  drafterDepartmentName: string | null;
+  departmentName: string | null;
   stepOrder: number;
   lineType: string;
   createdAt: string;

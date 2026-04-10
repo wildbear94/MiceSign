@@ -29,15 +29,16 @@ export interface ApprovalActionRequest {
 }
 
 export interface PendingApprovalResponse {
+  approvalLineId: number;
   documentId: number;
   docNumber: string;
   templateCode: string;
-  templateName: string;
   title: string;
-  drafterId: number;
   drafterName: string;
-  drafterDepartmentName: string;
-  submittedAt: string;
+  departmentName: string;
+  stepOrder: number;
+  lineType: string;
+  createdAt: string;
 }
 
 // Local state for approval line editor (not sent to server)

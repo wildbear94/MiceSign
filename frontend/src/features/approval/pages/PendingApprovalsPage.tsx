@@ -101,12 +101,12 @@ export default function PendingApprovalsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {item.drafterName} ({item.drafterDepartmentName})
+                        {item.drafterName} ({item.departmentName})
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-sm text-gray-500">
-                        {item.submittedAt?.slice(0, 10)}
+                        {item.createdAt?.slice(0, 10)}
                       </span>
                     </td>
                   </tr>
