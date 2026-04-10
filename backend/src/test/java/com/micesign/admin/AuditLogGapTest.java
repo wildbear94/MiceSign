@@ -2,6 +2,7 @@ package com.micesign.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.common.AuditAction;
+import com.micesign.dto.auth.LoginRequest;
 import com.micesign.dto.department.CreateDepartmentRequest;
 import com.micesign.dto.user.CreateUserRequest;
 import com.micesign.dto.user.UpdateUserRequest;
@@ -141,5 +142,69 @@ class AuditLogGapTest {
             "SELECT detail FROM audit_log WHERE action = ? AND target_type = ? ORDER BY id DESC LIMIT 1",
             String.class, AuditAction.ADMIN_USER_EDIT, "USER");
         assertThat(detail).contains("update");
+    }
+
+    @Test
+    void login_producesAuditLog() throws Exception {
+        LoginRequest loginRequest = new LoginRequest("admin@micesign.com", "admin1234!", false);
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isOk());
+
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM audit_log WHERE action = ? AND target_type = ?",
+            Integer.class, AuditAction.USER_LOGIN, "USER");
+        assertThat(count).isGreaterThanOrEqualTo(1);
+
+        String detail = jdbcTemplate.queryForObject(
+            "SELECT detail FROM audit_log WHERE action = ? AND target_type = ? ORDER BY id DESC LIMIT 1",
+            String.class, AuditAction.USER_LOGIN, "USER");
+        assertThat(detail).contains("admin@micesign.com");
+    }
+
+    @Test
+    void logout_producesAuditLog() throws Exception {
+        // First login to get a refresh token cookie and access token
+        LoginRequest loginRequest = new LoginRequest("admin@micesign.com", "admin1234!", false);
+
+        var loginResult = mockMvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // Extract access token from response body
+        String responseBody = loginResult.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(responseBody).path("data").path("accessToken").asText();
+        assertThat(accessToken).isNotBlank();
+
+        // Extract refreshToken cookie from Set-Cookie header
+        String setCookie = loginResult.getResponse().getHeader("Set-Cookie");
+        assertThat(setCookie).isNotNull();
+        String refreshToken = null;
+        for (String part : setCookie.split(";")) {
+            String trimmed = part.trim();
+            if (trimmed.startsWith("refreshToken=")) {
+                refreshToken = trimmed.substring("refreshToken=".length());
+                break;
+            }
+        }
+        assertThat(refreshToken).isNotNull();
+
+        // Clear login audit entry to isolate logout
+        jdbcTemplate.update("DELETE FROM audit_log WHERE action = ?", AuditAction.USER_LOGIN);
+
+        // Perform logout (requires authentication)
+        mockMvc.perform(post("/api/v1/auth/logout")
+                .header("Authorization", "Bearer " + accessToken)
+                .cookie(new jakarta.servlet.http.Cookie("refreshToken", refreshToken)))
+            .andExpect(status().isOk());
+
+        Integer count = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM audit_log WHERE action = ? AND target_type = ?",
+            Integer.class, AuditAction.USER_LOGOUT, "USER");
+        assertThat(count).isGreaterThanOrEqualTo(1);
     }
 }
