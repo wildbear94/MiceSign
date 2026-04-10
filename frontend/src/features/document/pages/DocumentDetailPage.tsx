@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
 import ApprovalLineTimeline from '../../approval/components/ApprovalLineTimeline';
+import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
@@ -125,9 +126,13 @@ export default function DocumentDetailPage() {
         </div>
       )}
 
-      {/* Attachments placeholder */}
-      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
-        {t('placeholder.attachments')}
+      {/* Attachments */}
+      <div className="mt-6">
+        <FileAttachmentArea
+          documentId={doc.id}
+          documentStatus={doc.status}
+          readOnly={true}
+        />
       </div>
     </div>
   );

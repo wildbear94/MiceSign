@@ -3,10 +3,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import TiptapEditor from '../TiptapEditor';
+import FileAttachmentArea from '../attachment/FileAttachmentArea';
 import { generalFormSchema, type GeneralFormValues } from '../../validations/generalSchema';
 import type { TemplateEditProps } from './templateRegistry';
 
 export default function GeneralForm({
+  documentId,
   initialData,
   onSave,
   readOnly = false,
@@ -82,10 +84,18 @@ export default function GeneralForm({
         )}
       </div>
 
-      {/* Attachment placeholder */}
-      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
-        {t('placeholder.attachments')}
-      </div>
+      {/* Attachments */}
+      {documentId ? (
+        <FileAttachmentArea
+          documentId={documentId}
+          documentStatus="DRAFT"
+          readOnly={readOnly}
+        />
+      ) : (
+        <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
+          문서를 저장한 후 파일을 첨부할 수 있습니다.
+        </div>
+      )}
     </form>
   );
 }
