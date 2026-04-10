@@ -149,7 +149,7 @@ Plans:
 Plans:
 - [x] 08-01-PLAN.md — Dashboard verification (DASH-01/02/03) + audit log gap-filling for admin services (AUD-01)
 - [x] 08-02-PLAN.md — Template management admin page with activate/deactivate toggle, sidebar + routing
-- [ ] 08-03-PLAN.md — Gap closure: USER_LOGIN/USER_LOGOUT audit logging in AuthService (AUD-01)
+- [x] 08-03-PLAN.md — Gap closure: USER_LOGIN/USER_LOGOUT audit logging in AuthService (AUD-01)
 **UI hint**: yes
 
 ## Progress
