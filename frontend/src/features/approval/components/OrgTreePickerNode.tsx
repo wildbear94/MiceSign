@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, ChevronDown, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { departmentApi } from '../../admin/api/departmentApi';
+import { organizationApi } from '../api/organizationApi';
 import type { DepartmentTreeNode } from '../../../types/admin';
 import type { ApprovalLineItem, ApprovalLineType } from '../types/approval';
 
@@ -46,7 +46,7 @@ export default function OrgTreePickerNode({
   const { data: members } = useQuery({
     queryKey: ['department-members', node.id],
     queryFn: async () => {
-      const res = await departmentApi.getMembers(node.id);
+      const res = await organizationApi.getMembers(node.id);
       return res.data.data;
     },
     enabled: expanded,
