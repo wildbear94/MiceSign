@@ -10,6 +10,7 @@ import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
 import UserListPage from './features/admin/pages/UserListPage';
 import UserDetailPage from './features/admin/pages/UserDetailPage';
+import TemplateListPage from './features/admin/pages/TemplateListPage';
 import RegistrationListPage from './features/admin/pages/RegistrationListPage';
 import PendingApprovalsPage from './features/approval/pages/PendingApprovalsPage';
 import CompletedDocumentsPage from './features/approval/pages/CompletedDocumentsPage';
@@ -76,6 +77,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="departments" element={<DepartmentPage />} />
             <Route path="positions" element={<PositionPage />} />
+            <Route path="templates" element={<TemplateListPage />} />
             <Route path="users" element={<UserListPage />} />
             <Route path="users/:id" element={<UserDetailPage />} />
             <Route path="registrations" element={<RegistrationListPage />} />

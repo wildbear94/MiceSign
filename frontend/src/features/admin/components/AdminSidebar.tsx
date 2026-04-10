@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router';
-import { Building2, Award, Users, UserPlus, X, ArrowLeft } from 'lucide-react';
+import { Building2, Award, FileText, Users, UserPlus, X, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../../stores/authStore';
 import { usePendingRegistrationCount } from '../hooks/useRegistrations';
@@ -17,6 +17,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const navItems = [
     { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
     { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
+    { to: '/admin/templates', icon: FileText, labelKey: 'sidebar.templates' },
     { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
     ...(user?.role === 'SUPER_ADMIN'
       ? [{ to: '/admin/registrations', icon: UserPlus, labelKey: 'registration.title' }]
