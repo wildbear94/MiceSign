@@ -1,0 +1,54 @@
+{
+  "orgPicker": {
+    "title": "조직도에서 선택",
+    "searchPlaceholder": "이름 또는 부서 검색",
+    "close": "닫기"
+  },
+  "approvalLine": {
+    "title": "결재선",
+    "addApprover": "결재자 추가",
+    "emptyState": "결재자를 추가해 주세요",
+    "sequential": "순차 결재",
+    "reference": "참조",
+    "self": "본인",
+    "alreadyAdded": "추가됨",
+    "maxWarning": "최대 인원 초과"
+  },
+  "typeShort": {
+    "APPROVE": "결재",
+    "AGREE": "합의",
+    "REFERENCE": "참조"
+  },
+  "type": {
+    "APPROVE": "결재",
+    "AGREE": "합의",
+    "REFERENCE": "참조"
+  },
+  "status": {
+    "APPROVED": "승인",
+    "REJECTED": "반려",
+    "PENDING": "대기",
+    "SKIPPED": "건너뜀"
+  },
+  "action": {
+    "currentApprover": "현재 결재자",
+    "approve": "승인",
+    "reject": "반려",
+    "commentPlaceholder": "의견을 입력하세요 (선택사항)",
+    "rejectCommentRequired": "반려 시 사유를 입력해 주세요",
+    "notYourTurn": "현재 결재 순서가 아닙니다"
+  },
+  "success": {
+    "approved": "승인되었습니다",
+    "rejected": "반려되었습니다"
+  },
+  "error": {
+    "approveFailed": "승인 처리에 실패했습니다",
+    "rejectFailed": "반려 처리에 실패했습니다"
+  },
+  "confirm": {
+    "rejectTitle": "반려 확인",
+    "rejectMessage": "이 문서를 반려하시겠습니까?",
+    "rejectConfirm": "반려"
+  }
+}
