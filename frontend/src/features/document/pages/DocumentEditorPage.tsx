@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Trash2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
+import ApprovalLineEditor from '../../approval/components/ApprovalLineEditor';
+import type { ApprovalLineItem } from '../../approval/types/approval';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import {
   useDocumentDetail,
@@ -12,6 +14,7 @@ import {
   useDeleteDocument,
 } from '../hooks/useDocuments';
 import { useAutoSave } from '../hooks/useAutoSave';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default function DocumentEditorPage() {
   const { t } = useTranslation('document');
@@ -28,6 +31,8 @@ export default function DocumentEditorPage() {
   const [savedDocId, setSavedDocId] = useState<number | null>(documentId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const user = useAuthStore((s) => s.user);
+  const [approvalLineItems, setApprovalLineItems] = useState<ApprovalLineItem[]>([]);
 
   // For new docs, use templateCode from URL; for edits, from loaded document
   const { data: existingDoc } = useDocumentDetail(documentId);
@@ -196,6 +201,15 @@ export default function DocumentEditorPage() {
             onSave={handleSave}
           />
         )}
+      </div>
+
+      {/* Approval line editor */}
+      <div className="mt-6">
+        <ApprovalLineEditor
+          items={approvalLineItems}
+          onChange={setApprovalLineItems}
+          drafterId={user?.id ?? 0}
+        />
       </div>
 
       {/* Delete confirmation */}

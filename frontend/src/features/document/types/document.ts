@@ -1,3 +1,5 @@
+import type { ApprovalLineResponse } from '../../approval/types/approval';
+
 // === Response Types (from backend) ===
 export interface DocumentResponse {
   id: number;
@@ -23,6 +25,8 @@ export interface DocumentDetailResponse extends DocumentResponse {
   formData: string | null; // JSON string, parsed on frontend
   submittedAt: string | null;
   completedAt: string | null;
+  approvalLines?: ApprovalLineResponse[];  // Populated when backend Phase 7 includes them
+  currentStep?: number | null;             // Populated when backend Phase 7 includes them
 }
 
 export interface TemplateResponse {

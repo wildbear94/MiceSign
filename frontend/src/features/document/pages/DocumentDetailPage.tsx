@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
+import ApprovalLineTimeline from '../../approval/components/ApprovalLineTimeline';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
 import { useDocumentDetail } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
@@ -111,10 +112,18 @@ export default function DocumentDetailPage() {
         )}
       </div>
 
-      {/* Approval line placeholder */}
-      <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400 mb-4">
-        {t('placeholder.approvalLine')}
-      </div>
+      {/* Approval line */}
+      {doc.approvalLines && doc.approvalLines.length > 0 ? (
+        <ApprovalLineTimeline
+          approvalLines={doc.approvalLines}
+          currentStep={doc.currentStep ?? null}
+          documentStatus={doc.status}
+        />
+      ) : (
+        <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400 mb-4">
+          {doc.status === 'DRAFT' ? t('placeholder.approvalLine') : t('placeholder.noApprovalLine', '결재선 정보가 없습니다')}
+        </div>
+      )}
 
       {/* Attachments placeholder */}
       <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center text-sm text-gray-400">
