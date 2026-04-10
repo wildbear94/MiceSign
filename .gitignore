@@ -35,3 +35,8 @@ logs/
 # ===== QueryDSL Generated =====
 backend/src/main/generated/
 .gstack/
+
+# ===== Claude Code =====
+.claude/worktrees/
+.playwright-mcp/
+micesign-*.json
