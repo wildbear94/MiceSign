@@ -165,8 +165,10 @@ Plans:
   4. rewriteDocument() (재기안) creates an audit log entry
   5. AuditLogController uses AuditLogService.search() instead of direct repository access
   6. ADMIN role cannot navigate to /admin/registrations (frontend sidebar hides menu)
-**Plans:** 0/TBD
+**Plans:** 2 plans
 Plans:
+- [ ] 09-01-PLAN.md — Backend: fix getCompletedApprovals dead code, add rewriteDocument audit log, wire AuditLogController to service
+- [ ] 09-02-PLAN.md — Frontend: rewire OrgTreePickerModal to organization API, align PendingApprovalResponse type
 
 ## Progress
 
@@ -183,4 +185,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 6. Document Submission & Numbering | 2/2 | Complete | 2026-04-09 |
 | 7. Approval Workflow | 4/4 | Complete | 2026-04-09 |
 | 8. Dashboard & Audit | 3/3 | Complete | 2026-04-10 |
-| 9. Integration Gap Closure | 0/TBD | Not started | - |
+| 9. Integration Gap Closure | 0/2 | Not started | - |
