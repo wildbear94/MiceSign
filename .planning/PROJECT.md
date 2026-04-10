@@ -26,7 +26,7 @@ Employees can submit approval documents and get them approved/rejected through a
 - [ ] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
 - [ ] Document immutability after submission (locked body, attachments, approval line)
 - [ ] Document numbering system (prefix-year-sequence, assigned at submission)
-- [ ] File attachments via Google Drive API (Service Account)
+- [x] File attachments via Google Drive API (Service Account) — Validated in Phase 5: File Attachments (FILE-01, FILE-02, FILE-03)
 - [ ] Audit trail logging for all document state changes
 - [ ] Dashboard showing pending approvals and recent documents
 
@@ -90,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after Phase 09 (Integration Gap Closure) completion*
+*Last updated: 2026-04-10 after Phase 05 (File Attachments) completion*
