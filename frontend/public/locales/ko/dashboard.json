@@ -1,0 +1,14 @@
+{
+  "title": "대시보드",
+  "newDocument": "새 문서 작성",
+  "pending": "결재 대기",
+  "drafts": "작성 중",
+  "completed": "완료",
+  "pendingList": "결재 대기 문서",
+  "recentDocuments": "최근 문서",
+  "viewAll": "전체 보기",
+  "emptyPending": "대기 중인 결재가 없습니다",
+  "emptyPendingDesc": "결재 요청이 들어오면 여기에 표시됩니다.",
+  "emptyRecent": "최근 문서가 없습니다",
+  "emptyRecentDesc": "문서를 작성하면 여기에 표시됩니다."
+}
