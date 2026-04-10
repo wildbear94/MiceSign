@@ -14,10 +14,6 @@ public class DocumentAttachment {
     @Column(name = "document_id", nullable = false)
     private Long documentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_id", nullable = false, insertable = false, updatable = false)
-    private Document document;
-
     @Column(name = "original_name", nullable = false, length = 500)
     private String originalName;
 
@@ -35,10 +31,6 @@ public class DocumentAttachment {
 
     @Column(name = "uploaded_by", nullable = false)
     private Long uploadedBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "uploaded_by", nullable = false, insertable = false, updatable = false)
-    private User uploader;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -68,14 +60,6 @@ public class DocumentAttachment {
 
     public void setDocumentId(Long documentId) {
         this.documentId = documentId;
-    }
-
-    public Document getDocument() {
-        return document;
-    }
-
-    public void setDocument(Document document) {
-        this.document = document;
     }
 
     public String getOriginalName() {
@@ -124,14 +108,6 @@ public class DocumentAttachment {
 
     public void setUploadedBy(Long uploadedBy) {
         this.uploadedBy = uploadedBy;
-    }
-
-    public User getUploader() {
-        return uploader;
-    }
-
-    public void setUploader(User uploader) {
-        this.uploader = uploader;
     }
 
     public LocalDateTime getCreatedAt() {

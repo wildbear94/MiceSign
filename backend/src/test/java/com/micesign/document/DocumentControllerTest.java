@@ -40,7 +40,6 @@ class DocumentControllerTest {
     @BeforeEach
     void setUp() {
         // Clean document data (order matters due to FK constraints)
-        jdbcTemplate.update("DELETE FROM approval_line");
         jdbcTemplate.update("DELETE FROM document_attachment");
         jdbcTemplate.update("DELETE FROM document_content");
         jdbcTemplate.update("DELETE FROM document");
@@ -53,7 +52,7 @@ class DocumentControllerTest {
     @Test
     void createDraft_general_returns201() throws Exception {
         CreateDocumentRequest request = new CreateDocumentRequest(
-            "GENERAL", "일반 기안 테스트", "<p>본문 내용입니다.</p>", null, null);
+            "GENERAL", "일반 기안 테스트", "<p>본문 내용입니다.</p>", null);
 
         mockMvc.perform(post("/api/v1/documents")
                 .header("Authorization", "Bearer " + token)
@@ -73,7 +72,7 @@ class DocumentControllerTest {
             {"items":[{"name":"택시비","quantity":1,"unitPrice":15000,"amount":15000}],"totalAmount":15000}
             """;
         CreateDocumentRequest request = new CreateDocumentRequest(
-            "EXPENSE", "지출 결의서 테스트", null, formData.trim(), null);
+            "EXPENSE", "지출 결의서 테스트", null, formData.trim());
 
         mockMvc.perform(post("/api/v1/documents")
                 .header("Authorization", "Bearer " + token)
@@ -91,7 +90,7 @@ class DocumentControllerTest {
             {"leaveTypeId":1,"startDate":"2026-04-05","endDate":"2026-04-07","days":3,"reason":"개인 사유"}
             """;
         CreateDocumentRequest request = new CreateDocumentRequest(
-            "LEAVE", "휴가 신청 테스트", null, formData.trim(), null);
+            "LEAVE", "휴가 신청 테스트", null, formData.trim());
 
         mockMvc.perform(post("/api/v1/documents")
                 .header("Authorization", "Bearer " + token)
@@ -106,7 +105,7 @@ class DocumentControllerTest {
     @Test
     void createDraft_invalidTemplate_returns400() throws Exception {
         CreateDocumentRequest request = new CreateDocumentRequest(
-            "INVALID", "테스트", "<p>body</p>", null, null);
+            "INVALID", "테스트", "<p>body</p>", null);
 
         mockMvc.perform(post("/api/v1/documents")
                 .header("Authorization", "Bearer " + token)
@@ -123,7 +122,7 @@ class DocumentControllerTest {
         Long docId = createGeneralDraft();
 
         UpdateDocumentRequest updateReq = new UpdateDocumentRequest(
-            "수정된 제목", "<p>수정된 본문</p>", null, null);
+            "수정된 제목", "<p>수정된 본문</p>", null);
 
         mockMvc.perform(put("/api/v1/documents/" + docId)
                 .header("Authorization", "Bearer " + token)
@@ -142,7 +141,7 @@ class DocumentControllerTest {
         String otherToken = tokenHelper.userToken();
 
         UpdateDocumentRequest updateReq = new UpdateDocumentRequest(
-            "수정 시도", "<p>본문</p>", null, null);
+            "수정 시도", "<p>본문</p>", null);
 
         mockMvc.perform(put("/api/v1/documents/" + docId)
                 .header("Authorization", "Bearer " + otherToken)
@@ -160,13 +159,13 @@ class DocumentControllerTest {
         jdbcTemplate.update("UPDATE document SET status = 'SUBMITTED' WHERE id = ?", docId);
 
         UpdateDocumentRequest updateReq = new UpdateDocumentRequest(
-            "수정 시도", "<p>본문</p>", null, null);
+            "수정 시도", "<p>본문</p>", null);
 
         mockMvc.perform(put("/api/v1/documents/" + docId)
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateReq)))
-            .andExpect(status().isForbidden())
+            .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.error.code").value("DOC_NOT_DRAFT"));
     }
 
@@ -227,7 +226,7 @@ class DocumentControllerTest {
 
     private Long createGeneralDraft() throws Exception {
         CreateDocumentRequest request = new CreateDocumentRequest(
-            "GENERAL", "테스트 문서", "<p>본문 내용입니다.</p>", null, null);
+            "GENERAL", "테스트 문서", "<p>본문 내용입니다.</p>", null);
 
         MvcResult result = mockMvc.perform(post("/api/v1/documents")
                 .header("Authorization", "Bearer " + token)

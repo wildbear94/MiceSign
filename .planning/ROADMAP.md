@@ -20,7 +20,6 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Document Submission & Numbering** - Submit workflow, document immutability, concurrent-safe numbering
 - [ ] **Phase 7: Approval Workflow** - Approval line editor, sequential processing, approve/reject, withdrawal, resubmission
 - [ ] **Phase 8: Dashboard & Audit** - Pending approvals list, recent documents, badge counts, audit trail logging
-- [ ] **Phase 9: Integration Gap Closure** - Cross-phase wiring fixes from v1.0 milestone audit
 
 ## Phase Details
 
@@ -84,7 +83,7 @@ Plans:
   3. Expense form supports item table with quantity/unit price/amount and auto-sum calculation
   4. Leave form supports leave type selection, date range, auto-calculated days, and reason
   5. User can view a list of their documents with current status and open any document's detail page
-**Plans:** 4 plans
+**Plans:** 3 plans
 Plans:
 - [x] 04-01-PLAN.md — Backend: V5 migration, JPA entities, DTOs, services, controllers, document CRUD API with form validation, integration tests
 - [x] 04-02-PLAN.md — Frontend infrastructure: Tiptap/date-fns deps, TypeScript types, API clients, hooks, Zod schemas, MainLayout/navbar, routing
@@ -99,12 +98,11 @@ Plans:
   1. User can upload files that are stored in Google Drive via Service Account
   2. User can download attachments only if they are an authorized viewer of the document
   3. System rejects uploads exceeding 50MB per file, 10 files per document, or 200MB total, and blocks disallowed extensions
-**Plans:** 4 plans
+**Plans:** 3 plans
 Plans:
 - [x] 05-01-PLAN.md — Backend: Google Drive config, JPA entity, services, controller endpoints, integration tests with mocked Drive
-- [x] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
-- [x] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
-- [x] 05-04-PLAN.md — Gap closure: remove gdriveFileId from API, fix audit log injection, parameter swap bug, resource leak, readOnly prop
+- [ ] 05-02-PLAN.md — Frontend: TypeScript types, API client, hooks, attachment components (FileDropZone, FileItem, FileAttachmentArea, useFileUpload)
+- [ ] 05-03-PLAN.md — Frontend integration: replace placeholders in all template forms + detail page, end-to-end checkpoint
 
 ### Phase 6: Document Submission & Numbering
 **Goal**: Users can submit drafts, triggering immutable locking and document number assignment with race-condition protection
@@ -114,10 +112,7 @@ Plans:
   1. User can submit a draft document, changing its status from DRAFT to SUBMITTED
   2. Submitted document body, attachments, and approval line are fully locked and cannot be modified
   3. Document number (PREFIX-YYYY-NNNN) is assigned at submission with no duplicates under concurrent submissions
-**Plans:** 2 plans
-Plans:
-- [x] 06-01-PLAN.md — Backend: Flyway LEV prefix fix, submitDocument approval line validation removal, integration tests
-- [x] 06-02-PLAN.md — Frontend: submit API/hook, editor submit button + confirm dialog, success message, doc number display
+**Plans**: TBD
 
 ### Phase 7: Approval Workflow
 **Goal**: Users can build approval lines, process approvals sequentially, and handle rejections, withdrawals, and resubmissions
@@ -129,12 +124,7 @@ Plans:
   3. Approver can approve or reject with optional comment; rejection immediately sets document to REJECTED
   4. Final approval sets document to APPROVED; the complete state machine (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN) works correctly
   5. Drafter can withdraw a submitted document if the next approver has not acted, and can create a new pre-filled document from rejected or withdrawn documents
-**Plans:** 4 plans
-Plans:
-- [x] 07-00-PLAN.md — Wave 0: Vitest + testing-library setup + frontend test stubs for approval behaviors
-- [x] 07-01-PLAN.md — Backend approval validation + integration tests + frontend types/API/hooks/i18n
-- [x] 07-02-PLAN.md — Approval line editor: org tree picker modal + drag-and-drop editor + editor page integration
-- [x] 07-03-PLAN.md — Approval processing UI: timeline, action panel, withdraw, resubmit + checkpoint
+**Plans**: TBD
 **UI hint**: yes
 
 ### Phase 8: Dashboard & Audit
@@ -146,43 +136,21 @@ Plans:
   2. User sees their recent documents with current status on the dashboard
   3. Badge counts display for pending approvals, in-progress drafts, and completed documents
   4. All document state changes (create, submit, approve, reject, withdraw) and key user actions (login, logout, file operations, admin edits) are recorded in immutable audit log entries
-**Plans:** 3 plans
-Plans:
-- [x] 08-01-PLAN.md — Dashboard verification (DASH-01/02/03) + audit log gap-filling for admin services (AUD-01)
-- [x] 08-02-PLAN.md — Template management admin page with activate/deactivate toggle, sidebar + routing
-- [x] 08-03-PLAN.md — Gap closure: USER_LOGIN/USER_LOGOUT audit logging in AuthService (AUD-01)
+**Plans**: TBD
 **UI hint**: yes
-
-### Phase 9: Integration Gap Closure
-**Goal**: Fix cross-phase wiring issues discovered during v1.0 milestone audit — restore core approval workflow for USER role, align frontend/backend type contracts, and complete audit trail coverage
-**Depends on**: Phase 8
-**Requirements**: APR-01, DASH-01, AUD-01
-**Gap Closure**: Closes gaps from v1.0-MILESTONE-AUDIT.md
-**Success Criteria** (what must be TRUE):
-  1. USER-role employee can open OrgTreePickerModal and see the full department/user tree (no 403)
-  2. Pending approvals list renders correct dates and department names (no "Invalid Date")
-  3. "완료된 문서" page returns documents the user approved, not documents the user drafted
-  4. rewriteDocument() (재기안) creates an audit log entry
-  5. AuditLogController uses AuditLogService.search() instead of direct repository access
-  6. ADMIN role cannot navigate to /admin/registrations (frontend sidebar hides menu)
-**Plans:** 2 plans
-Plans:
-- [ ] 09-01-PLAN.md — Backend: fix getCompletedApprovals dead code, add rewriteDocument audit log, wire AuditLogController to service
-- [ ] 09-02-PLAN.md — Frontend: rewire OrgTreePickerModal to organization API, align PendingApprovalResponse type
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Foundation | 3/3 | Complete   | 2026-03-31 |
-| 2. Authentication | 4/4 | Complete | 2026-04-01 |
-| 3. Organization Management | 5/5 | Complete | 2026-04-02 |
-| 4. Document Core & Templates | 3/3 | Complete | 2026-04-02 |
-| 5. File Attachments | 4/4 | Complete | 2026-04-08 |
-| 6. Document Submission & Numbering | 2/2 | Complete | 2026-04-09 |
-| 7. Approval Workflow | 4/4 | Complete | 2026-04-09 |
-| 8. Dashboard & Audit | 3/3 | Complete | 2026-04-10 |
-| 9. Integration Gap Closure | 0/2 | Not started | - |
+| 2. Authentication | 0/4 | Planning complete | - |
+| 3. Organization Management | 2/4 | In Progress|  |
+| 4. Document Core & Templates | 0/3 | Planning complete | - |
+| 5. File Attachments | 0/3 | Planning complete | - |
+| 6. Document Submission & Numbering | 0/TBD | Not started | - |
+| 7. Approval Workflow | 0/TBD | Not started | - |
+| 8. Dashboard & Audit | 0/TBD | Not started | - |

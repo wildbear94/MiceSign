@@ -1,6 +1,5 @@
 package com.micesign.service;
 
-import com.micesign.common.AuditAction;
 import com.micesign.common.exception.BusinessException;
 import com.micesign.domain.Position;
 import com.micesign.domain.enums.UserStatus;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,16 +20,13 @@ public class PositionService {
     private final PositionRepository positionRepository;
     private final UserRepository userRepository;
     private final PositionMapper positionMapper;
-    private final AuditLogService auditLogService;
 
     public PositionService(PositionRepository positionRepository,
                            UserRepository userRepository,
-                           PositionMapper positionMapper,
-                           AuditLogService auditLogService) {
+                           PositionMapper positionMapper) {
         this.positionRepository = positionRepository;
         this.userRepository = userRepository;
         this.positionMapper = positionMapper;
-        this.auditLogService = auditLogService;
     }
 
     public List<PositionResponse> getAllPositions() {
@@ -45,7 +40,7 @@ public class PositionService {
     }
 
     @Transactional
-    public PositionResponse createPosition(CreatePositionRequest request, Long actingUserId) {
+    public PositionResponse createPosition(CreatePositionRequest request) {
         if (positionRepository.existsByName(request.name())) {
             throw new BusinessException("ORG_DUPLICATE_NAME", "이미 존재하는 직급명입니다.");
         }
@@ -62,15 +57,11 @@ public class PositionService {
         position.setActive(true);
 
         position = positionRepository.save(position);
-
-        auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "POSITION", position.getId(),
-                Map.of("action", "create", "name", position.getName()));
-
         return positionMapper.toResponse(position, 0);
     }
 
     @Transactional
-    public PositionResponse updatePosition(Long id, UpdatePositionRequest request, Long actingUserId) {
+    public PositionResponse updatePosition(Long id, UpdatePositionRequest request) {
         Position position = positionRepository.findById(id)
             .orElseThrow(() -> new BusinessException("ORG_NOT_FOUND", "직급을 찾을 수 없습니다."));
 
@@ -80,9 +71,6 @@ public class PositionService {
 
         position.setName(request.name());
         position = positionRepository.save(position);
-
-        auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "POSITION", position.getId(),
-                Map.of("action", "update", "name", position.getName()));
 
         int userCount = (int) userRepository.countByPositionIdAndStatus(id, UserStatus.ACTIVE);
         return positionMapper.toResponse(position, userCount);
@@ -100,7 +88,7 @@ public class PositionService {
     }
 
     @Transactional
-    public void deactivatePosition(Long id, Long actingUserId) {
+    public void deactivatePosition(Long id) {
         Position position = positionRepository.findById(id)
             .orElseThrow(() -> new BusinessException("ORG_NOT_FOUND", "직급을 찾을 수 없습니다."));
 
@@ -111,8 +99,5 @@ public class PositionService {
 
         position.setActive(false);
         positionRepository.save(position);
-
-        auditLogService.log(actingUserId, AuditAction.ADMIN_ORG_EDIT, "POSITION", position.getId(),
-                Map.of("action", "deactivate", "name", position.getName()));
     }
 }

@@ -8,7 +8,6 @@ import com.google.api.services.drive.model.FileList;
 import com.micesign.common.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -26,23 +25,16 @@ public class GoogleDriveService {
     private static final long BASE_DELAY_MS = 1000L;
 
     private final Drive driveClient;
-    private final String rootFolderId;
     private final ConcurrentHashMap<String, String> folderIdCache = new ConcurrentHashMap<>();
 
-    public GoogleDriveService(@Nullable Drive driveClient,
-                               @Value("${google.drive.root-folder-id:}") String rootFolderId) {
+    public GoogleDriveService(@Nullable Drive driveClient) {
         this.driveClient = driveClient;
-        this.rootFolderId = (rootFolderId != null && !rootFolderId.isBlank()) ? rootFolderId : null;
-        if (this.rootFolderId != null) {
-            log.info("Google Drive root folder ID configured: {}", this.rootFolderId);
-        }
     }
 
     public record DriveUploadResult(String fileId, String folderPath) {}
 
     public String createFolder(String folderName, String parentFolderId) {
         ensureDriveConfigured();
-        log.debug("Creating folder: name={}, parentId={}", folderName, parentFolderId);
         return executeWithRetry(() -> {
             File folderMetadata = new File()
                     .setName(folderName)
@@ -51,7 +43,6 @@ public class GoogleDriveService {
                 folderMetadata.setParents(Collections.singletonList(parentFolderId));
             }
             File folder = driveClient.files().create(folderMetadata)
-                    .setSupportsAllDrives(true)
                     .setFields("id")
                     .execute();
             return folder.getId();
@@ -66,7 +57,7 @@ public class GoogleDriveService {
         }
 
         String[] parts = path.split("/");
-        String parentId = rootFolderId;
+        String parentId = null;
         StringBuilder currentPath = new StringBuilder();
 
         for (String part : parts) {
@@ -101,7 +92,6 @@ public class GoogleDriveService {
     public DriveUploadResult uploadFile(String folderPath, String fileName, String mimeType,
                                          InputStream inputStream, long fileSize) {
         ensureDriveConfigured();
-        log.info("Uploading file: name={}, mimeType={}, size={}, folder={}", fileName, mimeType, fileSize, folderPath);
         String folderId = findOrCreateFolder(folderPath);
         String fileId = executeWithRetry(() -> {
             File fileMetadata = new File()
@@ -112,7 +102,6 @@ public class GoogleDriveService {
                 mediaContent.setLength(fileSize);
             }
             File uploaded = driveClient.files().create(fileMetadata, mediaContent)
-                    .setSupportsAllDrives(true)
                     .setFields("id")
                     .execute();
             return uploaded.getId();
@@ -123,32 +112,14 @@ public class GoogleDriveService {
     public InputStream downloadFile(String fileId) {
         ensureDriveConfigured();
         return executeWithRetry(() ->
-                driveClient.files().get(fileId)
-                        .setSupportsAllDrives(true)
-                        .executeMediaAsInputStream()
+                driveClient.files().get(fileId).executeMediaAsInputStream()
         );
-    }
-
-    public void moveFile(String fileId, String oldParentId, String newParentId) {
-        ensureDriveConfigured();
-        log.info("Moving file: fileId={}, from={}, to={}", fileId, oldParentId, newParentId);
-        executeWithRetry(() -> {
-            driveClient.files().update(fileId, null)
-                    .setAddParents(newParentId)
-                    .setRemoveParents(oldParentId)
-                    .setSupportsAllDrives(true)
-                    .setFields("id, parents")
-                    .execute();
-            return null;
-        });
     }
 
     public void deleteFile(String fileId) {
         ensureDriveConfigured();
         executeWithRetry(() -> {
-            driveClient.files().delete(fileId)
-                    .setSupportsAllDrives(true)
-                    .execute();
+            driveClient.files().delete(fileId).execute();
             return null;
         });
     }
@@ -166,8 +137,6 @@ public class GoogleDriveService {
             }
             FileList result = driveClient.files().list()
                     .setQ(query.toString())
-                    .setIncludeItemsFromAllDrives(true)
-                    .setSupportsAllDrives(true)
                     .setFields("files(id)")
                     .setPageSize(1)
                     .execute();
@@ -194,19 +163,13 @@ public class GoogleDriveService {
                 return action.execute();
             } catch (GoogleJsonResponseException e) {
                 attempt++;
-                log.error("Google Drive API error (attempt {}/{}): status={}, message={}",
-                        attempt, MAX_RETRIES, e.getStatusCode(),
-                        e.getDetails() != null ? e.getDetails().getMessage() : e.getMessage(), e);
                 if (attempt >= MAX_RETRIES || !isRetryable(e.getStatusCode())) {
-                    String detail = e.getDetails() != null ? e.getDetails().getMessage() : e.getMessage();
                     throw new BusinessException("FILE_DRIVE_ERROR",
-                            "Google Drive API 오류 (HTTP " + e.getStatusCode() + "): " + detail);
+                            "Google Drive API 오류: " + e.getDetails().getMessage());
                 }
                 sleepBeforeRetry(attempt);
             } catch (IOException e) {
                 attempt++;
-                log.error("Google Drive IO error (attempt {}/{}): {}",
-                        attempt, MAX_RETRIES, e.getMessage(), e);
                 if (attempt >= MAX_RETRIES) {
                     throw new BusinessException("FILE_DRIVE_ERROR",
                             "Google Drive 연결 오류: " + e.getMessage());

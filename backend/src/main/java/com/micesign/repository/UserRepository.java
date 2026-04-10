@@ -28,6 +28,4 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     boolean existsByEmailAndIdNot(String email, Long id);
 
     List<User> findByDepartmentIdAndStatus(Long departmentId, UserStatus status);
-
-    List<User> findByRoleAndStatus(UserRole role, UserStatus status);
 }

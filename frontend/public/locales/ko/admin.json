@@ -66,72 +66,9 @@
       "RETIRED": "퇴사"
     }
   },
-  "templates": {
-    "title": "양식 관리",
-    "code": "코드",
-    "name": "이름",
-    "description": "설명",
-    "prefix": "접두어",
-    "status": "상태",
-    "active": "활성",
-    "inactive": "비활성",
-    "confirmDeactivate": "{{name}} 양식을 비활성화하시겠습니까?",
-    "confirmDeactivateDesc": "비활성화된 양식은 새 문서 작성 시 선택할 수 없습니다.",
-    "confirmActivate": "{{name}} 양식을 활성화하시겠습니까?",
-    "deactivateButton": "비활성화",
-    "activateButton": "활성화",
-    "addTemplate": "양식 추가",
-    "editTemplate": "양식 수정",
-    "templateName": "양식 이름",
-    "templateDescription": "설명",
-    "templatePrefix": "문서번호 접두어",
-    "templateCategory": "카테고리",
-    "templateIcon": "아이콘",
-    "tabInfo": "기본 정보",
-    "tabFields": "필드 구성",
-    "schemaEditor": "필드 구성",
-    "addField": "필드 추가",
-    "fieldLabel": "필드 라벨",
-    "fieldId": "필드 ID",
-    "fieldRequired": "필수",
-    "fieldType": "필드 유형",
-    "fieldPlaceholder": "플레이스홀더",
-    "fieldMaxLength": "최대 길이",
-    "fieldMin": "최소값",
-    "fieldMax": "최대값",
-    "fieldUnit": "단위",
-    "fieldContent": "내용",
-    "fieldDefaultValue": "기본값",
-    "fieldOptions": "선택 옵션",
-    "fieldWidth": "너비",
-    "optionValue": "값",
-    "optionLabel": "라벨",
-    "addOption": "옵션 추가",
-    "removeOption": "옵션 삭제",
-    "removeField": "필드 삭제",
-    "confirmRemoveField": "이 필드를 삭제하시겠습니까?",
-    "noFields": "추가된 필드가 없습니다. '필드 추가' 버튼으로 필드를 추가하세요.",
-    "noConfig": "이 유형은 추가 설정이 없습니다.",
-    "fieldTypes": {
-      "text": "텍스트",
-      "textarea": "텍스트(여러줄)",
-      "number": "숫자",
-      "date": "날짜",
-      "select": "선택",
-      "staticText": "고정 텍스트",
-      "hidden": "숨김 필드",
-      "table": "테이블"
-    },
-    "emptyTitle": "등록된 양식이 없습니다",
-    "emptyBody": "양식은 시스템에 의해 관리됩니다.",
-    "toggleError": "양식 상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.",
-    "activatedSuccess": "양식이 활성화되었습니다",
-    "deactivatedSuccess": "양식이 비활성화되었습니다"
-  },
   "sidebar": {
     "departments": "부서 관리",
     "positions": "직급 관리",
-    "templates": "양식 관리",
     "users": "사용자 관리"
   },
   "common": {
@@ -167,64 +104,6 @@
     "positionReordered": "직급 순서가 변경되었습니다.",
     "userCreated": "사용자가 추가되었습니다.",
     "userUpdated": "사용자 정보가 수정되었습니다.",
-    "userDeactivated": "사용자가 비활성화되었습니다.",
-    "templateCreated": "양식이 추가되었습니다.",
-    "templateUpdated": "양식 정보가 수정되었습니다."
-  },
-  "registration": {
-    "title": "등록 신청 관리",
-    "tabs": {
-      "all": "전체",
-      "pending": "대기중",
-      "approved": "승인",
-      "rejected": "거부",
-      "expired": "만료",
-      "cancelled": "취소"
-    },
-    "table": {
-      "name": "신청자명",
-      "email": "이메일",
-      "createdAt": "신청일",
-      "processedAt": "처리일",
-      "status": "상태"
-    },
-    "modal": {
-      "title": "등록 신청 상세",
-      "applicantInfo": "신청자 정보",
-      "assignInfo": "배정 정보",
-      "employeeNo": "사원번호",
-      "department": "부서",
-      "position": "직급",
-      "rejectionReason": "거부 사유",
-      "rejectionReasonPlaceholder": "거부 사유를 입력해주세요 (10자 이상)"
-    },
-    "action": {
-      "approve": "승인",
-      "reject": "거부",
-      "confirmReject": "거부 확인",
-      "rejectConfirmTitle": "신청 거부",
-      "rejectConfirmMessage": "이 신청을 거부하시겠습니까?",
-      "cancel": "취소"
-    },
-    "status": {
-      "PENDING": "대기중",
-      "APPROVED": "승인",
-      "REJECTED": "거부",
-      "EXPIRED": "만료",
-      "CANCELLED": "취소"
-    },
-    "emptyList": "등록 신청이 없습니다.",
-    "toast": {
-      "approved": "등록 신청이 승인되었습니다.",
-      "rejected": "등록 신청이 거부되었습니다.",
-      "alreadyProcessed": "이미 처리된 신청입니다.",
-      "error": "처리 중 오류가 발생했습니다."
-    },
-    "validation": {
-      "departmentRequired": "부서를 선택해주세요.",
-      "positionRequired": "직급을 선택해주세요.",
-      "employeeNoRequired": "사원번호를 입력해주세요.",
-      "rejectionReasonMinLength": "거부 사유는 10자 이상 입력해주세요."
-    }
+    "userDeactivated": "사용자가 비활성화되었습니다."
   }
 }

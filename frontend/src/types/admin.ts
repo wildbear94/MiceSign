@@ -101,40 +101,6 @@ export interface UpdateUserRequest {
   phone: string;
 }
 
-// Registration
-export type RegistrationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED';
-
-export interface RegistrationListItem {
-  id: number;
-  name: string;
-  email: string;
-  status: RegistrationStatus;
-  rejectionReason: string | null;
-  createdAt: string;
-  processedAt: string | null;
-  // Assignment info for APPROVED registrations (per D-11)
-  employeeNo: string | null;
-  departmentName: string | null;
-  positionName: string | null;
-}
-
-export interface ApproveRegistrationRequest {
-  employeeNo: string;
-  departmentId: number;
-  positionId: number;
-}
-
-export interface RejectRegistrationRequest {
-  rejectionReason: string;
-}
-
-export interface RegistrationFilterParams {
-  status?: RegistrationStatus;
-  page?: number;
-  size?: number;
-  sort?: string;
-}
-
 // Filter params
 export interface UserFilterParams {
   keyword?: string;

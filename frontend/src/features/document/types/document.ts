@@ -1,5 +1,3 @@
-import type { ApprovalLineResponse, ApprovalLineRequest } from '../../approval/types/approval';
-
 // === Response Types (from backend) ===
 export interface DocumentResponse {
   id: number;
@@ -25,11 +23,6 @@ export interface DocumentDetailResponse extends DocumentResponse {
   formData: string | null; // JSON string, parsed on frontend
   submittedAt: string | null;
   completedAt: string | null;
-  // Phase 7 additions
-  drafterId: number;
-  currentStep: number | null;
-  sourceDocId: number | null;
-  approvalLines: ApprovalLineResponse[];
 }
 
 export interface TemplateResponse {
@@ -54,14 +47,12 @@ export interface CreateDocumentRequest {
   title: string;
   bodyHtml?: string | null;
   formData?: string | null;
-  approvalLines?: ApprovalLineRequest[] | null;
 }
 
 export interface UpdateDocumentRequest {
   title: string;
   bodyHtml?: string | null;
   formData?: string | null;
-  approvalLines?: ApprovalLineRequest[] | null;
 }
 
 // === Enums ===

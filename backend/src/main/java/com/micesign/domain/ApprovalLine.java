@@ -6,7 +6,10 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "approval_line")
+@Table(name = "approval_line", indexes = {
+    @Index(name = "idx_approver_status", columnList = "approver_id, status"),
+    @Index(name = "idx_document_step", columnList = "document_id, step_order")
+})
 public class ApprovalLine {
 
     @Id

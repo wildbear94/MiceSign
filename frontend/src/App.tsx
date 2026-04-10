@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { Routes, Route, Navigate } from 'react-router';
-import { Toaster } from 'sonner';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ForcePasswordChangeGuard from './components/ForcePasswordChangeGuard';
@@ -10,11 +9,6 @@ import DepartmentPage from './features/admin/pages/DepartmentPage';
 import PositionPage from './features/admin/pages/PositionPage';
 import UserListPage from './features/admin/pages/UserListPage';
 import UserDetailPage from './features/admin/pages/UserDetailPage';
-import TemplateListPage from './features/admin/pages/TemplateListPage';
-import RegistrationListPage from './features/admin/pages/RegistrationListPage';
-import PendingApprovalsPage from './features/approval/pages/PendingApprovalsPage';
-import CompletedDocumentsPage from './features/approval/pages/CompletedDocumentsPage';
-import DashboardPage from './features/dashboard/pages/DashboardPage';
 import DocumentListPage from './features/document/pages/DocumentListPage';
 import DocumentEditorPage from './features/document/pages/DocumentEditorPage';
 import DocumentDetailPage from './features/document/pages/DocumentDetailPage';
@@ -52,8 +46,6 @@ function App() {
   }, [setAuth, clearAuth]);
 
   return (
-    <>
-    <Toaster position="top-right" richColors duration={3000} />
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
@@ -66,27 +58,22 @@ function App() {
       />
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<DashboardPage />} />
+          <Route path="/" element={<Navigate to="/documents/my" replace />} />
           <Route path="/documents/my" element={<DocumentListPage />} />
           <Route path="/documents/new/:templateCode" element={<DocumentEditorPage />} />
           <Route path="/documents/:id" element={<DocumentDetailPage />} />
-          <Route path="/approvals/pending" element={<PendingApprovalsPage />} />
-          <Route path="/approvals/completed" element={<CompletedDocumentsPage />} />
         </Route>
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="departments" element={<DepartmentPage />} />
             <Route path="positions" element={<PositionPage />} />
-            <Route path="templates" element={<TemplateListPage />} />
             <Route path="users" element={<UserListPage />} />
             <Route path="users/:id" element={<UserDetailPage />} />
-            <Route path="registrations" element={<RegistrationListPage />} />
           </Route>
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-    </>
   );
 }
 

@@ -11,12 +11,4 @@ public interface ApprovalTemplateRepository extends JpaRepository<ApprovalTempla
     List<ApprovalTemplate> findByIsActiveTrueOrderBySortOrder();
 
     Optional<ApprovalTemplate> findByCode(String code);
-
-    boolean existsByPrefix(String prefix);
-
-    boolean existsByPrefixAndIdNot(String prefix, Long id);
-
-    boolean existsByCode(String code);
-
-    Optional<ApprovalTemplate> findByIdAndIsCustomTrue(Long id);
 }

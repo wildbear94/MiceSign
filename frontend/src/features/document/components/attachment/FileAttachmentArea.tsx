@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { DocumentStatus } from '../../types/document';
 import { useAttachments, useDeleteAttachment } from '../../hooks/useAttachments';
@@ -12,14 +12,12 @@ interface FileAttachmentAreaProps {
   documentId: number;
   documentStatus: DocumentStatus;
   readOnly: boolean;
-  onUploadStateChange?: (state: { isUploading: boolean; hasError: boolean }) => void;
 }
 
 export default function FileAttachmentArea({
   documentId,
   documentStatus: _documentStatus,
   readOnly,
-  onUploadStateChange,
 }: FileAttachmentAreaProps) {
   const { t } = useTranslation('document');
   const { data: existingAttachments = [], refetch } = useAttachments(documentId);
@@ -32,15 +30,6 @@ export default function FileAttachmentArea({
       refetch();
     },
   });
-
-  // Report upload state to parent
-  useEffect(() => {
-    if (onUploadStateChange) {
-      const isUploading = uploadItems.some(item => item.status === 'uploading' || item.status === 'pending');
-      const hasError = uploadItems.some(item => item.status === 'error');
-      onUploadStateChange({ isUploading, hasError });
-    }
-  }, [uploadItems, onUploadStateChange]);
 
   // Calculate usage
   const totalCount =

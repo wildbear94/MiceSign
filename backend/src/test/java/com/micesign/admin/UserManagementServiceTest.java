@@ -12,7 +12,6 @@ import com.micesign.repository.DepartmentRepository;
 import com.micesign.repository.PositionRepository;
 import com.micesign.repository.UserRepository;
 import com.micesign.security.CustomUserDetails;
-import com.micesign.service.AuditLogService;
 import com.micesign.service.UserManagementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +34,12 @@ class UserManagementServiceTest {
     @Mock PositionRepository positionRepository;
     @Mock UserMapper userMapper;
     @Mock PasswordEncoder passwordEncoder;
-    @Mock AuditLogService auditLogService;
 
     UserManagementService service;
 
     @BeforeEach
     void setUp() {
-        service = new UserManagementService(userRepository, departmentRepository, positionRepository, userMapper, passwordEncoder, auditLogService);
+        service = new UserManagementService(userRepository, departmentRepository, positionRepository, userMapper, passwordEncoder);
     }
 
     @Test

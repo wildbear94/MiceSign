@@ -11,7 +11,6 @@ interface ConfirmDialogProps {
   confirmVariant: 'danger' | 'primary';
   isLoading?: boolean;
   showCancel?: boolean;
-  cancelLabel?: string;
 }
 
 export default function ConfirmDialog({
@@ -24,7 +23,6 @@ export default function ConfirmDialog({
   confirmVariant,
   isLoading = false,
   showCancel = true,
-  cancelLabel,
 }: ConfirmDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -115,7 +113,7 @@ export default function ConfirmDialog({
               disabled={isLoading}
               className="h-11 px-4 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
             >
-              {cancelLabel ?? '닫기'}
+              닫기
             </button>
           )}
 

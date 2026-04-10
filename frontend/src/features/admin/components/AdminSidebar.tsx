@@ -1,38 +1,23 @@
-import { NavLink, Link } from 'react-router';
-import { Building2, Award, FileText, Users, UserPlus, X, ArrowLeft } from 'lucide-react';
+import { NavLink } from 'react-router';
+import { Building2, Award, Users, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore } from '../../../stores/authStore';
-import { usePendingRegistrationCount } from '../hooks/useRegistrations';
 
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const navItems = [
+  { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
+  { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
+  { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
+] as const;
+
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const { t } = useTranslation('admin');
-  const { user } = useAuthStore();
-  const { data: pendingCount } = usePendingRegistrationCount();
-
-  const navItems = [
-    { to: '/admin/departments', icon: Building2, labelKey: 'sidebar.departments' },
-    { to: '/admin/positions', icon: Award, labelKey: 'sidebar.positions' },
-    { to: '/admin/templates', icon: FileText, labelKey: 'sidebar.templates' },
-    { to: '/admin/users', icon: Users, labelKey: 'sidebar.users' },
-    ...(user?.role === 'SUPER_ADMIN'
-      ? [{ to: '/admin/registrations', icon: UserPlus, labelKey: 'registration.title' }]
-      : []),
-  ];
 
   const navContent = (
     <nav className="flex flex-col gap-1 p-3">
-      <Link
-        to="/"
-        className="flex items-center gap-2 px-4 py-3 mb-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
-      >
-        <ArrowLeft className="h-4 w-4 shrink-0" />
-        <span className="hidden xl:inline">대시보드로 돌아가기</span>
-      </Link>
       {navItems.map(({ to, icon: Icon, labelKey }) => (
         <NavLink
           key={to}
@@ -49,11 +34,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         >
           <Icon className="h-5 w-5 shrink-0" />
           <span className="hidden xl:inline">{t(labelKey)}</span>
-          {to === '/admin/registrations' && pendingCount != null && pendingCount > 0 && (
-            <span className="hidden xl:inline-flex bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 px-1.5 items-center justify-center ml-auto">
-              {pendingCount}
-            </span>
-          )}
         </NavLink>
       ))}
     </nav>
@@ -84,14 +64,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </button>
             </div>
             <nav className="flex flex-col gap-1 px-3">
-              <Link
-                to="/"
-                onClick={onClose}
-                className="flex items-center gap-2 px-4 py-3 mb-2 rounded-lg text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
-              >
-                <ArrowLeft className="h-4 w-4 shrink-0" />
-                <span>대시보드로 돌아가기</span>
-              </Link>
               {navItems.map(({ to, icon: Icon, labelKey }) => (
                 <NavLink
                   key={to}
@@ -107,11 +79,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 >
                   <Icon className="h-5 w-5 shrink-0" />
                   <span>{t(labelKey)}</span>
-                  {to === '/admin/registrations' && pendingCount != null && pendingCount > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full min-w-[20px] h-5 px-1.5 inline-flex items-center justify-center ml-auto">
-                      {pendingCount}
-                    </span>
-                  )}
                 </NavLink>
               ))}
             </nav>

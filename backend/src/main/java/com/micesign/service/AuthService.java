@@ -1,6 +1,5 @@
 package com.micesign.service;
 
-import com.micesign.common.AuditAction;
 import com.micesign.domain.AuditLog;
 import com.micesign.domain.RefreshToken;
 import com.micesign.domain.User;
@@ -105,17 +104,6 @@ public class AuthService {
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        // Audit log for successful login (AUD-01)
-        AuditLog loginAudit = new AuditLog();
-        loginAudit.setUserId(user.getId());
-        loginAudit.setAction(AuditAction.USER_LOGIN);
-        loginAudit.setTargetType("USER");
-        loginAudit.setTargetId(user.getId());
-        String safeEmail = user.getEmail().replace("\\", "\\\\").replace("\"", "\\\"");
-        String safeDevice = deviceInfo != null ? deviceInfo.replace("\\", "\\\\").replace("\"", "\\\"") : "";
-        loginAudit.setDetail("{\"email\":\"" + safeEmail + "\",\"deviceInfo\":\"" + safeDevice + "\"}");
-        auditLogRepository.save(loginAudit);
-
         // 6. Generate tokens
         String accessToken = jwtTokenProvider.generateAccessToken(user);
         String rawRefreshToken = UUID.randomUUID().toString();
@@ -203,19 +191,7 @@ public class AuthService {
         }
         String tokenHash = hashToken(rawRefreshToken);
         refreshTokenRepository.findByTokenHash(tokenHash)
-                .ifPresent(stored -> {
-                    Long userId = stored.getUserId();
-                    refreshTokenRepository.delete(stored);
-
-                    // Audit log for logout (AUD-01)
-                    AuditLog logoutAudit = new AuditLog();
-                    logoutAudit.setUserId(userId);
-                    logoutAudit.setAction(AuditAction.USER_LOGOUT);
-                    logoutAudit.setTargetType("USER");
-                    logoutAudit.setTargetId(userId);
-                    logoutAudit.setDetail("{\"action\":\"logout\"}");
-                    auditLogRepository.save(logoutAudit);
-                });
+                .ifPresent(refreshTokenRepository::delete);
     }
 
     // ---- Private helpers ----

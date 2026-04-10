@@ -1,6 +1,5 @@
 package com.micesign.service;
 
-import com.micesign.common.AuditAction;
 import com.micesign.domain.RefreshToken;
 import com.micesign.domain.User;
 import com.micesign.domain.enums.UserRole;
@@ -12,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,16 +31,13 @@ public class PasswordService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuditLogService auditLogService;
 
     public PasswordService(UserRepository userRepository,
                            RefreshTokenRepository refreshTokenRepository,
-                           PasswordEncoder passwordEncoder,
-                           AuditLogService auditLogService) {
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.passwordEncoder = passwordEncoder;
-        this.auditLogService = auditLogService;
     }
 
     /**
@@ -172,9 +167,6 @@ public class PasswordService {
 
         // 8. Save target user
         userRepository.save(target);
-
-        auditLogService.log(adminUserId, AuditAction.ADMIN_USER_EDIT, "USER", targetUserId,
-                Map.of("action", "adminPasswordReset", "targetEmail", target.getEmail()));
 
         return PasswordResult.ok();
     }

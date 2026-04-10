@@ -1,30 +1,20 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Trash2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
-import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
 import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
-import ApprovalLineEditor, {
-  toApprovalLineRequests,
-  toApprovalLineItems,
-} from '../../approval/components/ApprovalLineEditor';
-import { useAuthStore } from '../../../stores/authStore';
-import type { ApprovalLineItem } from '../../approval/types/approval';
 import {
   useDocumentDetail,
   useCreateDocument,
   useUpdateDocument,
   useDeleteDocument,
-  useSubmitDocument,
 } from '../hooks/useDocuments';
 import { useAutoSave } from '../hooks/useAutoSave';
 
 export default function DocumentEditorPage() {
   const { t } = useTranslation('document');
-  const { t: tApproval } = useTranslation('approval');
-  const currentUserId = useAuthStore((s) => s.user?.id);
   const navigate = useNavigate();
   const { templateCode, id } = useParams<{
     templateCode?: string;
@@ -37,11 +27,7 @@ export default function DocumentEditorPage() {
   // Track the saved document ID (starts null for new, set after first save)
   const [savedDocId, setSavedDocId] = useState<number | null>(documentId);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
-  const [uploadState, setUploadState] = useState<{ isUploading: boolean; hasError: boolean }>({ isUploading: false, hasError: false });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [approvalLines, setApprovalLines] = useState<ApprovalLineItem[]>([]);
-  const [approvalLineError, setApprovalLineError] = useState<string | null>(null);
 
   // For new docs, use templateCode from URL; for edits, from loaded document
   const { data: existingDoc } = useDocumentDetail(documentId);
@@ -50,14 +36,6 @@ export default function DocumentEditorPage() {
   const createMutation = useCreateDocument();
   const updateMutation = useUpdateDocument();
   const deleteMutation = useDeleteDocument();
-  const submitMutation = useSubmitDocument();
-
-  // Initialize approval lines from existing document (e.g., resubmitted draft)
-  useEffect(() => {
-    if (existingDoc?.approvalLines && existingDoc.approvalLines.length > 0) {
-      setApprovalLines(toApprovalLineItems(existingDoc.approvalLines));
-    }
-  }, [existingDoc]);
 
   // Store the latest form data for auto-save
   const formDataRef = useRef<{
@@ -73,24 +51,22 @@ export default function DocumentEditorPage() {
 
       try {
         if (savedDocId) {
-          // Update existing — D-30: always send approvalLines: null during auto-save/manual save
+          // Update existing
           await updateMutation.mutateAsync({
             id: savedDocId,
             data: {
               title: data.title,
               bodyHtml: data.bodyHtml ?? null,
               formData: data.formData ?? null,
-              approvalLines: null,
             },
           });
         } else {
-          // Create new — D-30: approvalLines: null during draft creation
+          // Create new
           const created = await createMutation.mutateAsync({
             templateCode: resolvedTemplateCode,
             title: data.title,
             bodyHtml: data.bodyHtml ?? null,
             formData: data.formData ?? null,
-            approvalLines: null,
           });
           setSavedDocId(created.id);
           // Update URL without re-rendering
@@ -135,82 +111,6 @@ export default function DocumentEditorPage() {
     }
   }, [savedDocId, deleteMutation, navigate, t]);
 
-  const handleSubmitClick = useCallback(() => {
-    setErrorMessage(null);
-    setApprovalLineError(null);
-
-    // D-14: block if upload has failed files
-    if (uploadState.hasError) {
-      setErrorMessage(t('error.uploadFailed'));
-      return;
-    }
-
-    // D-13: block if upload in progress
-    if (uploadState.isUploading) {
-      setErrorMessage(t('error.uploadInProgress'));
-      return;
-    }
-
-    // D-06: trigger frontend form validation
-    const form = document.getElementById('document-form') as HTMLFormElement;
-    if (form && !form.checkValidity()) {
-      form.requestSubmit();
-      return;
-    }
-
-    // D-07: validate at least 1 APPROVE type approver
-    const hasApprover = approvalLines.some((l) => l.lineType === 'APPROVE');
-    if (!hasApprover) {
-      setApprovalLineError(tApproval('approvalLine.approveRequired'));
-      return;
-    }
-
-    // D-09: show confirm dialog
-    setShowSubmitConfirm(true);
-  }, [uploadState, t, tApproval, approvalLines]);
-
-  const handleSubmitConfirm = useCallback(async () => {
-    if (!savedDocId) return;
-
-    try {
-      // D-12: save unsaved changes before submit
-      await saveNow();
-
-      // D-30: persist approval lines to DB ONLY at submit time
-      await updateMutation.mutateAsync({
-        id: savedDocId,
-        data: {
-          title: formDataRef.current.title,
-          bodyHtml: formDataRef.current.bodyHtml ?? null,
-          formData: formDataRef.current.formData ?? null,
-          approvalLines: toApprovalLineRequests(approvalLines),
-        },
-      });
-
-      // D-05: call submit API
-      const result = await submitMutation.mutateAsync(savedDocId);
-
-      // D-17, D-18: redirect to detail page with success message
-      navigate(`/documents/${savedDocId}`, {
-        state: {
-          submitSuccess: true,
-          docNumber: result.docNumber,
-        },
-      });
-    } catch (err: unknown) {
-      setShowSubmitConfirm(false);
-      // D-11, D-15: show error message
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response?: { status?: number } };
-        if (axiosErr.response?.status === 409) {
-          setErrorMessage(t('error.alreadySubmitted'));
-          return;
-        }
-      }
-      setErrorMessage(t('error.submitFailed'));
-    }
-  }, [savedDocId, saveNow, updateMutation, approvalLines, submitMutation, navigate, t]);
-
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
   if (!templateEntry && !isEditMode) {
     return (
@@ -252,37 +152,21 @@ export default function DocumentEditorPage() {
       <div className="flex items-center justify-between mb-4">
         <AutoSaveIndicator status={autoSaveStatus} />
         <div className="flex items-center gap-2">
-          {savedDocId && (
-            <button
-              type="button"
-              onClick={() => setShowDeleteConfirm(true)}
-              disabled={submitMutation.isPending}
-              className="inline-flex items-center gap-2 h-11 px-4 border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium rounded-lg disabled:opacity-50"
-            >
-              <Trash2 className="h-4 w-4" />
-              {t('delete')}
-            </button>
-          )}
           <button
             type="button"
             onClick={handleManualSave}
-            disabled={submitMutation.isPending}
-            className="inline-flex items-center gap-2 h-11 px-4 border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm font-medium rounded-lg disabled:opacity-50"
+            className="inline-flex items-center gap-2 h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg"
           >
             {t('save')}
           </button>
           {savedDocId && (
             <button
               type="button"
-              onClick={handleSubmitClick}
-              disabled={submitMutation.isPending}
-              className="inline-flex items-center gap-2 h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg disabled:opacity-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              aria-label={submitMutation.isPending ? t('submitConfirm.title') + '...' : undefined}
+              onClick={() => setShowDeleteConfirm(true)}
+              className="inline-flex items-center gap-2 h-11 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg"
             >
-              {submitMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : null}
-              {t('submit')}
+              <Trash2 className="h-4 w-4" />
+              {t('delete')}
             </button>
           )}
         </div>
@@ -296,8 +180,7 @@ export default function DocumentEditorPage() {
       )}
 
       {/* Form container */}
-      <div className={`bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 ${submitMutation.isPending ? 'opacity-50 pointer-events-none' : ''}`}
-           aria-busy={submitMutation.isPending}>
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
         {EditComponent && (
           <EditComponent
             documentId={savedDocId}
@@ -315,30 +198,6 @@ export default function DocumentEditorPage() {
         )}
       </div>
 
-      {/* Attachments */}
-      {savedDocId && (
-        <div className="mt-6">
-          <FileAttachmentArea
-            documentId={savedDocId}
-            documentStatus="DRAFT"
-            readOnly={false}
-            onUploadStateChange={setUploadState}
-          />
-        </div>
-      )}
-
-      {/* Approval Line Editor */}
-      {savedDocId && (
-        <div className="mt-8">
-          <ApprovalLineEditor
-            items={approvalLines}
-            onChange={setApprovalLines}
-            drafterId={currentUserId ?? 0}
-            error={approvalLineError}
-          />
-        </div>
-      )}
-
       {/* Delete confirmation */}
       <ConfirmDialog
         open={showDeleteConfirm}
@@ -349,19 +208,6 @@ export default function DocumentEditorPage() {
         confirmLabel={t('deleteConfirm.confirm')}
         confirmVariant="danger"
         isLoading={deleteMutation.isPending}
-      />
-
-      {/* Submit confirmation */}
-      <ConfirmDialog
-        open={showSubmitConfirm}
-        onClose={() => setShowSubmitConfirm(false)}
-        onConfirm={handleSubmitConfirm}
-        title={t('submitConfirm.title')}
-        message={t('submitConfirm.message')}
-        confirmLabel={t('submitConfirm.confirm')}
-        confirmVariant="primary"
-        cancelLabel={t('submitConfirm.cancel')}
-        isLoading={submitMutation.isPending}
       />
     </div>
   );
