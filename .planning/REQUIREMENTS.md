@@ -195,12 +195,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Complete |
 | DASH-03 | Phase 8: Dashboard & Audit | Complete |
 | AUD-01 | Phase 8: Dashboard & Audit | Complete |
+| RFT-01 | Phase 21: SchemaFieldEditor 리팩토링 | Pending |
+| RFT-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
+| PRV-01 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
+| PRV-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
+| PRV-03 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
+| TBL-01 | Phase 23: 테이블 컬럼 편집기 | Pending |
+| TBL-02 | Phase 23: 테이블 컬럼 편집기 | Pending |
+| CND-01 | Phase 24: 조건부 표시 규칙 UI | Pending |
+| CND-02 | Phase 24: 조건부 표시 규칙 UI | Pending |
+| CAL-01 | Phase 25: 계산 규칙 UI | Pending |
+| CAL-02 | Phase 25: 계산 규칙 UI | Pending |
+| CNV-01 | Phase 26: 편의 기능 | Pending |
+| CNV-02 | Phase 26: 편의 기능 | Pending |
+| CNV-03 | Phase 26: 편의 기능 | Pending |
+| CNV-04 | Phase 26: 편의 기능 | Pending |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36
-- Unmapped: 0
+- v1 requirements: 36 total, 36 mapped, 0 unmapped (Complete)
+- v1.1 requirements: 15 total, 15 mapped, 0 unmapped
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-11 — v1.1 requirements defined (15 requirements for 양식 생성 모달 창 고도화)*
+*Last updated: 2026-04-11 -- v1.1 traceability mapped (15 requirements across 6 phases)*
