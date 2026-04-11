@@ -77,7 +77,10 @@ Plans:
   2. 관리자가 필드를 추가/수정/삭제하면 우측 미리보기 패널에 변경사항이 실시간으로 반영된다
   3. 관리자가 전체화면 미리보기 버튼을 클릭하면 완성된 폼이 포탈 모달로 표시된다
   4. 관리자가 미리보기 패널 표시/숨김을 토글하여 편집 영역을 전체 너비로 사용할 수 있다
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 22-01-PLAN.md — FormPreview 컴포넌트 생성 + i18n 키 추가
+- [ ] 22-02-PLAN.md — TemplateFormModal 분할 레이아웃 전환 + FormPreview 통합
 **UI hint**: yes
 
 ### Phase 23: 테이블 컬럼 편집기
@@ -142,7 +145,7 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 7. Approval Workflow | v1.0 | Done | Complete | 2026-04-10 |
 | 8. Dashboard & Audit | v1.0 | Done | Complete | 2026-04-10 |
 | 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete    | 2026-04-11 |
-| 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 0/? | Not started | - |
+| 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 0/2 | In progress | - |
 | 23. 테이블 컬럼 편집기 | v1.1 | 0/? | Not started | - |
 | 24. 조건부 표시 규칙 UI | v1.1 | 0/? | Not started | - |
 | 25. 계산 규칙 UI | v1.1 | 0/? | Not started | - |
