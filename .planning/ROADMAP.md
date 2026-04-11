@@ -141,7 +141,7 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 6. Document Submission & Numbering | v1.0 | Done | Complete | 2026-04-10 |
 | 7. Approval Workflow | v1.0 | Done | Complete | 2026-04-10 |
 | 8. Dashboard & Audit | v1.0 | Done | Complete | 2026-04-10 |
-| 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete   | 2026-04-11 |
+| 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete    | 2026-04-11 |
 | 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 0/? | Not started | - |
 | 23. 테이블 컬럼 편집기 | v1.1 | 0/? | Not started | - |
 | 24. 조건부 표시 규칙 UI | v1.1 | 0/? | Not started | - |
