@@ -93,6 +93,48 @@ export interface LeaveFormData {
   emergencyContact?: string;
 }
 
+export interface PurchaseItem {
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  amount: number;
+}
+export interface PurchaseFormData {
+  supplier: string;
+  deliveryDate: string;
+  purchaseReason: string;
+  items: PurchaseItem[];
+  totalAmount: number;
+}
+
+export interface ItineraryItem {
+  date: string;
+  location: string;
+  description?: string;
+}
+export interface TripExpenseItem {
+  category: string;
+  amount: number;
+  description?: string;
+}
+export interface BusinessTripFormData {
+  destination: string;
+  startDate: string;
+  endDate: string;
+  purpose: string;
+  itinerary: ItineraryItem[];
+  expenses?: TripExpenseItem[];
+  totalExpense?: number;
+}
+
+export interface OvertimeFormData {
+  workDate: string;
+  startTime: string;
+  endTime: string;
+  hours: number;
+  reason: string;
+}
+
 // === Query Params ===
 export interface MyDocumentParams {
   page?: number;

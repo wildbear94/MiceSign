@@ -2,9 +2,15 @@ import type { ComponentType } from 'react';
 import GeneralForm from './GeneralForm';
 import ExpenseForm from './ExpenseForm';
 import LeaveForm from './LeaveForm';
+import PurchaseForm from './PurchaseForm';
+import BusinessTripForm from './BusinessTripForm';
+import OvertimeForm from './OvertimeForm';
 import GeneralReadOnly from './GeneralReadOnly';
 import ExpenseReadOnly from './ExpenseReadOnly';
 import LeaveReadOnly from './LeaveReadOnly';
+import PurchaseReadOnly from './PurchaseReadOnly';
+import BusinessTripReadOnly from './BusinessTripReadOnly';
+import OvertimeReadOnly from './OvertimeReadOnly';
 
 export interface TemplateEditProps {
   documentId: number | null;
@@ -48,6 +54,27 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateEntry> = {
     label: '휴가 신청서',
     description: '휴가를 신청합니다.',
     icon: 'CalendarDays',
+  },
+  PURCHASE: {
+    editComponent: PurchaseForm,
+    readOnlyComponent: PurchaseReadOnly,
+    label: '구매 요청서',
+    description: '물품 및 서비스 구매를 요청합니다.',
+    icon: 'ShoppingCart',
+  },
+  BUSINESS_TRIP: {
+    editComponent: BusinessTripForm,
+    readOnlyComponent: BusinessTripReadOnly,
+    label: '출장 보고서',
+    description: '출장 일정과 경비를 보고합니다.',
+    icon: 'Plane',
+  },
+  OVERTIME: {
+    editComponent: OvertimeForm,
+    readOnlyComponent: OvertimeReadOnly,
+    label: '연장 근무 신청서',
+    description: '연장 근무를 신청합니다.',
+    icon: 'Clock',
   },
 };
 

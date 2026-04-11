@@ -74,7 +74,10 @@
   "template": {
     "GENERAL": "일반 업무 기안",
     "EXPENSE": "지출 결의서",
-    "LEAVE": "휴가 신청서"
+    "LEAVE": "휴가 신청서",
+    "PURCHASE": "구매 요청서",
+    "BUSINESS_TRIP": "출장 보고서",
+    "OVERTIME": "연장 근무 신청서"
   },
   "expense": {
     "addRow": "항목 추가",
@@ -85,6 +88,46 @@
       "unitPrice": "단가",
       "amount": "금액"
     }
+  },
+  "purchase": {
+    "supplier": "납품업체명",
+    "deliveryDate": "희망 납품일",
+    "purchaseReason": "구매 사유",
+    "addItem": "품목 추가",
+    "removeItem": "품목 삭제",
+    "total": "합계",
+    "columns": {
+      "name": "품목명",
+      "quantity": "수량",
+      "unitPrice": "단가",
+      "amount": "금액"
+    }
+  },
+  "businessTrip": {
+    "destination": "출장지",
+    "startDate": "출장 시작일",
+    "endDate": "출장 종료일",
+    "purpose": "출장 목적",
+    "itinerary": "일정",
+    "expenses": "경비",
+    "addSchedule": "일정 추가",
+    "addExpense": "경비 추가",
+    "totalExpense": "경비 합계",
+    "columns": {
+      "date": "날짜",
+      "location": "장소",
+      "description": "비고",
+      "category": "분류",
+      "amount": "금액"
+    }
+  },
+  "overtime": {
+    "workDate": "근무 날짜",
+    "startTime": "시작 시간",
+    "endTime": "종료 시간",
+    "hours": "근무 시간",
+    "reason": "사유",
+    "hoursUnit": "시간"
   },
   "leave": {
     "type": "휴가 유형",
