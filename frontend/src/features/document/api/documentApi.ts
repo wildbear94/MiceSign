@@ -6,6 +6,7 @@ import type {
   CreateDocumentRequest,
   UpdateDocumentRequest,
   MyDocumentParams,
+  DocumentSearchParams,
 } from '../types/document';
 
 const BASE = '/documents';
@@ -34,4 +35,7 @@ export const documentApi = {
 
   rewrite: (id: number) =>
     apiClient.post<ApiResponse<DocumentDetailResponse>>(`${BASE}/${id}/rewrite`),
+
+  searchDocuments: (params: DocumentSearchParams) =>
+    apiClient.get<ApiResponse<PageResponse<DocumentResponse>>>(`${BASE}/search`, { params }),
 };

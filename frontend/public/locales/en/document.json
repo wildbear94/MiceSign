@@ -29,9 +29,25 @@
   },
   "columns": {
     "title": "Title",
+    "docNumber": "Doc Number",
     "template": "Template",
     "status": "Status",
     "createdAt": "Created"
+  },
+  "search": {
+    "placeholder": "Search by title, document number, or drafter",
+    "button": "Search"
+  },
+  "filter": {
+    "all": "All",
+    "status": "Status",
+    "template": "Template",
+    "dateFrom": "From",
+    "dateTo": "To"
+  },
+  "tab": {
+    "my": "My Documents",
+    "search": "Search"
   },
   "status": {
     "DRAFT": "Draft",

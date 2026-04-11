@@ -29,9 +29,25 @@
   },
   "columns": {
     "title": "제목",
+    "docNumber": "문서번호",
     "template": "양식",
     "status": "상태",
     "createdAt": "작성일"
+  },
+  "search": {
+    "placeholder": "제목, 문서번호, 기안자로 검색",
+    "button": "검색"
+  },
+  "filter": {
+    "all": "전체",
+    "status": "상태",
+    "template": "양식 유형",
+    "dateFrom": "시작일",
+    "dateTo": "종료일"
+  },
+  "tab": {
+    "my": "내 문서",
+    "search": "검색"
   },
   "status": {
     "DRAFT": "임시저장",

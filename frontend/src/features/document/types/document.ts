@@ -100,6 +100,17 @@ export interface MyDocumentParams {
   status?: DocumentStatus;
 }
 
+export interface DocumentSearchParams {
+  keyword?: string;
+  status?: string;
+  templateCode?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  tab?: string;
+  page?: number;
+  size?: number;
+}
+
 // === Attachment Types ===
 export interface AttachmentResponse {
   id: number;

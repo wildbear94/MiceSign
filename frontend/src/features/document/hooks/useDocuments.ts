@@ -4,6 +4,7 @@ import type {
   CreateDocumentRequest,
   UpdateDocumentRequest,
   MyDocumentParams,
+  DocumentSearchParams,
 } from '../types/document';
 
 export function useMyDocuments(params: MyDocumentParams) {
@@ -11,6 +12,15 @@ export function useMyDocuments(params: MyDocumentParams) {
     queryKey: ['documents', 'my', params],
     queryFn: () => documentApi.getMyDocuments(params).then((res) => res.data.data!),
     placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useSearchDocuments(params: DocumentSearchParams, enabled: boolean) {
+  return useQuery({
+    queryKey: ['documents', 'search', params],
+    queryFn: () => documentApi.searchDocuments(params).then((res) => res.data.data!),
+    placeholderData: (previousData) => previousData,
+    enabled,
   });
 }
 
