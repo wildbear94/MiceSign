@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-11 — Phase 21 complete (SchemaFieldEditor 리팩토링 — 596줄 모놀리식 컴포넌트를 8개 파일로 분리)*
+*Last updated: 2026-04-12 — Phase 22 complete (분할 레이아웃 + 라이브 미리보기 — TemplateFormModal near-fullscreen 분할 뷰 + FormPreview 실시간 프리뷰 패널)*
