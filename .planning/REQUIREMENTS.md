@@ -116,6 +116,43 @@ Deferred to future releases (Phase 1-B, 1-C, Phase 2).
 | Real-time notifications (WebSocket) | Deferred; email + dashboard sufficient |
 | Document versioning | Immutability model: changes = new document |
 
+## v1.1 Requirements
+
+Requirements for Milestone v1.1: 양식 생성 모달 창 고도화
+
+### 리팩토링 (기반 작업)
+
+- [ ] **RFT-01**: SchemaFieldEditor를 FieldCard/FieldConfigEditor 등 하위 컴포넌트로 분리하여 유지보수성 확보
+- [ ] **RFT-02**: TemplateFormModal을 near-fullscreen 분할 레이아웃으로 확장 (좌: 편집, 우: 프리뷰)
+
+### 라이브 미리보기
+
+- [ ] **PRV-01**: 관리자가 필드 구성 변경 시 오른쪽 패널에 실시간 폼 미리보기를 볼 수 있다
+- [ ] **PRV-02**: 관리자가 전체화면 미리보기 버튼으로 완성된 폼을 포탈 모달로 볼 수 있다
+- [ ] **PRV-03**: 관리자가 프리뷰 패널 표시/숨김을 토글할 수 있다
+
+### 테이블 컬럼 편집
+
+- [ ] **TBL-01**: 관리자가 table 타입 필드에 컬럼을 추가/삭제/순서변경할 수 있다
+- [ ] **TBL-02**: 관리자가 각 컬럼의 타입(text/number/date/select), 라벨, 필수여부를 설정할 수 있다
+
+### 조건부 규칙
+
+- [ ] **CND-01**: 관리자가 필드별 조건부 표시/숨김 규칙을 설정할 수 있다 (IF 필드 = 값 THEN 표시/숨김/필수/선택)
+- [ ] **CND-02**: 필드 삭제 시 해당 필드를 참조하는 규칙이 자동 정리된다
+
+### 계산 규칙
+
+- [ ] **CAL-01**: 관리자가 숫자 필드에 계산 공식을 설정할 수 있다 (SUM, 사칙연산, 테이블 컬럼 참조)
+- [ ] **CAL-02**: 순환 의존성 감지 시 실시간 경고가 표시된다
+
+### 편의 기능
+
+- [ ] **CNV-01**: 관리자가 기존 양식을 복제하여 새 양식을 생성할 수 있다
+- [ ] **CNV-02**: 관리자가 양식 스키마를 JSON 파일로 내보내기할 수 있다
+- [ ] **CNV-03**: 관리자가 JSON 파일을 업로드하여 양식을 생성할 수 있다 (Zod 검증 포함)
+- [ ] **CNV-04**: 관리자가 프리셋 템플릿(경비, 신청서 등)을 선택하여 빠르게 양식을 생성할 수 있다
+
 ## Traceability
 
 Which phases cover which requirements. Updated during roadmap creation.
@@ -166,4 +203,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-11 — all 36 v1 requirements marked complete after full implementation audit*
+*Last updated: 2026-04-11 — v1.1 requirements defined (15 requirements for 양식 생성 모달 창 고도화)*
