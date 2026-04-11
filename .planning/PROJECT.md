@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-11 — Milestone v1.1 started (양식 생성 모달 창 고도화)*
+*Last updated: 2026-04-11 — Phase 21 complete (SchemaFieldEditor 리팩토링 — 596줄 모놀리식 컴포넌트를 8개 파일로 분리)*
