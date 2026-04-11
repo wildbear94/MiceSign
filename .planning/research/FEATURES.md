@@ -1,146 +1,209 @@
 # Feature Landscape
 
-**Domain:** Electronic Approval System (전자 결재) for in-house use (~50 employees)
-**Researched:** 2026-03-31
-**Confidence:** HIGH (based on PRD v2.0, FSD v1.0, and domain expertise in Korean corporate workflow systems)
+**Domain:** Form Builder Modal Enhancement (전자 결재 양식 빌더)
+**Researched:** 2026-04-11
+
+## Existing Foundation (Already Built)
+
+Before mapping new features, the codebase already has:
+
+| Component | What It Does | Location |
+|-----------|-------------|----------|
+| `SchemaFieldEditor` | Field CRUD, reorder, expand/collapse, type-specific config | `admin/components/SchemaFieldEditor.tsx` |
+| `TemplateFormModal` | Two-tab modal (info/fields), create/edit template, JSON schema persistence | `admin/components/TemplateFormModal.tsx` |
+| `dynamicForm.ts` | Full type definitions: `FieldDefinition`, `ColumnDefinition`, `ConditionalRule`, `CalculationRule`, `SchemaDefinition` | `document/types/dynamicForm.ts` |
+| `evaluateConditions` | Runtime evaluator for conditional rules (10 operators, 4 actions) | `document/utils/evaluateConditions.ts` |
+| `executeCalculations` | Runtime evaluator for calculation formulas (SUM, arithmetic, column refs) | `document/utils/executeCalculations.ts` |
+| `detectCircularDeps` | Circular dependency detection for calculation rule graphs | `document/utils/detectCircularDeps.ts` |
+| `schemaToZod` | Dynamic Zod schema generation from field definitions | `document/utils/schemaToZod.ts` |
+
+**Key insight:** The runtime engines (conditions, calculations, circular dep detection) are already built. The milestone is about building **admin UI** that produces the data structures these engines consume.
+
+---
 
 ## Table Stakes
 
-Features users expect from any electronic approval system. Missing any of these means the system cannot replace Docswave.
+Features that form builder admins expect. Missing = the builder feels like a toy.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Authentication (login/logout/token refresh)** | Cannot use system without it | Medium | JWT stateless auth already spec'd. Account lockout (5 fails / 15min) is important for corporate security posture. |
-| **Document drafting with form templates** | Core purpose of the system | Medium | 3 MVP forms (GENERAL, EXPENSE, LEAVE). Hardcoded React components -- correct for MVP, avoids dynamic form builder complexity. |
-| **Draft save (임시저장)** | Users expect to save work-in-progress before submitting | Low | DRAFT state with no doc number. Essential -- users will lose trust if work disappears. |
-| **Approval line selection (결재선 지정)** | Defining who approves is the fundamental workflow act | High | This is the hardest UX component. Org tree browser + search + drag-and-drop ordering + type assignment (APPROVE/AGREE/REFERENCE). Invest heavily here. |
-| **Sequential approval processing** | Core workflow engine | High | State machine: DRAFT -> SUBMITTED -> APPROVED/REJECTED/WITHDRAWN. Must handle edge cases (withdrawals, rejections, re-drafting). |
-| **Document immutability after submission** | Legal and audit requirement in Korean corporate culture | Low | Lock body + attachments + approval line after SUBMITTED. Non-negotiable. |
-| **Approve/Reject with comments** | Approvers need to provide reasoning, especially on rejections | Low | Reject comment should be mandatory. Approve comment optional. |
-| **Document withdrawal (회수)** | Drafters need to pull back mistaken submissions | Medium | Only before next approver acts. Creates WITHDRAWN state (not revert to DRAFT). |
-| **Re-draft from rejected/withdrawn (재기안)** | Users should not re-type entire documents | Low | Copy content to new document with fresh doc number. Essential UX. |
-| **Document numbering (채번)** | Corporate traceability requirement | Low | Format: PREFIX-YEAR-SEQUENCE. Assigned at submission, not draft. |
-| **File attachments** | Most approval docs need supporting evidence | Medium | Google Drive API integration. 50MB per file, 200MB per doc, 10 files max. |
-| **My Documents inbox (내 문서함)** | Users need to find their own submissions | Low | Filter by status (DRAFT, SUBMITTED, APPROVED, REJECTED, WITHDRAWN). |
-| **Pending approvals inbox (결재 대기함)** | Approvers must see what needs their action | Low | Most critical inbox -- this drives daily workflow. Badge count on nav. |
-| **Completed approvals inbox (결재 완료함)** | Approvers need to review past decisions | Low | Historical reference. |
-| **Reference documents inbox (참조 문서함)** | CC'd users need access to referenced documents | Low | Read-only access, no action required. |
-| **Dashboard (대시보드)** | Landing page showing actionable summary | Medium | Pending count, recent docs, quick links. First thing users see. |
-| **Organization management (부서/직급/사용자)** | Admin must configure org structure before anyone can use the system | Medium | Department tree, position hierarchy, user CRUD. Prerequisite for everything else. |
-| **RBAC (역할 기반 접근 제어)** | Corporate systems require role-based permissions | Medium | SUPER_ADMIN / ADMIN / USER. Controls who sees what. |
-| **Password management** | Users must change passwords; admins must reset them | Low | Self-service change + admin reset with temp password. |
-| **Audit trail (감사 로그 기록)** | Corporate compliance -- all actions must be traceable | Medium | Backend logging of all state changes. UI for querying is Phase 1-C, but recording starts in Phase 1-A. |
-| **Document viewing permissions** | Confidential docs must not leak to unauthorized users | Medium | Drafter, approval line members, REFERENCE targets, ADMIN (dept scope), SUPER_ADMIN (all). |
+| # | Feature | Why Expected | Complexity | Dependencies on Existing |
+|---|---------|--------------|------------|--------------------------|
+| 1 | **Live Form Preview** | Every modern form builder shows what users will see as you edit. Without it, admins must save-reload-check cycles. The gap between "editing fields" and "seeing the form" is the #1 frustration. | Medium | Needs a renderer component that consumes `SchemaDefinition` and renders read-only preview. Reuses `evaluateConditions` / `executeCalculations` for showing dynamic behavior. |
+| 2 | **Table Column Editor** | The `table` field type exists in `SchemaFieldType` but `FIELD_TYPES` array excludes it (line 83). `ColumnDefinition` type exists in `dynamicForm.ts` with full config. Without a column editor, table fields are unusable in the builder. | Medium | Must produce `ColumnDefinition[]` into `field.config.columns`. Column types are a subset of existing field types. |
+| 3 | **Template Clone/Duplicate** | Standard CRUD operation. Admins create similar forms (e.g., Q1 expense vs Q2 expense). Copy-then-modify is faster than rebuild. Every admin panel offers this. | Low | API: POST new template with copied `schemaDefinition`. Frontend: single button on template list + modal for new name/prefix. |
+| 4 | **Preset Templates** | New users stare at a blank builder. Presets (general, expense, leave, etc.) give starting points. The 6 hardcoded templates already define these patterns -- presets are their schema equivalents. | Low | Static JSON objects matching `SchemaDefinition` type. Button in modal to load preset into `schemaFields` state. |
 
 ## Differentiators
 
-Features that elevate the system beyond basic approval. Not strictly required for MVP, but create real value for a small company.
+Features that elevate the builder from functional to powerful. Not expected, but high-value for admin productivity.
 
-| Feature | Value Proposition | Complexity | Phase | Notes |
-|---------|-------------------|------------|-------|-------|
-| **Email notifications (SMTP)** | Users don't have to constantly check the system for pending items | Medium | 1-B | Event-driven async. High impact for adoption -- without this, approvals stall because people forget to check. |
-| **Document search/filtering** | Find any document by keyword, date range, template type, status | Medium | 1-B | Essential once document volume grows past ~100 docs. Not needed for first week of use. |
-| **Approval line favorites (자주 쓰는 결재선)** | Save commonly used approval chains; huge time-saver for repetitive forms | Low | P2 | Low effort, high UX value. Consider pulling into Phase 1-B. |
-| **Statistics and reports** | Approval turnaround times, rejection rates, department volumes | Medium | 1-C | Valuable for management oversight. Shows the system is more than just Docswave replacement. |
-| **Audit log query UI** | SUPER_ADMIN can investigate any action with filters | Medium | 1-C | Backend already logging in P1A; this just adds the frontend. |
-| **Retirement/handover processing** | Clean handling of departing employees' pending approvals | Medium | 1-C | Bulk WITHDRAWN for drafter exits, SKIPPED for approver exits. Small company but still needed. |
-| **Additional form templates** | Purchase request, business trip report, overtime request | Low each | 1-B | Each is a new React component. Hardcoded approach makes adding forms straightforward. |
-| **Forced password change on first login** | Security best practice after admin creates temp password | Low | 1-B | Small effort, meaningful security improvement. |
-| **Read/unread status for reference docs** | Users know which reference docs they haven't read yet | Low | 1-B | Simple boolean flag per user per doc. Nice quality-of-life feature. |
-| **AI-assisted document drafting** | Auto-generate initial draft based on historical documents | High | P2 | The long-term differentiator. Requires substantial document corpus first. Only meaningful after 6+ months of data. |
-| **Proxy approval (대결/위임)** | Designated person approves on behalf of absent approver | Medium | P2 | Common in Korean corporate systems. Important for vacation coverage, but adds complexity to the state machine. |
-| **PDF export/print template** | Generate printable document with approval stamps | Medium | P2 | Some departments want physical records. Korean corporate culture still values printed approvals for certain docs. |
-| **In-app real-time notifications (WebSocket/SSE)** | Instant notification without email dependency | High | P2 | Over-engineering for 50 users. Email + dashboard badge is sufficient. |
-| **Parallel approval (병렬 합의)** | Multiple agreers process simultaneously instead of sequentially | Medium | P2 | Adds significant state machine complexity. Sequential is simpler and adequate for ~50 users. |
+| # | Feature | Value Proposition | Complexity | Dependencies on Existing |
+|---|---------|-------------------|------------|--------------------------|
+| 5 | **Conditional Visibility Rule UI** | Turns invisible JSON rule arrays into visual "IF field X equals Y THEN show/hide field Z" rows. Without this, admins need to hand-edit JSON to use the conditional system that **already works at runtime**. | Medium-High | Produces `ConditionalRule[]` matching the existing type. Must present field ID dropdown (from current fields), operator dropdown (10 operators from `evaluateConditions`), value input, and action selector. |
+| 6 | **Calculation Rule UI** | Same pattern as conditions -- the engine exists but there is no admin UI. Visual "field Z = field A + field B" or "field Z = SUM(table.column)" builder. | Medium-High | Produces `CalculationRule[]` matching existing type. Must show field reference picker, formula template buttons (SUM, arithmetic), `dependsOn` auto-detection, and circular dependency warning via `detectCircularDeps`. |
+| 7 | **JSON Import/Export** | Power-user escape hatch. Copy schema between environments, backup templates, share with other admins. Also critical for developer debugging. | Low | `JSON.stringify(schemaDefinition)` for export (already done in submit handler line 113-118). Import = parse + validate + load into state. |
 
 ## Anti-Features
 
-Features to explicitly NOT build. Each would add complexity without proportional value for a 50-person company.
+Features to explicitly NOT build in this milestone.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| **Dynamic form builder** | Massive complexity (drag-and-drop field editor, validation engine, conditional logic). Only justified at 500+ users or SaaS product. | Hardcoded React components per template. Adding a new form is a developer task (~2-4 hours), not an admin task. Perfectly acceptable at this scale. |
-| **Automatic approval routing rules** | Rule engines (if amount > X then add department head, etc.) add tremendous complexity and edge cases. Korean corporate culture values explicit human decision on approval lines. | 100% manual approval line selection by drafter. This is already the spec and it is correct. |
-| **Mobile native app** | React Native or Flutter app for ~50 users is unjustifiable cost. | Responsive web. Desktop-first, but ensure approve/reject works on mobile browser for P1A. |
-| **SSO / OAuth / LDAP integration** | Over-engineering for a small company that doesn't have an identity provider. | Simple email + password with JWT. Revisit only if company adopts Google Workspace or similar. |
-| **Document versioning** | Tracking diffs between versions adds storage and UI complexity. | Immutable-after-submission model. Need changes? Withdraw and re-draft. Clean and auditable. |
-| **Complex notification preferences** | Per-user notification channel/frequency settings. | Send email for all approval events. No opt-out needed at this scale -- approvals are mandatory workflows. |
-| **Multi-language support (i18n)** | All users are Korean speakers in a Korean company. | Korean UI only. Mixed Korean/English in code is fine per project conventions. |
-| **Data migration from Docswave** | Legacy data is messy and the effort to map old schemas exceeds the value. | Fresh start (clean start). Already confirmed in PRD. Old data stays in Docswave for historical reference. |
-| **Workflow branching / conditional steps** | "If rejected by step 2, skip to step 5" type logic adds enormous state machine complexity. | Linear sequential approval only. Rejection terminates the workflow. Re-draft if needed. |
-| **Bulk approval (일괄 결재)** | Approving multiple documents at once encourages rubber-stamping and defeats the purpose of review. | One-at-a-time approval with mandatory review of document content. |
-| **Docker containerization** | Added infrastructure complexity with no benefit for a single-server deployment. | Native deployment: Spring Boot JAR via systemd, React static via Nginx. Simple and sufficient. |
+| **Drag-and-drop field reordering** | Current up/down arrow reordering works fine for <20 fields. DnD libraries (dnd-kit, react-beautiful-dnd) add significant complexity, bundle size, and accessibility challenges for marginal UX gain at this scale. | Keep chevron up/down buttons. Revisit only if field counts routinely exceed 15. |
+| **Visual formula editor with syntax highlighting** | Full expression editors (CodeMirror, Monaco) are overkill for simple arithmetic formulas like `field1 + field2` or `SUM(items.price)`. The formula language is intentionally simple. | Provide formula templates/snippets and field reference picker. Plain text input with validation feedback. |
+| **Multi-page form sections** | Approval documents are single-page by nature. Section headers suffice for visual grouping. Page breaks add routing complexity for no real user benefit. | Use `staticText` field type for section dividers. |
+| **Form versioning/history** | Complex to implement (schema diffing, migration between versions). Documents reference template at submission time, and immutability rules already handle this. | Template editing is allowed, but submitted documents keep their snapshot. Add versioning only if regulatory requirements demand it. |
+| **AI-generated form rules** | Explicitly deferred to Phase 2 in PROJECT.md. Tempting but premature. | Manual rule building is sufficient for ~50 employees and a handful of templates. |
+| **Nested conditional logic (AND/OR groups)** | The existing `ConditionalRule` type supports single conditions per rule. AND/OR groups require a tree data structure and significantly more complex UI. Single conditions cover 90%+ of real approval form needs. | Multiple single-condition rules achieve AND logic (all must pass). If OR is needed, revisit later. |
+
+---
+
+## Feature Implementation Details
+
+### 1. Live Form Preview
+
+**Pattern:** Side-by-side split panel (editor left, preview right) at desktop widths, with fullscreen preview toggle button.
+
+**How it works:**
+- Preview panel renders `schemaFields` through a read-only form renderer
+- Updates on every field change (debounced ~300ms to avoid jank)
+- Shows field labels, types, placeholders, required indicators
+- For conditional rules: shows sample toggle (admin enters test values, sees fields show/hide)
+- Fullscreen preview: opens modal/overlay with the form at actual render size
+
+**Complexity notes:**
+- Requires building a `FormPreview` component that mirrors the document creation form
+- Can reuse/adapt existing DynamicFormField rendering logic if one exists, or build a simpler read-only version
+- The modal currently uses `max-w-4xl` (line 174); split pane needs wider or a layout change
+
+**Recommendation:** Start with a collapsible right panel inside the existing modal (expand modal to near-fullscreen when preview is open), plus a dedicated fullscreen preview button. Do NOT try to fit split pane into the current 4xl modal width -- it will feel cramped.
+
+### 2. Table Column Editor
+
+**Pattern:** Inline sub-editor that appears when a `table` field is expanded in SchemaFieldEditor.
+
+**How it works:**
+- Add `table` to `FIELD_TYPES` array (currently excluded at line 83)
+- When field type is `table`, `FieldConfigEditor` renders a column editor instead of text/number config
+- Column editor: list of column definitions, each with type selector (text/number/date/select only), label, required toggle
+- Add/remove/reorder columns with same UX as field-level add/remove/reorder
+- `minRows` / `maxRows` config for the table itself
+
+**Type alignment:** `ColumnDefinition` already exists in `dynamicForm.ts` with `id`, `type`, `label`, `required`, `config`. The `SchemaFieldConfig` already has `columns?: ColumnDefinition[]`. Types are ready.
+
+**Column type restrictions:** Only allow `text`, `number`, `date`, `select` as column types. `textarea`, `staticText`, `hidden`, `table` make no sense as table columns.
+
+### 3. Conditional Visibility Rule UI
+
+**Pattern:** Per-field settings panel with a "Conditions" tab, showing rule rows in IF-THEN format.
+
+**How it works:**
+- Each field card gets a tabbed detail section: [Settings] [Conditions] [Calculations]
+- Conditions tab shows rules where this field is the `targetFieldId`
+- Each rule row: dropdown(source field) + dropdown(operator) + input(value) + dropdown(action)
+- Operators sourced from the 10 operators in `evaluateConditions`: eq, neq, gt, gte, lt, lte, in, notIn, isEmpty, isNotEmpty
+- Actions: show, hide, require, unrequire
+- Add rule button, delete rule button per row
+- Rules stored in `conditionalRules[]` at the schema level (already in submit handler line 116)
+
+**UX consideration:** Show field labels (not IDs) in dropdowns, but store IDs in the rule. Auto-filter: a field cannot reference itself as source.
+
+### 4. Calculation Rule UI
+
+**Pattern:** Per-field settings panel "Calculations" tab (only for `number` fields).
+
+**How it works:**
+- Only shown when field type is `number` (calculations produce numeric values)
+- Formula input with helper buttons: `+`, `-`, `*`, `/`, `SUM()`
+- Field reference picker: click a field name to insert its ID into the formula
+- For table column references: show `tableName.columnName` format
+- `dependsOn` auto-computed by parsing field references from the formula
+- Real-time circular dependency check using `detectCircularDeps` -- show warning if cycle detected
+- Preview: show computed result with sample values
+
+**Formula language:** Already defined and implemented in `executeCalculations`:
+- Simple: `field1 + field2`, `amount * 0.1`
+- SUM: `SUM(items.price)`, `SUM(items.price * items.qty)`
+
+### 5. Template Clone/Duplicate
+
+**Pattern:** Action button on template list row.
+
+**How it works:**
+- "Duplicate" button on each template row in the admin list
+- Opens TemplateFormModal pre-filled with source template data
+- Name auto-suffixed with "(복사)" / "(Copy)"
+- Prefix cleared (must be unique per template)
+- Calls existing create API with the copied schema
+
+### 6. JSON Import/Export
+
+**Pattern:** Buttons in the template modal toolbar area.
+
+**How it works:**
+- **Export:** Button generates JSON from current `SchemaDefinition` (fields + conditionalRules + calculationRules), triggers browser download as `.json` file
+- **Import:** File input that accepts `.json`, parses content, validates against `SchemaDefinition` type shape, loads into state
+- Validation on import: check field IDs unique, check rule references valid, check no circular deps
+- Error toast if import JSON is malformed or invalid
+
+### 7. Preset Templates
+
+**Pattern:** Dropdown/grid in the "create new template" flow.
+
+**How it works:**
+- When creating (not editing), show "Start from preset" option before the blank builder
+- Presets: general approval (2-3 text fields), expense report (items table + total), leave request (date range + type select), purchase request (items table + budget fields)
+- Selecting a preset populates `schemaFields` and optionally calculation/condition rules
+- Admin can freely modify after loading -- presets are starting points, not constraints
+- Presets stored as static TypeScript constants, not in DB
+
+---
 
 ## Feature Dependencies
 
 ```
-Organization Management (departments, positions, users)
-  --> Authentication (users must exist to log in)
-    --> Dashboard (landing page after login)
-    --> Document Drafting (logged-in user creates documents)
-      --> Approval Line Selection (select approvers from org tree)
-        --> Document Submission (lock + number + start workflow)
-          --> Approval Processing (approve/reject by approvers)
-            --> Document Completion (APPROVED/REJECTED terminal states)
-          --> Document Withdrawal (drafter pulls back before next step)
-        --> Re-draft (copy rejected/withdrawn content to new draft)
-      --> File Attachments (attach to draft before submission)
-
-Audit Trail Recording (P1A) --> Audit Trail Query UI (P1C)
-Email Notifications (P1B) --> depends on Authentication + Approval Processing
-Document Search (P1B) --> depends on Documents existing (data volume)
-Statistics (P1C) --> depends on sufficient approval history data
+Preset Templates -----> [no dependency, standalone]
+Template Clone -------> [no dependency, standalone]
+JSON Export ----------> [no dependency, standalone]
+JSON Import ----------> [needs validation logic]
+Table Column Editor --> [no dependency, types already exist]
+Live Form Preview ----> [needs form renderer component]
+Conditional Rule UI --> [needs field list context, depends on fields being defined]
+Calculation Rule UI --> [needs field list context, depends on Conditional Rule UI for shared tab pattern, uses detectCircularDeps]
 ```
 
-**Critical path for MVP:** Organization setup -> Auth -> Document drafting + Approval line editor -> Submission + Approval workflow -> Dashboard
-
-The approval line editor (FN-APR-005) is the most complex single UI component and sits on the critical path. It depends on the organization tree being populated, so org management must be built first.
+**Suggested build order based on dependencies:**
+1. **Low-hanging fruit first:** Template Clone, JSON Export/Import, Preset Templates (all Low complexity, no blockers)
+2. **Table Column Editor** (unlocks the `table` field type that is currently dead code)
+3. **Live Form Preview** (high user value, needs renderer but no rule dependencies)
+4. **Conditional Rule UI** (establishes the per-field settings tab pattern)
+5. **Calculation Rule UI** (reuses the tab pattern from conditions, adds dep detection)
 
 ## MVP Recommendation
 
-### Must ship in Phase 1-A (34 functions per FSD):
+**Must ship (table stakes):**
+1. Live Form Preview -- the single highest-impact feature for admin UX
+2. Table Column Editor -- unlocks an existing but unusable field type
+3. Template Clone -- trivial to build, high admin productivity
+4. Preset Templates -- removes blank-canvas paralysis for new admins
 
-1. **Authentication** -- FN-AUTH-001 through FN-AUTH-005
-2. **Organization management** -- FN-ORG-001 through FN-ORG-008
-3. **Form templates** -- FN-TPL-001, FN-TPL-003 (GENERAL, EXPENSE, LEAVE)
-4. **Document lifecycle** -- FN-DOC-001 through FN-DOC-009
-5. **Approval processing** -- FN-APR-001 through FN-APR-005
-6. **File management** -- FN-FILE-001 through FN-FILE-003
-7. **Dashboard** -- FN-DASH-001
-8. **Audit logging (backend)** -- FN-AUD-001
+**Ship if time allows (differentiators):**
+5. JSON Export/Import -- low complexity, high power-user value
+6. Conditional Rule UI -- high value but medium-high complexity
+7. Calculation Rule UI -- highest complexity, depends on condition UI patterns
 
-### Defer to Phase 1-B:
-
-- **Email notifications** (FN-NTF-001): High impact but not blocking. Users can check dashboard manually for the first week.
-- **Document search** (FN-SEARCH-001): Not needed until document volume grows.
-- **Additional templates**: PURCHASE, BUSINESS_TRIP, OVERTIME -- add incrementally.
-- **Password change enforcement on first login**: Security improvement, low effort.
-
-### Defer to Phase 1-C:
-
-- **Audit log query UI** (FN-AUD-002): Backend is already logging; frontend can wait.
-- **Statistics/reports**: Needs data to be useful.
-- **Retirement/handover processing** (FN-ORG-009): Edge case that can be handled manually initially.
-
-### Defer to Phase 2 or later:
-
-- **AI document assistance**: Requires 6+ months of document corpus.
-- **Proxy/delegation approval**: Complex state machine changes.
-- **PDF export**: Nice-to-have, not urgent.
-- **Approval line favorites**: Low complexity -- consider pulling to 1-B if time allows.
-
-## Risk Notes
-
-| Feature Area | Risk | Mitigation |
-|--------------|------|------------|
-| Approval line editor UX | Most complex frontend component. Bad UX here kills adoption. | Prototype and test with 2-3 actual users before building all other features. Org tree search must be fast and intuitive. |
-| Google Drive API reliability | External dependency for file storage. API rate limits, outages. | Retry with exponential backoff (already in spec). Ensure approval flow works without attachments. |
-| Document state machine edge cases | Concurrent actions (withdraw while approver is approving), race conditions | Optimistic locking on document status. Backend must validate state transitions strictly. |
-| Form template extensibility | Hardcoded components mean developer effort for each new form | Acceptable at this scale. Create a clear pattern/boilerplate so new forms take 2-4 hours, not days. |
+**Explicitly defer:**
+- Drag-and-drop reordering
+- Visual formula editor
+- Nested AND/OR condition groups
+- Form versioning
 
 ## Sources
 
-- PRD v2.0: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/docs/PRD_MiceSign_v2.0.md`
-- FSD v1.0: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/docs/FSD_MiceSign_v1.0.md`
-- PROJECT.md: `/Volumes/USB-SSD/03-code/VibeCoding/MiceSign/.planning/PROJECT.md`
-- Domain knowledge: Korean corporate electronic approval systems (전자 결재) are a well-established domain with consistent feature expectations across products like Docswave, Hiworks, Groupware solutions (Hancom, Daou), and enterprise systems (Samsung SDS Brity Works, LG CNS). The table stakes listed above reflect consensus features across these products.
+- [FormCarve: Building a Dynamic React Form Builder & Renderer](https://dev.to/allenarduino/formcarve-building-a-dynamic-react-form-builder-renderer-monorepo-49dj) -- split pane preview patterns
+- [SurveyJS React Form Builder](https://surveyjs.io/react-form-builder) -- commercial form builder reference
+- [Rule Builder UI Pattern](https://ui-patterns.com/patterns/rule-builder) -- conditional rule builder design patterns
+- [Easy Forms Rule Builder](https://docs.easyforms.dev/rule-builder.html) -- condition/action rule builder implementation reference
+- [Form.io Data Components](https://help.form.io/userguide/forms/form-building/form-components/data-components) -- Edit Grid / table column patterns
+- [Budibase Conditional Logic Forms](https://budibase.com/blog/tutorials/conditional-logic-forms/) -- conditional logic best practices
+- [SurveyJS JSON Schema Form Builder](https://surveyjs.io/stay-updated/blog/dynamically-create-forms-from-json-schema) -- JSON schema import/export patterns
+- Existing codebase: `dynamicForm.ts`, `evaluateConditions.ts`, `executeCalculations.ts`, `detectCircularDeps.ts`
