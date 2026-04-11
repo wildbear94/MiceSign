@@ -45,10 +45,11 @@ Exceptions: none
 
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
-| Body | 14px | 400 (normal) | 1.5 | `text-sm` |
-| Label | 14px | 500 (medium) | 1.5 | `text-sm font-medium` |
+| Body / Label | 14px | 400 (normal) | 1.5 | `text-sm` |
 | Panel heading | 14px | 600 (semibold) | 1.5 | `text-sm font-semibold` |
 | Preview title | 18px | 600 (semibold) | 1.2 | `text-lg font-semibold` |
+
+Weights used: 2 (400 normal, 600 semibold). Body and Label are unified under weight 400 — in Korean UI the visual distinction between 400 and 500 is negligible, and semibold (600) provides sufficient contrast for headings.
 
 Source: Existing TemplateFormModal uses `text-sm` for body/labels, `text-lg font-semibold` for modal title.
 
