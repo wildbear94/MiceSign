@@ -78,7 +78,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               <button
                 onClick={onClose}
                 className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-                aria-label="Close sidebar"
+                aria-label="사이드바 닫기"
               >
                 <X className="h-5 w-5" />
               </button>

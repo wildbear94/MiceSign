@@ -12,7 +12,8 @@
     "reference": "참조",
     "self": "본인",
     "alreadyAdded": "추가됨",
-    "maxWarning": "최대 인원 초과"
+    "maxWarning": "최대 인원 초과",
+    "approveRequired": "승인자를 1명 이상 지정해주세요."
   },
   "typeShort": {
     "APPROVE": "결재",
@@ -34,21 +35,29 @@
     "currentApprover": "현재 결재자",
     "approve": "승인",
     "reject": "반려",
+    "withdraw": "회수",
+    "resubmit": "재작성",
     "commentPlaceholder": "의견을 입력하세요 (선택사항)",
     "rejectCommentRequired": "반려 시 사유를 입력해 주세요",
     "notYourTurn": "현재 결재 순서가 아닙니다"
   },
   "success": {
     "approved": "승인되었습니다",
-    "rejected": "반려되었습니다"
+    "rejected": "반려되었습니다",
+    "withdrawn": "문서가 회수되었습니다."
   },
   "error": {
     "approveFailed": "승인 처리에 실패했습니다",
-    "rejectFailed": "반려 처리에 실패했습니다"
+    "rejectFailed": "반려 처리에 실패했습니다",
+    "withdrawFailed": "문서 회수에 실패했습니다.",
+    "rewriteFailed": "문서 재작성에 실패했습니다."
   },
   "confirm": {
     "rejectTitle": "반려 확인",
     "rejectMessage": "이 문서를 반려하시겠습니까?",
-    "rejectConfirm": "반려"
+    "rejectConfirm": "반려",
+    "withdrawTitle": "문서 회수",
+    "withdrawMessage": "이 문서를 회수하시겠습니까?",
+    "withdrawConfirm": "회수"
   }
 }

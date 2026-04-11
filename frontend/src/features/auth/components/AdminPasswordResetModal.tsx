@@ -53,7 +53,7 @@ export default function AdminPasswordResetModal({
       }, 1500);
     } catch (err) {
       const axiosError = err as AxiosError<ApiResponse<null>>;
-      setError(axiosError.response?.data?.error?.message ?? 'An error occurred');
+      setError(axiosError.response?.data?.error?.message ?? '오류가 발생했습니다');
       setShowConfirm(false);
     } finally {
       setIsLoading(false);
@@ -81,7 +81,7 @@ export default function AdminPasswordResetModal({
           type="button"
           onClick={handleClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          aria-label="Close"
+          aria-label="닫기"
         >
           <X className="w-5 h-5" />
         </button>

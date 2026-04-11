@@ -69,7 +69,8 @@
   "sidebar": {
     "departments": "부서 관리",
     "positions": "직급 관리",
-    "users": "사용자 관리"
+    "users": "사용자 관리",
+    "templates": "양식 관리"
   },
   "common": {
     "close": "닫기",
@@ -95,6 +96,90 @@
     "ORG_NOT_FOUND": "대상을 찾을 수 없습니다.",
     "NETWORK_ERROR": "네트워크 오류가 발생했습니다. 다시 시도해주세요."
   },
+  "templates": {
+    "title": "양식 관리",
+    "addTemplate": "양식 추가",
+    "editTemplate": "양식 수정",
+    "code": "코드",
+    "name": "이름",
+    "description": "설명",
+    "prefix": "접두어",
+    "status": "상태",
+    "active": "활성",
+    "inactive": "비활성",
+    "emptyTitle": "등록된 양식이 없습니다",
+    "emptyBody": "양식을 추가해주세요.",
+    "deactivatedSuccess": "양식이 비활성화되었습니다.",
+    "activatedSuccess": "양식이 활성화되었습니다.",
+    "toggleError": "양식 상태 변경에 실패했습니다.",
+    "confirmDeactivate": "양식 비활성화",
+    "confirmActivate": "양식 활성화",
+    "confirmDeactivateDesc": "이 양식을 비활성화하시겠습니까?",
+    "deactivateButton": "비활성화",
+    "activateButton": "활성화",
+    "templateName": "양식 이름",
+    "templateDescription": "양식 설명",
+    "templatePrefix": "접두어",
+    "templateCategory": "카테고리",
+    "templateIcon": "아이콘",
+    "tabInfo": "기본 정보",
+    "tabFields": "필드 구성"
+  },
+  "registration": {
+    "title": "등록 신청 관리",
+    "table": {
+      "name": "이름",
+      "email": "이메일",
+      "createdAt": "신청일",
+      "status": "상태",
+      "processedAt": "처리일"
+    },
+    "emptyList": "등록 신청이 없습니다.",
+    "status": {
+      "PENDING": "대기중",
+      "APPROVED": "승인",
+      "REJECTED": "거부",
+      "EXPIRED": "만료",
+      "CANCELLED": "취소"
+    },
+    "tabs": {
+      "all": "전체",
+      "pending": "대기중",
+      "approved": "승인",
+      "rejected": "거부",
+      "expired": "만료",
+      "cancelled": "취소"
+    },
+    "modal": {
+      "title": "등록 신청 상세",
+      "department": "부서",
+      "position": "직급",
+      "employeeNo": "사원번호",
+      "assignInfo": "배정 정보",
+      "rejectionReason": "거부 사유",
+      "rejectionReasonPlaceholder": "거부 사유를 입력해주세요 (최소 10자)"
+    },
+    "validation": {
+      "departmentRequired": "부서를 선택해주세요.",
+      "positionRequired": "직급을 선택해주세요.",
+      "employeeNoRequired": "사원번호를 입력해주세요.",
+      "rejectionReasonMinLength": "거부 사유는 최소 10자 이상 입력해주세요."
+    },
+    "action": {
+      "approve": "승인",
+      "reject": "거부",
+      "cancel": "취소",
+      "confirmReject": "거부 확인",
+      "rejectConfirmTitle": "등록 신청 거부",
+      "rejectConfirmMessage": "이 등록 신청을 거부하시겠습니까?"
+    },
+    "toast": {
+      "approved": "등록 신청이 승인되었습니다.",
+      "rejected": "등록 신청이 거부되었습니다.",
+      "alreadyProcessed": "이미 처리된 신청입니다.",
+      "error": "처리 중 오류가 발생했습니다."
+    }
+  },
   "toast": {
     "departmentCreated": "부서가 추가되었습니다.",
     "departmentUpdated": "부서 정보가 수정되었습니다.",
@@ -104,6 +189,8 @@
     "positionReordered": "직급 순서가 변경되었습니다.",
     "userCreated": "사용자가 추가되었습니다.",
     "userUpdated": "사용자 정보가 수정되었습니다.",
-    "userDeactivated": "사용자가 비활성화되었습니다."
+    "userDeactivated": "사용자가 비활성화되었습니다.",
+    "templateCreated": "양식이 생성되었습니다.",
+    "templateUpdated": "양식이 수정되었습니다."
   }
 }

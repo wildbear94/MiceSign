@@ -59,7 +59,7 @@ export default function Pagination({
               ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
-          aria-label="Previous page"
+          aria-label="이전 페이지"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -97,7 +97,7 @@ export default function Pagination({
               ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
-          aria-label="Next page"
+          aria-label="다음 페이지"
         >
           <ChevronRight className="h-4 w-4" />
         </button>

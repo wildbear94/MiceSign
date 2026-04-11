@@ -19,7 +19,7 @@ export default function AdminLayout() {
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-            aria-label="Open sidebar"
+            aria-label="사이드바 열기"
           >
             <Menu className="h-5 w-5" />
           </button>

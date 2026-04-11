@@ -215,7 +215,7 @@ export default function DocumentEditorPage() {
   if (!templateEntry && !isEditMode) {
     return (
       <div className="text-center py-12 text-gray-500">
-        Unknown template: {resolvedTemplateCode}
+        알 수 없는 양식: {resolvedTemplateCode}
       </div>
     );
   }
