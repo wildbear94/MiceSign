@@ -47,7 +47,7 @@
 - Phases 21-26: v1.1 양식 생성 모달 창 고도화
 - Decimal phases (e.g., 22.1): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 21: SchemaFieldEditor 리팩토링** - 596줄 모놀리식 컴포넌트를 유지보수 가능한 하위 컴포넌트로 분리
+- [x] **Phase 21: SchemaFieldEditor 리팩토링** - 596줄 모놀리식 컴포넌트를 유지보수 가능한 하위 컴포넌트로 분리 (completed 2026-04-11)
 - [ ] **Phase 22: 분할 레이아웃 + 라이브 미리보기** - 모달을 near-fullscreen 분할 뷰로 확장하고 실시간 프리뷰 패널 구축
 - [ ] **Phase 23: 테이블 컬럼 편집기** - table 타입 필드에 컬럼 추가/삭제/순서변경/타입설정 기능 구현
 - [ ] **Phase 24: 조건부 표시 규칙 UI** - 필드별 조건부 표시/숨김 규칙 설정 인터페이스 구축
@@ -64,9 +64,9 @@
   1. SchemaFieldEditor가 FieldCard, FieldConfigEditor 등 명확한 책임의 하위 컴포넌트로 분리되어 있다
   2. 기존 양식 생성/편집 기능이 리팩토링 전과 동일하게 작동한다 (필드 추가/삭제/순서변경/설정)
   3. 각 하위 컴포넌트가 독립적으로 테스트 가능한 크기이다 (200줄 이하)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 21-01-PLAN.md — 폴더 생성 + 하위 모듈 추출 + barrel export
+- [x] 21-01-PLAN.md — 폴더 생성 + 하위 모듈 추출 + barrel export
 
 ### Phase 22: 분할 레이아웃 + 라이브 미리보기
 **Goal**: 관리자가 양식을 편집하면서 실시간으로 결과물을 확인할 수 있는 분할 화면 환경을 갖는다
@@ -141,7 +141,7 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 6. Document Submission & Numbering | v1.0 | Done | Complete | 2026-04-10 |
 | 7. Approval Workflow | v1.0 | Done | Complete | 2026-04-10 |
 | 8. Dashboard & Audit | v1.0 | Done | Complete | 2026-04-10 |
-| 21. SchemaFieldEditor 리팩토링 | v1.1 | 0/1 | Not started | - |
+| 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete   | 2026-04-11 |
 | 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 0/? | Not started | - |
 | 23. 테이블 컬럼 편집기 | v1.1 | 0/? | Not started | - |
 | 24. 조건부 표시 규칙 UI | v1.1 | 0/? | Not started | - |

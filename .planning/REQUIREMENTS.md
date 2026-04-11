@@ -122,7 +122,7 @@ Requirements for Milestone v1.1: 양식 생성 모달 창 고도화
 
 ### 리팩토링 (기반 작업)
 
-- [ ] **RFT-01**: SchemaFieldEditor를 FieldCard/FieldConfigEditor 등 하위 컴포넌트로 분리하여 유지보수성 확보
+- [x] **RFT-01**: SchemaFieldEditor를 FieldCard/FieldConfigEditor 등 하위 컴포넌트로 분리하여 유지보수성 확보
 - [ ] **RFT-02**: TemplateFormModal을 near-fullscreen 분할 레이아웃으로 확장 (좌: 편집, 우: 프리뷰)
 
 ### 라이브 미리보기
@@ -195,7 +195,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-02 | Phase 8: Dashboard & Audit | Complete |
 | DASH-03 | Phase 8: Dashboard & Audit | Complete |
 | AUD-01 | Phase 8: Dashboard & Audit | Complete |
-| RFT-01 | Phase 21: SchemaFieldEditor 리팩토링 | Pending |
+| RFT-01 | Phase 21: SchemaFieldEditor 리팩토링 | Complete |
 | RFT-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
 | PRV-01 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
 | PRV-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
