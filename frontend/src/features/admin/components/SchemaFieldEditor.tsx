@@ -388,7 +388,7 @@ function FieldCard({
             disabled={index === 0}
             onClick={() => onMove('up')}
             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded transition-colors"
-            title="Move up"
+            title="위로 이동"
           >
             <ChevronUp className="w-4 h-4" />
           </button>
@@ -397,7 +397,7 @@ function FieldCard({
             disabled={index === total - 1}
             onClick={() => onMove('down')}
             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed rounded transition-colors"
-            title="Move down"
+            title="아래로 이동"
           >
             <ChevronDown className="w-4 h-4" />
           </button>
