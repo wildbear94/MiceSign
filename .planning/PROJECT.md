@@ -19,21 +19,17 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] Password management (user change + admin reset) — Validated in Phase 2: Authentication (AUTH-06, AUTH-07)
 
 ### Active
-- [ ] Admin-managed organization structure (departments, positions, users)
-- [ ] RBAC with three roles (SUPER_ADMIN, ADMIN, USER)
-- [ ] Document drafting with template-based forms (GENERAL, EXPENSE, LEAVE)
-- [ ] Flexible approval line selection (APPROVE, AGREE, REFERENCE types)
-- [ ] Sequential approval workflow with document state machine (DRAFT → SUBMITTED → APPROVED/REJECTED/WITHDRAWN)
-- [ ] Document immutability after submission (locked body, attachments, approval line)
-- [ ] Document numbering system (prefix-year-sequence, assigned at submission)
-- [x] File attachments via Google Drive API (Service Account) — Validated in Phase 5: File Attachments (FILE-01, FILE-02, FILE-03)
-- [ ] Audit trail logging for all document state changes
-- [ ] Dashboard showing pending approvals and recent documents
+- [ ] 실시간 미리보기 패널 + 전체화면 미리보기 버튼
+- [ ] 표(table) 필드 컬럼 편집기 (컬럼 추가/삭제/순서변경/타입 설정)
+- [ ] 조건부 표시 규칙 UI (필드별 설정 패널 내 조건 탭)
+- [ ] 계산 규칙 UI (필드별 설정 패널 내 계산 탭)
+- [ ] 양식 복제 기능
+- [ ] JSON 내보내기/가져오기
+- [ ] 기본 양식 템플릿 프리셋
 
 ### Out of Scope
 
 - SMTP email notifications — deferred to Phase 1-B
-- Document search/filtering — deferred to Phase 1-B
 - Audit log query UI — deferred to Phase 1-C
 - Statistics/reports — deferred to Phase 1-C
 - Handover features — deferred to Phase 1-C
@@ -60,6 +56,19 @@ Employees can submit approval documents and get them approved/rejected through a
 - **File storage:** Google Drive API v3 with Service Account — metadata only in DB
 - **Form templates:** Hardcoded React components per template type, not a dynamic form builder
 - **Approval rules:** 100% manual approval line selection by drafter — no auto-routing
+
+## Current Milestone: v1.1 양식 생성 모달 창 고도화
+
+**Goal:** 양식 관리 모달(TemplateFormModal)을 고급 빌더 수준으로 확장하여 관리자가 동적 양식을 시각적으로 설계하고, 미리보기하고, 재사용할 수 있도록 함
+
+**Target features:**
+- 실시간 미리보기 패널 + 전체화면 미리보기 버튼
+- 표(table) 필드 컬럼 편집기
+- 조건부 표시 규칙 UI (필드별 설정)
+- 계산 규칙 UI (필드별 설정)
+- 양식 복제 기능
+- JSON 내보내기/가져오기
+- 기본 양식 템플릿 프리셋
 
 ## Key Decisions
 
@@ -90,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 after Phase 05 (File Attachments) completion*
+*Last updated: 2026-04-11 — Milestone v1.1 started (양식 생성 모달 창 고도화)*

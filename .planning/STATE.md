@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: complete
-stopped_at: All phases complete
-last_updated: "2026-04-11T00:00:00.000Z"
+milestone: v1.1
+milestone_name: 양식 생성 모달 창 고도화
+status: defining_requirements
+stopped_at: null
+last_updated: "2026-04-11T09:30:00.000Z"
 last_activity: 2026-04-11
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 1-A MVP complete — all 36 requirements implemented
+**Current focus:** Milestone v1.1 — 양식 생성 모달 창 고도화
 
 ## Current Position
 
-Phase: All 8 phases complete
-Plan: N/A
-Status: Phase 1-A MVP complete
-Last activity: 2026-04-11
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-11 — Milestone v1.1 started
 
-Progress: [██���███████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
