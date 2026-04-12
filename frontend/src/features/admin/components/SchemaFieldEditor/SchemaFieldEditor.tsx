@@ -1,11 +1,22 @@
 import { useState, useRef, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import type { ConditionalRule } from '../../../document/types/dynamicForm';
 import type { SchemaField, SchemaFieldType, SchemaFieldEditorProps } from './types';
 import { FIELD_TYPE_META, FALLBACK_TYPE_META, FIELD_TYPES } from './constants';
 import { FieldCard } from './FieldCard';
+import { cleanupRulesForDeletedField, cleanupRulesForTypeChange } from './conditionalRuleUtils';
 
-export default function SchemaFieldEditor({ fields, onChange }: SchemaFieldEditorProps) {
+export default function SchemaFieldEditor({
+  fields,
+  onChange,
+  conditionalRules = [],
+  onConditionalRulesChange,
+}: SchemaFieldEditorProps & {
+  conditionalRules?: ConditionalRule[];
+  onConditionalRulesChange?: (rules: ConditionalRule[]) => void;
+}) {
   const { t } = useTranslation('admin');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -38,9 +49,19 @@ export default function SchemaFieldEditor({ fields, onChange }: SchemaFieldEdito
   };
 
   const updateField = (index: number, updated: SchemaField) => {
+    const oldField = fields[index];
     const newFields = [...fields];
     newFields[index] = updated;
     onChange(newFields);
+
+    // D-25: Cleanup rules when field type changes
+    if (oldField.type !== updated.type && onConditionalRulesChange) {
+      const [cleanedRules, removedCount] = cleanupRulesForTypeChange(updated.id, updated.type, conditionalRules);
+      if (removedCount > 0) {
+        toast(t('templates.condition.rulesAutoRemoved', { count: removedCount }));
+        onConditionalRulesChange(cleanedRules);
+      }
+    }
   };
 
   const moveField = (index: number, direction: 'up' | 'down') => {
@@ -54,8 +75,19 @@ export default function SchemaFieldEditor({ fields, onChange }: SchemaFieldEdito
 
   const deleteField = (index: number) => {
     if (!window.confirm(t('templates.confirmRemoveField'))) return;
+    const deletedFieldId = fields[index].id;
     const newFields = fields.filter((_, i) => i !== index);
     onChange(newFields);
+
+    // D-21, D-22: Cleanup rules referencing the deleted field
+    if (onConditionalRulesChange) {
+      const [cleanedRules, removedCount] = cleanupRulesForDeletedField(deletedFieldId, conditionalRules);
+      if (removedCount > 0) {
+        toast(t('templates.condition.rulesAutoRemoved', { count: removedCount }));
+      }
+      onConditionalRulesChange(cleanedRules);
+    }
+
     if (expandedIndex === index) {
       setExpandedIndex(null);
     } else if (expandedIndex !== null && expandedIndex > index) {
@@ -123,6 +155,15 @@ export default function SchemaFieldEditor({ fields, onChange }: SchemaFieldEdito
               onUpdate={(updated) => updateField(index, updated)}
               onMove={(dir) => moveField(index, dir)}
               onDelete={() => deleteField(index)}
+              conditionalRules={conditionalRules}
+              allFields={fields}
+              onAddRule={(rule) => onConditionalRulesChange?.([...conditionalRules, rule])}
+              onUpdateRule={(rule) => onConditionalRulesChange?.(
+                conditionalRules.map(r => r.targetFieldId === rule.targetFieldId ? rule : r)
+              )}
+              onDeleteRule={(targetFieldId) => onConditionalRulesChange?.(
+                conditionalRules.filter(r => r.targetFieldId !== targetFieldId)
+              )}
             />
           ))}
         </div>

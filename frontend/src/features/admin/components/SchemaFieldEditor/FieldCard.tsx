@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronUp, ChevronDown, Trash2, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { ConditionalRule } from '../../../document/types/dynamicForm';
 import type { SchemaField } from './types';
-import { INPUT_CLASS } from './constants';
+import { INPUT_CLASS, CONDITION_EXCLUDED_TARGET_TYPES } from './constants';
 import { toFieldId } from './utils';
 import { TypeBadge } from './TypeBadge';
 import { FieldConfigEditor } from './FieldConfigEditor';
+import { ConditionalRuleEditor } from './ConditionalRuleEditor';
 
 export function FieldCard({
   field,
@@ -16,6 +18,11 @@ export function FieldCard({
   onUpdate,
   onMove,
   onDelete,
+  conditionalRules,
+  allFields,
+  onAddRule,
+  onUpdateRule,
+  onDeleteRule,
 }: {
   field: SchemaField;
   index: number;
@@ -25,9 +32,15 @@ export function FieldCard({
   onUpdate: (updated: SchemaField) => void;
   onMove: (direction: 'up' | 'down') => void;
   onDelete: () => void;
+  conditionalRules: ConditionalRule[];
+  allFields: SchemaField[];
+  onAddRule: (rule: ConditionalRule) => void;
+  onUpdateRule: (rule: ConditionalRule) => void;
+  onDeleteRule: (targetFieldId: string) => void;
 }) {
   const { t } = useTranslation('admin');
   const [labelEdited, setLabelEdited] = useState(false);
+  const [conditionExpanded, setConditionExpanded] = useState(false);
 
   const handleLabelChange = (newLabel: string) => {
     const updated = { ...field, label: newLabel };
@@ -62,6 +75,11 @@ export function FieldCard({
         {field.required && (
           <span className="text-red-500 text-sm font-bold" title={t('templates.fieldRequired')}>
             *
+          </span>
+        )}
+        {conditionalRules.some(r => r.targetFieldId === field.id) && (
+          <span className="inline-flex items-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 rounded px-1 py-0.5">
+            <Zap className="w-3.5 h-3.5" />
           </span>
         )}
         {/* Action buttons */}
@@ -144,6 +162,38 @@ export function FieldCard({
             field={field}
             onConfigChange={(config) => onUpdate({ ...field, config })}
           />
+
+          {/* Conditional rule section (D-01, D-04) */}
+          {!CONDITION_EXCLUDED_TARGET_TYPES.includes(field.type) && (
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
+              <div
+                role="button"
+                aria-expanded={conditionExpanded}
+                onClick={() => setConditionExpanded(!conditionExpanded)}
+                className="flex items-center gap-2 py-2 cursor-pointer select-none"
+              >
+                <ChevronRight
+                  className={`w-4 h-4 text-gray-400 transition-transform ${conditionExpanded ? 'rotate-90' : ''}`}
+                />
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('templates.condition.sectionTitle')}
+                </span>
+              </div>
+              {conditionExpanded && (
+                <div className="pl-6 pb-1">
+                  <ConditionalRuleEditor
+                    targetFieldId={field.id}
+                    rule={conditionalRules.find(r => r.targetFieldId === field.id)}
+                    allFields={allFields}
+                    allRules={conditionalRules}
+                    onAddRule={onAddRule}
+                    onUpdateRule={onUpdateRule}
+                    onDeleteRule={() => onDeleteRule(field.id)}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
