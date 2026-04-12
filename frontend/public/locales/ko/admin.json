@@ -185,7 +185,41 @@
     "minRows": "최소 행 수",
     "maxRows": "최대 행 수",
     "addRow": "행 추가",
-    "columnMinError": "테이블에 최소 1개의 컬럼이 필요합니다"
+    "columnMinError": "테이블에 최소 1개의 컬럼이 필요합니다",
+    "condition": {
+      "sectionTitle": "조건 규칙",
+      "noRule": "조건 규칙이 없습니다",
+      "addRule": "조건 추가",
+      "deleteRule": "조건 삭제",
+      "if": "IF",
+      "then": "THEN",
+      "selectField": "필드 선택",
+      "selectOperator": "연산자 선택",
+      "selectAction": "액션 선택",
+      "enterValue": "값 입력",
+      "operators": {
+        "eq": "값이 같음",
+        "neq": "값이 다름",
+        "gt": "보다 큼",
+        "gte": "이상",
+        "lt": "보다 작음",
+        "lte": "이하",
+        "in": "포함",
+        "notIn": "미포함",
+        "isEmpty": "비어있음",
+        "isNotEmpty": "비어있지 않음"
+      },
+      "actions": {
+        "show": "표시",
+        "hide": "숨김",
+        "require": "필수로 변경",
+        "unrequire": "선택으로 변경"
+      },
+      "rulesAutoRemoved": "조건 규칙 {{count}}개가 자동 제거되었습니다",
+      "validationError": "조건 규칙에 오류가 있습니다",
+      "noSourceFields": "조건 소스로 사용 가능한 필드가 없습니다",
+      "resetPreview": "초기화"
+    }
   },
   "registration": {
     "title": "등록 신청 관리",

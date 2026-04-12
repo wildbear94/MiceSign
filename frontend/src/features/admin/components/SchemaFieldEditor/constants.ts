@@ -57,3 +57,29 @@ export const INPUT_CLASS =
 
 export const SMALL_INPUT_CLASS =
   'w-full h-9 px-3 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors border-gray-300 dark:border-gray-600';
+
+// === Conditional Rule Constants ===
+
+import type { SchemaFieldType, ComparisonOperator, ActionOption } from './types';
+
+// D-05: Source field allowed types
+export const CONDITION_SOURCE_TYPES: SchemaFieldType[] = ['text', 'number', 'date', 'select'];
+
+// D-04: Target field excluded types
+export const CONDITION_EXCLUDED_TARGET_TYPES: SchemaFieldType[] = ['staticText', 'hidden'];
+
+// D-08: Operators by source field type
+export const OPERATORS_BY_TYPE: Record<string, ComparisonOperator[]> = {
+  text:   ['eq', 'neq', 'isEmpty', 'isNotEmpty'],
+  number: ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'in', 'notIn', 'isEmpty', 'isNotEmpty'],
+  date:   ['eq', 'neq', 'gt', 'lt', 'gte', 'lte'],
+  select: ['eq', 'neq', 'in', 'notIn', 'isEmpty', 'isNotEmpty'],
+};
+
+// D-09: Action options
+export const ACTION_OPTIONS: ActionOption[] = [
+  { value: 'show', labelKey: 'templates.condition.actions.show' },
+  { value: 'hide', labelKey: 'templates.condition.actions.hide' },
+  { value: 'require', labelKey: 'templates.condition.actions.require' },
+  { value: 'unrequire', labelKey: 'templates.condition.actions.unrequire' },
+];

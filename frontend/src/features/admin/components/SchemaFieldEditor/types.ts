@@ -52,3 +52,18 @@ export interface SchemaFieldEditorProps {
   fields: SchemaField[];
   onChange: (fields: SchemaField[]) => void;
 }
+
+// === Conditional Rule UI Types ===
+
+export type ComparisonOperator = 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'notIn' | 'isEmpty' | 'isNotEmpty';
+export type ConditionalAction = 'show' | 'hide' | 'require' | 'unrequire';
+
+export interface OperatorOption {
+  value: ComparisonOperator;
+  labelKey: string; // i18n key under templates.condition.operators.*
+}
+
+export interface ActionOption {
+  value: ConditionalAction;
+  labelKey: string; // i18n key under templates.condition.actions.*
+}

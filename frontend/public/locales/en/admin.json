@@ -185,7 +185,41 @@
     "columnTypeCheckbox": "Checkbox",
     "columnTypeStaticText": "Static Text",
     "reorderColumn": "Reorder column",
-    "noLabel": "(No label)"
+    "noLabel": "(No label)",
+    "condition": {
+      "sectionTitle": "Conditional Rules",
+      "noRule": "No conditional rules",
+      "addRule": "Add Condition",
+      "deleteRule": "Delete Condition",
+      "if": "IF",
+      "then": "THEN",
+      "selectField": "Select field",
+      "selectOperator": "Select operator",
+      "selectAction": "Select action",
+      "enterValue": "Enter value",
+      "operators": {
+        "eq": "equals",
+        "neq": "not equals",
+        "gt": "greater than",
+        "gte": "greater or equal",
+        "lt": "less than",
+        "lte": "less or equal",
+        "in": "is in",
+        "notIn": "is not in",
+        "isEmpty": "is empty",
+        "isNotEmpty": "is not empty"
+      },
+      "actions": {
+        "show": "Show",
+        "hide": "Hide",
+        "require": "Make required",
+        "unrequire": "Make optional"
+      },
+      "rulesAutoRemoved": "{{count}} conditional rule(s) auto-removed",
+      "validationError": "Conditional rules have errors",
+      "noSourceFields": "No fields available as condition source",
+      "resetPreview": "Reset"
+    }
   },
   "toast": {
     "departmentCreated": "Department has been added.",
