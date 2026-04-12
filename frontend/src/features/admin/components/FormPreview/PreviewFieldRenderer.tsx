@@ -3,12 +3,15 @@ import type { SchemaField } from '../SchemaFieldEditor/types';
 
 interface PreviewFieldRendererProps {
   field: SchemaField;
+  value?: unknown;
+  onChange?: (value: unknown) => void;
+  dynamicRequired?: boolean;
 }
 
-const DISABLED_INPUT_CLASS =
-  'w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-400 text-sm';
+const ENABLED_INPUT_CLASS =
+  'w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors';
 
-export default function PreviewFieldRenderer({ field }: PreviewFieldRendererProps) {
+export default function PreviewFieldRenderer({ field, value, onChange, dynamicRequired }: PreviewFieldRendererProps) {
   const { t } = useTranslation('admin');
 
   const renderInput = () => {
@@ -17,18 +20,20 @@ export default function PreviewFieldRenderer({ field }: PreviewFieldRendererProp
         return (
           <input
             type="text"
-            disabled
+            value={(value as string) || ''}
+            onChange={(e) => onChange?.(e.target.value)}
             placeholder={field.config.placeholder || ''}
-            className={DISABLED_INPUT_CLASS}
+            className={ENABLED_INPUT_CLASS}
           />
         );
       case 'textarea':
         return (
           <textarea
-            disabled
+            value={(value as string) || ''}
+            onChange={(e) => onChange?.(e.target.value)}
             rows={3}
             placeholder={field.config.placeholder || ''}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-400 text-sm resize-none"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none transition-colors"
           />
         );
       case 'number':
@@ -36,9 +41,10 @@ export default function PreviewFieldRenderer({ field }: PreviewFieldRendererProp
           <div className="flex items-center gap-2">
             <input
               type="number"
-              disabled
+              value={(value as string) || ''}
+              onChange={(e) => onChange?.(e.target.value)}
               placeholder={field.config.placeholder || '0'}
-              className={DISABLED_INPUT_CLASS}
+              className={ENABLED_INPUT_CLASS}
             />
             {field.config.unit && (
               <span className="text-sm text-gray-500 flex-shrink-0">{field.config.unit}</span>
@@ -49,19 +55,21 @@ export default function PreviewFieldRenderer({ field }: PreviewFieldRendererProp
         return (
           <input
             type="date"
-            disabled
-            className={DISABLED_INPUT_CLASS}
+            value={(value as string) || ''}
+            onChange={(e) => onChange?.(e.target.value)}
+            className={ENABLED_INPUT_CLASS}
           />
         );
       case 'select':
         return (
           <select
-            disabled
-            className={DISABLED_INPUT_CLASS}
+            value={(value as string) || ''}
+            onChange={(e) => onChange?.(e.target.value)}
+            className={ENABLED_INPUT_CLASS}
           >
-            <option>{t('templates.selectPlaceholder')}</option>
+            <option value="">{t('templates.selectPlaceholder')}</option>
             {field.config.options?.map((opt) => (
-              <option key={opt.value}>{opt.label || opt.value}</option>
+              <option key={opt.value} value={opt.value}>{opt.label || opt.value}</option>
             ))}
           </select>
         );
@@ -145,7 +153,7 @@ export default function PreviewFieldRenderer({ field }: PreviewFieldRendererProp
     <div>
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
         {field.label || t('templates.noLabel')}
-        {field.required && <span className="text-red-500 ml-1">*</span>}
+        {(field.required || dynamicRequired) && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
       </label>
       {renderInput()}
     </div>

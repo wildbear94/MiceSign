@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useCreateTemplate, useUpdateTemplate, useTemplateDetail } from '../hooks/useTemplates';
 import type { TemplateListItem } from '../api/templateApi';
 import type { ApiResponse } from '../../../types/api';
+import type { ConditionalRule } from '../../document/types/dynamicForm';
 import SchemaFieldEditor from './SchemaFieldEditor';
 import type { SchemaField } from './SchemaFieldEditor';
 import { FormPreview, FullscreenPreviewPortal } from './FormPreview';
@@ -45,6 +46,7 @@ export default function TemplateFormModal({
   const detailQuery = useTemplateDetail(editingTemplate?.id ?? null);
   const isEdit = !!editingTemplate;
   const [schemaFields, setSchemaFields] = useState<SchemaField[]>([]);
+  const [conditionalRules, setConditionalRules] = useState<ConditionalRule[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [showPreview, setShowPreview] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -77,6 +79,7 @@ export default function TemplateFormModal({
       } else {
         reset({ name: '', description: '', prefix: '', category: '', icon: '' });
         setSchemaFields([]);
+        setConditionalRules([]);
       }
       setActiveTab('info');
     }
@@ -89,8 +92,10 @@ export default function TemplateFormModal({
       try {
         const schema = JSON.parse(detailQuery.data.schemaDefinition);
         setSchemaFields(schema.fields || []);
+        setConditionalRules(schema.conditionalRules || []);
       } catch {
         setSchemaFields([]);
+        setConditionalRules([]);
       }
     } else if (detailQuery.data && !detailQuery.data.schemaDefinition) {
       setSchemaFields([]);
@@ -132,10 +137,23 @@ export default function TemplateFormModal({
       return;
     }
 
+    // 조건 규칙 유효성 검증 (D-26, D-27)
+    const fieldIds = new Set(schemaFields.map(f => f.id));
+    const invalidRules = conditionalRules.filter(rule =>
+      !fieldIds.has(rule.targetFieldId) ||
+      !fieldIds.has(rule.condition.fieldId) ||
+      !rule.condition.operator ||
+      !rule.action
+    );
+    if (invalidRules.length > 0) {
+      toast.error(t('templates.condition.validationError'));
+      return;
+    }
+
     const schemaDefinition = JSON.stringify({
       version: 1,
       fields: schemaFields,
-      conditionalRules: [],
+      conditionalRules: conditionalRules,
       calculationRules: [],
     });
 
@@ -344,7 +362,12 @@ export default function TemplateFormModal({
                     <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
                   </div>
                 ) : (
-                  <SchemaFieldEditor fields={schemaFields} onChange={setSchemaFields} />
+                  <SchemaFieldEditor
+                    fields={schemaFields}
+                    onChange={setSchemaFields}
+                    conditionalRules={conditionalRules}
+                    onConditionalRulesChange={setConditionalRules}
+                  />
                 )}
               </div>
 
@@ -398,7 +421,7 @@ export default function TemplateFormModal({
               </div>
               {/* Preview body */}
               <div className="flex-1 overflow-y-auto p-6 bg-gray-100 dark:bg-gray-900">
-                <FormPreview fields={schemaFields} templateName={watchedName} />
+                <FormPreview fields={schemaFields} templateName={watchedName} conditionalRules={conditionalRules} />
               </div>
             </div>
           )}
@@ -410,6 +433,7 @@ export default function TemplateFormModal({
         <FullscreenPreviewPortal
           fields={schemaFields}
           templateName={watchedName}
+          conditionalRules={conditionalRules}
           onClose={() => setIsFullscreen(false)}
         />
       )}
