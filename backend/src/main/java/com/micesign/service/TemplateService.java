@@ -194,9 +194,13 @@ public class TemplateService {
 
         // Save schema + version 1
         if (request.schemaDefinition() != null) {
-            SchemaDefinition schema = objectMapper.convertValue(
-                    request.schemaDefinition(), SchemaDefinition.class);
-            schemaService.updateSchema(template, schema);
+            try {
+                SchemaDefinition schema = objectMapper.readValue(
+                        request.schemaDefinition(), SchemaDefinition.class);
+                schemaService.updateSchema(template, schema);
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                throw new IllegalArgumentException("Invalid schemaDefinition JSON: " + e.getMessage(), e);
+            }
         }
 
         auditLogService.log(userId, AuditAction.ADMIN_ORG_EDIT, "TEMPLATE", template.getId(),
