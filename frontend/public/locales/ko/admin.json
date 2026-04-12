@@ -179,7 +179,13 @@
     "columnTypeSelect": "선택 목록",
     "columnTypeCheckbox": "체크박스",
     "columnTypeStaticText": "고정 텍스트",
-    "reorderColumn": "컬럼 순서 변경"
+    "reorderColumn": "컬럼 순서 변경",
+    "removeColumn": "컬럼 삭제",
+    "rowSettings": "행 설정",
+    "minRows": "최소 행 수",
+    "maxRows": "최대 행 수",
+    "addRow": "행 추가",
+    "columnMinError": "테이블에 최소 1개의 컬럼이 필요합니다"
   },
   "registration": {
     "title": "등록 신청 관리",

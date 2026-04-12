@@ -123,6 +123,15 @@ export default function TemplateFormModal({
   if (!open) return null;
 
   const onSubmit = async (data: TemplateFormData) => {
+    // D-10: table 타입 필드의 최소 1개 컬럼 밸리데이션
+    const tableFieldsWithNoColumns = schemaFields.filter(
+      (f) => f.type === 'table' && (!f.config.columns || f.config.columns.length === 0)
+    );
+    if (tableFieldsWithNoColumns.length > 0) {
+      toast.error(t('templates.columnMinError'));
+      return;
+    }
+
     const schemaDefinition = JSON.stringify({
       version: 1,
       fields: schemaFields,

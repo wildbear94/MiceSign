@@ -19,10 +19,15 @@ import { CSS } from '@dnd-kit/utilities';
 import { Plus, GripVertical, ChevronRight, Trash2 } from 'lucide-react';
 import type { TableColumn, TableColumnType } from './types';
 import { COLUMN_TYPES, COLUMN_TYPE_META, SMALL_INPUT_CLASS } from './constants';
+import { ColumnConfigPanel } from './ColumnConfigPanel';
 
 interface TableColumnEditorProps {
   columns: TableColumn[];
   onColumnsChange: (columns: TableColumn[]) => void;
+  minRows?: number;
+  maxRows?: number;
+  onMinRowsChange: (val: number | undefined) => void;
+  onMaxRowsChange: (val: number | undefined) => void;
 }
 
 function capitalize(s: string): string {
@@ -175,14 +180,15 @@ function SortableColumnRow({
               </label>
             </div>
           </div>
-          {/* ColumnConfigPanel will be added in Plan 02 */}
+          {/* Type-specific column settings */}
+          <ColumnConfigPanel column={column} onUpdate={(updated) => onUpdate(updated)} />
         </div>
       )}
     </div>
   );
 }
 
-export function TableColumnEditor({ columns, onColumnsChange }: TableColumnEditorProps) {
+export function TableColumnEditor({ columns, onColumnsChange, minRows, maxRows, onMinRowsChange, onMaxRowsChange }: TableColumnEditorProps) {
   const { t } = useTranslation('admin');
   const [expandedColumnId, setExpandedColumnId] = useState<string | null>(null);
 
@@ -266,6 +272,39 @@ export function TableColumnEditor({ columns, onColumnsChange }: TableColumnEdito
           </SortableContext>
         </DndContext>
       )}
+
+      {/* Row settings */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+          {t('templates.rowSettings')}
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              {t('templates.minRows')}
+            </label>
+            <input
+              type="number"
+              value={minRows ?? ''}
+              onChange={(e) => onMinRowsChange(e.target.value ? parseInt(e.target.value, 10) : undefined)}
+              className={SMALL_INPUT_CLASS}
+              min={0}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+              {t('templates.maxRows')}
+            </label>
+            <input
+              type="number"
+              value={maxRows ?? ''}
+              onChange={(e) => onMaxRowsChange(e.target.value ? parseInt(e.target.value, 10) : undefined)}
+              className={SMALL_INPUT_CLASS}
+              min={0}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

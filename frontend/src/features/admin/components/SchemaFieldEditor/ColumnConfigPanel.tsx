@@ -1,23 +1,21 @@
 import { useTranslation } from 'react-i18next';
 import { Trash2, Plus } from 'lucide-react';
-import type { SchemaField, SchemaFieldConfig } from './types';
+import type { TableColumn, SchemaFieldConfig } from './types';
 import { SMALL_INPUT_CLASS } from './constants';
-import { TableColumnEditor } from './TableColumnEditor';
-export function FieldConfigEditor({
-  field,
-  onConfigChange,
-}: {
-  field: SchemaField;
-  onConfigChange: (config: SchemaFieldConfig) => void;
-}) {
+
+interface ColumnConfigPanelProps {
+  column: TableColumn;
+  onUpdate: (column: TableColumn) => void;
+}
+
+export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) {
   const { t } = useTranslation('admin');
-  const config = field.config;
 
   const updateConfig = (partial: Partial<SchemaFieldConfig>) => {
-    onConfigChange({ ...config, ...partial });
+    onUpdate({ ...column, config: { ...column.config, ...partial } });
   };
 
-  switch (field.type) {
+  switch (column.type) {
     case 'text':
     case 'textarea':
       return (
@@ -28,7 +26,7 @@ export function FieldConfigEditor({
             </label>
             <input
               type="text"
-              value={config.placeholder || ''}
+              value={column.config.placeholder || ''}
               onChange={(e) => updateConfig({ placeholder: e.target.value })}
               className={SMALL_INPUT_CLASS}
             />
@@ -39,7 +37,7 @@ export function FieldConfigEditor({
             </label>
             <input
               type="number"
-              value={config.maxLength ?? ''}
+              value={column.config.maxLength ?? ''}
               onChange={(e) =>
                 updateConfig({
                   maxLength: e.target.value ? parseInt(e.target.value, 10) : undefined,
@@ -61,7 +59,7 @@ export function FieldConfigEditor({
             </label>
             <input
               type="number"
-              value={config.min ?? ''}
+              value={column.config.min ?? ''}
               onChange={(e) =>
                 updateConfig({
                   min: e.target.value ? parseFloat(e.target.value) : undefined,
@@ -76,7 +74,7 @@ export function FieldConfigEditor({
             </label>
             <input
               type="number"
-              value={config.max ?? ''}
+              value={column.config.max ?? ''}
               onChange={(e) =>
                 updateConfig({
                   max: e.target.value ? parseFloat(e.target.value) : undefined,
@@ -91,7 +89,7 @@ export function FieldConfigEditor({
             </label>
             <input
               type="text"
-              value={config.unit || ''}
+              value={column.config.unit || ''}
               onChange={(e) => updateConfig({ unit: e.target.value })}
               className={SMALL_INPUT_CLASS}
             />
@@ -102,7 +100,7 @@ export function FieldConfigEditor({
             </label>
             <input
               type="text"
-              value={config.placeholder || ''}
+              value={column.config.placeholder || ''}
               onChange={(e) => updateConfig({ placeholder: e.target.value })}
               className={SMALL_INPUT_CLASS}
             />
@@ -118,7 +116,7 @@ export function FieldConfigEditor({
       );
 
     case 'select': {
-      const options = config.options || [];
+      const options = column.config.options || [];
       return (
         <div className="space-y-2">
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -175,6 +173,13 @@ export function FieldConfigEditor({
       );
     }
 
+    case 'checkbox':
+      return (
+        <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+          {t('templates.noConfig')}
+        </p>
+      );
+
     case 'staticText':
       return (
         <div>
@@ -182,37 +187,10 @@ export function FieldConfigEditor({
             {t('templates.fieldContent')}
           </label>
           <textarea
-            rows={3}
-            value={config.content || ''}
+            rows={2}
+            value={column.config.content || ''}
             onChange={(e) => updateConfig({ content: e.target.value })}
             className={`w-full px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors resize-none border-gray-300 dark:border-gray-600`}
-          />
-        </div>
-      );
-
-    case 'table':
-      return (
-        <TableColumnEditor
-          columns={config.columns || []}
-          onColumnsChange={(columns) => updateConfig({ columns })}
-          minRows={config.minRows}
-          maxRows={config.maxRows}
-          onMinRowsChange={(minRows) => updateConfig({ minRows })}
-          onMaxRowsChange={(maxRows) => updateConfig({ maxRows })}
-        />
-      );
-
-    case 'hidden':
-      return (
-        <div>
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-            {t('templates.fieldDefaultValue')}
-          </label>
-          <input
-            type="text"
-            value={config.defaultValue || ''}
-            onChange={(e) => updateConfig({ defaultValue: e.target.value })}
-            className={SMALL_INPUT_CLASS}
           />
         </div>
       );
