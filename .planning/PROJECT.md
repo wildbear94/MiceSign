@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-12 — Phase 22 complete (분할 레이아웃 + 라이브 미리보기 — TemplateFormModal near-fullscreen 분할 뷰 + FormPreview 실시간 프리뷰 패널)*
+*Last updated: 2026-04-12 — Phase 23 complete (테이블 컬럼 편집기 — TableColumnEditor DnD 컴포넌트 + ColumnConfigPanel 7가지 타입별 설정 + PreviewFieldRenderer 테이블 미리보기 + 저장 가드)*
