@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Trash2, Plus } from 'lucide-react';
 import type { SchemaField, SchemaFieldConfig } from './types';
 import { SMALL_INPUT_CLASS } from './constants';
+import { TableColumnEditor } from './TableColumnEditor';
 export function FieldConfigEditor({
   field,
   onConfigChange,
@@ -187,6 +188,14 @@ export function FieldConfigEditor({
             className={`w-full px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors resize-none border-gray-300 dark:border-gray-600`}
           />
         </div>
+      );
+
+    case 'table':
+      return (
+        <TableColumnEditor
+          columns={config.columns || []}
+          onColumnsChange={(columns) => updateConfig({ columns })}
+        />
       );
 
     case 'hidden':

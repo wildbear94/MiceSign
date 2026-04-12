@@ -164,7 +164,22 @@
     "noLabel": "(라벨 없음)",
     "selectPlaceholder": "선택하세요",
     "staticTextPlaceholder": "(고정 텍스트)",
-    "tableFieldPlaceholder": "표 필드 (컬럼 설정은 다음 단계에서 구현)"
+    "tableFieldPlaceholder": "표 필드 (컬럼 설정은 다음 단계에서 구현)",
+    "columnList": "컬럼 목록",
+    "addColumn": "컬럼 추가",
+    "columnEmpty": "컬럼이 없습니다. '컬럼 추가' 버튼으로 컬럼을 추가해주세요.",
+    "columnMaxError": "컬럼은 최대 20개까지 추가할 수 있습니다.",
+    "columnLabel": "컬럼 라벨",
+    "columnId": "컬럼 ID",
+    "columnType": "컬럼 타입",
+    "columnTypeText": "텍스트",
+    "columnTypeTextarea": "긴 텍스트",
+    "columnTypeNumber": "숫자",
+    "columnTypeDate": "날짜",
+    "columnTypeSelect": "선택 목록",
+    "columnTypeCheckbox": "체크박스",
+    "columnTypeStaticText": "고정 텍스트",
+    "reorderColumn": "컬럼 순서 변경"
   },
   "registration": {
     "title": "등록 신청 관리",
