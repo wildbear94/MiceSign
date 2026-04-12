@@ -8,6 +8,15 @@ export type SchemaFieldType =
   | 'hidden'
   | 'table';
 
+export type TableColumnType =
+  | 'text'
+  | 'textarea'
+  | 'number'
+  | 'date'
+  | 'select'
+  | 'checkbox'
+  | 'staticText';
+
 export interface SchemaFieldConfig {
   placeholder?: string;
   maxLength?: number;
@@ -18,6 +27,17 @@ export interface SchemaFieldConfig {
   content?: string;
   defaultValue?: string;
   width?: string;
+  columns?: TableColumn[];
+  minRows?: number;
+  maxRows?: number;
+}
+
+export interface TableColumn {
+  id: string;
+  type: TableColumnType;
+  label: string;
+  required: boolean;
+  config: SchemaFieldConfig;
 }
 
 export interface SchemaField {

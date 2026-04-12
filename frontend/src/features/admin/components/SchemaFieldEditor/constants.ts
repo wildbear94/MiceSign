@@ -1,6 +1,6 @@
 import type React from 'react';
-import { Type, AlignLeft, Hash, Calendar, List, FileText, EyeOff, Table, HelpCircle } from 'lucide-react';
-import type { SchemaFieldType } from './types';
+import { Type, AlignLeft, Hash, Calendar, List, FileText, EyeOff, Table, HelpCircle, CheckSquare } from 'lucide-react';
+import type { SchemaFieldType, TableColumnType } from './types';
 
 export const FIELD_TYPE_META: Record<
   SchemaFieldType,
@@ -26,7 +26,31 @@ export const FIELD_TYPES: SchemaFieldType[] = [
   'select',
   'staticText',
   'hidden',
+  'table',
 ];
+
+export const COLUMN_TYPES: TableColumnType[] = [
+  'text',
+  'textarea',
+  'number',
+  'date',
+  'select',
+  'checkbox',
+  'staticText',
+];
+
+export const COLUMN_TYPE_META: Record<
+  TableColumnType,
+  { icon: React.ElementType; color: string; bgColor: string }
+> = {
+  text: FIELD_TYPE_META.text,
+  textarea: FIELD_TYPE_META.textarea,
+  number: FIELD_TYPE_META.number,
+  date: FIELD_TYPE_META.date,
+  select: FIELD_TYPE_META.select,
+  checkbox: { icon: CheckSquare, color: 'text-cyan-700 dark:text-cyan-300', bgColor: 'bg-cyan-100 dark:bg-cyan-900/40' },
+  staticText: FIELD_TYPE_META.staticText,
+};
 
 export const INPUT_CLASS =
   'w-full h-11 px-4 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors border-gray-300 dark:border-gray-600';
