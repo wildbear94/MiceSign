@@ -1,6 +1,6 @@
 import type React from 'react';
 import { Type, AlignLeft, Hash, Calendar, List, FileText, EyeOff, Table, HelpCircle, CheckSquare } from 'lucide-react';
-import type { SchemaFieldType, TableColumnType } from './types';
+import type { SchemaFieldType, TableColumnType, ComparisonOperator, ActionOption } from './types';
 
 export const FIELD_TYPE_META: Record<
   SchemaFieldType,
@@ -59,8 +59,6 @@ export const SMALL_INPUT_CLASS =
   'w-full h-9 px-3 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors border-gray-300 dark:border-gray-600';
 
 // === Conditional Rule Constants ===
-
-import type { SchemaFieldType, ComparisonOperator, ActionOption } from './types';
 
 // D-05: Source field allowed types
 export const CONDITION_SOURCE_TYPES: SchemaFieldType[] = ['text', 'number', 'date', 'select'];
