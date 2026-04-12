@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: milestone
 status: executing
-stopped_at: Phase 23 context gathered
-last_updated: "2026-04-12T00:44:35.360Z"
+stopped_at: Phase 23 UI-SPEC approved
+last_updated: "2026-04-12T00:54:06.411Z"
 last_activity: 2026-04-11
 progress:
   total_phases: 6
@@ -78,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-12T00:44:35.357Z
-Stopped at: Phase 23 context gathered
-Resume file: .planning/phases/23-table-column-editor/23-CONTEXT.md
+Last session: 2026-04-12T00:54:06.409Z
+Stopped at: Phase 23 UI-SPEC approved
+Resume file: .planning/phases/23-table-column-editor/23-UI-SPEC.md
