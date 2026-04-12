@@ -49,7 +49,7 @@
 
 - [x] **Phase 21: SchemaFieldEditor 리팩토링** - 596줄 모놀리식 컴포넌트를 유지보수 가능한 하위 컴포넌트로 분리 (completed 2026-04-11)
 - [x] **Phase 22: 분할 레이아웃 + 라이브 미리보기** - 모달을 near-fullscreen 분할 뷰로 확장하고 실시간 프리뷰 패널 구축 (completed 2026-04-11)
-- [ ] **Phase 23: 테이블 컬럼 편집기** - table 타입 필드에 컬럼 추가/삭제/순서변경/타입설정 기능 구현
+- [x] **Phase 23: 테이블 컬럼 편집기** - table 타입 필드에 컬럼 추가/삭제/순서변경/타입설정 기능 구현 (completed 2026-04-12)
 - [ ] **Phase 24: 조건부 표시 규칙 UI** - 필드별 조건부 표시/숨김 규칙 설정 인터페이스 구축
 - [ ] **Phase 25: 계산 규칙 UI** - 숫자 필드 계산 공식 설정 및 순환 의존성 감지 구현
 - [ ] **Phase 26: 편의 기능** - 양식 복제, JSON 내보내기/가져오기, 프리셋 템플릿 기능 구현
@@ -91,10 +91,10 @@ Plans:
   1. 관리자가 table 필드 선택 시 컬럼 편집 UI에서 컬럼을 추가/삭제/드래그 순서변경할 수 있다
   2. 관리자가 각 컬럼의 타입(text/number/date/select), 라벨, 필수여부를 설정할 수 있다
   3. 컬럼 변경사항이 미리보기 패널의 테이블에 실시간 반영된다
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 23-01-PLAN.md — @dnd-kit 설치 + TableColumn 타입 정의 + TableColumnEditor 핵심 컴포넌트 + FieldConfigEditor 연결
-- [ ] 23-02-PLAN.md — ColumnConfigPanel 타입별 설정 + 행 설정 + PreviewFieldRenderer 테이블 미리보기 + i18n
+- [x] 23-01-PLAN.md — @dnd-kit 설치 + TableColumn 타입 정의 + TableColumnEditor 핵심 컴포넌트 + FieldConfigEditor 연결
+- [x] 23-02-PLAN.md — ColumnConfigPanel 타입별 설정 + 행 설정 + PreviewFieldRenderer 테이블 미리보기 + i18n
 **UI hint**: yes
 
 ### Phase 24: 조건부 표시 규칙 UI
@@ -149,7 +149,7 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 8. Dashboard & Audit | v1.0 | Done | Complete | 2026-04-10 |
 | 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete    | 2026-04-11 |
 | 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 2/2 | Complete    | 2026-04-11 |
-| 23. 테이블 컬럼 편집기 | v1.1 | 0/2 | Not started | - |
+| 23. 테이블 컬럼 편집기 | v1.1 | 2/2 | Complete    | 2026-04-12 |
 | 24. 조건부 표시 규칙 UI | v1.1 | 0/? | Not started | - |
 | 25. 계산 규칙 UI | v1.1 | 0/? | Not started | - |
 | 26. 편의 기능 | v1.1 | 0/? | Not started | - |
