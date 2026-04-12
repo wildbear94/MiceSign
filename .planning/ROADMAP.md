@@ -50,7 +50,7 @@
 - [x] **Phase 21: SchemaFieldEditor 리팩토링** - 596줄 모놀리식 컴포넌트를 유지보수 가능한 하위 컴포넌트로 분리 (completed 2026-04-11)
 - [x] **Phase 22: 분할 레이아웃 + 라이브 미리보기** - 모달을 near-fullscreen 분할 뷰로 확장하고 실시간 프리뷰 패널 구축 (completed 2026-04-11)
 - [x] **Phase 23: 테이블 컬럼 편집기** - table 타입 필드에 컬럼 추가/삭제/순서변경/타입설정 기능 구현 (completed 2026-04-12)
-- [ ] **Phase 24: 조건부 표시 규칙 UI** - 필드별 조건부 표시/숨김 규칙 설정 인터페이스 구축
+- [x] **Phase 24: 조건부 표시 규칙 UI** - 필드별 조건부 표시/숨김 규칙 설정 인터페이스 구축 (completed 2026-04-12)
 - [ ] **Phase 25: 계산 규칙 UI** - 숫자 필드 계산 공식 설정 및 순환 의존성 감지 구현
 - [ ] **Phase 26: 편의 기능** - 양식 복제, JSON 내보내기/가져오기, 프리셋 템플릿 기능 구현
 
@@ -105,11 +105,25 @@ Plans:
   1. 관리자가 필드별 설정 패널에서 조건 탭을 열어 IF-THEN 규칙을 설정할 수 있다 (IF 필드 = 값 THEN 표시/숨김/필수/선택)
   2. 설정된 조건 규칙이 미리보기 패널에서 동작하여 필드 표시/숨김이 실시간 확인된다
   3. 필드 삭제 시 해당 필드를 참조하는 조건 규칙이 자동으로 정리되며, 사용자에게 알림이 표시된다
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 24-01-PLAN.md — 조건 규칙 편집 UI 핵심 컴포넌트 + 유틸리티 + i18n
-- [ ] 24-02-PLAN.md — 인터랙티브 미리보기 + TemplateFormModal 상태 통합 + 저장 검증
+- [x] 24-01-PLAN.md — 조건 규칙 편집 UI 핵심 컴포넌트 + 유틸리티 + i18n
+- [x] 24-02-PLAN.md — 인터랙티브 미리보기 + TemplateFormModal 상태 통합 + 저장 검증
 **UI hint**: yes
+
+### Phase 24.1: 사용자 측 동적 폼 렌더러 - CUSTOM 템플릿으로 기안 작성/조회를 위한 DynamicFormRenderer 구현 (INSERTED)
+
+**Goal:** 관리자가 양식 빌더로 만든 CUSTOM 템플릿(SchemaDefinition)을 사용자가 실제 기안 작성/편집/읽기 전용 조회할 수 있도록 DynamicFormRenderer를 구축하고, 양식 변경 이후에도 과거 문서는 schemaSnapshot 기반으로 원본 그대로 표시된다.
+**Requirements**: D-01~D-26 (locked decisions in 24.1-CONTEXT.md) + IR-01~IR-09 (implicit requirements in 24.1-RESEARCH.md)
+**Depends on:** Phase 24
+**Plans:** 5 plans
+
+Plans:
+- [ ] 24.1-01-PLAN.md — 타입 확장(DocumentDetailResponse.schemaDefinitionSnapshot, TemplateEditProps/TemplateReadOnlyProps.schemaSnapshot) + baseline build
+- [ ] 24.1-02-PLAN.md — DynamicFieldRenderer 추출 + DynamicTableField(useFieldArray) + adaptSchemaField adapter
+- [ ] 24.1-03-PLAN.md — DynamicCustomForm(RHF+실시간 조건/계산 평가) + DynamicCustomReadOnly
+- [ ] 24.1-04-PLAN.md — admin FormPreview 리팩터링(DynamicFieldRenderer 위임) + DocumentEditorPage/DocumentDetailPage CUSTOM fallback 분기
+- [ ] 24.1-05-PLAN.md — 통합 검증(tsc+build) + admin 회귀 수동 UAT + CUSTOM end-to-end UAT
 
 ### Phase 25: 계산 규칙 UI
 **Goal**: 관리자가 숫자 필드에 자동 계산 공식을 설정하고 오류를 사전에 방지할 수 있다
@@ -159,6 +173,6 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete    | 2026-04-11 |
 | 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 2/2 | Complete    | 2026-04-11 |
 | 23. 테이블 컬럼 편집기 | v1.1 | 2/2 | Complete    | 2026-04-12 |
-| 24. 조건부 표시 규칙 UI | v1.1 | 0/2 | Not started | - |
+| 24. 조건부 표시 규칙 UI | v1.1 | 2/2 | Complete   | 2026-04-12 |
 | 25. 계산 규칙 UI | v1.1 | 0/? | Not started | - |
 | 26. 편의 기능 | v1.1 | 0/? | Not started | - |
