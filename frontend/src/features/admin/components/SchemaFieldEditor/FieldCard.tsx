@@ -43,15 +43,15 @@ export function FieldCard({
   const [conditionExpanded, setConditionExpanded] = useState(false);
 
   const handleLabelChange = (newLabel: string) => {
-    const updated = { ...field, label: newLabel };
-    // Auto-generate ID from label on first edit only
-    if (!labelEdited && newLabel.trim()) {
-      updated.id = toFieldId(newLabel);
-    }
-    if (newLabel.trim()) {
+    onUpdate({ ...field, label: newLabel });
+  };
+
+  const handleLabelBlur = () => {
+    // Auto-generate ID from label on first edit only (on blur to avoid key change during typing)
+    if (!labelEdited && field.label.trim()) {
       setLabelEdited(true);
+      onUpdate({ ...field, id: toFieldId(field.label) });
     }
-    onUpdate(updated);
   };
 
   return (
@@ -126,6 +126,7 @@ export function FieldCard({
                 type="text"
                 value={field.label}
                 onChange={(e) => handleLabelChange(e.target.value)}
+                onBlur={handleLabelBlur}
                 className={INPUT_CLASS}
                 placeholder={t('templates.fieldLabel')}
               />
