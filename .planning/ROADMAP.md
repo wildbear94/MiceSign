@@ -91,7 +91,10 @@ Plans:
   1. 관리자가 table 필드 선택 시 컬럼 편집 UI에서 컬럼을 추가/삭제/드래그 순서변경할 수 있다
   2. 관리자가 각 컬럼의 타입(text/number/date/select), 라벨, 필수여부를 설정할 수 있다
   3. 컬럼 변경사항이 미리보기 패널의 테이블에 실시간 반영된다
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 23-01-PLAN.md — @dnd-kit 설치 + TableColumn 타입 정의 + TableColumnEditor 핵심 컴포넌트 + FieldConfigEditor 연결
+- [ ] 23-02-PLAN.md — ColumnConfigPanel 타입별 설정 + 행 설정 + PreviewFieldRenderer 테이블 미리보기 + i18n
 **UI hint**: yes
 
 ### Phase 24: 조건부 표시 규칙 UI
@@ -146,7 +149,7 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 8. Dashboard & Audit | v1.0 | Done | Complete | 2026-04-10 |
 | 21. SchemaFieldEditor 리팩토링 | v1.1 | 1/1 | Complete    | 2026-04-11 |
 | 22. 분할 레이아웃 + 라이브 미리보기 | v1.1 | 2/2 | Complete    | 2026-04-11 |
-| 23. 테이블 컬럼 편집기 | v1.1 | 0/? | Not started | - |
+| 23. 테이블 컬럼 편집기 | v1.1 | 0/2 | Not started | - |
 | 24. 조건부 표시 규칙 UI | v1.1 | 0/? | Not started | - |
 | 25. 계산 규칙 UI | v1.1 | 0/? | Not started | - |
 | 26. 편의 기능 | v1.1 | 0/? | Not started | - |
