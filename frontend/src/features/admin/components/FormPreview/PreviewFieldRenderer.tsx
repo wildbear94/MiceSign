@@ -73,14 +73,65 @@ export default function PreviewFieldRenderer({ field }: PreviewFieldRendererProp
         );
       case 'hidden':
         return null;
-      case 'table':
-        return (
-          <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 dark:bg-gray-700 px-3 py-2 text-xs text-gray-500">
-              {t('templates.tableFieldPlaceholder')}
+      case 'table': {
+        const columns = field.config.columns || [];
+        if (columns.length === 0) {
+          return (
+            <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+              <div className="bg-gray-50 dark:bg-gray-700 px-3 py-3 text-xs text-gray-400 dark:text-gray-500 text-center">
+                {t('templates.columnEmpty')}
+              </div>
             </div>
+          );
+        }
+        return (
+          <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 dark:bg-gray-700">
+                  {columns.map((col) => (
+                    <th key={col.id} className="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                      {col.label || t('templates.noLabel')}
+                      {col.required && <span className="text-red-500 ml-1">*</span>}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[0, 1].map((rowIdx) => (
+                  <tr key={rowIdx} className="border-t border-gray-200 dark:border-gray-700">
+                    {columns.map((col) => (
+                      <td key={col.id} className="px-3 py-2">
+                        {col.type === 'checkbox' ? (
+                          <input type="checkbox" disabled className="w-4 h-4 rounded border-gray-300" />
+                        ) : col.type === 'select' ? (
+                          <select disabled className="w-full h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400">
+                            <option>{t('templates.selectPlaceholder')}</option>
+                          </select>
+                        ) : col.type === 'date' ? (
+                          <input type="date" disabled className="w-full h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400" />
+                        ) : col.type === 'textarea' ? (
+                          <textarea disabled rows={1} className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400 resize-none" />
+                        ) : col.type === 'staticText' ? (
+                          <span className="text-xs text-gray-400">{col.config?.content || '-'}</span>
+                        ) : (
+                          <input type={col.type === 'number' ? 'number' : 'text'} disabled placeholder={col.config?.placeholder || ''} className="w-full h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400" />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button
+              disabled
+              className="w-full py-2 text-sm text-gray-400 border-t border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-not-allowed"
+            >
+              + {t('templates.addRow')}
+            </button>
           </div>
         );
+      }
       default:
         return null;
     }
