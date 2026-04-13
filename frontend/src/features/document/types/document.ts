@@ -30,6 +30,10 @@ export interface DocumentDetailResponse extends DocumentResponse {
   currentStep: number | null;
   sourceDocId: number | null;
   approvalLines: ApprovalLineResponse[];
+  /** 백엔드 DocumentContent.schemaVersion (CUSTOM 템플릿 전용) */
+  schemaVersion?: number | null;
+  /** 백엔드 DocumentContent.schemaDefinitionSnapshot — JSON 직렬화된 SchemaDefinition 스냅샷. 백엔드 DocumentService가 자동 저장 (D-10). */
+  schemaDefinitionSnapshot?: string | null;
 }
 
 export interface TemplateResponse {
