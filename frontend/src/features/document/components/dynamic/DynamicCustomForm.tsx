@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useEffect, useMemo, useRef } from 'react';
+import { useForm, FormProvider, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { templateApi } from '../../api/templateApi';
 import { schemaToZod, buildDefaultValues } from '../../utils/schemaToZod';
+import { evaluateConditions } from '../../utils/evaluateConditions';
 import type { SchemaDefinition, FieldDefinition } from '../../types/dynamicForm';
 import type { TemplateEditProps } from '../templates/templateRegistry';
 import DynamicFieldRenderer from './DynamicFieldRenderer';
@@ -103,12 +104,42 @@ function DynamicFormInner({
     [schema, parsedFormData, initialData?.title],
   );
 
-  // Task 1b 에서 커스텀 resolver + hiddenFieldsRef 로 교체됨.
+  // 숨김 필드 집합 — resolver 에서 참조하기 위해 ref 로 보관 (D-16)
+  const hiddenFieldsRef = useRef<Set<string>>(new Set());
+
+  const resolver: Resolver<FormValues> = useMemo(() => {
+    return async (values, ctx, options) => {
+      // 숨김 필드는 required 를 false 로 오버라이드한 schema 로 검증
+      const visibleSchema: SchemaDefinition = {
+        ...schema,
+        fields: schema.fields.map((f) =>
+          hiddenFieldsRef.current.has(f.id) ? { ...f, required: false } : f,
+        ),
+      };
+      const zod = schemaToZod(visibleSchema);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return zodResolver(zod as any)(values, ctx, options) as ReturnType<
+        Resolver<FormValues>
+      >;
+    };
+  }, [schema]);
+
   const form = useForm<FormValues>({
     defaultValues,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(schemaToZod(schema) as any),
+    resolver,
   });
+
+  const watched = form.watch();
+
+  const { hiddenFields, requiredFields } = useMemo(
+    () => evaluateConditions(schema.conditionalRules ?? [], watched),
+    [schema.conditionalRules, watched],
+  );
+
+  // resolver 가 다음 검증 사이클에서 최신 hidden 집합을 사용하도록 동기화
+  useEffect(() => {
+    hiddenFieldsRef.current = hiddenFields;
+  }, [hiddenFields]);
 
   const onSubmit = async (values: FormValues) => {
     const { __title, ...formFields } = values;
@@ -146,21 +177,29 @@ function DynamicFormInner({
         </div>
 
         {schema.fields.map((field: FieldDefinition) => {
+          const isHidden = hiddenFields.has(field.id);
+          // table 외 숨김 필드는 unmount (값은 form state 에 보존됨 — D-19)
+          if (isHidden && field.type !== 'table') return null;
           const errMsg = form.formState.errors[field.id]?.message as
             | string
             | undefined;
           return (
-            <DynamicFieldRenderer
+            <div
               key={field.id}
-              field={field}
-              mode="edit"
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              register={form.register as any}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              control={form.control as any}
-              error={errMsg}
-              disabled={readOnly}
-            />
+              style={isHidden ? { display: 'none' } : undefined}
+            >
+              <DynamicFieldRenderer
+                field={field}
+                mode="edit"
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                register={form.register as any}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                control={form.control as any}
+                error={errMsg}
+                dynamicRequired={requiredFields.has(field.id)}
+                disabled={readOnly}
+              />
+            </div>
           );
         })}
       </form>
