@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { Plus, X } from 'lucide-react';
-import { formatCurrency, parseNumericInput } from '../../utils/currency';
+import { formatCurrency } from '../../utils/currency';
 import FileAttachmentArea from '../attachment/FileAttachmentArea';
 import { expenseFormSchema, type ExpenseFormValues } from '../../validations/expenseSchema';
 import type { TemplateEditProps } from './templateRegistry';
