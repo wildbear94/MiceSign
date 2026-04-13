@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,9 +9,11 @@ import { toast } from 'sonner';
 import { useCreateTemplate, useUpdateTemplate, useTemplateDetail } from '../hooks/useTemplates';
 import type { TemplateListItem } from '../api/templateApi';
 import type { ApiResponse } from '../../../types/api';
-import type { ConditionalRule } from '../../document/types/dynamicForm';
+import type { ConditionalRule, CalculationRule } from '../../document/types/dynamicForm';
+import { detectCircularDeps } from '../../document/utils/detectCircularDeps';
 import SchemaFieldEditor from './SchemaFieldEditor';
 import type { SchemaField } from './SchemaFieldEditor';
+import { validateFormula } from './SchemaFieldEditor/calculationRuleUtils';
 import { FormPreview, FullscreenPreviewPortal } from './FormPreview';
 
 const templateSchema = z.object({
@@ -47,6 +49,7 @@ export default function TemplateFormModal({
   const isEdit = !!editingTemplate;
   const [schemaFields, setSchemaFields] = useState<SchemaField[]>([]);
   const [conditionalRules, setConditionalRules] = useState<ConditionalRule[]>([]);
+  const [calculationRules, setCalculationRules] = useState<CalculationRule[]>([]);
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [showPreview, setShowPreview] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -80,6 +83,7 @@ export default function TemplateFormModal({
         reset({ name: '', description: '', prefix: '', category: '', icon: '' });
         setSchemaFields([]);
         setConditionalRules([]);
+        setCalculationRules([]);
       }
       setActiveTab('info');
     }
@@ -93,12 +97,15 @@ export default function TemplateFormModal({
         const schema = JSON.parse(detailQuery.data.schemaDefinition);
         setSchemaFields(schema.fields || []);
         setConditionalRules(schema.conditionalRules || []);
+        setCalculationRules(schema.calculationRules || []);
       } catch {
         setSchemaFields([]);
         setConditionalRules([]);
+        setCalculationRules([]);
       }
     } else if (detailQuery.data && !detailQuery.data.schemaDefinition) {
       setSchemaFields([]);
+      setCalculationRules([]);
     }
   }, [open, editingTemplate, detailQuery.data]);
 
@@ -150,11 +157,25 @@ export default function TemplateFormModal({
       return;
     }
 
+    // Phase 25: 계산 규칙 검증 (D-10, D-11, D-24, D-26)
+    const calcCyclesAtSubmit = detectCircularDeps(calculationRules);
+    if (calcCyclesAtSubmit.length > 0) {
+      toast.error(t('templates.calculation.circularSaveBlocked'));
+      return;
+    }
+    for (const rule of calculationRules) {
+      const err = validateFormula(rule.formula, schemaFields, rule.targetFieldId);
+      if (err) {
+        toast.error(t('templates.calculation.validationError'));
+        return;
+      }
+    }
+
     const schemaDefinition = JSON.stringify({
       version: 1,
       fields: schemaFields,
       conditionalRules: conditionalRules,
-      calculationRules: [],
+      calculationRules: calculationRules,
     });
 
     try {
@@ -198,6 +219,15 @@ export default function TemplateFormModal({
   };
 
   const isLoading = createMutation.isPending || updateMutation.isPending;
+
+  // Phase 25: 저장 버튼 disabled 파생 (D-11, D-24, D-31)
+  const calcCycles = useMemo(() => detectCircularDeps(calculationRules), [calculationRules]);
+  const hasCalcErrors = useMemo(
+    () =>
+      calcCycles.length > 0 ||
+      calculationRules.some((r) => validateFormula(r.formula, schemaFields, r.targetFieldId) !== null),
+    [calcCycles, calculationRules, schemaFields],
+  );
 
   const inputClassName = (hasError: boolean) =>
     `w-full h-11 px-4 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors ${
@@ -367,6 +397,8 @@ export default function TemplateFormModal({
                     onChange={setSchemaFields}
                     conditionalRules={conditionalRules}
                     onConditionalRulesChange={setConditionalRules}
+                    calculationRules={calculationRules}
+                    onCalculationRulesChange={setCalculationRules}
                   />
                 )}
               </div>
@@ -382,7 +414,8 @@ export default function TemplateFormModal({
                 </button>
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || hasCalcErrors}
+                  title={hasCalcErrors ? t('templates.calculation.circularSaveBlocked') : undefined}
                   className="flex-1 h-11 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                 >
                   {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
