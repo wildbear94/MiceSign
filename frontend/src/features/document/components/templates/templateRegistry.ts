@@ -1,4 +1,6 @@
 import type { ComponentType } from 'react';
+import DynamicCustomForm from '../dynamic/DynamicCustomForm';
+import DynamicCustomReadOnly from '../dynamic/DynamicCustomReadOnly';
 import GeneralForm from './GeneralForm';
 import ExpenseForm from './ExpenseForm';
 import LeaveForm from './LeaveForm';
@@ -88,4 +90,30 @@ export const TEMPLATE_REGISTRY: Record<string, TemplateEntry> = {
 
 export function getTemplateEntry(code: string): TemplateEntry | undefined {
   return TEMPLATE_REGISTRY[code];
+}
+
+/**
+ * Phase 24.1-04: CUSTOM (사용자 정의) 양식 fallback 렌더러.
+ *
+ * D-01/D-03 — TEMPLATE_REGISTRY lookup 이 실패했을 때 DocumentEditorPage /
+ * DocumentDetailPage 가 이 두 컴포넌트로 fallback 한다. 하드코딩 6개 템플릿은
+ * 여전히 TEMPLATE_REGISTRY 로 분기되므로 영향 없음.
+ */
+export const DYNAMIC_CUSTOM_EDIT = DynamicCustomForm;
+export const DYNAMIC_CUSTOM_READONLY = DynamicCustomReadOnly;
+
+/**
+ * CUSTOM 템플릿 fallback 판정.
+ *
+ * - `hasSnapshot=true` (편집/조회 시 schemaDefinitionSnapshot 존재): 과거 문서가
+ *   스냅샷을 가지고 있으면 templateCode 가 하드코딩이어도 CUSTOM 취급하여 스냅샷 기반 렌더.
+ * - 신규 작성 (`hasSnapshot=false`): TEMPLATE_REGISTRY 미등록 코드일 때 CUSTOM fallback.
+ */
+export function isCustomTemplate(
+  templateCode: string | undefined,
+  hasSnapshot = false,
+): boolean {
+  if (hasSnapshot) return true;
+  if (!templateCode) return false;
+  return !(templateCode in TEMPLATE_REGISTRY);
 }

@@ -5,7 +5,11 @@ import { ArrowLeft, Trash2, Loader2 } from 'lucide-react';
 import AutoSaveIndicator from '../components/AutoSaveIndicator';
 import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import ConfirmDialog from '../../admin/components/ConfirmDialog';
-import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import {
+  TEMPLATE_REGISTRY,
+  DYNAMIC_CUSTOM_EDIT,
+  isCustomTemplate,
+} from '../components/templates/templateRegistry';
 import ApprovalLineEditor, {
   toApprovalLineRequests,
   toApprovalLineItems,
@@ -212,7 +216,16 @@ export default function DocumentEditorPage() {
   }, [savedDocId, saveNow, updateMutation, approvalLines, submitMutation, navigate, t]);
 
   const templateEntry = TEMPLATE_REGISTRY[resolvedTemplateCode];
-  if (!templateEntry && !isEditMode) {
+  const schemaSnapshot = existingDoc?.schemaDefinitionSnapshot ?? null;
+  // Phase 24.1-04: CUSTOM fallback — 편집 모드는 스냅샷 존재로, 신규 작성은
+  // 미등록 templateCode 로 판정. 하드코딩 6개 템플릿은 templateEntry 로 분기되어 영향 없음.
+  const useCustomRenderer =
+    !templateEntry &&
+    (isEditMode
+      ? !!schemaSnapshot
+      : isCustomTemplate(resolvedTemplateCode));
+
+  if (!templateEntry && !useCustomRenderer && !isEditMode) {
     return (
       <div className="text-center py-12 text-gray-500">
         알 수 없는 양식: {resolvedTemplateCode}
@@ -234,7 +247,8 @@ export default function DocumentEditorPage() {
     );
   }
 
-  const EditComponent = templateEntry?.editComponent;
+  const EditComponent =
+    templateEntry?.editComponent ?? (useCustomRenderer ? DYNAMIC_CUSTOM_EDIT : undefined);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -307,6 +321,7 @@ export default function DocumentEditorPage() {
                     title: existingDoc.title,
                     bodyHtml: existingDoc.bodyHtml ?? undefined,
                     formData: existingDoc.formData ?? undefined,
+                    schemaSnapshot,
                   }
                 : undefined
             }

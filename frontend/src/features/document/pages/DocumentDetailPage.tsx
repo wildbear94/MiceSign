@@ -5,7 +5,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, CheckCircle, X, Loader2 } from 'lucide-react';
 import DocumentStatusBadge from '../components/DocumentStatusBadge';
 import TemplateBadge from '../components/TemplateBadge';
-import { TEMPLATE_REGISTRY } from '../components/templates/templateRegistry';
+import {
+  TEMPLATE_REGISTRY,
+  DYNAMIC_CUSTOM_READONLY,
+} from '../components/templates/templateRegistry';
 import FileAttachmentArea from '../components/attachment/FileAttachmentArea';
 import { useDocumentDetail, useWithdrawDocument, useRewriteDocument } from '../hooks/useDocuments';
 import DocumentEditorPage from './DocumentEditorPage';
@@ -112,7 +115,12 @@ export default function DocumentDetailPage() {
 
   // Non-DRAFT: render read-only view
   const templateEntry = TEMPLATE_REGISTRY[doc.templateCode];
-  const ReadOnlyComponent = templateEntry?.readOnlyComponent;
+  // Phase 24.1-04: CUSTOM fallback — 하드코딩 템플릿이 없거나 과거 스냅샷이 있으면
+  // DynamicCustomReadOnly 로 fallback.
+  const schemaSnapshot = doc.schemaDefinitionSnapshot ?? null;
+  const ReadOnlyComponent =
+    templateEntry?.readOnlyComponent ??
+    (schemaSnapshot ? DYNAMIC_CUSTOM_READONLY : undefined);
 
   function formatDate(dateString: string | null): string {
     if (!dateString) return '-';
@@ -244,6 +252,7 @@ export default function DocumentDetailPage() {
             title={doc.title}
             bodyHtml={doc.bodyHtml}
             formData={doc.formData}
+            schemaSnapshot={schemaSnapshot}
           />
         ) : (
           <p className="text-sm text-gray-400">알 수 없는 양식입니다.</p>
