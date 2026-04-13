@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronUp, ChevronDown, Trash2, Zap } from 'lucide-react';
+import { ChevronRight, ChevronUp, ChevronDown, Trash2, Zap, Sigma } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import type { ConditionalRule } from '../../../document/types/dynamicForm';
+import type { ConditionalRule, CalculationRule } from '../../../document/types/dynamicForm';
 import type { SchemaField } from './types';
 import { INPUT_CLASS, CONDITION_EXCLUDED_TARGET_TYPES } from './constants';
 import { toFieldId } from './utils';
 import { TypeBadge } from './TypeBadge';
 import { FieldConfigEditor } from './FieldConfigEditor';
 import { ConditionalRuleEditor } from './ConditionalRuleEditor';
+import { CalculationRuleEditor } from './CalculationRuleEditor';
+import { renderFormulaFriendly } from './calculationRuleUtils';
 
 export function FieldCard({
   field,
@@ -23,6 +25,11 @@ export function FieldCard({
   onAddRule,
   onUpdateRule,
   onDeleteRule,
+  calculationRules,
+  cycles,
+  onAddCalcRule,
+  onUpdateCalcRule,
+  onDeleteCalcRule,
 }: {
   field: SchemaField;
   index: number;
@@ -37,10 +44,19 @@ export function FieldCard({
   onAddRule: (rule: ConditionalRule) => void;
   onUpdateRule: (rule: ConditionalRule) => void;
   onDeleteRule: (targetFieldId: string) => void;
+  calculationRules: CalculationRule[];
+  cycles: string[][];
+  onAddCalcRule: (rule: CalculationRule) => void;
+  onUpdateCalcRule: (rule: CalculationRule) => void;
+  onDeleteCalcRule: (targetFieldId: string) => void;
 }) {
   const { t } = useTranslation('admin');
   const [labelEdited, setLabelEdited] = useState(false);
   const [conditionExpanded, setConditionExpanded] = useState(false);
+  const [calcExpanded, setCalcExpanded] = useState(false);
+
+  const myCalcRule = calculationRules.find((r) => r.targetFieldId === field.id);
+  const hasCalcCycle = cycles.some((c) => c.includes(field.id));
 
   const handleLabelChange = (newLabel: string) => {
     onUpdate({ ...field, label: newLabel });
@@ -80,6 +96,19 @@ export function FieldCard({
         {conditionalRules.some(r => r.targetFieldId === field.id) && (
           <span className="inline-flex items-center bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 rounded px-1 py-0.5">
             <Zap className="w-3.5 h-3.5" />
+          </span>
+        )}
+        {myCalcRule && (
+          <span
+            className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs font-mono max-w-[200px] ${
+              hasCalcCycle
+                ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                : 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
+            }`}
+            title={renderFormulaFriendly(myCalcRule.formula)}
+          >
+            <Sigma className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">= {renderFormulaFriendly(myCalcRule.formula)}</span>
           </span>
         )}
         {/* Action buttons */}
@@ -190,6 +219,39 @@ export function FieldCard({
                     onAddRule={onAddRule}
                     onUpdateRule={onUpdateRule}
                     onDeleteRule={() => onDeleteRule(field.id)}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Calculation rule section (D-01, D-19) */}
+          {field.type === 'number' && (
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
+              <div
+                role="button"
+                aria-expanded={calcExpanded}
+                onClick={() => setCalcExpanded(!calcExpanded)}
+                className="flex items-center gap-2 py-2 cursor-pointer select-none"
+              >
+                <ChevronRight
+                  className={`w-4 h-4 text-gray-400 transition-transform ${calcExpanded ? 'rotate-90' : ''}`}
+                />
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t('templates.calculation.sectionTitle')}
+                </span>
+              </div>
+              {calcExpanded && (
+                <div className="pl-6 pb-1">
+                  <CalculationRuleEditor
+                    targetFieldId={field.id}
+                    rule={myCalcRule}
+                    allFields={allFields}
+                    allRules={calculationRules}
+                    cycles={cycles}
+                    onAddRule={onAddCalcRule}
+                    onUpdateRule={onUpdateCalcRule}
+                    onDeleteRule={() => onDeleteCalcRule(field.id)}
                   />
                 </div>
               )}

@@ -1,22 +1,26 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import type { ConditionalRule } from '../../../document/types/dynamicForm';
 import type { SchemaField, SchemaFieldType, SchemaFieldEditorProps } from './types';
 import { FIELD_TYPE_META, FALLBACK_TYPE_META, FIELD_TYPES } from './constants';
 import { FieldCard } from './FieldCard';
 import { cleanupRulesForDeletedField, cleanupRulesForTypeChange } from './conditionalRuleUtils';
+import { detectCircularDeps } from '../../../document/utils/detectCircularDeps';
+import {
+  cleanupCalcRulesForDeletedField,
+  cleanupCalcRulesForTypeChange,
+  cleanupCalcRulesForTableColumnChange,
+} from './calculationRuleUtils';
 
 export default function SchemaFieldEditor({
   fields,
   onChange,
   conditionalRules = [],
   onConditionalRulesChange,
-}: SchemaFieldEditorProps & {
-  conditionalRules?: ConditionalRule[];
-  onConditionalRulesChange?: (rules: ConditionalRule[]) => void;
-}) {
+  calculationRules = [],
+  onCalculationRulesChange,
+}: SchemaFieldEditorProps) {
   const { t } = useTranslation('admin');
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -48,6 +52,8 @@ export default function SchemaFieldEditor({
     setDropdownOpen(false);
   };
 
+  const cycles = useMemo(() => detectCircularDeps(calculationRules), [calculationRules]);
+
   const updateField = (index: number, updated: SchemaField) => {
     const oldField = fields[index];
     const newFields = [...fields];
@@ -60,6 +66,43 @@ export default function SchemaFieldEditor({
       if (removedCount > 0) {
         toast(t('templates.condition.rulesAutoRemoved', { count: removedCount }));
         onConditionalRulesChange(cleanedRules);
+      }
+    }
+
+    // Phase 25: calculation rule cascade on type change (D-08)
+    if (oldField.type !== updated.type && onCalculationRulesChange) {
+      const [cleanedCalc, removedCalcCount] = cleanupCalcRulesForTypeChange(
+        updated.id,
+        updated.type,
+        calculationRules,
+      );
+      if (removedCalcCount > 0) {
+        toast(t('templates.calculation.rulesAutoRemoved', { count: removedCalcCount }));
+        onCalculationRulesChange(cleanedCalc);
+      }
+    }
+
+    // Pitfall 3: table column type change — number → other
+    if (oldField.type === 'table' && updated.type === 'table' && onCalculationRulesChange) {
+      const oldCols = oldField.config.columns || [];
+      const newCols = updated.config.columns || [];
+      const changedColIds: string[] = [];
+      for (const oldCol of oldCols) {
+        const newCol = newCols.find((c) => c.id === oldCol.id);
+        if (!newCol || (oldCol.type === 'number' && newCol.type !== 'number')) {
+          changedColIds.push(oldCol.id);
+        }
+      }
+      if (changedColIds.length > 0) {
+        const [cleanedCalc, removedCalcCount] = cleanupCalcRulesForTableColumnChange(
+          updated.id,
+          changedColIds,
+          calculationRules,
+        );
+        if (removedCalcCount > 0) {
+          toast(t('templates.calculation.rulesAutoRemoved', { count: removedCalcCount }));
+          onCalculationRulesChange(cleanedCalc);
+        }
       }
     }
   };
@@ -86,6 +129,15 @@ export default function SchemaFieldEditor({
         toast(t('templates.condition.rulesAutoRemoved', { count: removedCount }));
       }
       onConditionalRulesChange(cleanedRules);
+    }
+
+    // Phase 25: calculation rule cascade on delete (D-06, D-07)
+    if (onCalculationRulesChange) {
+      const [cleanedCalc, removedCalcCount] = cleanupCalcRulesForDeletedField(deletedFieldId, calculationRules);
+      if (removedCalcCount > 0) {
+        toast(t('templates.calculation.rulesAutoRemoved', { count: removedCalcCount }));
+      }
+      onCalculationRulesChange(cleanedCalc);
     }
 
     if (expandedIndex === index) {
@@ -163,6 +215,15 @@ export default function SchemaFieldEditor({
               )}
               onDeleteRule={(targetFieldId) => onConditionalRulesChange?.(
                 conditionalRules.filter(r => r.targetFieldId !== targetFieldId)
+              )}
+              calculationRules={calculationRules}
+              cycles={cycles}
+              onAddCalcRule={(rule) => onCalculationRulesChange?.([...calculationRules, rule])}
+              onUpdateCalcRule={(rule) => onCalculationRulesChange?.(
+                calculationRules.map(r => r.targetFieldId === rule.targetFieldId ? rule : r)
+              )}
+              onDeleteCalcRule={(targetFieldId) => onCalculationRulesChange?.(
+                calculationRules.filter(r => r.targetFieldId !== targetFieldId)
               )}
             />
           ))}
