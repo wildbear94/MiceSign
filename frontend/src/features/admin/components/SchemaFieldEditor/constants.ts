@@ -1,6 +1,6 @@
 import type React from 'react';
 import { Type, AlignLeft, Hash, Calendar, List, FileText, EyeOff, Table, HelpCircle, CheckSquare } from 'lucide-react';
-import type { SchemaFieldType, TableColumnType, ComparisonOperator, ActionOption } from './types';
+import type { SchemaFieldType, TableColumnType, ComparisonOperator, ActionOption, PresetType } from './types';
 
 export const FIELD_TYPE_META: Record<
   SchemaFieldType,
@@ -80,4 +80,30 @@ export const ACTION_OPTIONS: ActionOption[] = [
   { value: 'hide', labelKey: 'templates.condition.actions.hide' },
   { value: 'require', labelKey: 'templates.condition.actions.require' },
   { value: 'unrequire', labelKey: 'templates.condition.actions.unrequire' },
+];
+
+// === Phase 25: Calculation Rule Constants ===
+
+// D-19: 타겟은 루트 number 만
+export const CALC_TARGET_TYPES: SchemaFieldType[] = ['number'];
+
+// D-20: 소스는 루트 number + table 내부 number 컬럼 (루트 후보 타입)
+export const CALC_SOURCE_ROOT_TYPES: SchemaFieldType[] = ['number'];
+
+// D-23: 정규식 추출 시 예약어로 제거
+export const CALC_RESERVED_WORDS = new Set<string>(['SUM']);
+
+// D-15/D-16: 프리셋 4종 메타
+export interface PresetOption {
+  type: PresetType;
+  labelKey: string; // i18n: templates.calculation.presets.*
+  /** 사용자 표시용 포맷 예시 i18n 키 */
+  exampleKey: string;
+}
+
+export const PRESET_OPTIONS: PresetOption[] = [
+  { type: 'sum-col',   labelKey: 'templates.calculation.presets.sumCol',   exampleKey: 'templates.calculation.presets.sumColExample' },
+  { type: 'sum-mul',   labelKey: 'templates.calculation.presets.sumMul',   exampleKey: 'templates.calculation.presets.sumMulExample' },
+  { type: 'field-sum', labelKey: 'templates.calculation.presets.fieldSum', exampleKey: 'templates.calculation.presets.fieldSumExample' },
+  { type: 'ratio',     labelKey: 'templates.calculation.presets.ratio',    exampleKey: 'templates.calculation.presets.ratioExample' },
 ];

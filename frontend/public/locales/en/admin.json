@@ -219,6 +219,46 @@
       "validationError": "Conditional rules have errors",
       "noSourceFields": "No fields available as condition source",
       "resetPreview": "Reset"
+    },
+    "calculation": {
+      "sectionTitle": "Calculation Rules",
+      "noRule": "No calculation rule",
+      "addRule": "Add Calculation",
+      "deleteRule": "Delete Calculation",
+      "presetMode": "Preset",
+      "advancedMode": "Advanced",
+      "advancedPlaceholder": "e.g. SUM(items.price * items.qty) * 1.1",
+      "noSourceFields": "No numeric fields available as calculation source",
+      "rulesAutoRemoved": "{{count}} calculation rule(s) auto-removed",
+      "validationError": "Calculation rules have errors",
+      "circularSaveBlocked": "Calculation rules have circular dependency",
+      "targetBadgePrefix": "=",
+      "presets": {
+        "sumCol": "Column Sum",
+        "sumColExample": "SUM(items.price)",
+        "sumMul": "Column Product Sum",
+        "sumMulExample": "SUM(items.price × items.qty)",
+        "fieldSum": "Field Sum",
+        "fieldSumExample": "A + B + C",
+        "ratio": "Ratio",
+        "ratioExample": "A ÷ B × 100",
+        "selectTable": "Select table",
+        "selectColumn": "Select column",
+        "selectColumnA": "Column A",
+        "selectColumnB": "Column B",
+        "selectFields": "Select fields",
+        "numerator": "Numerator",
+        "denominator": "Denominator"
+      },
+      "errors": {
+        "emptyFormula": "Formula is empty",
+        "syntaxError": "Formula syntax error (unbalanced parens, etc.)",
+        "unknownField": "Unknown field reference",
+        "unknownColumn": "Unknown column or not a numeric type",
+        "invalidOperator": "Invalid operator",
+        "selfReference": "Cannot reference the target field itself",
+        "circularDependency": "Circular dependency detected"
+      }
     }
   },
   "toast": {
