@@ -577,22 +577,22 @@ export const presets: Preset[] = Object.entries(modules).map(([path, mod]) => {
 - 프리셋 4종의 구체적 필드 구성: Phase 22~25 기능(분할 프리뷰, 테이블, 조건 규칙, 계산 규칙) 각각이 최소 1개 프리셋에 등장하도록 구성
 - i18n 키: `templates.create.blank`, `templates.create.preset`, `templates.create.import`, `templates.duplicate`, `templates.export.button`, `templates.export.success`, `templates.import.title`, `templates.import.parseError`, `templates.import.validationError`, `templates.preset.expense.name`, `templates.preset.leave.name`, `templates.preset.trip.name`, `templates.preset.purchase.name` 권장
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **프리셋 `name` 중복 시 UX**
    - 알려진 것: 사용자가 "경비신청서" 프리셋을 두 번 선택하면 두 번째에서 prefix는 비어 있지만 name은 같음.
    - 불분명한 것: 저장 시 name 중복을 허용하는가? 백엔드가 name 유니크 제약을 두지 않음 (`TemplateService.createTemplate`은 prefix만 검증) [VERIFIED].
-   - 권장: 허용. prefix가 유니크하므로 name 중복은 식별에 영향 없음. 다만 사용자가 name을 수정할 수 있도록 모달이 열린 채로 제공하는 기존 UX로 충분.
+   - **RESOLVED:** 허용. 사용자가 모달에서 name을 자유롭게 편집 가능. 백엔드 유니크 제약은 prefix(및 code)에만 존재하므로 409 Conflict는 prefix/code 기준으로만 발생한다. name 중복은 검증하지 않는다 (CONTEXT.md D-10과 정합).
 
 2. **Export 시 비활성(inactive) 템플릿도 허용하는가?**
    - 알려진 것: `GET /admin/templates/{id}`는 isActive 여부와 무관하게 detail을 반환 (현재 코드 확인 필요).
    - 불분명한 것: 비활성 템플릿 Export를 금지해야 할 비즈니스 이유가 있는가?
-   - 권장: 허용 — 관리자가 과거 양식을 참고/복원하는 유스케이스를 막을 이유 없음. `TemplateTable`에 isActive와 무관하게 Download 버튼 노출.
+   - **RESOLVED:** 허용 (단순화). `TemplateTable`은 isActive와 무관하게 Download 버튼을 노출하며, 프론트에서 별도 필터링/경고를 수행하지 않는다. 관리자가 과거 양식을 참고/복원하는 유스케이스를 지원.
 
 3. **대용량 JSON Import의 업로드 크기 한계**
    - 알려진 것: Import는 클라이언트 파싱이므로 서버 업로드 크기는 무관.
    - 불분명한 것: 현실적 JSON 크기 상한(예: 1MB)을 front에서 가드할 것인가?
-   - 권장: `FileReader` 전에 `file.size > 1_000_000` 체크하고 에러 토스트. 100+ 필드 + 복잡한 규칙 양식도 수십 KB를 넘지 않으므로 1MB는 충분히 여유.
+   - **RESOLVED:** 1MB. `FileReader` 호출 전에 `file.size > 1_000_000` 가드를 `ImportTemplateModal`(Plan 02 Task 2)에 구현하고, 초과 시 `templates.importErrorFileTooLarge` 토스트/에러를 표시한다. 100+ 필드의 복잡한 양식도 수십 KB 수준이므로 1MB는 충분한 여유이며, Plan 02 Task 2의 `file.size > 1_000_000` 가드와 정확히 일치한다.
 
 ## Environment Availability
 
@@ -747,11 +747,11 @@ export const presets: Preset[] = Object.entries(modules).map(([path, mod]) => {
 | Pitfalls | HIGH | TemplateFormModal 기존 검증 로직과의 상호작용을 직접 확인 |
 | Import Zod 스키마 | HIGH | dynamicForm.ts 타입을 1:1 매핑 |
 
-### Open Questions
-- 프리셋 name 중복 허용 여부 — 권장: 허용
-- 비활성 템플릿 Export 허용 여부 — 권장: 허용
-- JSON 업로드 크기 상한 — 권장: 1MB 클라이언트 가드
-- Vitest 설정 상태 (frontend/package.json의 test script 확인 필요) — Wave 0에서 플래너 확인
+### Open Questions (RESOLVED)
+- **RESOLVED:** 프리셋 name 중복 — 허용 (사용자가 모달에서 편집 가능). 백엔드 409는 prefix/code 기준만.
+- **RESOLVED:** 비활성 템플릿 Export — 허용 (단순화). isActive 무관 Download 버튼 노출.
+- **RESOLVED:** JSON Import 크기 상한 — 1MB (`file.size > 1_000_000` 가드). Plan 02 Task 2의 ImportTemplateModal에서 `FileReader` 호출 전 체크.
+- **RESOLVED:** Vitest 설정 — Plan 01 Wave 0 foundation 태스크에서 `frontend/vitest.config.ts` 생성 + `npm run test` 스크립트 추가 + `templateImportSchema` 첫 단위 테스트로 즉시 검증.
 
 ### Ready for Planning
 Research complete. Planner can now create PLAN.md files. 2개 플랜 권장 구성(ROADMAP 힌트):
