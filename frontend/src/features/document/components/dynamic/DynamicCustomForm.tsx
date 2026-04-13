@@ -2,10 +2,11 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useForm, FormProvider, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { templateApi } from '../../api/templateApi';
 import { schemaToZod, buildDefaultValues } from '../../utils/schemaToZod';
 import { evaluateConditions } from '../../utils/evaluateConditions';
+import { executeCalculations } from '../../utils/executeCalculations';
 import type { SchemaDefinition, FieldDefinition } from '../../types/dynamicForm';
 import type { TemplateEditProps } from '../templates/templateRegistry';
 import DynamicFieldRenderer from './DynamicFieldRenderer';
@@ -141,14 +142,65 @@ function DynamicFormInner({
     hiddenFieldsRef.current = hiddenFields;
   }, [hiddenFields]);
 
+  // calculationRules 실시간 실행 (D-18). watched 변경 시마다 결과 필드 갱신.
+  // 무한 루프 방지: 현재 값과 동일하면 setValue 미호출.
+  const watchedKey = JSON.stringify(watched);
+  useEffect(() => {
+    const results = executeCalculations(
+      schema.calculationRules ?? [],
+      watched,
+    );
+    for (const [fid, v] of Object.entries(results)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const current = form.getValues(fid as any);
+      if (current !== v) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        form.setValue(fid as any, v as any, {
+          shouldValidate: false,
+          shouldDirty: false,
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchedKey, schema.calculationRules]);
+
+  // 계산 결과 필드 ID 집합 (입력 비활성화용)
+  const calcResultFieldIds = useMemo(() => {
+    const ids = new Set<string>();
+    (schema.calculationRules ?? []).forEach((r) => {
+      if (r.targetFieldId) ids.add(r.targetFieldId);
+    });
+    return ids;
+  }, [schema.calculationRules]);
+
   const onSubmit = async (values: FormValues) => {
     const { __title, ...formFields } = values;
-    // Task 1c 에서 빈 행 제거 로직 추가.
+
+    // D-26: table 필드의 빈 행 자동 제거
+    const cleanedFields: Record<string, unknown> = {};
+    for (const field of schema.fields) {
+      const v = formFields[field.id];
+      if (field.type === 'table' && Array.isArray(v)) {
+        const rows = v as Array<Record<string, unknown>>;
+        cleanedFields[field.id] = rows.filter((row) =>
+          Object.values(row).some(
+            (cell) => cell !== '' && cell !== null && cell !== undefined,
+          ),
+        );
+      } else {
+        cleanedFields[field.id] = v;
+      }
+    }
+    // schema.fields 에 없는 키도 보존
+    for (const [k, v] of Object.entries(formFields)) {
+      if (!(k in cleanedFields)) cleanedFields[k] = v;
+    }
+
     // D-10: payload 에 schema 미포함 — 백엔드 자동 저장.
     await onSave({
       title: __title,
       bodyHtml: undefined,
-      formData: JSON.stringify(formFields),
+      formData: JSON.stringify(cleanedFields),
     });
   };
 
@@ -197,7 +249,7 @@ function DynamicFormInner({
                 control={form.control as any}
                 error={errMsg}
                 dynamicRequired={requiredFields.has(field.id)}
-                disabled={readOnly}
+                disabled={readOnly || calcResultFieldIds.has(field.id)}
               />
             </div>
           );
