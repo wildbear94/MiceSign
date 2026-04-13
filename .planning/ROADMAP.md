@@ -116,14 +116,14 @@ Plans:
 **Goal:** 관리자가 양식 빌더로 만든 CUSTOM 템플릿(SchemaDefinition)을 사용자가 실제 기안 작성/편집/읽기 전용 조회할 수 있도록 DynamicFormRenderer를 구축하고, 양식 변경 이후에도 과거 문서는 schemaSnapshot 기반으로 원본 그대로 표시된다.
 **Requirements**: D-01~D-26 (locked decisions in 24.1-CONTEXT.md) + IR-01~IR-09 (implicit requirements in 24.1-RESEARCH.md)
 **Depends on:** Phase 24
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 
 Plans:
-- [ ] 24.1-01-PLAN.md — 타입 확장(DocumentDetailResponse.schemaDefinitionSnapshot, TemplateEditProps/TemplateReadOnlyProps.schemaSnapshot) + baseline build
-- [ ] 24.1-02-PLAN.md — DynamicFieldRenderer 추출 + DynamicTableField(useFieldArray) + adaptSchemaField adapter
-- [ ] 24.1-03-PLAN.md — DynamicCustomForm(RHF+실시간 조건/계산 평가) + DynamicCustomReadOnly
-- [ ] 24.1-04-PLAN.md — admin FormPreview 리팩터링(DynamicFieldRenderer 위임) + DocumentEditorPage/DocumentDetailPage CUSTOM fallback 분기
-- [ ] 24.1-05-PLAN.md — 통합 검증(tsc+build) + admin 회귀 수동 UAT + CUSTOM end-to-end UAT
+- [x] 24.1-01-PLAN.md — 타입 확장(DocumentDetailResponse.schemaDefinitionSnapshot, TemplateEditProps/TemplateReadOnlyProps.schemaSnapshot) + baseline build
+- [x] 24.1-02-PLAN.md — DynamicFieldRenderer 추출 + DynamicTableField(useFieldArray) + adaptSchemaField adapter
+- [x] 24.1-03-PLAN.md — DynamicCustomForm(RHF+실시간 조건/계산 평가) + DynamicCustomReadOnly
+- [x] 24.1-04-PLAN.md — admin FormPreview 리팩터링(DynamicFieldRenderer 위임) + DocumentEditorPage/DocumentDetailPage CUSTOM fallback 분기
+- [x] 24.1-05-PLAN.md — 통합 검증(tsc+build) + admin 회귀 수동 UAT + CUSTOM end-to-end UAT
 
 ### Phase 25: 계산 규칙 UI
 **Goal**: 관리자가 숫자 필드에 자동 계산 공식을 설정하고 오류를 사전에 방지할 수 있다
