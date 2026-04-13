@@ -150,8 +150,8 @@ Plans:
   4. 관리자가 프리셋 템플릿(경비, 신청서 등) 목록에서 선택하여 새 양식을 빠르게 시작할 수 있다
 **Plans:** 2 plans
 Plans:
-- [ ] 24-01-PLAN.md — 조건 규칙 편집 UI 핵심 컴포넌트 + 유틸리티 + i18n
-- [ ] 24-02-PLAN.md — 인터랙티브 미리보기 + TemplateFormModal 상태 통합 + 저장 검증
+- [ ] 26-01-PLAN.md — 기반: templateImportSchema(Zod) + templateExport 유틸 + 4종 프리셋 JSON + TemplateFormModal initialValues prop + Vitest 단위 테스트
+- [ ] 26-02-PLAN.md — UI 통합: TemplateCreateChoiceModal + PresetGallery + ImportTemplateModal + TemplateTable Copy/Download 버튼 + TemplateListPage 상태 머신 + i18n + 수동 UAT
 **UI hint**: yes
 
 ## Progress
