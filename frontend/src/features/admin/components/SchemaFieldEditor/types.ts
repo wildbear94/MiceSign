@@ -51,6 +51,12 @@ export interface SchemaField {
 export interface SchemaFieldEditorProps {
   fields: SchemaField[];
   onChange: (fields: SchemaField[]) => void;
+  // Phase 24: 조건 규칙 (optional for backward compat with existing callers)
+  conditionalRules?: import('../../../document/types/dynamicForm').ConditionalRule[];
+  onConditionalRulesChange?: (rules: import('../../../document/types/dynamicForm').ConditionalRule[]) => void;
+  // Phase 25: 계산 규칙
+  calculationRules?: import('../../../document/types/dynamicForm').CalculationRule[];
+  onCalculationRulesChange?: (rules: import('../../../document/types/dynamicForm').CalculationRule[]) => void;
 }
 
 // === Conditional Rule UI Types ===
