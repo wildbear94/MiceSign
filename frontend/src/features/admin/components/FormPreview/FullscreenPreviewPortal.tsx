@@ -3,13 +3,14 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import type { SchemaField } from '../SchemaFieldEditor/types';
-import type { ConditionalRule } from '../../../document/types/dynamicForm';
+import type { ConditionalRule, CalculationRule } from '../../../document/types/dynamicForm';
 import FormPreview from './FormPreview';
 
 interface FullscreenPreviewPortalProps {
   fields: SchemaField[];
   templateName?: string;
   conditionalRules?: ConditionalRule[];
+  calculationRules?: CalculationRule[];
   onClose: () => void;
 }
 
@@ -17,6 +18,7 @@ export default function FullscreenPreviewPortal({
   fields,
   templateName,
   conditionalRules,
+  calculationRules,
   onClose,
 }: FullscreenPreviewPortalProps) {
   const { t } = useTranslation('admin');
@@ -47,7 +49,12 @@ export default function FullscreenPreviewPortal({
         >
           <X className="w-5 h-5" />
         </button>
-        <FormPreview fields={fields} templateName={templateName} conditionalRules={conditionalRules} />
+        <FormPreview
+          fields={fields}
+          templateName={templateName}
+          conditionalRules={conditionalRules}
+          calculationRules={calculationRules}
+        />
       </div>
     </div>,
     document.body,

@@ -454,7 +454,12 @@ export default function TemplateFormModal({
               </div>
               {/* Preview body */}
               <div className="flex-1 overflow-y-auto p-6 bg-gray-100 dark:bg-gray-900">
-                <FormPreview fields={schemaFields} templateName={watchedName} conditionalRules={conditionalRules} />
+                <FormPreview
+                  fields={schemaFields}
+                  templateName={watchedName}
+                  conditionalRules={conditionalRules}
+                  calculationRules={calculationRules}
+                />
               </div>
             </div>
           )}
@@ -467,6 +472,7 @@ export default function TemplateFormModal({
           fields={schemaFields}
           templateName={watchedName}
           conditionalRules={conditionalRules}
+          calculationRules={calculationRules}
           onClose={() => setIsFullscreen(false)}
         />
       )}

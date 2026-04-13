@@ -1,18 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RotateCcw } from 'lucide-react';
 import type { SchemaField } from '../SchemaFieldEditor/types';
-import type { ConditionalRule } from '../../../document/types/dynamicForm';
+import type { ConditionalRule, CalculationRule } from '../../../document/types/dynamicForm';
 import { evaluateConditions } from '../../../document/utils/evaluateConditions';
+import { executeCalculations } from '../../../document/utils/executeCalculations';
 import PreviewFieldRenderer from './PreviewFieldRenderer';
 
 interface FormPreviewProps {
   fields: SchemaField[];
   templateName?: string;
   conditionalRules?: ConditionalRule[];
+  calculationRules?: CalculationRule[]; // D-28: Phase 25 실시간 계산
 }
 
-export default function FormPreview({ fields, templateName, conditionalRules }: FormPreviewProps) {
+export default function FormPreview({
+  fields,
+  templateName,
+  conditionalRules,
+  calculationRules,
+}: FormPreviewProps) {
   const { t } = useTranslation('admin');
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
 
@@ -20,6 +27,32 @@ export default function FormPreview({ fields, templateName, conditionalRules }: 
     conditionalRules || [],
     formValues,
   );
+
+  // Phase 25: 계산 결과 필드 ID set (D-29)
+  const calcResultIds = useMemo(
+    () => new Set((calculationRules || []).map((r) => r.targetFieldId)),
+    [calculationRules],
+  );
+
+  // Phase 25: 실시간 계산 실행 (D-28)
+  // Pitfall 2 방어: 변경 감지 early return 으로 무한 루프 방지.
+  // Phase 24.1 DynamicCustomForm 의 RHF watchedKey 패턴은 FormPreview 의
+  // 외부 useState 구조상 직접 이식 불가 — Pitfall 5 참조.
+  useEffect(() => {
+    if (!calculationRules || calculationRules.length === 0) return;
+    const results = executeCalculations(calculationRules, formValues);
+    let changed = false;
+    for (const [fid, v] of Object.entries(results)) {
+      if (formValues[fid] !== v) {
+        changed = true;
+        break;
+      }
+    }
+    if (changed) {
+      setFormValues((prev) => ({ ...prev, ...results }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formValues, calculationRules]);
 
   if (fields.length === 0) {
     return (
@@ -58,6 +91,7 @@ export default function FormPreview({ fields, templateName, conditionalRules }: 
               value={formValues[field.id]}
               onChange={(val) => setFormValues(prev => ({ ...prev, [field.id]: val }))}
               dynamicRequired={requiredFields.has(field.id)}
+              disabled={calcResultIds.has(field.id)}
             />
           ))}
       </div>

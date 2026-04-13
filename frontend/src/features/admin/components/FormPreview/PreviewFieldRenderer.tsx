@@ -26,6 +26,7 @@ interface PreviewFieldRendererProps {
   value?: unknown;
   onChange?: (value: unknown) => void;
   dynamicRequired?: boolean;
+  disabled?: boolean; // Phase 25 D-29: 계산 결과 필드 비활성화 표시
 }
 
 export default function PreviewFieldRenderer({
@@ -33,6 +34,7 @@ export default function PreviewFieldRenderer({
   value,
   onChange,
   dynamicRequired,
+  disabled,
 }: PreviewFieldRendererProps) {
   const adapted = useMemo(
     () => adaptSchemaFieldToFieldDefinition(field),
@@ -78,6 +80,7 @@ export default function PreviewFieldRenderer({
         register={form.register}
         control={form.control}
         dynamicRequired={dynamicRequired}
+        disabled={disabled}
       />
     </FormProvider>
   );
