@@ -14,7 +14,13 @@ import OvertimeReadOnly from './OvertimeReadOnly';
 
 export interface TemplateEditProps {
   documentId: number | null;
-  initialData?: { title: string; bodyHtml?: string; formData?: string };
+  initialData?: {
+    title: string;
+    bodyHtml?: string;
+    formData?: string;
+    /** CUSTOM 템플릿 전용 — DocumentDetailResponse.schemaDefinitionSnapshot 값 (JSON string) */
+    schemaSnapshot?: string | null;
+  };
   onSave: (data: { title: string; bodyHtml?: string; formData?: string }) => Promise<void>;
   readOnly?: boolean;
 }
@@ -23,6 +29,8 @@ export interface TemplateReadOnlyProps {
   title: string;
   bodyHtml?: string | null;
   formData?: string | null;
+  /** CUSTOM 템플릿 전용 — DocumentDetailResponse.schemaDefinitionSnapshot 값 (JSON string) */
+  schemaSnapshot?: string | null;
 }
 
 export interface TemplateEntry {
