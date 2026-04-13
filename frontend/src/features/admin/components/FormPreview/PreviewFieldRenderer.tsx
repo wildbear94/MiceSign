@@ -1,6 +1,26 @@
-import { useTranslation } from 'react-i18next';
+import { useEffect, useMemo } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import type { SchemaField } from '../SchemaFieldEditor/types';
+import DynamicFieldRenderer from '../../../document/components/dynamic/DynamicFieldRenderer';
+import { adaptSchemaFieldToFieldDefinition } from '../../../document/components/dynamic/adaptSchemaField';
 
+/**
+ * Phase 24.1-04: admin FormPreview 의 필드 렌더러는 사용자측
+ * `DynamicFieldRenderer` 에 위임하여 admin↔user 간 렌더 로직 이중화를 제거한다.
+ *
+ * **이진 결정 (선택 A - 미변경):** PreviewFieldRenderer 의 기존 prop 시그니처
+ * `{ field, value, onChange, dynamicRequired }` 를 유지한다. 호출부(`FormPreview.tsx`)는
+ * 절대 수정하지 않는다. 내부에서 필드별 미니 `useForm` 을 만들고 `<FormProvider>` 로
+ * 감싸 `DynamicFieldRenderer` 에게 위임한다 (table 필드가 `useFormContext` 에 의존하므로
+ * FormProvider 는 필수).
+ *
+ * 주의사항:
+ * - admin 의 formValues 는 외부 state 이므로, 내부 form.watch() 로 값 변경을 감지해
+ *   외부 onChange 를 호출하는 단방향 동기화 + 외부 value 가 바뀌면 setValue 로 역방향 동기화.
+ * - admin FormPreview 의 table 미리보기는 기존에 `[0, 1]` 고정 disabled 행을 보여줬으나
+ *   DynamicTableField 로 위임되면 editable 로 바뀐다 — 의도된 UX 개선이며, 회귀는
+ *   Plan 05 의 수동 체크리스트에 기록한다.
+ */
 interface PreviewFieldRendererProps {
   field: SchemaField;
   value?: unknown;
@@ -8,154 +28,57 @@ interface PreviewFieldRendererProps {
   dynamicRequired?: boolean;
 }
 
-const ENABLED_INPUT_CLASS =
-  'w-full h-10 px-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors';
+export default function PreviewFieldRenderer({
+  field,
+  value,
+  onChange,
+  dynamicRequired,
+}: PreviewFieldRendererProps) {
+  const adapted = useMemo(
+    () => adaptSchemaFieldToFieldDefinition(field),
+    [field],
+  );
 
-export default function PreviewFieldRenderer({ field, value, onChange, dynamicRequired }: PreviewFieldRendererProps) {
-  const { t } = useTranslation('admin');
+  const form = useForm<Record<string, unknown>>({
+    defaultValues: { [field.id]: value },
+  });
 
-  const renderInput = () => {
-    switch (field.type) {
-      case 'text':
-        return (
-          <input
-            type="text"
-            value={(value as string) || ''}
-            onChange={(e) => onChange?.(e.target.value)}
-            placeholder={field.config.placeholder || ''}
-            className={ENABLED_INPUT_CLASS}
-          />
-        );
-      case 'textarea':
-        return (
-          <textarea
-            value={(value as string) || ''}
-            onChange={(e) => onChange?.(e.target.value)}
-            rows={3}
-            placeholder={field.config.placeholder || ''}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none transition-colors"
-          />
-        );
-      case 'number':
-        return (
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              value={(value as string) || ''}
-              onChange={(e) => onChange?.(e.target.value)}
-              placeholder={field.config.placeholder || '0'}
-              className={ENABLED_INPUT_CLASS}
-            />
-            {field.config.unit && (
-              <span className="text-sm text-gray-500 flex-shrink-0">{field.config.unit}</span>
-            )}
-          </div>
-        );
-      case 'date':
-        return (
-          <input
-            type="date"
-            value={(value as string) || ''}
-            onChange={(e) => onChange?.(e.target.value)}
-            className={ENABLED_INPUT_CLASS}
-          />
-        );
-      case 'select':
-        return (
-          <select
-            value={(value as string) || ''}
-            onChange={(e) => onChange?.(e.target.value)}
-            className={ENABLED_INPUT_CLASS}
-          >
-            <option value="">{t('templates.selectPlaceholder')}</option>
-            {field.config.options?.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label || opt.value}</option>
-            ))}
-          </select>
-        );
-      case 'staticText':
-        return (
-          <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
-            {field.config.content || t('templates.staticTextPlaceholder')}
-          </p>
-        );
-      case 'hidden':
-        return null;
-      case 'table': {
-        const columns = field.config.columns || [];
-        if (columns.length === 0) {
-          return (
-            <div className="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-              <div className="bg-gray-50 dark:bg-gray-700 px-3 py-3 text-xs text-gray-400 dark:text-gray-500 text-center">
-                {t('templates.columnEmpty')}
-              </div>
-            </div>
-          );
-        }
-        return (
-          <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 dark:bg-gray-700">
-                  {columns.map((col) => (
-                    <th key={col.id} className="px-3 py-2 text-left text-xs font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                      {col.label || t('templates.noLabel')}
-                      {col.required && <span className="text-red-500 ml-1">*</span>}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[0, 1].map((rowIdx) => (
-                  <tr key={rowIdx} className="border-t border-gray-200 dark:border-gray-700">
-                    {columns.map((col) => (
-                      <td key={col.id} className="px-3 py-2">
-                        {col.type === 'checkbox' ? (
-                          <input type="checkbox" disabled className="w-4 h-4 rounded border-gray-300" />
-                        ) : col.type === 'select' ? (
-                          <select disabled className="w-full h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400">
-                            <option>{t('templates.selectPlaceholder')}</option>
-                          </select>
-                        ) : col.type === 'date' ? (
-                          <input type="date" disabled className="w-full h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400" />
-                        ) : col.type === 'textarea' ? (
-                          <textarea disabled rows={1} className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400 resize-none" />
-                        ) : col.type === 'staticText' ? (
-                          <span className="text-xs text-gray-400">{col.config?.content || '-'}</span>
-                        ) : (
-                          <input type={col.type === 'number' ? 'number' : 'text'} disabled placeholder={col.config?.placeholder || ''} className="w-full h-8 px-2 text-xs border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700 text-gray-400" />
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <button
-              disabled
-              className="w-full py-2 text-sm text-gray-400 border-t border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-not-allowed"
-            >
-              + {t('templates.addRow')}
-            </button>
-          </div>
-        );
-      }
-      default:
-        return null;
+  // 외부 value → 내부 form state 역방향 동기화 (FormPreview 의 "미리보기 초기화" 버튼 등)
+  useEffect(() => {
+    const current = form.getValues(field.id);
+    if (current !== value) {
+      form.setValue(field.id, value, { shouldDirty: false, shouldValidate: false });
     }
-  };
+    // form 은 안정 참조이므로 deps 제외
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, field.id]);
+
+  // 내부 form state → 외부 onChange 단방향 동기화
+  useEffect(() => {
+    if (!onChange) return;
+    const subscription = form.watch((values) => {
+      const next = values[field.id];
+      if (next !== value) {
+        onChange(next);
+      }
+    });
+    return () => subscription.unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, field.id, value, onChange]);
 
   if (field.type === 'hidden') {
     return null;
   }
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        {field.label || t('templates.noLabel')}
-        {(field.required || dynamicRequired) && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
-      </label>
-      {renderInput()}
-    </div>
+    <FormProvider {...form}>
+      <DynamicFieldRenderer
+        field={adapted}
+        mode="edit"
+        register={form.register}
+        control={form.control}
+        dynamicRequired={dynamicRequired}
+      />
+    </FormProvider>
   );
 }
