@@ -143,8 +143,8 @@ Requirements for Milestone v1.1: 양식 생성 모달 창 고도화
 
 ### 계산 규칙
 
-- [ ] **CAL-01**: 관리자가 숫자 필드에 계산 공식을 설정할 수 있다 (SUM, 사칙연산, 테이블 컬럼 참조)
-- [ ] **CAL-02**: 순환 의존성 감지 시 실시간 경고가 표시된다
+- [x] **CAL-01**: 관리자가 숫자 필드에 계산 공식을 설정할 수 있다 (SUM, 사칙연산, 테이블 컬럼 참조)
+- [x] **CAL-02**: 순환 의존성 감지 시 실시간 경고가 표시된다
 
 ### 편의 기능
 
@@ -204,8 +204,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TBL-02 | Phase 23: 테이블 컬럼 편집기 | Pending |
 | CND-01 | Phase 24: 조건부 표시 규칙 UI | Pending |
 | CND-02 | Phase 24: 조건부 표시 규칙 UI | Pending |
-| CAL-01 | Phase 25: 계산 규칙 UI | Pending |
-| CAL-02 | Phase 25: 계산 규칙 UI | Pending |
+| CAL-01 | Phase 25: 계산 규칙 UI | Complete |
+| CAL-02 | Phase 25: 계산 규칙 UI | Complete |
 | CNV-01 | Phase 26: 편의 기능 | Pending |
 | CNV-02 | Phase 26: 편의 기능 | Pending |
 | CNV-03 | Phase 26: 편의 기능 | Pending |
