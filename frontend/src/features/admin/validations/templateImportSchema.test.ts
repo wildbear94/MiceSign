@@ -1,0 +1,162 @@
+import { describe, it, expect } from 'vitest';
+import { ZodError } from 'zod';
+import { templateImportSchema, flattenZodErrors } from './templateImportSchema';
+
+const validPayload = {
+  exportFormatVersion: 1,
+  schemaVersion: 1,
+  name: '테스트 양식',
+  description: '설명',
+  prefix: 'TST',
+  category: 'general',
+  icon: 'FileText',
+  schemaDefinition: {
+    version: 1,
+    fields: [
+      { id: 'title', type: 'text', label: '제목', required: true },
+      {
+        id: 'items',
+        type: 'table',
+        label: '항목',
+        required: true,
+        config: {
+          columns: [
+            { id: 'name', type: 'text', label: '이름', required: true },
+            { id: 'qty', type: 'number', label: '수량' },
+          ],
+          minRows: 1,
+        },
+      },
+    ],
+    conditionalRules: [
+      {
+        targetFieldId: 'items',
+        condition: { fieldId: 'title', operator: 'equals', value: 'x' },
+        action: 'show',
+      },
+    ],
+    calculationRules: [
+      { targetFieldId: 'items', formula: 'SUM(items.qty)', dependsOn: ['items'] },
+    ],
+  },
+};
+
+describe('templateImportSchema', () => {
+  it('accepts a fully valid D-05 payload', () => {
+    const result = templateImportSchema.safeParse(validPayload);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects exportFormatVersion !== 1', () => {
+    const bad = { ...validPayload, exportFormatVersion: 2 };
+    const result = templateImportSchema.safeParse(bad);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path.join('.')).toBe('exportFormatVersion');
+    }
+  });
+
+  it('rejects missing name', () => {
+    const { name: _name, ...rest } = validPayload;
+    void _name;
+    const result = templateImportSchema.safeParse(rest);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const paths = result.error.issues.map((i) => i.path.join('.'));
+      expect(paths).toContain('name');
+    }
+  });
+
+  it('rejects invalid field type (not in enum)', () => {
+    const bad = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [{ id: 'a', type: 'invalidtype', label: 'A', required: false }],
+      },
+    };
+    const result = templateImportSchema.safeParse(bad);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const paths = result.error.issues.map((i) => i.path.join('.'));
+      expect(paths.some((p) => p.startsWith('schemaDefinition.fields.0.type'))).toBe(true);
+    }
+  });
+
+  it('rejects invalid conditionalRules action', () => {
+    const bad = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        conditionalRules: [
+          {
+            targetFieldId: 'title',
+            condition: { fieldId: 'title', operator: 'equals', value: 'x' },
+            action: 'explode',
+          },
+        ],
+      },
+    };
+    const result = templateImportSchema.safeParse(bad);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects calculationRules dependsOn not being array', () => {
+    const bad = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        calculationRules: [
+          { targetFieldId: 'title', formula: 'x', dependsOn: 'notanarray' },
+        ],
+      },
+    };
+    const result = templateImportSchema.safeParse(bad);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects prototype pollution attempt in fieldConfig (strict mode)', () => {
+    const bad = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          {
+            id: 'x',
+            type: 'text',
+            label: 'X',
+            required: false,
+            config: { placeholder: 'p', __proto__: { polluted: true } },
+          },
+        ],
+      },
+    };
+    const result = templateImportSchema.safeParse(bad);
+    expect(result.success).toBe(false);
+  });
+
+  it('flattenZodErrors converts issues to path/message list', () => {
+    const result = templateImportSchema.safeParse({ ...validPayload, name: undefined });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const flat = flattenZodErrors(result.error as ZodError);
+      expect(Array.isArray(flat)).toBe(true);
+      expect(flat.length).toBeGreaterThan(0);
+      expect(flat[0]).toHaveProperty('path');
+      expect(flat[0]).toHaveProperty('message');
+      expect(typeof flat[0].path).toBe('string');
+    }
+  });
+
+  it('accepts minimal payload without optional fields', () => {
+    const minimal = {
+      exportFormatVersion: 1,
+      schemaVersion: 1,
+      name: '미니',
+      prefix: 'MIN',
+      schemaDefinition: { version: 1, fields: [] },
+    };
+    const result = templateImportSchema.safeParse(minimal);
+    expect(result.success).toBe(true);
+  });
+});
