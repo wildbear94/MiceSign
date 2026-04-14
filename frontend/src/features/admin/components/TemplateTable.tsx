@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { Pencil } from 'lucide-react';
+import { Pencil, Copy, Download } from 'lucide-react';
 import { useToggleTemplate } from '../hooks/useTemplates';
 import ConfirmDialog from './ConfirmDialog';
 import type { TemplateListItem } from '../api/templateApi';
@@ -10,9 +10,19 @@ interface TemplateTableProps {
   templates: TemplateListItem[];
   isLoading: boolean;
   onEdit?: (template: TemplateListItem) => void;
+  /** Phase 26 (D-01, D-02): open create modal prefilled from this row. */
+  onDuplicate?: (template: TemplateListItem) => void;
+  /** Phase 26 (D-07): trigger browser JSON download for this row. */
+  onExport?: (template: TemplateListItem) => void;
 }
 
-export default function TemplateTable({ templates, isLoading, onEdit }: TemplateTableProps) {
+export default function TemplateTable({
+  templates,
+  isLoading,
+  onEdit,
+  onDuplicate,
+  onExport,
+}: TemplateTableProps) {
   const { t } = useTranslation('admin');
   const toggleMutation = useToggleTemplate();
   const [confirmTarget, setConfirmTarget] = useState<TemplateListItem | null>(null);
@@ -153,14 +163,35 @@ export default function TemplateTable({ templates, isLoading, onEdit }: Template
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <button
-                    type="button"
-                    onClick={() => onEdit?.(template)}
-                    className="text-gray-400 hover:text-blue-600 p-1 rounded transition-colors"
-                    aria-label={`${template.name} ${t('common.edit')}`}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {/* Phase 26 D-01: Copy → Download → Edit (order fixed) */}
+                    <button
+                      type="button"
+                      onClick={() => onDuplicate?.(template)}
+                      className="text-gray-400 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition-colors"
+                      aria-label={`${template.name} ${t('templates.duplicate')}`}
+                      title={t('templates.duplicate')}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onExport?.(template)}
+                      className="text-gray-400 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition-colors"
+                      aria-label={`${template.name} ${t('templates.exportJson')}`}
+                      title={t('templates.exportJson')}
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onEdit?.(template)}
+                      className="text-gray-400 hover:text-blue-600 p-1 rounded transition-colors"
+                      aria-label={`${template.name} ${t('common.edit')}`}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
