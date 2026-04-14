@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: milestone
-status: verifying
+milestone_name: 검증 위생 보강 — 코드 FLAG + HUMAN UAT
+status: executing
 stopped_at: Completed 26-02-PLAN.md
-last_updated: "2026-04-14T04:20:23.182Z"
+last_updated: "2026-04-14T06:52:10.316Z"
 last_activity: 2026-04-14
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 8
+  completed_phases: 8
+  total_plans: 20
+  completed_plans: 20
   percent: 100
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-11)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 25 — calculation-rule-ui
+**Current focus:** Phase 28 — v1.1-nyquist-catchup
 
 ## Current Position
 
-Phase: 25 (calculation-rule-ui) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 28
+Plan: Not started
+Status: Executing Phase 28
 Last activity: 2026-04-14
 
 Progress: [░░░░░░░░░░] 0%
@@ -36,7 +36,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 16
+- Total plans completed: 18
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | 22 | 2 | - | - |
 | 23 | 2 | - | - |
 | 24.1 | 5 | - | - |
+| 28 | 2 | - | - |
 
 **Recent Trend:**
 
