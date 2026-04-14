@@ -80,6 +80,7 @@
     "cancelEdit": "Cancel Edit",
     "confirm": "OK",
     "cancel": "Cancel",
+    "select": "Select",
     "reset": "Reset",
     "totalCount": "Total {{count}} items"
   },
