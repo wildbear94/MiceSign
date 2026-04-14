@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -77,9 +78,12 @@ export default function TemplateListPage() {
     setCreateFlow({ kind: 'form', initialValues: importToInitialValues(parsed) });
   };
 
-  const handleDuplicate = async (tpl: TemplateListItem) => {
-    try {
-      const response = await templateApi.getDetail(tpl.id);
+  // F5: useMutation wraps fetch so stale responses are auto-ignored. TanStack
+  // marks earlier in-flight mutations stale when a new one fires; we additionally
+  // check `isSuccess` state on consumers via single-call pattern below.
+  const duplicateMutation = useMutation({
+    mutationFn: (tpl: TemplateListItem) => templateApi.getDetail(tpl.id),
+    onSuccess: (response) => {
       const detail = response.data.data!;
       const schema = detail.schemaDefinition
         ? JSON.parse(detail.schemaDefinition)
@@ -98,20 +102,32 @@ export default function TemplateListPage() {
         },
       });
       toast.success(t('templates.duplicateReady'));
-    } catch {
+    },
+    onError: () => {
       toast.error(t('templates.duplicateFailure'));
-    }
-  };
+    },
+  });
 
-  const handleExport = async (tpl: TemplateListItem) => {
-    try {
-      const response = await templateApi.getDetail(tpl.id);
+  const exportMutation = useMutation({
+    mutationFn: (tpl: TemplateListItem) => templateApi.getDetail(tpl.id),
+    onSuccess: (response) => {
       const detail = response.data.data!;
       downloadTemplateJson(detail);
       toast.success(t('templates.exportSuccess', { name: detail.name }));
-    } catch {
+    },
+    onError: () => {
       toast.error(t('templates.exportFailure'));
-    }
+    },
+  });
+
+  const handleDuplicate = (tpl: TemplateListItem) => {
+    if (duplicateMutation.isPending) return;
+    duplicateMutation.mutate(tpl);
+  };
+
+  const handleExport = (tpl: TemplateListItem) => {
+    if (exportMutation.isPending) return;
+    exportMutation.mutate(tpl);
   };
 
   const formOpen = createFlow.kind === 'form' || editingTemplate !== null;

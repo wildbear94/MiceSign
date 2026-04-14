@@ -40,7 +40,7 @@ export function buildExportPayload(detail: TemplateDetailItem): ExportPayload {
  * The `code` is sanitized via `[^a-zA-Z0-9_-] → _` (Pitfall 5: path traversal / OS reserved chars).
  */
 export function buildExportFilename(code: string, date: Date = new Date()): string {
-  const safe = code.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safe = code.replace(/[^a-zA-Z0-9_-]/g, '_') || 'template';
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, '0');
   const dd = String(date.getDate()).padStart(2, '0');

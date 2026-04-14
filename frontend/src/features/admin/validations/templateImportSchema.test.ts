@@ -115,8 +115,10 @@ describe('templateImportSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('rejects prototype pollution attempt in fieldConfig (strict mode)', () => {
-    const bad = {
+  it('rejects prototype pollution via JSON.parse __proto__ own-property (T-26-01)', () => {
+    // JSON.parse creates __proto__ as a literal own-property (unlike JS object
+    // literal syntax which sets [[Prototype]]). This is the actual attack surface.
+    const badJson = JSON.stringify({
       ...validPayload,
       schemaDefinition: {
         ...validPayload.schemaDefinition,
@@ -126,10 +128,37 @@ describe('templateImportSchema', () => {
             type: 'text',
             label: 'X',
             required: false,
-            config: { placeholder: 'p', __proto__: { polluted: true } },
+            config: { placeholder: 'p' },
           },
         ],
       },
+    }).replace('"placeholder":"p"', '"placeholder":"p","__proto__":{"polluted":true}');
+    const parsed = JSON.parse(badJson);
+    // Sanity check: ensure __proto__ is a real own-property on the config object.
+    const configObj = parsed.schemaDefinition.fields[0].config;
+    expect(Object.prototype.hasOwnProperty.call(configObj, '__proto__')).toBe(true);
+    const result = templateImportSchema.safeParse(parsed);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      // Zod .strict() reports "Unrecognized key(s) in object" for the parent path.
+      // The issue message mentions the rejected key name.
+      const messages = result.error.issues.map((i) => i.message).join(' ');
+      expect(messages).toContain('__proto__');
+    }
+    // Verify global prototype was NOT polluted
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it('rejects unknown keys at top level (strict envelope)', () => {
+    const bad = { ...validPayload, maliciousExtra: 'x' };
+    const result = templateImportSchema.safeParse(bad);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects unknown keys in schemaDefinition (strict envelope)', () => {
+    const bad = {
+      ...validPayload,
+      schemaDefinition: { ...validPayload.schemaDefinition, rogue: true },
     };
     const result = templateImportSchema.safeParse(bad);
     expect(result.success).toBe(false);

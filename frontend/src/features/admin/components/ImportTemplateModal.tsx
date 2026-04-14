@@ -78,7 +78,7 @@ export default function ImportTemplateModal({ open, onClose, onValid }: ImportTe
     }
 
     // Size guard (T-26-02): reject if file.size > 1_000_000 bytes
-    if (selected.size > MAX_FILE_SIZE || selected.size > 1_000_000) {
+    if (selected.size > MAX_FILE_SIZE) {
       setErrors([{ path: '(root)', message: t('templates.importErrorFileTooLarge') }]);
       return;
     }
