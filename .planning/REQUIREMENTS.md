@@ -148,10 +148,10 @@ Requirements for Milestone v1.1: 양식 생성 모달 창 고도화
 
 ### 편의 기능
 
-- [ ] **CNV-01**: 관리자가 기존 양식을 복제하여 새 양식을 생성할 수 있다
-- [ ] **CNV-02**: 관리자가 양식 스키마를 JSON 파일로 내보내기할 수 있다
-- [ ] **CNV-03**: 관리자가 JSON 파일을 업로드하여 양식을 생성할 수 있다 (Zod 검증 포함)
-- [ ] **CNV-04**: 관리자가 프리셋 템플릿(경비, 신청서 등)을 선택하여 빠르게 양식을 생성할 수 있다
+- [x] **CNV-01**: 관리자가 기존 양식을 복제하여 새 양식을 생성할 수 있다
+- [x] **CNV-02**: 관리자가 양식 스키마를 JSON 파일로 내보내기할 수 있다
+- [x] **CNV-03**: 관리자가 JSON 파일을 업로드하여 양식을 생성할 수 있다 (Zod 검증 포함)
+- [x] **CNV-04**: 관리자가 프리셋 템플릿(경비, 신청서 등)을 선택하여 빠르게 양식을 생성할 수 있다
 
 ## Traceability
 
@@ -206,10 +206,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CND-02 | Phase 24: 조건부 표시 규칙 UI | Pending |
 | CAL-01 | Phase 25: 계산 규칙 UI | Complete |
 | CAL-02 | Phase 25: 계산 규칙 UI | Complete |
-| CNV-01 | Phase 26: 편의 기능 | Pending |
-| CNV-02 | Phase 26: 편의 기능 | Pending |
-| CNV-03 | Phase 26: 편의 기능 | Pending |
-| CNV-04 | Phase 26: 편의 기능 | Pending |
+| CNV-01 | Phase 26: 편의 기능 | Complete |
+| CNV-02 | Phase 26: 편의 기능 | Complete |
+| CNV-03 | Phase 26: 편의 기능 | Complete |
+| CNV-04 | Phase 26: 편의 기능 | Complete |
 
 **Coverage:**
 - v1 requirements: 36 total, 36 mapped, 0 unmapped (Complete)

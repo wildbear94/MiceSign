@@ -148,9 +148,9 @@ Plans:
   2. 관리자가 양식 스키마를 JSON 파일로 다운로드할 수 있다
   3. 관리자가 JSON 파일을 업로드하면 Zod 검증을 거쳐 양식이 생성되며, 검증 실패 시 상세 오류가 표시된다
   4. 관리자가 프리셋 템플릿(경비, 신청서 등) 목록에서 선택하여 새 양식을 빠르게 시작할 수 있다
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 26-01-PLAN.md — 기반: templateImportSchema(Zod) + templateExport 유틸 + 4종 프리셋 JSON + TemplateFormModal initialValues prop + Vitest 단위 테스트
+- [x] 26-01-PLAN.md — 기반: templateImportSchema(Zod) + templateExport 유틸 + 4종 프리셋 JSON + TemplateFormModal initialValues prop + Vitest 단위 테스트
 - [ ] 26-02-PLAN.md — UI 통합: TemplateCreateChoiceModal + PresetGallery + ImportTemplateModal + TemplateTable Copy/Download 버튼 + TemplateListPage 상태 머신 + i18n + 수동 UAT
 **UI hint**: yes
 
@@ -175,4 +175,4 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 23. 테이블 컬럼 편집기 | v1.1 | 2/2 | Complete    | 2026-04-12 |
 | 24. 조건부 표시 규칙 UI | v1.1 | 2/2 | Complete   | 2026-04-12 |
 | 25. 계산 규칙 UI | v1.1 | 3/3 | Complete   | 2026-04-13 |
-| 26. 편의 기능 | v1.1 | 0/? | Not started | - |
+| 26. 편의 기능 | v1.1 | 1/2 | In Progress|  |
