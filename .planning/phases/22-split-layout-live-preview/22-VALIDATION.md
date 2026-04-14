@@ -1,9 +1,9 @@
 ---
 phase: 22
 slug: split-layout-live-preview
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-11
 ---
 
@@ -38,18 +38,18 @@ created: 2026-04-11
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 22-01-01 | 01 | 1 | RFT-02 | — | N/A | visual | Manual browser check | — | ⬜ pending |
-| 22-01-02 | 01 | 1 | PRV-01 | — | N/A | visual | Manual browser check | — | ⬜ pending |
-| 22-01-03 | 01 | 1 | PRV-02 | — | N/A | visual | Manual browser check | — | ⬜ pending |
-| 22-01-04 | 01 | 1 | PRV-03 | — | N/A | visual | Manual browser check | — | ⬜ pending |
+| 22-01-01 | 01 | 1 | RFT-02 | — | N/A | visual | Manual browser check | — | ✅ green |
+| 22-01-02 | 01 | 1 | PRV-01 | — | N/A | visual | Manual browser check | — | ✅ green |
+| 22-01-03 | 01 | 1 | PRV-02 | — | N/A | visual | Manual browser check | — | ✅ green |
+| 22-01-04 | 01 | 1 | PRV-03 | — | N/A | visual | Manual browser check | — | ✅ green |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status legend: ✅ green · ❌ red · ⚠️ flaky*
 
 ---
 
 ## Wave 0 Requirements
 
-*Existing infrastructure covers all phase requirements.*
+Existing infrastructure covers all phase requirements. Verified post-hoc via v1.1-MILESTONE-AUDIT (2026-04-14).
 
 ---
 
@@ -66,11 +66,11 @@ created: 2026-04-11
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** retrofitted 2026-04-14 (Phase 28 catchup)
