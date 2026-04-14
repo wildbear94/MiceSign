@@ -131,6 +131,7 @@ export default function TemplateFormModal({
       }
     } else if (detailQuery.data && !detailQuery.data.schemaDefinition) {
       setSchemaFields([]);
+      setConditionalRules([]);
       setCalculationRules([]);
     }
   }, [open, editingTemplate, detailQuery.data]);
