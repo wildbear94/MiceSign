@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Aspect
 @Component
 public class AuditAspect {
@@ -45,11 +47,11 @@ public class AuditAspect {
             if (apiResponse.success() && apiResponse.data() instanceof LoginResponse loginResponse) {
                 Long userId = loginResponse.user().id();
                 auditLogService.log(userId, AuditAction.USER_LOGIN, "USER", userId,
-                        "Email: " + loginResponse.user().email());
+                        Map.of("email", loginResponse.user().email()));
             } else {
                 String email = extractEmailFromArgs(joinPoint);
                 auditLogService.log(null, AuditAction.USER_LOGIN, "USER", null,
-                        "Email: " + email);
+                        Map.of("email", email));
             }
         } catch (Exception e) {
             log.warn("Failed to audit login event: {}", e.getMessage());
