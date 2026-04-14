@@ -1,0 +1,44 @@
+{
+  "exportFormatVersion": 1,
+  "schemaVersion": 1,
+  "name": "구매신청서",
+  "description": "품목 테이블과 총액 자동 계산을 포함합니다",
+  "prefix": "PUR",
+  "category": "finance",
+  "icon": "ShoppingCart",
+  "schemaDefinition": {
+    "version": 1,
+    "fields": [
+      { "id": "title", "type": "text", "label": "구매 제목", "required": true },
+      { "id": "vendor", "type": "text", "label": "거래처", "required": true },
+      {
+        "id": "items",
+        "type": "table",
+        "label": "품목",
+        "required": true,
+        "config": {
+          "columns": [
+            { "id": "name", "type": "text", "label": "품명", "required": true },
+            { "id": "spec", "type": "text", "label": "규격" },
+            { "id": "quantity", "type": "number", "label": "수량", "required": true },
+            { "id": "unitPrice", "type": "number", "label": "단가", "required": true },
+            { "id": "amount", "type": "number", "label": "금액" }
+          ],
+          "minRows": 1
+        }
+      },
+      {
+        "id": "total",
+        "type": "number",
+        "label": "총액",
+        "required": false,
+        "config": { "unit": "원" }
+      },
+      { "id": "reason", "type": "textarea", "label": "구매 사유", "required": true }
+    ],
+    "conditionalRules": [],
+    "calculationRules": [
+      { "targetFieldId": "total", "formula": "SUM(items.amount)", "dependsOn": ["items"] }
+    ]
+  }
+}

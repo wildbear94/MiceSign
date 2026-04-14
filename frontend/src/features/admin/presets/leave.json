@@ -1,0 +1,51 @@
+{
+  "exportFormatVersion": 1,
+  "schemaVersion": 1,
+  "name": "휴가신청서",
+  "description": "휴가 종류 선택과 기간별 조건부 사유 입력을 포함합니다",
+  "prefix": "LV",
+  "category": "hr",
+  "icon": "CalendarDays",
+  "schemaDefinition": {
+    "version": 1,
+    "fields": [
+      {
+        "id": "leaveType",
+        "type": "select",
+        "label": "휴가 종류",
+        "required": true,
+        "config": {
+          "options": [
+            { "value": "annual", "label": "연차" },
+            { "value": "half", "label": "반차" },
+            { "value": "sick", "label": "병가" },
+            { "value": "family", "label": "경조" }
+          ]
+        }
+      },
+      { "id": "startDate", "type": "date", "label": "시작일", "required": true },
+      { "id": "endDate", "type": "date", "label": "종료일", "required": true },
+      {
+        "id": "sickReason",
+        "type": "textarea",
+        "label": "병가 사유",
+        "required": false,
+        "config": { "placeholder": "병가 관련 상세 사유를 입력하세요" }
+      },
+      { "id": "reason", "type": "textarea", "label": "사유", "required": true }
+    ],
+    "conditionalRules": [
+      {
+        "targetFieldId": "sickReason",
+        "condition": { "fieldId": "leaveType", "operator": "equals", "value": "sick" },
+        "action": "show"
+      },
+      {
+        "targetFieldId": "sickReason",
+        "condition": { "fieldId": "leaveType", "operator": "equals", "value": "sick" },
+        "action": "require"
+      }
+    ],
+    "calculationRules": []
+  }
+}

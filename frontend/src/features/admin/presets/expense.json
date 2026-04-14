@@ -1,0 +1,42 @@
+{
+  "exportFormatVersion": 1,
+  "schemaVersion": 1,
+  "name": "경비신청서",
+  "description": "항목/단가/수량/합계 테이블과 자동 합계 계산을 포함합니다",
+  "prefix": "EXP",
+  "category": "finance",
+  "icon": "Receipt",
+  "schemaDefinition": {
+    "version": 1,
+    "fields": [
+      { "id": "title", "type": "text", "label": "제목", "required": true },
+      {
+        "id": "items",
+        "type": "table",
+        "label": "경비 항목",
+        "required": true,
+        "config": {
+          "columns": [
+            { "id": "name", "type": "text", "label": "항목명", "required": true },
+            { "id": "unitPrice", "type": "number", "label": "단가", "required": true },
+            { "id": "quantity", "type": "number", "label": "수량", "required": true },
+            { "id": "amount", "type": "number", "label": "금액" }
+          ],
+          "minRows": 1,
+          "maxRows": 20
+        }
+      },
+      {
+        "id": "total",
+        "type": "number",
+        "label": "총합계",
+        "required": false,
+        "config": { "unit": "원" }
+      }
+    ],
+    "conditionalRules": [],
+    "calculationRules": [
+      { "targetFieldId": "total", "formula": "SUM(items.amount)", "dependsOn": ["items"] }
+    ]
+  }
+}
