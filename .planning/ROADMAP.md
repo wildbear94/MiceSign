@@ -38,13 +38,14 @@
 
 </details>
 
-- **v1.1 양식 생성 모달 창 고도화** - Phases 21-26 (in progress)
+- **v1.1 양식 생성 모달 창 고도화** - Phases 21-28 (in progress)
 
 ## Phases
 
 **Phase Numbering:**
 - Phases 1-8: v1.0 Phase 1-A MVP (complete)
 - Phases 21-26: v1.1 양식 생성 모달 창 고도화
+- Phases 27-28: v1.1 검증 위생 보강 (gap closure from v1.1-MILESTONE-AUDIT)
 - Decimal phases (e.g., 22.1): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 21: SchemaFieldEditor 리팩토링** - 596줄 모놀리식 컴포넌트를 유지보수 가능한 하위 컴포넌트로 분리 (completed 2026-04-11)
@@ -53,6 +54,8 @@
 - [x] **Phase 24: 조건부 표시 규칙 UI** - 필드별 조건부 표시/숨김 규칙 설정 인터페이스 구축 (completed 2026-04-12)
 - [x] **Phase 25: 계산 규칙 UI** - 숫자 필드 계산 공식 설정 및 순환 의존성 감지 구현 (completed 2026-04-13)
 - [x] **Phase 26: 편의 기능** - 양식 복제, JSON 내보내기/가져오기, 프리셋 템플릿 기능 구현 (completed 2026-04-14)
+- [ ] **Phase 27: v1.1 검증 위생 보강 — 코드 FLAG + HUMAN UAT** - TemplateFormModal conditionalRules 리셋 누락 수정 + Phase 21~24 HUMAN-UAT 기록 완성 (gap closure)
+- [ ] **Phase 28: v1.1 Nyquist validation 사후 보강** - Phase 21/22/24/25/26 VALIDATION.md 생성/보강 (gap closure, optional)
 
 ## Phase Details
 
@@ -154,6 +157,30 @@ Plans:
 - [x] 26-02-PLAN.md — UI 통합: TemplateCreateChoiceModal + PresetGallery + ImportTemplateModal + TemplateTable Copy/Download 버튼 + TemplateListPage 상태 머신 + i18n + 수동 UAT
 **UI hint**: yes
 
+### Phase 27: v1.1 검증 위생 보강 — 코드 FLAG + HUMAN UAT (GAP CLOSURE)
+**Goal**: v1.1-MILESTONE-AUDIT 에서 발견된 통합 FLAG(1건)를 수정하고 Phase 21~24 의 HUMAN-UAT 기록 공백을 채운다
+**Depends on**: Phase 26
+**Requirements**: CND-01, CND-02 (regression protection — 이미 SATISFIED 상태이나 FLAG 해소로 보강)
+**Gap Closure**: `.planning/v1.1-MILESTONE-AUDIT.md` 의 integration FLAG + HUMAN-UAT tech debt
+**Success Criteria** (what must be TRUE):
+  1. TemplateFormModal.tsx L132-135 에 `setConditionalRules([])` 가 추가되어 편집 모드 빈 스키마 분기에서 conditionalRules 상태가 올바르게 리셋된다
+  2. Phase 21, 23 의 HUMAN-UAT 파일이 생성되고 모든 수동 검증 항목이 pass 로 기록된다
+  3. Phase 22, 24 의 HUMAN-UAT 체크리스트가 채워지고 status 가 partial → complete 로 전환된다
+  4. TypeScript 빌드와 기존 UAT 회귀가 그대로 통과한다
+**Plans:** 0/? plans (to be planned)
+
+### Phase 28: v1.1 Nyquist validation 사후 보강 (GAP CLOSURE, OPTIONAL)
+**Goal**: Phase 21/22/24/25/26 의 VALIDATION.md 를 생성·보완해 Nyquist 호환 상태로 만든다
+**Depends on**: Phase 27
+**Requirements**: — (validation hygiene only)
+**Gap Closure**: `.planning/v1.1-MILESTONE-AUDIT.md` 의 Nyquist missing/partial 5건
+**Success Criteria** (what must be TRUE):
+  1. Phase 21, 25 에 VALIDATION.md 가 신규 생성되어 nyquist_compliant 상태가 기록된다
+  2. Phase 22, 24, 26 의 VALIDATION.md 가 갱신되어 wave_0_complete + nyquist_compliant 가 true 로 전환된다
+  3. `.planning/v1.1-MILESTONE-AUDIT.md` 의 Nyquist 섹션을 재실행 시 overall 이 compliant 로 승격된다
+**Plans:** 0/? plans (to be planned)
+**Note**: Nyquist 게이트는 strict 가 아니므로 v1.1 완료를 차단하지 않음. 수용 가능한 tech debt 이나 본 phase 로 잔부 청산.
+
 ## Progress
 
 **Execution Order:**
@@ -176,3 +203,5 @@ Phases execute in numeric order: 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 24. 조건부 표시 규칙 UI | v1.1 | 2/2 | Complete   | 2026-04-12 |
 | 25. 계산 규칙 UI | v1.1 | 3/3 | Complete   | 2026-04-13 |
 | 26. 편의 기능 | v1.1 | 2/2 | Complete   | 2026-04-14 |
+| 27. v1.1 검증 위생 보강 (gap closure) | v1.1 | 0/? | Not started | - |
+| 28. v1.1 Nyquist validation 사후 보강 (gap closure) | v1.1 | 0/? | Not started | - |
