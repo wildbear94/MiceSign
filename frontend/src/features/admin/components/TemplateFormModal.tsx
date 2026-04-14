@@ -30,6 +30,22 @@ interface TemplateFormModalProps {
   open: boolean;
   onClose: () => void;
   editingTemplate: TemplateListItem | null;
+  /**
+   * Phase 26 (D-21): Pre-filled values for create mode only.
+   * Ignored when `editingTemplate !== null`. Used by duplicate / import /
+   * preset flows — note that `prefix` should typically be left empty
+   * (D-03 / D-10) so the user is forced to type a fresh prefix.
+   */
+  initialValues?: {
+    name?: string;
+    description?: string;
+    prefix?: string;
+    category?: string;
+    icon?: string;
+    schemaFields?: SchemaField[];
+    conditionalRules?: ConditionalRule[];
+    calculationRules?: CalculationRule[];
+  } | null;
   onSuccess?: () => void;
 }
 
@@ -39,6 +55,7 @@ export default function TemplateFormModal({
   open,
   onClose,
   editingTemplate,
+  initialValues = null,
   onSuccess,
 }: TemplateFormModalProps) {
   const { t } = useTranslation('admin');
@@ -80,14 +97,23 @@ export default function TemplateFormModal({
           icon: editingTemplate.icon || '',
         });
       } else {
-        reset({ name: '', description: '', prefix: '', category: '', icon: '' });
-        setSchemaFields([]);
-        setConditionalRules([]);
-        setCalculationRules([]);
+        // Phase 26 (D-03 / D-10 / D-21): prefill from initialValues in create mode.
+        // `prefix` is intentionally left empty by callers for duplicate / import /
+        // preset flows so the user must type a fresh prefix.
+        reset({
+          name: initialValues?.name ?? '',
+          description: initialValues?.description ?? '',
+          prefix: initialValues?.prefix ?? '',
+          category: initialValues?.category ?? '',
+          icon: initialValues?.icon ?? '',
+        });
+        setSchemaFields(initialValues?.schemaFields ?? []);
+        setConditionalRules(initialValues?.conditionalRules ?? []);
+        setCalculationRules(initialValues?.calculationRules ?? []);
       }
       setActiveTab('info');
     }
-  }, [open, editingTemplate, reset]);
+  }, [open, editingTemplate, initialValues, reset]);
 
   // Load schema from detail query when editing
   useEffect(() => {
