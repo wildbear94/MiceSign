@@ -167,7 +167,11 @@ Plans:
   2. Phase 21, 23 의 HUMAN-UAT 파일이 생성되고 모든 수동 검증 항목이 pass 로 기록된다
   3. Phase 22, 24 의 HUMAN-UAT 체크리스트가 채워지고 status 가 partial → complete 로 전환된다
   4. TypeScript 빌드와 기존 UAT 회귀가 그대로 통과한다
-**Plans:** 0/? plans (to be planned)
+**Plans:** 3 plans
+Plans:
+- [ ] 27-01-PLAN.md — TemplateFormModal conditionalRules 리셋 누락 FLAG 수정 (CND-01/02)
+- [ ] 27-02-PLAN.md — Phase 21/23 HUMAN-UAT 파일 생성 및 수동 검증 실행
+- [ ] 27-03-PLAN.md — Phase 22/24 HUMAN-UAT 완료 전환 + TypeScript 빌드 재확인
 
 ### Phase 28: v1.1 Nyquist validation 사후 보강 (GAP CLOSURE, OPTIONAL)
 **Goal**: Phase 21/22/24/25/26 의 VALIDATION.md 를 생성·보완해 Nyquist 호환 상태로 만든다
