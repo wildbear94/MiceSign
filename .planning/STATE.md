@@ -1,13 +1,13 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Phase 1-B — 일상 업무 대체 수준
-status: roadmap_complete
-stopped_at: Roadmap created — 5 phases (29-33), 21 requirements mapped
-last_updated: "2026-04-22T00:00:00.000Z"
-last_activity: 2026-04-22
+milestone: v1.1
+milestone_name: phases
+status: planning
+stopped_at: Phase 29 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
+last_updated: "2026-04-22T22:46:17.063Z"
+last_activity: 2026-04-22 — v1.2 roadmap created (5 phases, 21 requirements mapped)
 progress:
-  total_phases: 5
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -99,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-22T00:00:00.000Z
-Stopped at: v1.2 roadmap created (Phases 29-33 appended, 21 requirements mapped 100%)
-Resume file: None — ready to run `/gsd-plan-phase 29` for Phase 29 planning
+Last session: --stopped-at
+Stopped at: Phase 29 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
+Resume file: --resume-file
