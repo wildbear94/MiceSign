@@ -1,34 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: 검증 위생 보강 — 코드 FLAG + HUMAN UAT
-status: executing
-stopped_at: Completed 26-02-PLAN.md
-last_updated: "2026-04-14T06:52:10.316Z"
-last_activity: 2026-04-14
+milestone: v1.2
+milestone_name: Phase 1-B — 일상 업무 대체 수준
+status: defining_requirements
+stopped_at: Milestone v1.2 started
+last_updated: "2026-04-22T00:00:00.000Z"
+last_activity: 2026-04-22
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 20
-  completed_plans: 20
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-11)
+See: .planning/PROJECT.md (updated 2026-04-22)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 28 — v1.1-nyquist-catchup
+**Current focus:** v1.2 Phase 1-B — SMTP 알림 + 검색/필터 + 대시보드 + 양식 확장
 
 ## Current Position
 
-Phase: 28
-Plan: Not started
-Status: Executing Phase 28
-Last activity: 2026-04-14
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-22 — Milestone v1.2 started
 
 Progress: [░░░░░░░░░░] 0%
 
