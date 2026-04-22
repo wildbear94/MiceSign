@@ -236,26 +236,54 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-03 | Phase 8: Dashboard & Audit | Complete |
 | AUD-01 | Phase 8: Dashboard & Audit | Complete |
 | RFT-01 | Phase 21: SchemaFieldEditor 리팩토링 | Complete |
-| RFT-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
-| PRV-01 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
-| PRV-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
-| PRV-03 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Pending |
-| TBL-01 | Phase 23: 테이블 컬럼 편집기 | Pending |
-| TBL-02 | Phase 23: 테이블 컬럼 편집기 | Pending |
-| CND-01 | Phase 24: 조건부 표시 규칙 UI | Pending |
-| CND-02 | Phase 24: 조건부 표시 규칙 UI | Pending |
+| RFT-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Complete |
+| PRV-01 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Complete |
+| PRV-02 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Complete |
+| PRV-03 | Phase 22: 분할 레이아웃 + 라이브 미리보기 | Complete |
+| TBL-01 | Phase 23: 테이블 컬럼 편집기 | Complete |
+| TBL-02 | Phase 23: 테이블 컬럼 편집기 | Complete |
+| CND-01 | Phase 24: 조건부 표시 규칙 UI | Complete |
+| CND-02 | Phase 24: 조건부 표시 규칙 UI | Complete |
 | CAL-01 | Phase 25: 계산 규칙 UI | Complete |
 | CAL-02 | Phase 25: 계산 규칙 UI | Complete |
 | CNV-01 | Phase 26: 편의 기능 | Complete |
 | CNV-02 | Phase 26: 편의 기능 | Complete |
 | CNV-03 | Phase 26: 편의 기능 | Complete |
 | CNV-04 | Phase 26: 편의 기능 | Complete |
+| NOTIF-01 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| NOTIF-02 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| NOTIF-03 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| NOTIF-04 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| NOTIF-05 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| NFR-02 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| NFR-03 | Phase 29: SMTP 이메일 알림 인프라 (Retrofit) | Pending |
+| SRCH-01 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| SRCH-02 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| SRCH-03 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| SRCH-04 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| SRCH-05 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| SRCH-06 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| NFR-01 | Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장 | Pending |
+| DASH-01 (v1.2) | Phase 31: 대시보드 고도화 | Pending |
+| DASH-02 (v1.2) | Phase 31: 대시보드 고도화 | Pending |
+| DASH-03 (v1.2) | Phase 31: 대시보드 고도화 | Pending |
+| DASH-04 | Phase 31: 대시보드 고도화 | Pending |
+| DASH-05 | Phase 31: 대시보드 고도화 | Pending |
+| FORM-01 | Phase 32: CUSTOM 프리셋 확장 | Pending |
+| FORM-02 | Phase 32: CUSTOM 프리셋 확장 | Pending |
+
+> Note: v1.2 의 `DASH-01/02/03` 은 v1 의 DASH-01/02/03 을 확장(4번째 카드·실시간 무효화 등)하는 요구이며 Phase 31 로 매핑. 동일 REQ-ID 재사용에 유의.
 
 **Coverage:**
 - v1 requirements: 36 total, 36 mapped, 0 unmapped (Complete)
 - v1.1 requirements: 15 total, 15 mapped, 0 unmapped (Complete)
-- v1.2 requirements: 21 total, 0 mapped (pending roadmap)
+- v1.2 requirements: 21 total, 21 mapped, 0 unmapped (Pending execution)
+  - NOTIF-01~05 (5) + NFR-02 + NFR-03 → Phase 29
+  - SRCH-01~06 (6) + NFR-01 → Phase 30
+  - DASH-01~05 (5) → Phase 31
+  - FORM-01~02 (2) → Phase 32
+  - Phase 33 (E2E 검증) 은 선택적 wrap-up, 특정 REQ 매핑 없음 (NFR 실측 재확인만)
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-22 -- v1.2 Phase 1-B requirements defined (NOTIF, SRCH, DASH, FORM, NFR — 21 items)*
+*Last updated: 2026-04-22 -- v1.2 traceability appended (Phases 29-33, 21 items mapped 100%)*
