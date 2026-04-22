@@ -104,8 +104,8 @@ Deferred to future releases (Phase 1-B, 1-C, Phase 2).
 
 | Feature | Reason |
 |---------|--------|
-| SMTP email notifications | Deferred to Phase 1-B; MVP uses dashboard polling |
-| Document search/filtering | Deferred to Phase 1-B |
+| ~~SMTP email notifications~~ | ~~Deferred to Phase 1-B~~ — **Moved to v1.2 scope (NOTIF-* requirements)** |
+| ~~Document search/filtering~~ | ~~Deferred to Phase 1-B~~ — **Moved to v1.2 scope (SRCH-* requirements)** |
 | Dynamic form builder | Hardcoded components are simpler and sufficient for ~50 users |
 | Auto-routing approval rules | PRD specifies 100% manual approval line selection |
 | Delegation/proxy approval (대결/위임) | Explicitly excluded from Phase 1 per PRD |
@@ -123,23 +123,23 @@ Requirements for Milestone v1.1: 양식 생성 모달 창 고도화
 ### 리팩토링 (기반 작업)
 
 - [x] **RFT-01**: SchemaFieldEditor를 FieldCard/FieldConfigEditor 등 하위 컴포넌트로 분리하여 유지보수성 확보
-- [ ] **RFT-02**: TemplateFormModal을 near-fullscreen 분할 레이아웃으로 확장 (좌: 편집, 우: 프리뷰)
+- [x] **RFT-02**: TemplateFormModal을 near-fullscreen 분할 레이아웃으로 확장 (좌: 편집, 우: 프리뷰)
 
 ### 라이브 미리보기
 
-- [ ] **PRV-01**: 관리자가 필드 구성 변경 시 오른쪽 패널에 실시간 폼 미리보기를 볼 수 있다
-- [ ] **PRV-02**: 관리자가 전체화면 미리보기 버튼으로 완성된 폼을 포탈 모달로 볼 수 있다
-- [ ] **PRV-03**: 관리자가 프리뷰 패널 표시/숨김을 토글할 수 있다
+- [x] **PRV-01**: 관리자가 필드 구성 변경 시 오른쪽 패널에 실시간 폼 미리보기를 볼 수 있다
+- [x] **PRV-02**: 관리자가 전체화면 미리보기 버튼으로 완성된 폼을 포탈 모달로 볼 수 있다
+- [x] **PRV-03**: 관리자가 프리뷰 패널 표시/숨김을 토글할 수 있다
 
 ### 테이블 컬럼 편집
 
-- [ ] **TBL-01**: 관리자가 table 타입 필드에 컬럼을 추가/삭제/순서변경할 수 있다
-- [ ] **TBL-02**: 관리자가 각 컬럼의 타입(text/number/date/select), 라벨, 필수여부를 설정할 수 있다
+- [x] **TBL-01**: 관리자가 table 타입 필드에 컬럼을 추가/삭제/순서변경할 수 있다
+- [x] **TBL-02**: 관리자가 각 컬럼의 타입(text/number/date/select), 라벨, 필수여부를 설정할 수 있다
 
 ### 조건부 규칙
 
-- [ ] **CND-01**: 관리자가 필드별 조건부 표시/숨김 규칙을 설정할 수 있다 (IF 필드 = 값 THEN 표시/숨김/필수/선택)
-- [ ] **CND-02**: 필드 삭제 시 해당 필드를 참조하는 규칙이 자동 정리된다
+- [x] **CND-01**: 관리자가 필드별 조건부 표시/숨김 규칙을 설정할 수 있다 (IF 필드 = 값 THEN 표시/숨김/필수/선택)
+- [x] **CND-02**: 필드 삭제 시 해당 필드를 참조하는 규칙이 자동 정리된다
 
 ### 계산 규칙
 
@@ -152,6 +152,46 @@ Requirements for Milestone v1.1: 양식 생성 모달 창 고도화
 - [x] **CNV-02**: 관리자가 양식 스키마를 JSON 파일로 내보내기할 수 있다
 - [x] **CNV-03**: 관리자가 JSON 파일을 업로드하여 양식을 생성할 수 있다 (Zod 검증 포함)
 - [x] **CNV-04**: 관리자가 프리셋 템플릿(경비, 신청서 등)을 선택하여 빠르게 양식을 생성할 수 있다
+
+## v1.2 Requirements
+
+Requirements for Milestone v1.2: Phase 1-B — 일상 업무 대체 수준 (SMTP 알림 + 검색/필터 + 대시보드 + CUSTOM 프리셋 확장). 인프라 약 70%가 v1.0/v1.1에서 이미 스캐폴딩되어 있으므로 본 마일스톤은 **retrofit/wiring 중심**이다.
+
+### SMTP 이메일 알림 (NOTIF)
+
+- [ ] **NOTIF-01**: 사용자가 결재 이벤트 5종(상신/중간 승인/최종 승인/반려/회수) 발생 시 해당 수신자에게 HTML 이메일을 수신한다 (EmailService stub 제거, 실 JavaMailSender 발송)
+- [ ] **NOTIF-02**: 사용자가 이메일 본문의 "문서 바로가기" 버튼을 클릭하면 해당 결재 문서 상세 페이지로 직접 이동한다 (`app.base-url` 기반 절대 URL)
+- [ ] **NOTIF-03**: 시스템이 이메일 발송 실패 시 최대 2회 자동 재시도(5분 간격)하며, 발송 이력을 `notification_log`에 PENDING→SUCCESS/FAILED로 기록한다 (`@Retryable` + `@Recover`)
+- [ ] **NOTIF-04**: 시스템이 퇴직(`RETIRED`) 또는 비활성(`INACTIVE`) 사용자 수신을 자동으로 스킵한다
+- [ ] **NOTIF-05**: 모든 알림 이메일 제목에 `[MiceSign]` prefix가 붙고 본문이 한글 UTF-8로 정상 표기된다 (`MimeMessageHelper` UTF-8 강제)
+
+### 문서 검색/필터링 (SRCH)
+
+- [ ] **SRCH-01**: **[보안 수정]** 사용자가 문서 검색 시 본인 기안 + `EXISTS approval_line(APPROVE/AGREE/REFERENCE)` + ADMIN 부서 범위 + SUPER_ADMIN 전체 권한 WHERE 절이 적용되어 타인 DRAFT가 노출되지 않는다 (FSD FN-SEARCH-001, `tab=my` 외에는 DRAFT 제외)
+- [ ] **SRCH-02**: 사용자가 키워드(제목/문서번호 LIKE)로 문서를 검색할 수 있다
+- [ ] **SRCH-03**: 사용자가 상태(복수 선택 가능: SUBMITTED/APPROVED/REJECTED/WITHDRAWN), 양식(단일), 기간(시작일~종료일)으로 필터링할 수 있다
+- [ ] **SRCH-04**: 사용자가 기안자(드롭다운/검색)로 필터링할 수 있다
+- [ ] **SRCH-05**: 검색 결과가 오프셋 페이지네이션(페이지 크기 20)으로 표시되며, 현재 필터·페이지 상태가 URL query string에 반영되어 공유 가능하다
+- [ ] **SRCH-06**: 검색 응답이 10K 문서 · 50 동시 사용자 기준 95p ≤ 1초 (기존 인덱스 기반 실측)
+
+### 대시보드 고도화 (DASH)
+
+- [ ] **DASH-01**: 사용자가 대시보드 상단에서 "결재 대기 / 진행 중 / 승인 완료 / 반려" 4종 카운트 카드를 본다 (`submittedCount` 신규 노출)
+- [ ] **DASH-02**: 사용자가 대시보드에서 "내가 처리할 결재 5건" + "내가 기안한 최근 문서 5건" 목록을 본다
+- [ ] **DASH-03**: 사용자가 대시보드의 "새 문서 작성" CTA 버튼으로 양식 선택 화면으로 이동할 수 있다
+- [ ] **DASH-04**: 대시보드에 skeleton 로딩 상태와 빈 상태(empty) UI가 표시된다
+- [ ] **DASH-05**: 결재 승인/반려/상신/회수 mutation 성공 시 대시보드 쿼리가 자동 무효화되어 카운트·목록이 실시간 갱신된다 (TanStack Query `invalidateQueries(['dashboard'])`)
+
+### 양식 확장 (FORM)
+
+- [ ] **FORM-01**: 관리자가 제공 프리셋 갤러리에서 "회의록" CUSTOM 스키마를 선택해 양식을 즉시 생성할 수 있다 (JSON 프리셋 + v1.1 import 파이프라인)
+- [ ] **FORM-02**: 관리자가 제공 프리셋 갤러리에서 "품의서" CUSTOM 스키마를 선택해 양식을 즉시 생성할 수 있다
+
+### 비기능 요구사항 (NFR - v1.2 범위 내)
+
+- [ ] **NFR-01**: 검색 응답 95p ≤ 1초 (SRCH-06과 중복 명시 — NFR 관점)
+- [ ] **NFR-02**: 이메일 발송이 결재 트랜잭션을 블로킹하지 않는다 (`@Async` + `AFTER_COMMIT`)
+- [ ] **NFR-03**: 감사 로그 중복 방지 — 리스너에서 `audit_log`를 추가 INSERT 하지 않는다 (기존 서비스 동기 기록 유지, `COUNT=1 per action` 테스트)
 
 ## Traceability
 
@@ -213,8 +253,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v1 requirements: 36 total, 36 mapped, 0 unmapped (Complete)
-- v1.1 requirements: 15 total, 15 mapped, 0 unmapped
+- v1.1 requirements: 15 total, 15 mapped, 0 unmapped (Complete)
+- v1.2 requirements: 21 total, 0 mapped (pending roadmap)
 
 ---
 *Requirements defined: 2026-03-31*
-*Last updated: 2026-04-11 -- v1.1 traceability mapped (15 requirements across 6 phases)*
+*Last updated: 2026-04-22 -- v1.2 Phase 1-B requirements defined (NOTIF, SRCH, DASH, FORM, NFR — 21 items)*
