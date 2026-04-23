@@ -15,7 +15,7 @@
     <tr>
         <td style="padding:32px;">
             <!-- 이벤트별 body 삽입 지점 (D-C3 fragment parameterization) -->
-            <div th:replace="${body}">BODY PLACEHOLDER</div>
+            <th:block th:insert="${body}">BODY PLACEHOLDER</th:block>
 
             <!-- 공통 CTA 버튼 — 단일 "문서 바로가기" (D-C4) -->
             <p style="margin:24px 0 0 0; text-align:center;">

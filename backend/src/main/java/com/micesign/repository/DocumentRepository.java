@@ -30,5 +30,11 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, Docum
     @Query("SELECT d FROM Document d JOIN FETCH d.drafter WHERE d.id = :id")
     Optional<Document> findByIdWithDrafter(@Param("id") Long id);
 
+    // Phase 29 — drafter + drafter.department 까지 eager-fetch (EmailService listener 가
+    // detached 상태에서 buildContext 의 drafter.getDepartment() lazy-load 시
+    // LazyInitializationException 회피, NotificationLog 발송 흐름 전용)
+    @Query("SELECT d FROM Document d JOIN FETCH d.drafter dr LEFT JOIN FETCH dr.department WHERE d.id = :id")
+    Optional<Document> findByIdWithDrafterAndDepartment(@Param("id") Long id);
+
     Page<Document> findByIdInAndStatusIn(List<Long> ids, List<DocumentStatus> statuses, Pageable pageable);
 }

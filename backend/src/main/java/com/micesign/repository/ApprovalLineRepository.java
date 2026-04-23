@@ -18,6 +18,13 @@ public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long
 
     List<ApprovalLine> findByDocumentIdOrderByStepOrderAsc(Long documentId);
 
+    // Phase 29 — approver + approver.department 까지 eager-fetch (EmailService listener 가
+    // detached 상태에서 line.getApprover()/getDepartment() lazy-load 시
+    // LazyInitializationException 회피, NotificationLog 발송 흐름 전용)
+    @Query("SELECT al FROM ApprovalLine al JOIN FETCH al.approver ap LEFT JOIN FETCH ap.department " +
+           "WHERE al.document.id = :documentId ORDER BY al.stepOrder ASC")
+    List<ApprovalLine> findByDocumentIdWithApproverOrderByStepOrderAsc(@Param("documentId") Long documentId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT al FROM ApprovalLine al WHERE al.id = :id")
     Optional<ApprovalLine> findByIdForUpdate(@Param("id") Long id);

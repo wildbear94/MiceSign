@@ -20,15 +20,16 @@ spring:
   mail:
     host: 127.0.0.1
     port: 3025
-    username: test
-    password: test
+    username: noreply@micesign.test   # From 주소로 사용됨 (auth 는 properties.mail.smtp.auth=false 로 비활성)
+    password: dummy                    # auth=false 라 실제 사용 안 됨, 빈 값 회피용
     default-encoding: UTF-8
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false            # GreenMail 은 user 등록 없이는 auth 실패 — test 는 plain SMTP
           starttls:
             enable: false        # GreenMail plain SMTP
+            required: false      # 메인 application.yml 의 starttls.required=true override
         mime:
           charset: UTF-8
 

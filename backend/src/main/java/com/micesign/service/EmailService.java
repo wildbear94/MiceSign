@@ -72,7 +72,7 @@ public class EmailService {
     @Async
     public void sendNotification(ApprovalNotificationEvent event) {
         try {
-            Document document = documentRepository.findByIdWithDrafter(event.getDocumentId())
+            Document document = documentRepository.findByIdWithDrafterAndDepartment(event.getDocumentId())
                     .orElse(null);
             if (document == null) {
                 log.warn("Document not found for notification: id={}", event.getDocumentId());
@@ -134,8 +134,9 @@ public class EmailService {
      * (D-A7 — User entity 의 equals/hashCode 미구현 방어). insertion order 보존.
      */
     private List<User> determineRecipients(Document document, NotificationEventType type) {
+        // Phase 29 — approver + approver.department 까지 eager-fetch (LazyInit 회피)
         List<ApprovalLine> lines = approvalLineRepository
-                .findByDocumentIdOrderByStepOrderAsc(document.getId());
+                .findByDocumentIdWithApproverOrderByStepOrderAsc(document.getId());
 
         Stream<User> baseStream = switch (type) {
             case SUBMIT, APPROVE -> {
