@@ -5,7 +5,13 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notification_log")
+@Table(
+        name = "notification_log",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_notification_dedup",
+                columnNames = {"document_id", "event_type", "recipient_id"}
+        )
+)
 public class NotificationLog {
 
     @Id
