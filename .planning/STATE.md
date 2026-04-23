@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
-status: completed
-stopped_at: Phase 31 context gathered (4 areas, 30+ decisions locked — D-A9 Phase 30 predicate hierarchy mismatch flagged)
-last_updated: "2026-04-23T20:17:58.208Z"
+status: executing
+stopped_at: Completed 31-01-PLAN.md
+last_updated: "2026-04-23T23:31:51.421Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 8
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 29 — smtp-retrofit
+**Current focus:** Phase 31 — dashboard
 
 ## Current Position
 
-Phase: 29
-Plan: Not started
-Status: Milestone complete
+Phase: 31 (dashboard) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
 Last activity: 2026-04-23
 
-Progress: [░░░░░░░░░░] 0% (0/5 phases complete)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [░░░░░░░░░░] 0% (0/5 phases complete)
 | Phase 25 P03 | 20 min | 3 tasks | 4 files |
 | Phase 26 P01 | 5 min | 4 tasks | 13 files |
 | Phase 26 P02 | 8 min | 4 tasks | 7 files |
+| Phase 31 P31-01 | 3 min | 3 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Progress: [░░░░░░░░░░] 0% (0/5 phases complete)
 - [Roadmap v1.2]: 대시보드(Phase 31) + 프리셋(Phase 32) 경량 — SMTP/검색 번인 사이 휴식 사이클
 - [Roadmap v1.2]: 양식 확장은 하드코딩 없이 CUSTOM 프리셋 JSON 만으로 — v1.1 빌더/렌더러/스냅샷 불변성 자산 재활용
 - [Roadmap v1.2]: MariaDB FULLTEXT/ngram/Elasticsearch 배제 — 50 user × <10K 문서 규모에서 LIKE + 기존 인덱스로 1초 NFR 충족
+- [Phase 31-01]: DashboardSummaryResponse 6-arg backward-compat secondary constructor 로 Plan 01 단독 적용 시 DashboardService 무수정 컴파일 보장 — Plan 02 에서 7-arg canonical 로 전환
+- [Phase 31-01]: DepartmentRepository.findDescendantIds 를 MariaDB native WITH RECURSIVE CTE 로 구현 — D-A6/A9 Option 1 공용 SoT (Plan 02 대시보드 + Plan 06 검색 권한 predicate)
+- [Phase 31-01]: UserRepository.findIdsByDepartmentIdIn 은 UserStatus 필터 없음 (D-A7) — ACTIVE/INACTIVE/RETIRED 모두 포함하여 ADMIN 스코프 과거 기안 문서 카운트 반영
 
 ### Pending Todos
 
@@ -100,8 +104,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 31 context gathered (4 areas, 30+ decisions locked — D-A9 Phase 30 predicate hierarchy mismatch flagged)
-Resume file: --resume-file
+Last session: 2026-04-23T23:31:51.418Z
+Stopped at: Completed 31-01-PLAN.md
+Resume file: None
 
-**Planned Phase:** 30 (검색 권한 WHERE 절 보안 수정 + 필터 확장) — 5 plans — 2026-04-23T08:23:32.483Z
+**Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z
