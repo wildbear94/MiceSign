@@ -93,7 +93,7 @@
 
 ### v1.2 phases
 
-- [ ] **Phase 29: SMTP 이메일 알림 인프라 (Retrofit)** - EmailService 스텁을 실 JavaMailSender 발송으로 전환하고 PENDING-first 로깅 + @Retryable 격리 + 5종 Thymeleaf 템플릿으로 5개 결재 이벤트 알림 완성
+- [x] **Phase 29: SMTP 이메일 알림 인프라 (Retrofit)** - EmailService 스텁을 실 JavaMailSender 발송으로 전환하고 PENDING-first 로깅 + @Retryable 격리 + 5종 Thymeleaf 템플릿으로 5개 결재 이벤트 알림 완성 (completed 2026-04-23)
 - [ ] **Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장** - FSD FN-SEARCH-001 권한 predicate(보안 수정) + drafterId 필터 + URL query 동기화 페이지네이션 구현
 - [ ] **Phase 31: 대시보드 고도화** - 4번째 "진행 중" 카운트 카드 노출 + 결재 mutation 후 invalidateQueries 로 실시간 갱신 + 로딩/빈 상태 UI
 - [ ] **Phase 32: CUSTOM 프리셋 확장** - v1.1 빌더 기반 회의록/품의서 JSON 프리셋 2종 추가 (하드코딩 컴포넌트 없이)
@@ -242,7 +242,13 @@ Plans:
   3. SMTP 연결 실패·transient 에러 발생 시 `@Retryable(maxAttempts=3)` 이 5분 간격 재시도하고, 최종 실패 시 `notification_log.status = FAILED` + `error_message` 가 기록된다 (PENDING 고아 행 없음)
   4. RETIRED/INACTIVE 상태의 수신자는 발송 대상에서 자동 제외되며, 같은 (`document_id`, `event_type`, `recipient_id`) 조합으로는 중복 SUCCESS 행이 생기지 않는다
   5. 결재 상신/승인/반려 API 응답은 메일 발송 결과와 독립적으로 즉시 반환되고 (`@Async` + `AFTER_COMMIT`), 리스너에서 `audit_log` 추가 INSERT 없이 `COUNT=1 per action` 테스트가 통과한다
-**Plans**: TBD
+**Plans:** 5/5 plans complete
+Plans:
+- [x] 29-01-PLAN.md — Schema + Entity + ApprovalEmailSender skeleton + BaseUrlGuard (Wave 1)
+- [x] 29-02-PLAN.md — Thymeleaf layout fragment + 5 event templates (Wave 2)
+- [x] 29-03-PLAN.md — EmailService 리팩터 + ApprovalEmailSender 실 send 로직 (Wave 2)
+- [x] 29-04-PLAN.md — GreenMail 통합 + @Retryable/@Recover 테스트 (Wave 3)
+- [x] 29-05-PLAN.md — application-prod.yml app.base-url + ApprovalServiceAuditTest (NFR-03) (Wave 3)
 **UI hint**: no
 
 ### Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장
@@ -321,7 +327,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33
 | 26. 편의 기능 | v1.1 | 2/2 | Complete   | 2026-04-14 |
 | 27. v1.1 검증 위생 보강 (gap closure) | v1.1 | 3/3 | Complete   | 2026-04-14 |
 | 28. v1.1 Nyquist validation 사후 보강 (gap closure) | v1.1 | 2/2 | Complete    | 2026-04-14 |
-| 29. SMTP 이메일 알림 인프라 (Retrofit) | v1.2 | 0/TBD | Not started | — |
+| 29. SMTP 이메일 알림 인프라 (Retrofit) | v1.2 | 5/5 | Complete    | 2026-04-23 |
 | 30. 검색 권한 WHERE 절 보안 수정 + 필터 확장 | v1.2 | 0/TBD | Not started | — |
 | 31. 대시보드 고도화 | v1.2 | 0/TBD | Not started | — |
 | 32. CUSTOM 프리셋 확장 | v1.2 | 0/TBD | Not started | — |

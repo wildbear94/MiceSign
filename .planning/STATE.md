@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
-status: planning
+status: milestone_complete
 stopped_at: Phase 29 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
-last_updated: "2026-04-22T22:46:17.063Z"
-last_activity: 2026-04-22 — v1.2 roadmap created (5 phases, 21 requirements mapped)
+last_updated: "2026-04-23T00:13:02.491Z"
+last_activity: 2026-04-23 -- Phase 29 execution started
 progress:
-  total_phases: 7
-  completed_phases: 0
+  total_phases: 8
+  completed_phases: 1
   total_plans: 0
   completed_plans: 0
-  percent: 0
+  percent: 13
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** v1.2 Phase 1-B — SMTP 알림 + 검색/필터 + 대시보드 + CUSTOM 프리셋 확장 (retrofit 중심 마일스톤)
+**Current focus:** Phase 29 — smtp-retrofit
 
 ## Current Position
 
-Phase: Phase 29 — SMTP 이메일 알림 인프라 (Retrofit) (not yet started)
-Plan: —
-Status: Roadmap complete, ready for Phase 29 planning
-Last activity: 2026-04-22 — v1.2 roadmap created (5 phases, 21 requirements mapped)
+Phase: 29
+Plan: Not started
+Status: Milestone complete
+Last activity: 2026-04-23
 
 Progress: [░░░░░░░░░░] 0% (0/5 phases complete)
 
@@ -36,7 +36,7 @@ Progress: [░░░░░░░░░░] 0% (0/5 phases complete)
 
 **Velocity:**
 
-- Total plans completed: 18 (v1.0 + v1.1)
+- Total plans completed: 23 (v1.0 + v1.1)
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0% (0/5 phases complete)
 | 23 | 2 | - | - |
 | 24.1 | 5 | - | - |
 | 28 | 2 | - | - |
+| 29 | 5 | - | - |
 
 **Recent Trend:**
 
@@ -102,3 +103,5 @@ None yet.
 Last session: --stopped-at
 Stopped at: Phase 29 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
 Resume file: --resume-file
+
+**Planned Phase:** 29 (SMTP 이메일 알림 인프라 (Retrofit)) — 5 plans — 2026-04-23T00:03:14.653Z
