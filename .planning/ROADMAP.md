@@ -262,7 +262,13 @@ Plans:
   3. 사용자가 키워드 + 상태(복수 선택) + 양식(단일) + 기간(시작일~종료일) + 기안자(드롭다운) 를 조합해 검색하고, 현재 필터·페이지가 URL query string 에 반영되어 링크 공유로 동일 결과를 재현할 수 있다
   4. 10,000 개 문서 seed + 50 동시 사용자 부하에서 95p 응답 시간 ≤ 1초 (EXPLAIN 기반 인덱스 사용 확인, `countDistinct` 로 페이지 총개수 정확)
   5. 페이지 크기 20 의 offset 페이지네이션이 동작하며, 결과 행의 `totalElements` 가 실제 접근 가능 문서 수와 일치한다 (JOIN 중복 inflate 없음)
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 30-01-PLAN.md — DocumentSearchCondition 개편 + Controller 시그니처 + enum 변환 + GlobalExceptionHandler (PR1)
+- [ ] 30-02-PLAN.md — QueryDSL 권한 predicate + DRAFT gate + countDistinct + 28-case 매트릭스 테스트 (PR1)
+- [ ] 30-03-PLAN.md — /users/search 엔드포인트 신설 + drafterId 필터 회귀 (PR2)
+- [ ] 30-04-PLAN.md — 프론트 axios paramsSerializer + DocumentListPage useSearchParams + DrafterCombo/StatusFilterPills (PR2)
+- [ ] 30-05-PLAN.md — 10K seed + ab 벤치 + EXPLAIN + URL 공유 UAT (PR2)
 **UI hint**: yes
 
 ### Phase 31: 대시보드 고도화
