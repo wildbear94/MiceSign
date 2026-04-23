@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/approval-base :: layout(~{::body/*})}">
+<body>
+    <!-- WITHDRAW — 회수 시 결재선 전원에게 통보 (REFERENCE 포함) -->
+    <h2 style="color:#1e293b; margin:0 0 16px 0; font-size:18px;">문서가 회수되었습니다</h2>
+    <p style="color:#334155; line-height:1.6;">
+        <span th:text="${recipientName}">수신자</span>님, 기안자가 해당 문서를 회수하여 결재가 중단되었습니다.
+    </p>
+
+    <!-- 메타데이터 테이블 (공통) -->
+    <table style="background-color:#f8fafc; border-radius:6px; padding:16px; width:100%; margin:16px 0; border-collapse:separate; border-spacing:0;">
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px; width:30%;">문서번호</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;" th:text="${docNumber}">GEN-2026-0001</td>
+        </tr>
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px;">제목</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;" th:text="${docTitle}">문서 제목</td>
+        </tr>
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px;">기안자</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;">
+                <span th:text="${drafterDepartment}">부서</span> <span th:text="${drafterName}">이름</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px;">회수일시</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;"
+                th:text="${#temporals.format(eventTime, 'yyyy-MM-dd HH:mm')}">2026-04-23 10:00</td>
+        </tr>
+    </table>
+</body>
+</html>

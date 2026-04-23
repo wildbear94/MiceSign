@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/approval-base :: layout(~{::body/*})}">
+<body>
+    <!-- REJECT — 반려 시 기안자에게 통보 (rejectComment 포함) -->
+    <h2 style="color:#1e293b; margin:0 0 16px 0; font-size:18px;">결재가 반려되었습니다</h2>
+    <p style="color:#334155; line-height:1.6;">
+        <span th:text="${recipientName}">수신자</span>님, 기안하신 문서가 반려되었습니다. 반려 사유를 확인해 주세요.
+    </p>
+
+    <!-- 메타데이터 테이블 (공통) -->
+    <table style="background-color:#f8fafc; border-radius:6px; padding:16px; width:100%; margin:16px 0; border-collapse:separate; border-spacing:0;">
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px; width:30%;">문서번호</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;" th:text="${docNumber}">GEN-2026-0001</td>
+        </tr>
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px;">제목</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;" th:text="${docTitle}">문서 제목</td>
+        </tr>
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px;">기안자</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;">
+                <span th:text="${drafterDepartment}">부서</span> <span th:text="${drafterName}">이름</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:8px 16px; color:#64748b; font-size:14px;">반려일시</td>
+            <td style="padding:8px 16px; color:#1e293b; font-size:14px;"
+                th:text="${#temporals.format(eventTime, 'yyyy-MM-dd HH:mm')}">2026-04-23 10:00</td>
+        </tr>
+    </table>
+
+    <!-- 반려 사유 (D-C6) — rejectComment 변수가 있을 때만 표시 -->
+    <div th:if="${rejectComment != null and !#strings.isEmpty(rejectComment)}"
+         style="margin:16px 0; padding:16px; background-color:#fef2f2; border-left:4px solid #dc2626; border-radius:6px;">
+        <p style="color:#991b1b; font-size:14px; font-weight:600; margin:0 0 8px 0;">반려 사유</p>
+        <p style="color:#334155; font-size:14px; margin:0; white-space:pre-wrap;" th:text="${rejectComment}">사유 텍스트</p>
+    </div>
+</body>
+</html>
