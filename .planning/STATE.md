@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: phases
 status: completed
 stopped_at: Phase 30 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
-last_updated: "2026-04-23T02:32:34.733Z"
+last_updated: "2026-04-23T08:23:32.501Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 8
@@ -104,4 +104,4 @@ Last session: --stopped-at
 Stopped at: Phase 30 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
 Resume file: --resume-file
 
-**Planned Phase:** 29 (SMTP 이메일 알림 인프라 (Retrofit)) — 5 plans — 2026-04-23T00:03:14.653Z
+**Planned Phase:** 30 (검색 권한 WHERE 절 보안 수정 + 필터 확장) — 5 plans — 2026-04-23T08:23:32.483Z
