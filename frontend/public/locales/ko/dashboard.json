@@ -2,13 +2,18 @@
   "title": "대시보드",
   "newDocument": "새 문서 작성",
   "pending": "결재 대기",
+  "submitted": "진행 중",
+  "completed": "승인 완료",
+  "rejected": "반려",
   "drafts": "작성 중",
-  "completed": "완료",
   "pendingList": "결재 대기 문서",
   "recentDocuments": "최근 문서",
   "viewAll": "전체 보기",
   "emptyPending": "대기 중인 결재가 없습니다",
   "emptyPendingDesc": "결재 요청이 들어오면 여기에 표시됩니다.",
   "emptyRecent": "최근 문서가 없습니다",
-  "emptyRecentDesc": "문서를 작성하면 여기에 표시됩니다."
+  "emptyRecentDesc": "문서를 작성하면 여기에 표시됩니다.",
+  "error": "일시적인 오류가 발생했습니다",
+  "errorDesc": "잠시 후 다시 시도해 주세요.",
+  "retry": "다시 시도"
 }
