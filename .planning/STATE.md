@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 31-01-PLAN.md
-last_updated: "2026-04-23T23:31:51.421Z"
+stopped_at: Completed 31-06-PLAN.md
+last_updated: "2026-04-23T23:38:46.043Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 8
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 31 (dashboard) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-23
 
@@ -66,6 +66,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 26 P01 | 5 min | 4 tasks | 13 files |
 | Phase 26 P02 | 8 min | 4 tasks | 7 files |
 | Phase 31 P31-01 | 3 min | 3 tasks tasks | 5 files files |
+| Phase 31 P06 | 3 min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 31-01]: DashboardSummaryResponse 6-arg backward-compat secondary constructor 로 Plan 01 단독 적용 시 DashboardService 무수정 컴파일 보장 — Plan 02 에서 7-arg canonical 로 전환
 - [Phase 31-01]: DepartmentRepository.findDescendantIds 를 MariaDB native WITH RECURSIVE CTE 로 구현 — D-A6/A9 Option 1 공용 SoT (Plan 02 대시보드 + Plan 06 검색 권한 predicate)
 - [Phase 31-01]: UserRepository.findIdsByDepartmentIdIn 은 UserStatus 필터 없음 (D-A7) — ACTIVE/INACTIVE/RETIRED 모두 포함하여 ADMIN 스코프 과거 기안 문서 카운트 반영
+- [Phase 31-06]: D-A9 Option 1 채택 — DocumentRepositoryCustomImpl 3곳 predicate 를 descendantDeptIds 기반 in-절로 upgrade. SoT 통일로 대시보드(Plan 02)와 검색(Phase 30) drafter 집합 정합성 보장
+- [Phase 31-06]: descendantDeptIds null/empty 시 단일 부서 eq fallback — Phase 30 backward-compat 보존, USER/SUPER_ADMIN 무영향
+- [Phase 31-06]: WITH RECURSIVE dept_tree(id) AS — 컬럼 리스트 명시 표준 (H2 호환 + MariaDB 유효). Plan 01 의 CTE 가 H2 에서 syntax error 발생하던 문제 fix
 
 ### Pending Todos
 
@@ -104,8 +108,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-23T23:31:51.418Z
-Stopped at: Completed 31-01-PLAN.md
+Last session: 2026-04-23T23:38:46.039Z
+Stopped at: Completed 31-06-PLAN.md
 Resume file: None
 
 **Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z
