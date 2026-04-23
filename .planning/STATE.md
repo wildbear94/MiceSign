@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 31-06-PLAN.md
-last_updated: "2026-04-23T23:38:46.043Z"
+stopped_at: Completed 31-02-PLAN.md
+last_updated: "2026-04-23T23:51:15.415Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 8
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 31 (dashboard) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-04-23
 
@@ -67,6 +67,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 26 P02 | 8 min | 4 tasks | 7 files |
 | Phase 31 P31-01 | 3 min | 3 tasks tasks | 5 files files |
 | Phase 31 P06 | 3 min | 3 tasks | 4 files |
+| Phase 31 P31-02 | 8 min | 3 tasks tasks | 4 files files |
 
 ## Accumulated Context
 
@@ -95,6 +96,10 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 31-06]: D-A9 Option 1 채택 — DocumentRepositoryCustomImpl 3곳 predicate 를 descendantDeptIds 기반 in-절로 upgrade. SoT 통일로 대시보드(Plan 02)와 검색(Phase 30) drafter 집합 정합성 보장
 - [Phase 31-06]: descendantDeptIds null/empty 시 단일 부서 eq fallback — Phase 30 backward-compat 보존, USER/SUPER_ADMIN 무영향
 - [Phase 31-06]: WITH RECURSIVE dept_tree(id) AS — 컬럼 리스트 명시 표준 (H2 호환 + MariaDB 유효). Plan 01 의 CTE 가 H2 에서 syntax error 발생하던 문제 fix
+- [Phase 31-02]: DashboardService 3-arg role-based 시그니처 확정 (userId, UserRole, departmentId) + switch(role) 분기 — USER/ADMIN/SUPER_ADMIN 모든 경로 sentinel List 패턴 (null=전사, empty=0, non-empty=IN)
+- [Phase 31-02]: CustomUserDetails.getRole() String 유지 (security 무수정) + Controller 에서 UserRole.valueOf 파싱 — enum 전환 책임 계층 분리
+- [Phase 31-02]: recentPending/recentDocuments 는 role 불문 본인 userId 스코프 — RESEARCH A6 결정 준수 (ADMIN 대시보드에서도 '내가 처리할 / 내가 기안한' 의미 보존)
+- [Phase 31-02]: H2 row-by-row FK 검사 대응 — 부서 계층 DELETE 는 leaf→root 개별 문 (Plan 06 CTE 보정에 이은 H2/MariaDB 호환 패턴 2건째)
 
 ### Pending Todos
 
@@ -108,8 +113,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-23T23:38:46.039Z
-Stopped at: Completed 31-06-PLAN.md
+Last session: 2026-04-23T23:51:02.248Z
+Stopped at: Completed 31-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z
