@@ -1,24 +1,30 @@
 ---
 phase: 29-smtp-retrofit
 verified: 2026-04-23T01:41:24Z
-status: human_needed
+human_verified: 2026-04-23T12:10:00Z
+status: verified
 score: 7/7 must-haves verified
 overrides_applied: 0
 human_verification:
   - test: "시각적 이메일 렌더링 — MailHog/Mailpit 에서 한글 subject + CTA 버튼 + 600px 레이아웃 확인"
     expected: "Gmail/Outlook/iOS Mail 3개 클라이언트에서 한글 subject 깨짐 없음, 인라인 CSS 600px 레이아웃, '문서 바로가기' 버튼 클릭 시 실제 문서 상세 페이지 이동"
     why_human: "이메일 클라이언트 렌더링은 자동 검증 불가. VALIDATION.md §5 Manual UAT 필수 체크리스트"
+    result: pass
+    verified_by: 29-HUMAN-UAT.md Test 1 (2026-04-23)
   - test: "NFR-02 비동기 응답 독립성 — 결재 API 응답이 이메일 발송 결과와 독립적으로 즉시 반환됨"
     expected: "mockMvc.perform(submit/approve) 응답 시간 < 100ms (mail.send 네트워크 대기 없이)"
     why_human: "timing 기반 검증은 CI 환경 불안정. 수동 MailHog 연동 시 직접 확인 필요"
+    result: pass
+    verified_by: 29-HUMAN-UAT.md Test 2 (2026-04-23)
 ---
 
 # Phase 29: SMTP 결재 알림 인프라 (Retrofit) 검증 보고서
 
 **Phase Goal:** 기안자/결재자가 결재 이벤트 5종(상신·중간 승인·최종 승인·반려·회수) 발생 시 한글 HTML 이메일을 자동 수신하고, 이메일 발송이 결재 트랜잭션을 블로킹하지 않으며 실패는 `notification_log` 에 PENDING→SUCCESS/FAILED 로 기록된다
-**Verified:** 2026-04-23T01:41:24Z
-**Status:** human_needed
-**Re-verification:** No — 초기 검증
+**Verified:** 2026-04-23T01:41:24Z (초기 자동 검증)
+**Human Verified:** 2026-04-23T12:10:00Z (29-HUMAN-UAT.md — 2 tests passed)
+**Status:** verified
+**Re-verification:** No — 초기 검증 + 사람 UAT 완료
 
 ---
 
