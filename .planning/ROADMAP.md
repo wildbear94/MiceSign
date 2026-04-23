@@ -281,7 +281,13 @@ Plans:
   2. 대시보드 중앙에 "내가 처리할 결재 5건" + "내가 기안한 최근 문서 5건" 목록이 나란히 렌더되며, "새 문서 작성" CTA 버튼이 양식 선택 화면으로 이동시킨다
   3. 로딩 중에는 skeleton UI, 결과가 없을 때는 각 위젯 내 empty 상태(일러스트 + 문구)가 표시된다
   4. 사용자가 결재를 승인·반려·상신·회수하는 mutation 이 성공하면 `queryClient.invalidateQueries(['dashboard'])` 가 즉시 호출되어 카운트·목록이 재조회되고 UI 에 반영된다 (페이지 이동 없이)
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 31-01-PLAN.md — BE foundation: DashboardSummaryResponse rejectedCount + DepartmentRepository.findDescendantIds CTE + count repos + D-A9 Option 1 predicate upgrade
+- [ ] 31-02-PLAN.md — DashboardService role-based aggregation + DashboardServiceIntegrationTest matrix + Phase 30 hierarchy regression
+- [ ] 31-03-PLAN.md — FE types (rejectedCount) + useDashboard single-hook (placeholderData) + i18n 5 new keys
+- [ ] 31-04-PLAN.md — DashboardPage 4-card + role-based navigation + ErrorState + CountCard isError + list props-drill + smoke tests
+- [ ] 31-05-PLAN.md — Mutation invalidate hookup (4 hooks) + invalidate spy tests + 31-HUMAN-UAT.md checklist
 **UI hint**: yes
 
 ### Phase 32: CUSTOM 프리셋 확장
@@ -335,6 +341,6 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33
 | 28. v1.1 Nyquist validation 사후 보강 (gap closure) | v1.1 | 2/2 | Complete    | 2026-04-14 |
 | 29. SMTP 이메일 알림 인프라 (Retrofit) | v1.2 | 5/5 | Complete    | 2026-04-23 |
 | 30. 검색 권한 WHERE 절 보안 수정 + 필터 확장 | v1.2 | 0/TBD | Not started | — |
-| 31. 대시보드 고도화 | v1.2 | 0/TBD | Not started | — |
+| 31. 대시보드 고도화 | v1.2 | 0/5 | Not started | — |
 | 32. CUSTOM 프리셋 확장 | v1.2 | 0/TBD | Not started | — |
 | 33. E2E 검증 + 운영 전환 | v1.2 | 0/TBD | Not started | — |
