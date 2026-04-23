@@ -64,6 +64,7 @@ dependencies {
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("com.icegreen:greenmail-junit5:2.1.3")  // Phase 29 — SMTP 통합 테스트 (Jakarta Mail 2.x 호환)
 
     // H2 for integration tests (with MariaDB-compatible test migrations)
     testRuntimeOnly("com.h2database:h2")

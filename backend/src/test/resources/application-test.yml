@@ -16,6 +16,22 @@ spring:
     enabled: true
     locations: classpath:db/testmigration
 
+  # Phase 29 — GreenMail SMTP 통합 테스트 (port 3025 = ServerSetupTest.SMTP default)
+  mail:
+    host: 127.0.0.1
+    port: 3025
+    username: test
+    password: test
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: false        # GreenMail plain SMTP
+        mime:
+          charset: UTF-8
+
 jwt:
   secret: test-secret-key-must-be-at-least-32-bytes-long-for-hs256-testing
   access-token-ttl: 1800000
@@ -29,3 +45,10 @@ management:
   health:
     mail:
       enabled: false
+
+# Phase 29 — 통합 테스트에서 이메일 CTA URL 검증 + @Retryable backoff 제거
+app:
+  base-url: http://127.0.0.1:5173
+  mail:
+    retry:
+      delay-ms: 0   # @Backoff(delayExpression = "#{${app.mail.retry.delay-ms:300000}}") override — 테스트는 backoff 대기 없이 즉시 재시도
