@@ -148,13 +148,14 @@ export interface MyDocumentParams {
 
 export interface DocumentSearchParams {
   keyword?: string;
-  status?: string;
+  statuses?: DocumentStatus[];
   templateCode?: string;
   dateFrom?: string;
   dateTo?: string;
-  tab?: string;
+  tab?: 'my' | 'search';
   page?: number;
   size?: number;
+  drafterId?: number;
 }
 
 // === Attachment Types ===

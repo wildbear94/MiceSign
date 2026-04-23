@@ -4,12 +4,32 @@ import { useAuthStore } from '../stores/authStore';
 import type { ApiResponse, ErrorDetail } from '../types/api';
 import type { RefreshResponse } from '../types/auth';
 
+// Plan 30-04: URL query serialization — repeat format (?key=a&key=b) for arrays,
+// skip null/undefined/empty string for backward compat with default axios behavior (Pitfall 3).
+export const serializeParams = (params: Record<string, unknown>): string => {
+  const sp = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === null || value === undefined) return;
+    if (Array.isArray(value)) {
+      value.forEach((v) => {
+        if (v !== null && v !== undefined && v !== '') {
+          sp.append(key, String(v));
+        }
+      });
+    } else if (value !== '') {
+      sp.append(key, String(value));
+    }
+  });
+  return sp.toString();
+};
+
 const apiClient = axios.create({
   baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+  paramsSerializer: { serialize: serializeParams },
 });
 
 // Decode JWT exp claim (base64 decode middle segment)
