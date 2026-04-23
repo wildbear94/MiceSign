@@ -54,7 +54,10 @@ import static org.mockito.Mockito.when;
  *   <tr><td>approvalEmailSender_isAopProxy</td><td>D-B1 AOP 프록시 활성</td></tr>
  * </table>
  */
-@SpringBootTest(properties = "app.mail.retry.delay-ms=0")
+@SpringBootTest(properties = {
+        "app.mail.retry.delay-ms=0",
+        "spring.mail.username=noreply@micesign.test"   // ApprovalEmailSender 의 fromAddress 가 빈 값이 되지 않도록
+})
 @ActiveProfiles("test")
 class ApprovalEmailSenderRetryTest {
 

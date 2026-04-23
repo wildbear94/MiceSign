@@ -16,22 +16,14 @@ spring:
     enabled: true
     locations: classpath:db/testmigration
 
-  # Phase 29 — GreenMail SMTP 통합 테스트 (port 3025 = ServerSetupTest.SMTP default)
-  mail:
-    host: 127.0.0.1
-    port: 3025
-    username: noreply@micesign.test   # From 주소로 사용됨 (auth 는 properties.mail.smtp.auth=false 로 비활성)
-    password: dummy                    # auth=false 라 실제 사용 안 됨, 빈 값 회피용
-    default-encoding: UTF-8
-    properties:
-      mail:
-        smtp:
-          auth: false            # GreenMail 은 user 등록 없이는 auth 실패 — test 는 plain SMTP
-          starttls:
-            enable: false        # GreenMail plain SMTP
-            required: false      # 메인 application.yml 의 starttls.required=true override
-        mime:
-          charset: UTF-8
+  # Phase 29 — 기본 stub mode 유지 (mail 블록 미설정 → application.yml 의 ${MAIL_HOST:} 빈 default
+  # → MailSenderAutoConfiguration 이 JavaMailSender bean 미생성 → ApprovalEmailSender stub path).
+  # GreenMail 통합 테스트는 @TestPropertySource 로 spring.mail.host/port/username 등 override.
+  # SMTP-related 기존 테스트(DocumentSubmitTest/ApprovalWorkflowTest)는 stub mode 로 무영향.
+  #
+  # NOTE: 만약 GreenMail 테스트에서 추가 properties 가 필요하면 @TestPropertySource 에서 같이 명시:
+  #   - spring.mail.username, password, properties.mail.smtp.auth=false,
+  #     properties.mail.smtp.starttls.required=false, properties.mail.mime.charset=UTF-8
 
 jwt:
   secret: test-secret-key-must-be-at-least-32-bytes-long-for-hs256-testing

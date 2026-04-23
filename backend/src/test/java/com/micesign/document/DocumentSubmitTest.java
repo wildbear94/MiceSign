@@ -51,6 +51,10 @@ class DocumentSubmitTest {
 
     @BeforeEach
     void setUp() {
+        // Phase 29 — notification_log 가 user FK 를 갖고 있어 stub mode 발송 시 INSERT 됨.
+        // user/document 정리 전에 cleanup 필수 (Plan 04 lazy-init fix 가 listener 흐름을
+        // 정상화시키면서 stub 발송 SUCCESS 행이 남는 사이드 이펙트 — base cleanup 결함 보강).
+        jdbcTemplate.update("DELETE FROM notification_log");
         // Clean document data (order matters due to FK constraints)
         jdbcTemplate.update("DELETE FROM approval_line");
         jdbcTemplate.update("DELETE FROM document_attachment");

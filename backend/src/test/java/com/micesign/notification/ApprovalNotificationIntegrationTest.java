@@ -24,6 +24,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @SpringBootTest
 @ActiveProfiles("test")
+@TestPropertySource(properties = {
+        "spring.mail.host=127.0.0.1",
+        "spring.mail.port=3025",
+        "spring.mail.username=noreply@micesign.test",
+        "spring.mail.password=dummy",
+        "spring.mail.default-encoding=UTF-8",
+        "spring.mail.properties.mail.smtp.auth=false",
+        "spring.mail.properties.mail.smtp.starttls.enable=false",
+        "spring.mail.properties.mail.smtp.starttls.required=false",
+        "spring.mail.properties.mail.mime.charset=UTF-8"
+})
 class ApprovalNotificationIntegrationTest {
 
     @RegisterExtension
