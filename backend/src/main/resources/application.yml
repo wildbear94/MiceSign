@@ -44,6 +44,10 @@ app:
   base-url: ${APP_BASE_URL:http://localhost:5173}
   cookie:
     secure: ${COOKIE_SECURE:false}
+  # Phase 29 D-D3 — @Retryable backoff 기본 5분 (300000ms). test profile에서 0으로 override 하여 backoff 대기 없이 검증.
+  mail:
+    retry:
+      delay-ms: ${APP_MAIL_RETRY_DELAY_MS:300000}
 
 google:
   drive:
