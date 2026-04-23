@@ -69,15 +69,16 @@ class DocumentSearchInvalidEnumTest {
     }
 
     @Test
-    void tabAll_withUserRole_returns403_AUTH_FORBIDDEN() throws Exception {
-        // D-A7 회귀 보호 — USER 가 tab=all 호출 시 403
+    void tabAll_withUserRole_returns200_permissionPredicateNarrows() throws Exception {
+        // Plan 30-02 Rule 4: D-A7 가드 제거. USER 가 tab=all (프론트 'search' 탭) 호출 시
+        // Controller 는 403 을 내지 않고, Repository 권한 predicate 가 결과를 본인+approval_line
+        // 참여자로 좁힌다 (D-A1). FSD FN-SEARCH-001 "권한: ALL" 준수.
         String userToken = tokenHelper.tokenForRole(999L, "user999@test.com", "테스트유저",
             com.micesign.domain.enums.UserRole.USER, 2L);
         mockMvc.perform(get("/api/v1/documents/search")
                 .param("tab", "all")
                 .header("Authorization", "Bearer " + userToken))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.error.code").value("AUTH_FORBIDDEN"));
+            .andExpect(status().isOk());
     }
 
     @Test

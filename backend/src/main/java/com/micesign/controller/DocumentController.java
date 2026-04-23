@@ -139,12 +139,9 @@ public class DocumentController {
 
         UserRole role = UserRole.valueOf(user.getRole());
 
-        // RBAC enforcement for ALL tab (D-A7 이중 방어)
-        if ("all".equalsIgnoreCase(tab)) {
-            if (role != UserRole.SUPER_ADMIN && role != UserRole.ADMIN) {
-                throw new BusinessException("AUTH_FORBIDDEN", "권한이 없습니다.", 403);
-            }
-        }
+        // Plan 30-02 Rule 4 결정: D-A7 403 가드 제거. FSD FN-SEARCH-001 "권한: ALL" +
+        // D-A1 에 따라 권한 predicate 가 USER 결과를 본인+approval_line 참여자로 자동 좁힘.
+        // USER 가 tab=all (프론트 'search' 탭) 로 호출 시 Repository 의 권한 predicate 가 SoT.
 
         // 수동 enum 변환 — Pitfall 2 (500 유출 방지) + Pitfall 9 (빈 값 필터)
         List<DocumentStatus> statuses;
