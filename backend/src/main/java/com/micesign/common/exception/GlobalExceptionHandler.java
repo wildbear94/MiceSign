@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,16 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult().getFieldErrors().stream()
             .map(e -> e.getField() + ": " + e.getDefaultMessage())
             .collect(Collectors.joining(", "));
+        return ResponseEntity.badRequest().body(ApiResponse.error("VALIDATION_ERROR", message));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<?>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = String.format("파라미터 '%s' 의 값이 올바르지 않습니다: %s",
+            ex.getName(), ex.getValue());
+        log.warn("TypeMismatch on '{}' = '{}' (required type: {})",
+            ex.getName(), ex.getValue(),
+            ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "?");
         return ResponseEntity.badRequest().body(ApiResponse.error("VALIDATION_ERROR", message));
     }
 

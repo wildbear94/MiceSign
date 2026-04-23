@@ -2,6 +2,7 @@ package com.micesign.controller;
 
 import com.micesign.common.dto.ApiResponse;
 import com.micesign.common.exception.BusinessException;
+import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.domain.enums.UserRole;
 import com.micesign.dto.document.*;
 import com.micesign.security.CustomUserDetails;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -63,8 +65,17 @@ public class DocumentController {
             @RequestParam(defaultValue = "20") int size,
             @AuthenticationPrincipal CustomUserDetails user) {
         UserRole role = UserRole.valueOf(user.getRole());
+        List<DocumentStatus> myStatuses = Collections.emptyList();
+        if (status != null && !status.isBlank()) {
+            try {
+                myStatuses = List.of(DocumentStatus.valueOf(status));
+            } catch (IllegalArgumentException ex) {
+                throw new BusinessException("VALIDATION_ERROR",
+                        "상태 값이 올바르지 않습니다: " + status, 400);
+            }
+        }
         DocumentSearchCondition condition = new DocumentSearchCondition(
-                null, status, null, null, null, "my");
+                null, myStatuses, null, null, null, "my", null);
         PageRequest pageable = PageRequest.of(page, size);
         Page<DocumentResponse> result = documentService.searchDocuments(
                 condition, user.getUserId(), role, user.getDepartmentId(), pageable);
@@ -116,8 +127,9 @@ public class DocumentController {
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<DocumentResponse>>> searchDocuments(
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String status,
+            @RequestParam(name = "status", required = false) List<String> rawStatuses,
             @RequestParam(required = false) String templateCode,
+            @RequestParam(required = false) Long drafterId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
             @RequestParam(defaultValue = "my") String tab,
@@ -127,15 +139,31 @@ public class DocumentController {
 
         UserRole role = UserRole.valueOf(user.getRole());
 
-        // RBAC enforcement for ALL tab
+        // RBAC enforcement for ALL tab (D-A7 이중 방어)
         if ("all".equalsIgnoreCase(tab)) {
             if (role != UserRole.SUPER_ADMIN && role != UserRole.ADMIN) {
                 throw new BusinessException("AUTH_FORBIDDEN", "권한이 없습니다.", 403);
             }
         }
 
+        // 수동 enum 변환 — Pitfall 2 (500 유출 방지) + Pitfall 9 (빈 값 필터)
+        List<DocumentStatus> statuses;
+        if (rawStatuses == null || rawStatuses.isEmpty()) {
+            statuses = Collections.emptyList();
+        } else {
+            try {
+                statuses = rawStatuses.stream()
+                        .filter(s -> s != null && !s.isBlank())
+                        .map(DocumentStatus::valueOf)
+                        .toList();
+            } catch (IllegalArgumentException ex) {
+                throw new BusinessException("VALIDATION_ERROR",
+                        "상태 값이 올바르지 않습니다: " + rawStatuses, 400);
+            }
+        }
+
         DocumentSearchCondition condition = new DocumentSearchCondition(
-                keyword, status, templateCode, dateFrom, dateTo, tab);
+                keyword, statuses, templateCode, dateFrom, dateTo, tab, drafterId);
         PageRequest pageable = PageRequest.of(page, size);
 
         Page<DocumentResponse> result = documentService.searchDocuments(

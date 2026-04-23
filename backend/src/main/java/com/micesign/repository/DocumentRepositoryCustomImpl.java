@@ -5,12 +5,10 @@ import com.micesign.domain.QDepartment;
 import com.micesign.domain.QDocument;
 import com.micesign.domain.QPosition;
 import com.micesign.domain.QUser;
-import com.micesign.domain.enums.DocumentStatus;
 import com.micesign.dto.document.DocumentResponse;
 import com.micesign.dto.document.DocumentSearchCondition;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -66,8 +64,12 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
         }
 
         // Filters (AND logic)
-        if (condition.status() != null && !condition.status().isBlank()) {
-            where.and(doc.status.eq(DocumentStatus.valueOf(condition.status())));
+        // TEMPORARY (Plan 30-01): Plan 30-02 가 권한 predicate + DRAFT gate + countDistinct 로 재작성 예정
+        if (condition.statuses() != null && !condition.statuses().isEmpty()) {
+            where.and(doc.status.in(condition.statuses()));
+        }
+        if (condition.drafterId() != null) {
+            where.and(doc.drafterId.eq(condition.drafterId()));
         }
         if (condition.templateCode() != null && !condition.templateCode().isBlank()) {
             where.and(doc.templateCode.eq(condition.templateCode()));
