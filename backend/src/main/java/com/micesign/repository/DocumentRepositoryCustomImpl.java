@@ -30,7 +30,7 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
     @Override
     public Page<DocumentResponse> searchDocuments(
             DocumentSearchCondition condition, Long userId, String role,
-            Long departmentId, Pageable pageable) {
+            Long departmentId, List<Long> descendantDeptIds, Pageable pageable) {
 
         QDocument doc = QDocument.document;
         QUser drafter = QUser.user;
@@ -44,11 +44,24 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
         String tab = condition.tab() != null ? condition.tab().toLowerCase() : "my";
         switch (tab) {
             case "my" -> where.and(doc.drafterId.eq(userId));
-            case "department" -> where.and(drafter.departmentId.eq(departmentId));
+            case "department" -> {
+                // Phase 31 D-A9 Option 1 — 부서 계층 재귀 확장 (descendantDeptIds non-empty 시),
+                // null/empty 는 Phase 30 단일 부서 fallback (backward-compat).
+                if (descendantDeptIds != null && !descendantDeptIds.isEmpty()) {
+                    where.and(drafter.departmentId.in(descendantDeptIds));
+                } else {
+                    where.and(drafter.departmentId.eq(departmentId));
+                }
+            }
             case "all" -> {
                 // Scope by role
                 if ("ADMIN".equals(role)) {
-                    where.and(drafter.departmentId.eq(departmentId));
+                    // Phase 31 D-A9 Option 1 — ADMIN tab=all 도 계층 재귀 확장
+                    if (descendantDeptIds != null && !descendantDeptIds.isEmpty()) {
+                        where.and(drafter.departmentId.in(descendantDeptIds));
+                    } else {
+                        where.and(drafter.departmentId.eq(departmentId));
+                    }
                 }
                 // SUPER_ADMIN sees all — no additional predicate
             }
@@ -72,10 +85,18 @@ public class DocumentRepositoryCustomImpl implements DocumentRepositoryCustom {
 
             if ("ADMIN".equals(role) && departmentId != null) {
                 QUser deptUser = new QUser("deptUser"); // 서브쿼리 별칭 — main drafter join 과 충돌 방지
+                BooleanExpression deptFilter;
+                if (descendantDeptIds != null && !descendantDeptIds.isEmpty()) {
+                    // Phase 31 D-A9 Option 1 — 계층 재귀 확장
+                    deptFilter = deptUser.departmentId.in(descendantDeptIds);
+                } else {
+                    // fallback: 단일 부서 (Phase 30 backward-compat)
+                    deptFilter = deptUser.departmentId.eq(departmentId);
+                }
                 BooleanExpression sameDepartment = doc.drafterId.in(
                         JPAExpressions.select(deptUser.id)
                                 .from(deptUser)
-                                .where(deptUser.departmentId.eq(departmentId))
+                                .where(deptFilter)
                 );
                 permissionBranch = permissionBranch.or(sameDepartment);
             }
