@@ -28,6 +28,7 @@ import com.micesign.event.BudgetIntegrationEvent;
 import com.micesign.mapper.DocumentMapper;
 import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.ApprovalTemplateRepository;
+import com.micesign.repository.DepartmentRepository;
 import com.micesign.repository.DocSequenceRepository;
 import com.micesign.repository.DocumentAttachmentRepository;
 import com.micesign.repository.DocumentContentRepository;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,7 @@ public class DocumentService {
     private final ApprovalLineRepository approvalLineRepository;
     private final DocSequenceRepository docSequenceRepository;
     private final UserRepository userRepository;
+    private final DepartmentRepository departmentRepository;
     private final DocumentFormValidator formValidator;
     private final DocumentMapper documentMapper;
     private final GoogleDriveService googleDriveService;
@@ -78,6 +81,7 @@ public class DocumentService {
                            ApprovalLineRepository approvalLineRepository,
                            DocSequenceRepository docSequenceRepository,
                            UserRepository userRepository,
+                           DepartmentRepository departmentRepository,
                            DocumentFormValidator formValidator,
                            DocumentMapper documentMapper,
                            GoogleDriveService googleDriveService,
@@ -91,6 +95,7 @@ public class DocumentService {
         this.approvalLineRepository = approvalLineRepository;
         this.docSequenceRepository = docSequenceRepository;
         this.userRepository = userRepository;
+        this.departmentRepository = departmentRepository;
         this.formValidator = formValidator;
         this.documentMapper = documentMapper;
         this.googleDriveService = googleDriveService;
@@ -451,7 +456,16 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public Page<DocumentResponse> searchDocuments(DocumentSearchCondition condition, Long userId,
                                                    UserRole role, Long departmentId, Pageable pageable) {
-        return documentRepository.searchDocuments(condition, userId, role.name(), departmentId, pageable);
+        // Phase 31 D-A9 Option 1 — ADMIN 또는 tab∈(department,all) 일 때 부서 계층 descendant 수집.
+        // tab=my 또는 SUPER_ADMIN 은 descendantDeptIds 불필요 → empty list (impl 의 fallback 로 동작 동일).
+        String tab = condition.tab() != null ? condition.tab().toLowerCase() : "my";
+        boolean needsHierarchy = ("department".equals(tab))
+                || ("all".equals(tab) && role == UserRole.ADMIN)
+                || (role == UserRole.ADMIN && departmentId != null);
+        List<Long> descendantDeptIds = (needsHierarchy && departmentId != null)
+                ? departmentRepository.findDescendantIds(departmentId)
+                : Collections.emptyList();
+        return documentRepository.searchDocuments(condition, userId, role.name(), departmentId, descendantDeptIds, pageable);
     }
 
     // ──────────────────────────────────────────────

@@ -34,7 +34,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
      * 일반 MiceSign 부서 트리 깊이 ≤ 5, MariaDB cte_max_recursion_depth default 1000 여유.
      */
     @Query(value = """
-        WITH RECURSIVE dept_tree AS (
+        WITH RECURSIVE dept_tree(id) AS (
           SELECT id FROM department WHERE id = :deptId
           UNION ALL
           SELECT d.id
