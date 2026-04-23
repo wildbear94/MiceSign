@@ -102,7 +102,9 @@ class RegistrationServiceTest {
         assertThat(captor.getValue().getPasswordHash()).isEqualTo("$2a$10$hashedValue");
 
         // Verify audit log called with null userId (unauthenticated)
-        verify(auditLogService).log(eq(null), eq("REGISTRATION_SUBMITTED"), eq("REGISTRATION_REQUEST"), eq(1L), any());
+        // Phase 29: AuditLogService 에 (..., String detailsJson) overload 추가로 any() 가 ambiguous —
+        // RegistrationService 가 Map.of(...) 사용하므로 anyMap() 으로 disambiguate.
+        verify(auditLogService).log(eq(null), eq("REGISTRATION_SUBMITTED"), eq("REGISTRATION_REQUEST"), eq(1L), anyMap());
     }
 
     @Test
@@ -262,8 +264,8 @@ class RegistrationServiceTest {
         assertThat(reg.getApprovedBy()).isEqualTo(1L);
         assertThat(reg.getProcessedAt()).isNotNull();
 
-        // Verify audit
-        verify(auditLogService).log(eq(1L), eq("REGISTRATION_APPROVED"), eq("REGISTRATION_REQUEST"), eq(10L), any());
+        // Verify audit (Phase 29: anyMap() to disambiguate Map vs String overload)
+        verify(auditLogService).log(eq(1L), eq("REGISTRATION_APPROVED"), eq("REGISTRATION_REQUEST"), eq(10L), anyMap());
     }
 
     @Test
@@ -367,7 +369,8 @@ class RegistrationServiceTest {
         assertThat(reg.getApprovedBy()).isEqualTo(1L);
         assertThat(reg.getProcessedAt()).isNotNull();
 
-        verify(auditLogService).log(eq(1L), eq("REGISTRATION_REJECTED"), eq("REGISTRATION_REQUEST"), eq(10L), any());
+        // Phase 29: anyMap() to disambiguate Map vs String overload
+        verify(auditLogService).log(eq(1L), eq("REGISTRATION_REJECTED"), eq("REGISTRATION_REQUEST"), eq(10L), anyMap());
     }
 
     @Test

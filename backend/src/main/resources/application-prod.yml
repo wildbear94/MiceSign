@@ -9,6 +9,9 @@ spring:
       minimum-idle: 5
 
 app:
+  # Phase 29 D-D2 — BaseUrlGuard(@Profile("prod")) 가 localhost 감지 시 startup 실패시킴 (Pitfall 5)
+  # 배포 시 APP_BASE_URL env var 를 실 사내 도메인으로 주입 필수
+  base-url: ${APP_BASE_URL:https://micesign.사내도메인}
   cookie:
     secure: true
 
