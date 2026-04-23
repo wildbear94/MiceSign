@@ -23,6 +23,7 @@ export function useApprove() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['approvals'] });
       queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });  // Phase 31 D-B3
     },
   });
 }
@@ -35,6 +36,7 @@ export function useReject() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['approvals'] });
       queryClient.invalidateQueries({ queryKey: ['documents'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });  // Phase 31 D-B3
     },
   });
 }
