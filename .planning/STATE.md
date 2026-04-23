@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 31-02-PLAN.md
-last_updated: "2026-04-23T23:51:15.415Z"
+stopped_at: Completed 31-03-PLAN.md
+last_updated: "2026-04-23T23:57:14.193Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 8
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 31 (dashboard) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-23
 
@@ -68,6 +68,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 31 P31-01 | 3 min | 3 tasks tasks | 5 files files |
 | Phase 31 P06 | 3 min | 3 tasks | 4 files |
 | Phase 31 P31-02 | 8 min | 3 tasks tasks | 4 files files |
+| Phase 31 P31-03 | 6 min | 3 tasks tasks | 3 files files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 31-02]: CustomUserDetails.getRole() String 유지 (security 무수정) + Controller 에서 UserRole.valueOf 파싱 — enum 전환 책임 계층 분리
 - [Phase 31-02]: recentPending/recentDocuments 는 role 불문 본인 userId 스코프 — RESEARCH A6 결정 준수 (ADMIN 대시보드에서도 '내가 처리할 / 내가 기안한' 의미 보존)
 - [Phase 31-02]: H2 row-by-row FK 검사 대응 — 부서 계층 DELETE 는 leaf→root 개별 문 (Plan 06 CTE 보정에 이은 H2/MariaDB 호환 패턴 2건째)
+- [Phase 31-03]: DashboardSummary.rejectedCount required non-optional — BE canonical constructor 가 long primitive 로 항상 채우므로 undefined 가드 불필요 (RESEARCH A7)
+- [Phase 31-03]: useDashboard 3훅 → useDashboardSummary 단일 훅으로 통합 + placeholderData (prev)=>prev 패턴 적용 — 3위젯 isLoading 자동 동기화 (D-C5) + invalidate 1회 waterfall 해소 (D-B6)
+- [Phase 31-03]: queryKey ['dashboard','summary'] 기존값 보존 — Plan 05 invalidateQueries({queryKey:['dashboard']}) prefix match 로 1 호출 무효화. drafts orphan key 삭제 금지 (D-A3)
 
 ### Pending Todos
 
@@ -113,8 +117,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-23T23:51:02.248Z
-Stopped at: Completed 31-02-PLAN.md
+Last session: 2026-04-23T23:57:05.319Z
+Stopped at: Completed 31-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z
