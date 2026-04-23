@@ -1,10 +1,11 @@
 ---
 phase: 31
 slug: dashboard
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-24
+reviewed_at: 2026-04-24
 ---
 
 # Phase 31 — UI Design Contract · 대시보드 고도화
