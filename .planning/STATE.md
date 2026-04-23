@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: completed
-stopped_at: Phase 30 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
-last_updated: "2026-04-23T08:23:32.501Z"
+stopped_at: Phase 31 context gathered (4 areas, 30+ decisions locked — D-A9 Phase 30 predicate hierarchy mismatch flagged)
+last_updated: "2026-04-23T20:17:58.208Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 8
@@ -101,7 +101,7 @@ None yet.
 ## Session Continuity
 
 Last session: --stopped-at
-Stopped at: Phase 30 context gathered (A/B/C/D 4 areas, 30+ decisions locked)
+Stopped at: Phase 31 context gathered (4 areas, 30+ decisions locked — D-A9 Phase 30 predicate hierarchy mismatch flagged)
 Resume file: --resume-file
 
 **Planned Phase:** 30 (검색 권한 WHERE 절 보안 수정 + 필터 확장) — 5 plans — 2026-04-23T08:23:32.483Z
