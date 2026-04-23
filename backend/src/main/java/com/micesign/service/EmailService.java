@@ -2,15 +2,14 @@ package com.micesign.service;
 
 import com.micesign.domain.ApprovalLine;
 import com.micesign.domain.Document;
-import com.micesign.domain.NotificationLog;
 import com.micesign.domain.User;
 import com.micesign.domain.enums.ApprovalLineType;
 import com.micesign.domain.enums.NotificationEventType;
-import com.micesign.domain.enums.NotificationStatus;
+import com.micesign.domain.enums.UserStatus;
 import com.micesign.event.ApprovalNotificationEvent;
 import com.micesign.repository.ApprovalLineRepository;
 import com.micesign.repository.DocumentRepository;
-import com.micesign.repository.NotificationLogRepository;
+import com.micesign.service.email.ApprovalEmailSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -18,19 +17,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Email notification service.
- * Listens for ApprovalNotificationEvent after transaction commit.
- * Runs asynchronously to avoid blocking the main thread.
+ * Approval notification dispatcher (Phase 29 retrofit).
  *
- * SMTP is deferred to Phase 1-B. Currently logs emails instead of sending.
- * When SMTP is configured, add spring-boot-starter-mail dependency and
- * inject JavaMailSender to replace the log-only implementation.
+ * <p>Listens for {@link ApprovalNotificationEvent} after the producing transaction commits and
+ * fans out to {@link ApprovalEmailSender#send} for each eligible recipient. PENDING-first
+ * 3단계 로깅 / @Retryable / @Recover / template render 는 모두 ApprovalEmailSender 가 담당
+ * (D-B1 Spring AOP 프록시 체인 보장 — Pitfall 1 회피).
+ *
+ * <p>본 클래스의 책임은:
+ * <ol>
+ *   <li>이벤트 디스패치 (after-commit + async)</li>
+ *   <li>수신자 결정 (D-C2 REFERENCE 제외, NOTIF-04 ACTIVE only, D-A7 distinct by User.id)</li>
+ * </ol>
+ *
+ * <p>NFR-03 준수 — 본 리스너는 audit_log 에 INSERT 하지 않는다. audit 기록은 producer
+ * (ApprovalService / DocumentService) 가 동기적으로 수행한다.
  */
 @Service
 public class EmailService {
@@ -39,14 +48,14 @@ public class EmailService {
 
     private final DocumentRepository documentRepository;
     private final ApprovalLineRepository approvalLineRepository;
-    private final NotificationLogRepository notificationLogRepository;
+    private final ApprovalEmailSender approvalEmailSender;
 
     public EmailService(DocumentRepository documentRepository,
                         ApprovalLineRepository approvalLineRepository,
-                        NotificationLogRepository notificationLogRepository) {
+                        ApprovalEmailSender approvalEmailSender) {
         this.documentRepository = documentRepository;
         this.approvalLineRepository = approvalLineRepository;
-        this.notificationLogRepository = notificationLogRepository;
+        this.approvalEmailSender = approvalEmailSender;
     }
 
     // ──────────────────────────────────────────────
@@ -54,7 +63,10 @@ public class EmailService {
     // ──────────────────────────────────────────────
 
     /**
-     * Handle approval notification events after transaction commit.
+     * Approval 이벤트 5종을 수신해 이메일 발송 디스패치.
+     *
+     * <p>리스너 내부 try-catch 는 이벤트 루프 안정화 목적 — 실 발송 실패는
+     * ApprovalEmailSender 가 notification_log 에 FAILED/RETRY 로 기록한다.
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async
@@ -67,39 +79,40 @@ public class EmailService {
                 return;
             }
 
-            String eventType = event.getEventType();
-            List<User> recipients = determineRecipients(document, eventType);
+            NotificationEventType type = NotificationEventType.valueOf(event.getEventType());
+            List<User> recipients = determineRecipients(document, type);
 
             if (recipients.isEmpty()) {
                 log.debug("No recipients for notification: docId={}, event={}",
-                        event.getDocumentId(), eventType);
+                        event.getDocumentId(), type);
                 return;
             }
 
-            String actionLabel = getActionLabel(eventType);
-            String docNo = document.getDocNumber() != null ? document.getDocNumber() : "DRAFT";
-            String subject = "[MiceSign] " + actionLabel + ": " + docNo + " " + document.getTitle();
-
             for (User recipient : recipients) {
-                sendToRecipient(recipient, subject, eventType, document);
+                // 별도 빈 호출 — Spring 프록시 체인 보장 (D-B1, Pitfall 1 회피)
+                approvalEmailSender.send(document, recipient, type);
             }
         } catch (Exception e) {
-            log.error("Failed to process notification event: docId={}, event={}, error={}",
+            log.error("Failed to dispatch approval notification: docId={}, event={}, error={}",
                     event.getDocumentId(), event.getEventType(), e.getMessage(), e);
         }
     }
 
     // ──────────────────────────────────────────────
-    // sendEmail (simple, used by budget integration etc.)
+    // sendEmail (legacy stub for non-approval callers)
     // ──────────────────────────────────────────────
 
     /**
-     * Send a templated email.
-     * Currently logs only (SMTP not configured until Phase 1-B).
+     * Legacy log-only stub used by callers outside the approval flow
+     * (BudgetIntegrationService 의 super-admin 알림, NotificationLogController 의 resend).
+     *
+     * <p>Phase 29 의 approval 이벤트 5종은 본 메서드를 거치지 않고
+     * {@link ApprovalEmailSender#send} 를 호출한다. 본 메서드는 NotificationLog 에 INSERT
+     * 하지 않으며 audit_log 도 만지지 않는다 (NFR-03). 실제 SMTP 발송 통합은 Phase 33
+     * 운영 런북 / NotificationLog resend 리팩터에서 정리한다.
      */
     public void sendEmail(String to, String subject, String templateName,
                           Map<String, Object> variables) {
-        // SMTP not yet configured. Log the email for now.
         log.info("[EMAIL STUB] To: {}, Subject: {}, Template: {}, Variables: {}",
                 to, subject, templateName, variables);
     }
@@ -108,86 +121,43 @@ public class EmailService {
     // Private helpers
     // ──────────────────────────────────────────────
 
-    private List<User> determineRecipients(Document document, String eventType) {
-        List<ApprovalLine> allLines = approvalLineRepository
+    /**
+     * 이벤트별 수신자 결정.
+     *
+     * <ul>
+     *   <li>SUBMIT / APPROVE — currentStep 의 non-REFERENCE 승인자 (D-C2)</li>
+     *   <li>FINAL_APPROVE / REJECT — 기안자</li>
+     *   <li>WITHDRAW — 결재선 전원 (REFERENCE 포함)</li>
+     * </ul>
+     *
+     * <p>공통 후처리: User.status == ACTIVE 만 통과 (NOTIF-04), User.id 기준 distinct
+     * (D-A7 — User entity 의 equals/hashCode 미구현 방어). insertion order 보존.
+     */
+    private List<User> determineRecipients(Document document, NotificationEventType type) {
+        List<ApprovalLine> lines = approvalLineRepository
                 .findByDocumentIdOrderByStepOrderAsc(document.getId());
-        List<User> recipients = new ArrayList<>();
 
-        NotificationEventType type = NotificationEventType.valueOf(eventType);
-
-        switch (type) {
-            case SUBMIT -> {
-                // First step approver(s)
-                if (document.getCurrentStep() != null) {
-                    allLines.stream()
-                            .filter(l -> l.getStepOrder().equals(document.getCurrentStep()))
-                            .filter(l -> l.getLineType() != ApprovalLineType.REFERENCE)
-                            .map(ApprovalLine::getApprover)
-                            .forEach(recipients::add);
+        Stream<User> baseStream = switch (type) {
+            case SUBMIT, APPROVE -> {
+                if (document.getCurrentStep() == null) {
+                    yield Stream.empty();
                 }
+                yield lines.stream()
+                        .filter(l -> l.getStepOrder().equals(document.getCurrentStep()))
+                        .filter(l -> l.getLineType() != ApprovalLineType.REFERENCE)
+                        .map(ApprovalLine::getApprover);
             }
-            case APPROVE -> {
-                // Next step approver(s)
-                if (document.getCurrentStep() != null) {
-                    allLines.stream()
-                            .filter(l -> l.getStepOrder().equals(document.getCurrentStep()))
-                            .filter(l -> l.getLineType() != ApprovalLineType.REFERENCE)
-                            .map(ApprovalLine::getApprover)
-                            .forEach(recipients::add);
-                }
-            }
-            case FINAL_APPROVE -> {
-                // Drafter
-                recipients.add(document.getDrafter());
-            }
-            case REJECT -> {
-                // Drafter
-                recipients.add(document.getDrafter());
-            }
-            case WITHDRAW -> {
-                // All approval line members
-                allLines.stream()
-                        .map(ApprovalLine::getApprover)
-                        .forEach(recipients::add);
-            }
-        }
-
-        return recipients;
-    }
-
-    private void sendToRecipient(User recipient, String subject, String eventType,
-                                  Document document) {
-        NotificationLog notifLog = new NotificationLog();
-        notifLog.setRecipient(recipient);
-        notifLog.setRecipientEmail(recipient.getEmail());
-        notifLog.setEventType(eventType);
-        notifLog.setDocumentId(document.getId());
-        notifLog.setSubject(subject);
-
-        try {
-            // Log-only mode until SMTP is configured
-            log.info("[EMAIL STUB] To: {}, Subject: {}", recipient.getEmail(), subject);
-            notifLog.setStatus(NotificationStatus.SUCCESS);
-            notifLog.setSentAt(LocalDateTime.now());
-        } catch (Exception e) {
-            log.error("Failed to send notification: to={}, error={}",
-                    recipient.getEmail(), e.getMessage());
-            notifLog.setStatus(notifLog.getRetryCount() < 2
-                    ? NotificationStatus.RETRY : NotificationStatus.FAILED);
-            notifLog.setErrorMessage(e.getMessage());
-        }
-
-        notificationLogRepository.save(notifLog);
-    }
-
-    private String getActionLabel(String eventType) {
-        return switch (eventType) {
-            case "SUBMIT" -> "결재 요청";
-            case "APPROVE" -> "승인";
-            case "FINAL_APPROVE" -> "최종 승인";
-            case "REJECT" -> "반려";
-            case "WITHDRAW" -> "회수";
-            default -> eventType;
+            case FINAL_APPROVE, REJECT -> Stream.of(document.getDrafter());
+            case WITHDRAW -> lines.stream().map(ApprovalLine::getApprover);
         };
+
+        return baseStream
+                .filter(u -> u != null && u.getStatus() == UserStatus.ACTIVE)
+                .collect(Collectors.toMap(
+                        User::getId,
+                        Function.identity(),
+                        (a, b) -> a,
+                        LinkedHashMap::new))
+                .values().stream().toList();
     }
 }
