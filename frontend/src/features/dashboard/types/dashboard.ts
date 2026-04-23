@@ -1,8 +1,9 @@
 export interface DashboardSummary {
   pendingCount: number;
-  draftCount: number;
+  draftCount: number;           // Phase 31 D-A3: FE 노출 안 함, API contract 보존
   submittedCount: number;
-  completedCount: number;
+  completedCount: number;       // Phase 31 D-A2 재정의: APPROVED only (기존 APPROVED+REJECTED 합산 폐기)
+  rejectedCount: number;        // Phase 31 D-A2 신규: REJECTED only
   recentPending: PendingApprovalSummary[];
   recentDocuments: RecentDocumentSummary[];
 }
