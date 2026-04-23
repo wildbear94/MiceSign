@@ -27,6 +27,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long>, Docum
 
     long countByDrafterIdAndStatus(Long drafterId, DocumentStatus status);
 
+    // Phase 31 D-A4 ADMIN 스코프 — 부서 계층으로 수집한 drafter id 집합의 상태별 문서 카운트
+    long countByDrafterIdInAndStatus(List<Long> drafterIds, DocumentStatus status);
+
+    // Phase 31 D-A4 SUPER_ADMIN 스코프 — 전사 drafter 필터 zero, 상태별 문서 카운트
+    long countByStatus(DocumentStatus status);
+
     @Query("SELECT d FROM Document d JOIN FETCH d.drafter WHERE d.id = :id")
     Optional<Document> findByIdWithDrafter(@Param("id") Long id);
 

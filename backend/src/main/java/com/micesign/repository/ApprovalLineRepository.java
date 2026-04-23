@@ -48,6 +48,26 @@ public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long
            "AND d.currentStep = al.stepOrder")
     long countPendingByApproverId(@Param("userId") Long userId);
 
+    // Phase 31 D-A5 — ADMIN 부서 계층 확장 pending 카운트. 본 쿼리의 WHERE 절은 기존
+    // countPendingByApproverId 와 완전 동일, approver.id = :userId → approver.id IN :userIds 만 변경.
+    // (pending 의미 변경 시 두 쿼리 동시 수정 필수)
+    @Query("SELECT COUNT(al) FROM ApprovalLine al JOIN al.document d " +
+           "WHERE al.approver.id IN :userIds " +
+           "AND al.status = com.micesign.domain.enums.ApprovalLineStatus.PENDING " +
+           "AND al.lineType IN (com.micesign.domain.enums.ApprovalLineType.APPROVE, com.micesign.domain.enums.ApprovalLineType.AGREE) " +
+           "AND d.status = com.micesign.domain.enums.DocumentStatus.SUBMITTED " +
+           "AND d.currentStep = al.stepOrder")
+    long countPendingByApproverIdIn(@Param("userIds") List<Long> userIds);
+
+    // Phase 31 D-A4 SUPER_ADMIN — 전사 PENDING approval_line 카운트 (approver 필터 zero).
+    // 상기와 동일한 WHERE 절에서 approver 분기만 제거.
+    @Query("SELECT COUNT(al) FROM ApprovalLine al JOIN al.document d " +
+           "WHERE al.status = com.micesign.domain.enums.ApprovalLineStatus.PENDING " +
+           "AND al.lineType IN (com.micesign.domain.enums.ApprovalLineType.APPROVE, com.micesign.domain.enums.ApprovalLineType.AGREE) " +
+           "AND d.status = com.micesign.domain.enums.DocumentStatus.SUBMITTED " +
+           "AND d.currentStep = al.stepOrder")
+    long countAllPending();
+
     List<ApprovalLine> findByApproverIdAndStatus(Long approverId, ApprovalLineStatus status);
 
     Optional<ApprovalLine> findByDocumentIdAndApproverId(Long documentId, Long approverId);
