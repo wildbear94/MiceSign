@@ -73,6 +73,7 @@ export function useSubmitDocument() {
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['documents', id] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });  // Phase 31 D-B3
     },
   });
 }
@@ -86,6 +87,7 @@ export function useWithdrawDocument() {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['documents', id] });
       queryClient.invalidateQueries({ queryKey: ['approvals'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });  // Phase 31 D-B3
     },
   });
 }
