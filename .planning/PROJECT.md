@@ -23,11 +23,11 @@ Employees can submit approval documents and get them approved/rejected through a
 - [x] CUSTOM 양식 동적 렌더러 (사용자 기안) — Validated in Phase 24.1 (v1.1)
 - [x] 계산 규칙 UI — Validated in Phase 25 (v1.1)
 - [x] 양식 복제 / JSON 내보내기·가져오기 / 프리셋 — Validated in Phase 26 (v1.1)
+- [x] 대시보드 고도화 (결재 대기/진행 중/승인 완료/반려 4 카드 + role-based 스코프 + mutation 실시간 invalidate + skeleton/empty/error UI) — Validated in Phase 31 (v1.2, DASH-01~05)
 
 ### Active
 - [ ] SMTP 이메일 알림 (상신/중간 승인/최종 승인/반려/회수 이벤트)
 - [ ] 문서 검색/필터링 UI (상태·양식·기간·기안자·문서번호·전문 검색)
-- [ ] 대시보드 고도화 (결재 대기/진행/완료 위젯, 최근 문서)
 - [ ] 추가 기본 제공 양식 또는 CUSTOM 빌더 기반 프리셋 확충
 
 ### Out of Scope
@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-22 — v1.2 milestone started (PRD Phase 1-B: SMTP 알림 + 검색/필터 + 대시보드 고도화 + 양식 확장)*
+*Last updated: 2026-04-24 — Phase 31 (대시보드 고도화) complete: DASH-01~05 validated, 4 카드 + role-based scope + mutation invalidate + ErrorState/skeleton/empty UI 통일.*
