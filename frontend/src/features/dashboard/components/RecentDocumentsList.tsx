@@ -5,6 +5,7 @@ import TemplateBadge from '../../document/components/TemplateBadge';
 import DocumentStatusBadge from '../../document/components/DocumentStatusBadge';
 import ErrorState from './ErrorState';
 import type { RecentDocumentSummary } from '../types/dashboard';
+import type { DocumentStatus } from '../../document/types/document';
 
 interface RecentDocumentsListProps {
   data: RecentDocumentSummary[] | undefined;
@@ -97,7 +98,7 @@ export default function RecentDocumentsList({ data, isLoading, isError }: Recent
                   <TemplateBadge templateCode={doc.templateCode} />
                 </td>
                 <td className="py-2">
-                  <DocumentStatusBadge status={doc.status} />
+                  <DocumentStatusBadge status={doc.status as DocumentStatus} />
                 </td>
                 <td className="py-2 text-sm text-gray-500 dark:text-gray-400">
                   {new Date(doc.createdAt).toLocaleDateString('ko-KR')}
