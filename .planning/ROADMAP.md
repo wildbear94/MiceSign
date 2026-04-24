@@ -287,7 +287,7 @@ Plans:
 - [ ] 31-02-PLAN.md — DashboardService role-based aggregation + DashboardServiceIntegrationTest matrix + Phase 30 hierarchy regression
 - [ ] 31-03-PLAN.md — FE types (rejectedCount) + useDashboard single-hook (placeholderData) + i18n 5 new keys
 - [ ] 31-04-PLAN.md — DashboardPage 4-card + role-based navigation + ErrorState + CountCard isError + list props-drill + smoke tests
-- [ ] 31-05-PLAN.md — Mutation invalidate hookup (4 hooks) + invalidate spy tests + 31-HUMAN-UAT.md checklist
+- [x] 31-05-PLAN.md — Mutation invalidate hookup (4 hooks) + invalidate spy tests + 31-HUMAN-UAT.md checklist
 **UI hint**: yes
 
 ### Phase 32: CUSTOM 프리셋 확장

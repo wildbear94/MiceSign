@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 31-03-PLAN.md
-last_updated: "2026-04-23T23:57:14.193Z"
-last_activity: 2026-04-23
+stopped_at: Completed 31-05-PLAN.md
+last_updated: "2026-04-24T00:03:42.036Z"
+last_activity: 2026-04-24
 progress:
   total_phases: 8
   completed_phases: 0
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 31 (dashboard) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
-Last activity: 2026-04-23
+Last activity: 2026-04-24
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -69,6 +69,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 31 P06 | 3 min | 3 tasks | 4 files |
 | Phase 31 P31-02 | 8 min | 3 tasks tasks | 4 files files |
 | Phase 31 P31-03 | 6 min | 3 tasks tasks | 3 files files |
+| Phase 31 P31-05 | 172 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 31-03]: DashboardSummary.rejectedCount required non-optional — BE canonical constructor 가 long primitive 로 항상 채우므로 undefined 가드 불필요 (RESEARCH A7)
 - [Phase 31-03]: useDashboard 3훅 → useDashboardSummary 단일 훅으로 통합 + placeholderData (prev)=>prev 패턴 적용 — 3위젯 isLoading 자동 동기화 (D-C5) + invalidate 1회 waterfall 해소 (D-B6)
 - [Phase 31-03]: queryKey ['dashboard','summary'] 기존값 보존 — Plan 05 invalidateQueries({queryKey:['dashboard']}) prefix match 로 1 호출 무효화. drafts orphan key 삭제 금지 (D-A3)
+- [Phase 31-05] D-B3 4 mutation 훅 (useApprove/useReject/useSubmitDocument/useWithdrawDocument) onSuccess 에 ['dashboard'] prefix invalidate 추가 — Plan 03 단일 useDashboardSummary (queryKey ['dashboard','summary']) 와 prefix match 로 페이지 이동 없이 실시간 갱신 완성
+- [Phase 31-05] D-B3 scope 외 4 훅 (useCreate/useUpdate/useDelete/useRewrite) 미변경 — DRAFT 단계 작업으로 대시보드 4카드 (pending/submitted/completed/rejected) 영향 zero. spy test 가 'useCreateDocument 는 dashboard invalidate 하지 않음' 케이스로 scope 경계 regression 방어
+- [Phase 31-05] FE invalidate spy 테스트 패턴 확립 — vi.spyOn(queryClient, 'invalidateQueries') + renderHook + QueryClientProvider wrapper. 향후 mutation 훅 수정 시 invalidate 누락/추가 자동 검증 가능
 
 ### Pending Todos
 
@@ -117,8 +121,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-23T23:57:05.319Z
-Stopped at: Completed 31-03-PLAN.md
+Last session: 2026-04-24T00:03:42.033Z
+Stopped at: Completed 31-05-PLAN.md
 Resume file: None
 
 **Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z

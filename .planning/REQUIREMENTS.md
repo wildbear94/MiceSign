@@ -182,7 +182,8 @@ Requirements for Milestone v1.2: Phase 1-B — 일상 업무 대체 수준 (SMTP
 **: 사용자가 대시보드에서 "내가 처리할 결재 5건" + "내가 기안한 최근 문서 5건" 목록을 본다
 - [ ] **DASH-03**: 사용자가 대시보드의 "새 문서 작성" CTA 버튼으로 양식 선택 화면으로 이동할 수 있다
 - [ ] **DASH-04**: 대시보드에 skeleton 로딩 상태와 빈 상태(empty) UI가 표시된다
-- [ ] **DASH-05**: 결재 승인/반려/상신/회수 mutation 성공 시 대시보드 쿼리가 자동 무효화되어 카운트·목록이 실시간 갱신된다 (TanStack Query `invalidateQueries(['dashboard'])`)
+- [x] **DASH-05
+**: 결재 승인/반려/상신/회수 mutation 성공 시 대시보드 쿼리가 자동 무효화되어 카운트·목록이 실시간 갱신된다 (TanStack Query `invalidateQueries(['dashboard'])`)
 
 ### 양식 확장 (FORM)
 
