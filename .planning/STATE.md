@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 31-05-PLAN.md
-last_updated: "2026-04-24T00:03:42.036Z"
+stopped_at: Completed 31-04-PLAN.md
+last_updated: "2026-04-24T00:11:19Z"
 last_activity: 2026-04-24
 progress:
   total_phases: 8
@@ -70,6 +70,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 31 P31-02 | 8 min | 3 tasks tasks | 4 files files |
 | Phase 31 P31-03 | 6 min | 3 tasks tasks | 3 files files |
 | Phase 31 P31-05 | 172 | 3 tasks | 5 files |
+| Phase 31 P31-04 | 5 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,10 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 31-05] D-B3 4 mutation 훅 (useApprove/useReject/useSubmitDocument/useWithdrawDocument) onSuccess 에 ['dashboard'] prefix invalidate 추가 — Plan 03 단일 useDashboardSummary (queryKey ['dashboard','summary']) 와 prefix match 로 페이지 이동 없이 실시간 갱신 완성
 - [Phase 31-05] D-B3 scope 외 4 훅 (useCreate/useUpdate/useDelete/useRewrite) 미변경 — DRAFT 단계 작업으로 대시보드 4카드 (pending/submitted/completed/rejected) 영향 zero. spy test 가 'useCreateDocument 는 dashboard invalidate 하지 않음' 케이스로 scope 경계 regression 방어
 - [Phase 31-05] FE invalidate spy 테스트 패턴 확립 — vi.spyOn(queryClient, 'invalidateQueries') + renderHook + QueryClientProvider wrapper. 향후 mutation 훅 수정 시 invalidate 누락/추가 자동 검증 가능
+- [Phase 31-04] DashboardPage drafts 카드 제거 + 4 카드 (Clock/Hourglass/CheckCircle2/XCircle, blue/gray/green/red-500) + grid lg:grid-cols-4 — D-A1/A3/C3/C4 동시 처리. role-based statusPath helper inline (USER → /documents/my, ADMIN/SUPER_ADMIN → /documents?tab=search) D-A8 적용
+- [Phase 31-04] ErrorState 공통 컴포넌트 — variant card/list 분기, refetchQueries(['dashboard']) (invalidate 가 아닌 즉시 네트워크 호출), AlertTriangle + role=alert/aria-live + aria-busy + Loader2 spinner. CountCard isError prop + focus-visible:ring-2 + aria-label 패턴 (UI-SPEC §9.1, §9.4)
+- [Phase 31-04] PendingList/RecentDocumentsList props-based 리팩터로 Plan 03 SUMMARY 의 'Known Consuming-Side Errors' (TS2305 4건) 해소 — useDashboardSummary 단일 훅 호출 → DashboardPage 가 recentPending/recentDocuments 평평한 배열을 props drill. data.content.length → data.length 변경
+- [Phase 31-04] vitest 6/6 (DashboardPage 3 + ErrorState 3) green, tsc --noEmit PASS, vite build PASS — Phase 31 의 모든 코드 작업 완료. Human UAT 만 남음
 
 ### Pending Todos
 
@@ -121,8 +126,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-24T00:03:42.033Z
-Stopped at: Completed 31-05-PLAN.md
+Last session: 2026-04-24T00:11:19Z
+Stopped at: Completed 31-04-PLAN.md
 Resume file: None
 
 **Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z
