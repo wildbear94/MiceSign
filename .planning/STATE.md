@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
-status: executing
-stopped_at: Completed 32-04-PLAN.md
-last_updated: "2026-04-25T14:36:08.219Z"
+status: verifying
+stopped_at: Completed 32-05-PLAN.md
+last_updated: "2026-04-25T14:40:03.893Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 8
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 Phase: 30 (where) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-25
 
 Progress: [░░░░░░░░░░] 0%
@@ -76,6 +76,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 32 P32-02 | 1m 19s | 1 tasks | 1 files |
 | Phase 32 P32-03 | 1m 28s | 1 task tasks | 1 file files |
 | Phase 32 P32-04 | 0m 43s | 1 tasks | 1 files |
+| Phase 32 P32-05 | 1m 16s | 1 tasks tasks | 1 files files |
 
 ## Accumulated Context
 
@@ -128,6 +129,8 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 32-03] lucide-react Users + FileSignature 표준 export 확정 (RESEARCH Open Question 2 해소) — dist/lucide-react.d.ts grep 으로 export {} 블록 직접 확인. fallback (FilePenLine/ClipboardCheck) 미사용
 - [Phase 32-03] grid-cols-2 / max-w-3xl / max-h-[80vh] 무수정 (D-C3) + presets/index.ts localeCompare sort 무수정 (D-C4) — 6 카드 = 3행×2열 자동 스크롤, 알파벳 정렬 자동 (expense→leave→meeting→proposal→purchase→trip). 신규 코드/sortOrder 도입 0건
 - Phase 32 Plan 04: ko/admin.json 의 4 신규 i18n 키 (presetMeetingName/Desc, presetProposalName/Desc) 추가 — PresetGallery I18N_MAP 와 1:1 매칭, en/admin.json 무수정 (D-E2 한국어 only)
+- [Phase 32-05] presets.test.ts 9 단언 게이트 (length=6/keys=6entry+meeting 5 fields+proposal 4 fields/preserve 5) — Wave 1 의도된 fail 일괄 해소, vitest+tsc+build 모두 PASS
+- [Phase 32-05] 신규 단언 형식 = 기존 preset-specific 단언 100% mimicking (find!+toHaveLength+map(f=>f.id)+toEqual) — 향후 preset 추가 시 동일 답습 패턴 확립
 
 ### Pending Todos
 
@@ -141,8 +144,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-25T14:36:08.216Z
-Stopped at: Completed 32-04-PLAN.md
+Last session: 2026-04-25T14:40:03.890Z
+Stopped at: Completed 32-05-PLAN.md
 Resume file: None
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
