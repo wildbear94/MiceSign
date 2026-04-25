@@ -6,6 +6,8 @@ import {
   CalendarDays,
   Plane,
   ShoppingCart,
+  Users,
+  FileSignature,
   LayoutTemplate,
   type LucideIcon,
 } from 'lucide-react';
@@ -30,6 +32,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
   leave: CalendarDays,
   trip: Plane,
   purchase: ShoppingCart,
+  meeting: Users,
+  proposal: FileSignature,
 };
 
 /** Map preset `key` (filename stem) to an i18n name/desc pair. */
@@ -38,6 +42,8 @@ const I18N_MAP: Record<string, { nameKey: string; descKey: string }> = {
   leave: { nameKey: 'templates.presetLeaveName', descKey: 'templates.presetLeaveDesc' },
   trip: { nameKey: 'templates.presetTripName', descKey: 'templates.presetTripDesc' },
   purchase: { nameKey: 'templates.presetPurchaseName', descKey: 'templates.presetPurchaseDesc' },
+  meeting: { nameKey: 'templates.presetMeetingName', descKey: 'templates.presetMeetingDesc' },
+  proposal: { nameKey: 'templates.presetProposalName', descKey: 'templates.presetProposalDesc' },
 };
 
 export default function PresetGallery({ open, onClose, onSelect }: PresetGalleryProps) {
