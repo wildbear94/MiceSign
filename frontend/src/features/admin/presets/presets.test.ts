@@ -3,13 +3,20 @@ import { presets } from './index';
 import { templateImportSchema } from '../validations/templateImportSchema';
 
 describe('presets', () => {
-  it('contains exactly 4 presets', () => {
-    expect(presets).toHaveLength(4);
+  it('contains exactly 6 presets', () => {
+    expect(presets).toHaveLength(6);
   });
 
   it('has expected keys', () => {
     const keys = presets.map((p) => p.key).sort();
-    expect(keys).toEqual(['expense', 'leave', 'purchase', 'trip']);
+    expect(keys).toEqual([
+      'expense',
+      'leave',
+      'meeting',
+      'proposal',
+      'purchase',
+      'trip',
+    ]);
   });
 
   it('each preset passes templateImportSchema', () => {
@@ -36,6 +43,20 @@ describe('presets', () => {
     const purchase = presets.find((p) => p.key === 'purchase')!;
     const hasTable = purchase.data.schemaDefinition.fields.some((f) => f.type === 'table');
     expect(hasTable).toBe(true);
+  });
+
+  it('meeting preset has 5 fields', () => {
+    const meeting = presets.find((p) => p.key === 'meeting')!;
+    expect(meeting.data.schemaDefinition.fields).toHaveLength(5);
+    const ids = meeting.data.schemaDefinition.fields.map((f) => f.id);
+    expect(ids).toEqual(['title', 'meetingDate', 'attendees', 'agenda', 'decisions']);
+  });
+
+  it('proposal preset has 4 fields', () => {
+    const proposal = presets.find((p) => p.key === 'proposal')!;
+    expect(proposal.data.schemaDefinition.fields).toHaveLength(4);
+    const ids = proposal.data.schemaDefinition.fields.map((f) => f.id);
+    expect(ids).toEqual(['title', 'background', 'proposal', 'expectedEffect']);
   });
 
   it('all preset names are Korean', () => {
