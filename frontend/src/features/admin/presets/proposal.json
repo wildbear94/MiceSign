@@ -1,0 +1,38 @@
+{
+  "exportFormatVersion": 1,
+  "schemaVersion": 1,
+  "name": "품의서",
+  "description": "품의 배경·제안 내용·예상 효과를 정리합니다",
+  "prefix": "PRP",
+  "category": "general",
+  "icon": "FileSignature",
+  "schemaDefinition": {
+    "version": 1,
+    "fields": [
+      { "id": "title", "type": "text", "label": "제목", "required": true },
+      {
+        "id": "background",
+        "type": "textarea",
+        "label": "품의 배경",
+        "required": true,
+        "config": { "maxLength": 2000, "placeholder": "예: 현재 시스템의 한계와 개선 필요성을 기술" }
+      },
+      {
+        "id": "proposal",
+        "type": "textarea",
+        "label": "제안 내용",
+        "required": true,
+        "config": { "maxLength": 2000, "placeholder": "구체적인 제안 사항을 기술" }
+      },
+      {
+        "id": "expectedEffect",
+        "type": "textarea",
+        "label": "예상 효과",
+        "required": true,
+        "config": { "maxLength": 2000, "placeholder": "정성적·정량적 기대 효과를 기술" }
+      }
+    ],
+    "conditionalRules": [],
+    "calculationRules": []
+  }
+}
