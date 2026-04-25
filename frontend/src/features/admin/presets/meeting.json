@@ -1,0 +1,70 @@
+{
+  "exportFormatVersion": 1,
+  "schemaVersion": 1,
+  "name": "회의록",
+  "description": "회의 일시·참석자·안건·결정사항을 구조화하여 기록합니다",
+  "prefix": "MTG",
+  "category": "general",
+  "icon": "Users",
+  "schemaDefinition": {
+    "version": 1,
+    "fields": [
+      { "id": "title", "type": "text", "label": "제목", "required": true },
+      { "id": "meetingDate", "type": "date", "label": "회의 일시", "required": true },
+      {
+        "id": "attendees",
+        "type": "table",
+        "label": "참석자",
+        "required": true,
+        "config": {
+          "columns": [
+            { "id": "name", "type": "text", "label": "이름", "required": true },
+            {
+              "id": "affiliation",
+              "type": "text",
+              "label": "소속",
+              "required": true,
+              "config": { "placeholder": "예: 개발팀, 영업팀" }
+            },
+            { "id": "role", "type": "text", "label": "역할" }
+          ],
+          "minRows": 1,
+          "maxRows": 20
+        }
+      },
+      {
+        "id": "agenda",
+        "type": "table",
+        "label": "안건",
+        "required": true,
+        "config": {
+          "columns": [
+            { "id": "number", "type": "number", "label": "번호", "required": true },
+            { "id": "title", "type": "text", "label": "안건명", "required": true },
+            { "id": "description", "type": "textarea", "label": "설명" }
+          ],
+          "minRows": 1,
+          "maxRows": 20
+        }
+      },
+      {
+        "id": "decisions",
+        "type": "table",
+        "label": "결정사항",
+        "required": true,
+        "config": {
+          "columns": [
+            { "id": "topic", "type": "text", "label": "주제", "required": true },
+            { "id": "decision", "type": "text", "label": "결정", "required": true },
+            { "id": "owner", "type": "text", "label": "담당자" },
+            { "id": "dueDate", "type": "date", "label": "기한" }
+          ],
+          "minRows": 1,
+          "maxRows": 20
+        }
+      }
+    ],
+    "conditionalRules": [],
+    "calculationRules": []
+  }
+}
