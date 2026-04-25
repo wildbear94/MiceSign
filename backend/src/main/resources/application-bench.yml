@@ -1,0 +1,35 @@
+# ============================================
+# Phase 30 Benchmark Profile
+# ============================================
+# 사용법:
+#   ./gradlew bootRun --args='--spring.profiles.active=bench'
+#
+# 목적: SearchBenchmarkSeeder 실행 — 100 users + 10K documents + approval_lines seed
+# (SRCH-06 / NFR-01 실측 검증용).
+#
+# 주의:
+# - 운영 DB 에 실행되면 10K 쓰레기 데이터 주입됨. dev 환경 전용 (T-30-10).
+# - cleanup() 이 baseUserId(1000) 이상 ID 만 삭제하므로 V2 seed (id 1-20) 안전.
+# - seed 완료 후 ConfigurableApplicationContext.close() 로 자동 종료.
+
+spring:
+  config:
+    activate:
+      on-profile: bench
+
+  # JPA batch insert 활성화 (JdbcTemplate 사용하지만 안전망)
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+
+# Bench seed 파라미터
+bench:
+  user-count: 100                       # round-robin drafter 수
+  document-count: 10000                 # 문서 총량
+  approval-lines-per-submitted: 3       # 비-DRAFT 문서당 approval_line 행 수
+  batch-size: 100                       # 진행 로그 출력 단위
+  base-user-id: 1000                    # V2 seed (1-20) 회피
