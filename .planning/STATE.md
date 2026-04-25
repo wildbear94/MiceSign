@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Phase 32 context gathered
-last_updated: "2026-04-25T08:00:37.439Z"
-last_activity: 2026-04-25 -- Phase 30 execution started
+stopped_at: Completed 32-01-PLAN.md
+last_updated: "2026-04-25T14:22:16.377Z"
+last_activity: 2026-04-25
 progress:
   total_phases: 8
   completed_phases: 0
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 30 (where) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 30
-Last activity: 2026-04-25 -- Phase 30 execution started
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-25
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -72,6 +72,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 31 P31-03 | 6 min | 3 tasks tasks | 3 files files |
 | Phase 31 P31-05 | 172 | 3 tasks | 5 files |
 | Phase 31 P31-04 | 5 min | 3 tasks | 7 files |
+| Phase 32 P32-01 | 1m 26s | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 31-04] ErrorState 공통 컴포넌트 — variant card/list 분기, refetchQueries(['dashboard']) (invalidate 가 아닌 즉시 네트워크 호출), AlertTriangle + role=alert/aria-live + aria-busy + Loader2 spinner. CountCard isError prop + focus-visible:ring-2 + aria-label 패턴 (UI-SPEC §9.1, §9.4)
 - [Phase 31-04] PendingList/RecentDocumentsList props-based 리팩터로 Plan 03 SUMMARY 의 'Known Consuming-Side Errors' (TS2305 4건) 해소 — useDashboardSummary 단일 훅 호출 → DashboardPage 가 recentPending/recentDocuments 평평한 배열을 props drill. data.content.length → data.length 변경
 - [Phase 31-04] vitest 6/6 (DashboardPage 3 + ErrorState 3) green, tsc --noEmit PASS, vite build PASS — Phase 31 의 모든 코드 작업 완료. Human UAT 만 남음
+- [Phase 32-01] meeting.json prefix=MTG / category=general / icon=Users (D-A2/A3/A4) — 신규 카테고리 키 도입 안 함, lucide-react 표준 export 사용
+- [Phase 32-01] agenda.columns[1].id='title' 옵션 A 채택 — DynamicTableField path namespace 분리 보장 (T-32-02 mitigation), 향후 calculationRule 도입 시 옵션 B (subject rename) 재고
+- [Phase 32-01] presets.test.ts length=4/keys=[4] 단언 일시 fail 은 의도된 게이트 — Plan 05 에서 length=6 + keys=[6] 동시 업데이트 예정. 핵심 단언 (Zod .strict() 통과, 한국어 이름) 모두 PASS
 
 ### Pending Todos
 
@@ -127,8 +131,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: --stopped-at
-Stopped at: Phase 32 context gathered
-Resume file: --resume-file
+Last session: 2026-04-25T14:22:11.836Z
+Stopped at: Completed 32-01-PLAN.md
+Resume file: None
 
-**Planned Phase:** 31 (대시보드 고도화) — 6 plans — 2026-04-23T21:51:49.488Z
+**Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
