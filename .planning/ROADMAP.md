@@ -303,7 +303,7 @@ Plans:
 Plans:
 - [ ] 32-01-PLAN.md — meeting.json 작성 + Zod 통과 (Wave 1, FORM-01)
 - [ ] 32-02-PLAN.md — proposal.json 작성 + Zod 통과 (Wave 1, FORM-02)
-- [ ] 32-03-PLAN.md — PresetGallery ICON_MAP/I18N_MAP 4 entry 추가 (Wave 2, FORM-01/02)
+- [x] 32-03-PLAN.md — PresetGallery ICON_MAP/I18N_MAP 4 entry 추가 (Wave 2, FORM-01/02)
 - [ ] 32-04-PLAN.md — ko/admin.json 4 신규 i18n 키 추가 (Wave 2, FORM-01/02)
 - [ ] 32-05-PLAN.md — presets.test.ts length=6 + meeting/proposal 신규 단언 (Wave 2, FORM-01/02)
 - [ ] 32-06-PLAN.md — 통합 검증 (vitest+build+tsc) + 32-HUMAN-UAT.md (Wave 3, autonomous=false)

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 32-02-PLAN.md
-last_updated: "2026-04-25T14:27:00.994Z"
+stopped_at: Completed 32-03-PLAN.md
+last_updated: "2026-04-25T14:32:02.399Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 8
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 30 (where) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-04-25
 
@@ -74,6 +74,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 31 P31-04 | 5 min | 3 tasks | 7 files |
 | Phase 32 P32-01 | 1m 26s | 1 tasks | 1 files |
 | Phase 32 P32-02 | 1m 19s | 1 tasks | 1 files |
+| Phase 32 P32-03 | 1m 28s | 1 task tasks | 1 file files |
 
 ## Accumulated Context
 
@@ -122,6 +123,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 32-02] proposal.json prefix=PRP / category=general / icon=FileSignature (D-B2/B3/B4) — 4 fields (title text + 3 textarea config.maxLength=2000), 첨부 필드 schema 미포함 (D-B6) per document_attachment 위임
 - [Phase 32-02] textarea config.placeholder Discretion 적용 (3 textarea 각각 한국어 가이드 텍스트) — UX 가이드로 작성자 인지 부담 감소, fieldConfigSchema 가 placeholder optional 허용
 - [Phase 32-02] Wave 1 peer 무충돌 검증 — 32-01 (meeting.json) + 32-02 (proposal.json) 둘 다 신규 파일 추가, 동일 파일 수정 0건. presets.test.ts length/keys 단언 일시 fail 은 Plan 05 일괄 해소 예정 (Plan 01 과 동일 게이트)
+- [Phase 32-03] PresetGallery.tsx 의 3 위치 (import/ICON_MAP/I18N_MAP) 동시 atomic 수정 — 단일 파일 6 줄 추가, 단일 commit. 분할 시 중간 상태 (ICON_MAP entry 추가 후 lucide import 미추가) 가 컴파일 실패로 노출 — bisect 안전성 보장
+- [Phase 32-03] lucide-react Users + FileSignature 표준 export 확정 (RESEARCH Open Question 2 해소) — dist/lucide-react.d.ts grep 으로 export {} 블록 직접 확인. fallback (FilePenLine/ClipboardCheck) 미사용
+- [Phase 32-03] grid-cols-2 / max-w-3xl / max-h-[80vh] 무수정 (D-C3) + presets/index.ts localeCompare sort 무수정 (D-C4) — 6 카드 = 3행×2열 자동 스크롤, 알파벳 정렬 자동 (expense→leave→meeting→proposal→purchase→trip). 신규 코드/sortOrder 도입 0건
 
 ### Pending Todos
 
@@ -135,8 +139,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-25T14:27:00.991Z
-Stopped at: Completed 32-02-PLAN.md
+Last session: 2026-04-25T14:32:02.396Z
+Stopped at: Completed 32-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
