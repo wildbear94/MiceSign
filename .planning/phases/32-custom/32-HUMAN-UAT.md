@@ -1,10 +1,10 @@
 ---
 phase: 32-custom
 type: human-uat
-status: pending
+status: complete
 created: 2026-04-25
-tester: (사용자 기입)
-tested_at: ""
+tester: park sang young
+tested_at: 2026-04-26
 requirements:
   - FORM-01
   - FORM-02
@@ -154,12 +154,12 @@ threat_refs:
 
 ## Sign-Off
 
-- [ ] 모든 항목 통과 (실패 항목 없음 또는 별도 이슈 기록)
-- [ ] 검증자: ______________________
-- [ ] 검증일: ______________________
-- [ ] 결과: pass / fail (특정 항목 명시: ______________________)
-- [ ] T-32-02 검증 결론: 옵션 A 확정 / 옵션 B 전환 필요 (택1)
-- [ ] 발견된 이슈: (있으면 이슈 트래커에 기록 + 본 phase 의 SUMMARY.md 반영)
+- [x] 모든 항목 통과 (실패 항목 없음 또는 별도 이슈 기록)
+- [x] 검증자: park sang young
+- [x] 검증일: 2026-04-26
+- [x] 결과: **pass**
+- [x] T-32-02 검증 결론: **옵션 A 확정** (DynamicTableField namespace 격리로 root title vs agenda.title 충돌 없음)
+- [x] 발견된 이슈: 없음
 
 ---
 
