@@ -94,7 +94,7 @@
 ### v1.2 phases
 
 - [x] **Phase 29: SMTP 이메일 알림 인프라 (Retrofit)** - EmailService 스텁을 실 JavaMailSender 발송으로 전환하고 PENDING-first 로깅 + @Retryable 격리 + 5종 Thymeleaf 템플릿으로 5개 결재 이벤트 알림 완성 (completed 2026-04-23)
-- [ ] **Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장** - FSD FN-SEARCH-001 권한 predicate(보안 수정) + drafterId 필터 + URL query 동기화 페이지네이션 구현
+- [x] **Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장** - FSD FN-SEARCH-001 권한 predicate(보안 수정) + drafterId 필터 + URL query 동기화 페이지네이션 구현 (completed 2026-04-27)
 - [x] **Phase 31: 대시보드 고도화** - 4번째 "진행 중" 카운트 카드 노출 + 결재 mutation 후 invalidateQueries 로 실시간 갱신 + 로딩/빈 상태 UI (completed 2026-04-24)
 - [ ] **Phase 32: CUSTOM 프리셋 확장** - v1.1 빌더 기반 회의록/품의서 JSON 프리셋 2종 추가 (하드코딩 컴포넌트 없이)
 - [ ] **Phase 33: E2E 검증 + 운영 전환** - MailHog→운영 SMTP 런북, 검색 10K/50-user 1초 NFR 실측, 통합 회귀 테스트 (선택적 wrap-up)
@@ -262,13 +262,13 @@ Plans:
   3. 사용자가 키워드 + 상태(복수 선택) + 양식(단일) + 기간(시작일~종료일) + 기안자(드롭다운) 를 조합해 검색하고, 현재 필터·페이지가 URL query string 에 반영되어 링크 공유로 동일 결과를 재현할 수 있다
   4. 10,000 개 문서 seed + 50 동시 사용자 부하에서 95p 응답 시간 ≤ 1초 (EXPLAIN 기반 인덱스 사용 확인, `countDistinct` 로 페이지 총개수 정확)
   5. 페이지 크기 20 의 offset 페이지네이션이 동작하며, 결과 행의 `totalElements` 가 실제 접근 가능 문서 수와 일치한다 (JOIN 중복 inflate 없음)
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 Plans:
-- [ ] 30-01-PLAN.md — DocumentSearchCondition 개편 + Controller 시그니처 + enum 변환 + GlobalExceptionHandler (PR1)
-- [ ] 30-02-PLAN.md — QueryDSL 권한 predicate + DRAFT gate + countDistinct + 28-case 매트릭스 테스트 (PR1)
-- [ ] 30-03-PLAN.md — /users/search 엔드포인트 신설 + drafterId 필터 회귀 (PR2)
-- [ ] 30-04-PLAN.md — 프론트 axios paramsSerializer + DocumentListPage useSearchParams + DrafterCombo/StatusFilterPills (PR2)
-- [ ] 30-05-PLAN.md — 10K seed + ab 벤치 + EXPLAIN + URL 공유 UAT (PR2)
+- [x] 30-01-PLAN.md — DocumentSearchCondition 개편 + Controller 시그니처 + enum 변환 + GlobalExceptionHandler (PR1)
+- [x] 30-02-PLAN.md — QueryDSL 권한 predicate + DRAFT gate + countDistinct + 28-case 매트릭스 테스트 (PR1)
+- [x] 30-03-PLAN.md — /users/search 엔드포인트 신설 + drafterId 필터 회귀 (PR2)
+- [x] 30-04-PLAN.md — 프론트 axios paramsSerializer + DocumentListPage useSearchParams + DrafterCombo/StatusFilterPills (PR2)
+- [x] 30-05-PLAN.md — 10K seed + ab 벤치 + EXPLAIN + URL 공유 UAT (PR2)
 **UI hint**: yes
 
 ### Phase 31: 대시보드 고도화
@@ -347,7 +347,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33
 | 27. v1.1 검증 위생 보강 (gap closure) | v1.1 | 3/3 | Complete   | 2026-04-14 |
 | 28. v1.1 Nyquist validation 사후 보강 (gap closure) | v1.1 | 2/2 | Complete    | 2026-04-14 |
 | 29. SMTP 이메일 알림 인프라 (Retrofit) | v1.2 | 5/5 | Complete    | 2026-04-23 |
-| 30. 검색 권한 WHERE 절 보안 수정 + 필터 확장 | v1.2 | 0/TBD | Not started | — |
+| 30. 검색 권한 WHERE 절 보안 수정 + 필터 확장 | v1.2 | 5/5 | Complete    | 2026-04-27 |
 | 31. 대시보드 고도화 | v1.2 | 6/6 | Complete    | 2026-04-24 |
 | 32. CUSTOM 프리셋 확장 | v1.2 | 0/TBD | Not started | — |
 | 33. E2E 검증 + 운영 전환 | v1.2 | 0/TBD | Not started | — |
