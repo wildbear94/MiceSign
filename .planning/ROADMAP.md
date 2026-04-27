@@ -318,7 +318,14 @@ Plans:
   1. MailHog 개발 환경에서 5종 이벤트(상신/중간 승인/최종 승인/반려/회수) 이메일이 각각 1통씩 정확히 도착하고, 운영 SMTP 전환 런북(`MAIL_HOST/MAIL_PORT/MAIL_USERNAME/MAIL_PASSWORD` 체크리스트 + `app.base-url` 검증)이 문서화된다
   2. 10,000 문서 seed + 50 동시 사용자 부하 테스트에서 `/api/v1/documents/search` 95p ≤ 1초가 실측 통과하고 측정 리포트가 `.planning/milestones/v1.2/` 에 기록된다
   3. 결재 승인·반려 직후 대시보드 `invalidateQueries` 가 실시간으로 반영되며, `audit_log` 에 각 action 당 정확히 1개 row 가 존재한다 (SMTP 리스너로 인한 중복 없음)
-**Plans**: TBD
+**Plans:** 5 plans
+Plans:
+- [ ] 33-01-PLAN.md — 보안 보강: application-prod.yml 자격증명 위생 + .env.production 카탈로그 + .gitignore 차단 (D-C1, Wave 1)
+- [ ] 33-02-PLAN.md — 운영 SMTP 전환 런북 (.planning/milestones/v1.2/SMTP-RUNBOOK.md — 사내 IT 협업 + systemd EnvironmentFile + 5종 smoke + 트러블슈팅, D-M1/M2/M3, Wave 2)
+- [ ] 33-03-PLAN.md — NFR-01 운영 모니터링 게이트 (.planning/milestones/v1.2/MONITORING.md — slow_query_log + 3 신호 + Plan 30-05 인프라 재활용 절차, D-S2, Wave 2)
+- [ ] 33-04-PLAN.md — v1.2-MILESTONE-AUDIT (.planning/milestones/v1.2/AUDIT.md — SC 매트릭스 + Deferred 추적 + Requirements 매핑 + 9 출시 게이트 + 5종 smoke 사용자 sign-off, D-A1, Wave 3)
+- [ ] 33-05-PLAN.md — Phase 33 종결 verification + ROADMAP/STATE/VALIDATION 갱신 + v1.2 archive 시점 결정 (Wave 4)
+**Note**: 본 phase 는 사용자 결정 D-S1 (CONTEXT.md) 에 따라 축소 scope — NFR-01 합성 부하 실측은 운영 모니터링 게이트로 이관 (`.planning/milestones/v1.2/MONITORING.md` §3 + AUDIT.md §2-A)
 **UI hint**: no
 
 ## Progress
