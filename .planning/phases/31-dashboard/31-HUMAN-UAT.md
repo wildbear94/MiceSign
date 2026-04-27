@@ -1,9 +1,11 @@
 ---
 phase: 31-dashboard
 document: HUMAN-UAT
-status: pending
-tester: (사용자 기입)
-tested_at: ""
+status: complete
+tester: park sang young
+tested_at: "2026-04-25"
+superseded_by: 31-UAT.md
+note: "본 체크리스트는 정적 markdown 형태이며, 실제 검증은 conversational UAT (31-UAT.md, 14/14 PASS, 2026-04-25 sign-off) 에서 완료됨. 31-VERIFICATION.md 의 human_verification 5 항목 모두 31-UAT.md Test 1-3, 7-10, 11-13 로 cross-check 통과. 메타데이터 정합성을 위해 2026-04-28 status 를 complete 로 갱신."
 ---
 
 # Phase 31 — Human UAT Checklist

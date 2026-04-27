@@ -1,9 +1,11 @@
 ---
 phase: 31-dashboard
 verified: 2026-04-24T09:38:30Z
-status: human_needed
-score: 4/4 must-haves verified (자동 검증 가능 범위 100%)
+status: passed
+score: 4/4 must-haves verified — human_verification 5/5 cross-checked via 31-UAT.md (14/14 PASS, 2026-04-25)
 overrides_applied: 0
+human_uat_resolved: 2026-04-28
+human_uat_resolution: "human_verification 5 항목 모두 31-UAT.md 의 14 conversational tests 로 cross-check 완료 — VERIFICATION #1 ↔ UAT Test 1, #2 ↔ Test 2, #3 ↔ Test 3, #4 ↔ Test 7-10, #5 ↔ Test 11-13. 31-UAT.md status: complete (14/14 pass, 0 issues, sign-off 2026-04-25 by park sang young)."
 human_verification:
   - test: "USER 로 로그인 → 대시보드 4 카드 (결재 대기/진행 중/승인 완료/반려) 가시성 확인"
     expected: "4개 카드 좌→우 순서, 본인 기안 기준 카운트, drafts 카드 비노출, '승인 완료' 라벨 (not '완료')"
