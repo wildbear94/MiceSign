@@ -254,4 +254,183 @@ ROADMAP.md 의 Phase 29-32 Success Criteria 원문을 그대로 옮겨 분류.
 
 **판독:** v1.2 의 모든 요구사항 ID 가 단일 표에서 검증 경로 추적 가능. Deferred 2건은 §2-A 의 후속 게이트로 보존 + NFR-03 1건은 §G6 SQL 스팟으로 자동 회귀 보강. 출시 게이트 결정에 누락된 요구사항 zero.
 
+---
+
+## §4. 출시 게이트 체크리스트
+
+아래 모든 항목 PASS 시 v1.2 운영 출시 가능. 하나라도 FAIL 또는 미확인 시 보류 + 원인 해소 후 재실행. 각 항목 좌측 체크박스는 출시 담당자가 수동으로 채움. 본 plan 의 Task 4 (수동 5종 smoke 체크포인트) 가 §G5 + §G6 를 PASS 마크.
+
+총 9개 게이트 그룹 (G1-G9), 30+ 검증 항목.
+
+### G1. DB 마이그레이션 적용 검증
+
+- [ ] **G1.1** Flyway 가 V1~V19 마이그레이션을 모두 success 로 기록함
+  - 검증: `mysql -u$DB_USER -p$DB_PASS $DB_NAME -e "SELECT version, description, success FROM flyway_schema_history ORDER BY installed_rank;"`
+  - 기대: 18 rows (V1-V6, V8-V19 — V7 결번), 모두 `success=1`
+  - 마지막 row 의 `version=19` (V19 = `add_notification_dedup_unique`, NOTIF-04 unique constraint)
+- [ ] **G1.2** charset / collation = utf8mb4 / utf8mb4_unicode_ci
+  - 검증: `mysql -u$DB_USER -p$DB_PASS -e "SELECT default_character_set_name, default_collation_name FROM information_schema.schemata WHERE schema_name = '$DB_NAME';"`
+  - 기대: `utf8mb4 / utf8mb4_unicode_ci` (한글 본문 / subject UTF-8 보존의 전제)
+
+### G2. 환경변수 + 자격증명 위생 (Phase 33 D-C1)
+
+- [ ] **G2.1** `application-prod.yml` 의 username/password 가 모두 빈 default (`${DB_USER:}` / `${DB_PASS:}`)
+  - 검증: `grep -E '\$\{DB_(USER|PASS):' backend/src/main/resources/application-prod.yml | grep -E ':\}$'`
+  - 기대: 2 줄 출력 (`DB_USER:}` + `DB_PASS:}`). hardcoded default 값이 있으면 git history secret 노출 위험 — Phase 33-01 commit `12fc094` 누락
+- [ ] **G2.2** `/etc/micesign/.env.production` 권한 = 600, owner = micesign:micesign
+  - 검증 (운영 서버): `stat -c '%a %U:%G' /etc/micesign/.env.production`
+  - 기대: `600 micesign:micesign`
+  - SMTP-RUNBOOK §2.2 절차로 보정 가능
+- [ ] **G2.3** systemd unit 의 `EnvironmentFile=/etc/micesign/.env.production` 설정 + daemon-reload 완료
+  - 검증: `sudo systemctl show micesign.service -p EnvironmentFiles | grep .env.production`
+  - 기대: `EnvironmentFiles=/etc/micesign/.env.production (ignore_errors=no)`
+  - SMTP-RUNBOOK §3.3 절차로 보정
+
+### G3. SMTP 운영 연결 (Phase 33 D-M1)
+
+- [ ] **G3.1** `MAIL_HOST` / `MAIL_PORT` 가 `.env.production` 에 채워짐 (빈 값 → JavaMailSender bean 생성 skip + stub fallback)
+  - 검증 (운영 서버): `sudo grep -E '^MAIL_(HOST|PORT)=' /etc/micesign/.env.production` (값 노출 안 되도록 운영자 직접 확인)
+- [ ] **G3.2** 사내 IT 가 운영 서버 IP 를 SMTP allowlist 에 추가 + From 도메인 승인 (SMTP-RUNBOOK §1.1 4 항목 회신 완료)
+  - 검증: 사내 IT 측 회신 메일 또는 협의 기록
+- [ ] **G3.3** 운영 서버에서 `telnet $MAIL_HOST $MAIL_PORT` 핸드셰이크 PASS (SMTP banner `220 ... ESMTP ...` 출력)
+  - 검증: SMTP-RUNBOOK §4.3 절차 (`telnet` 또는 `nc -zv` 또는 `openssl s_client -starttls smtp`)
+  - 도달 불가 시 §G3.2 의 IT 협의로 회귀
+
+### G4. BaseUrlGuard startup 검증 (Phase 29 D-D2)
+
+- [ ] **G4.1** `APP_BASE_URL` 이 사내 실 도메인 (`https://micesign.사내도메인` 형식, localhost / 127.0.0.1 미포함)
+  - 검증: `sudo grep '^APP_BASE_URL=' /etc/micesign/.env.production`
+  - 기대: `localhost` / `127.0.0.1` / 빈 값 zero
+- [ ] **G4.2** `sudo systemctl restart micesign` 후 `journalctl -u micesign | grep BaseUrlGuard` 가 PASS 로그 + IllegalStateException 부재
+  - 검증 (게이트 1): `sudo journalctl -u micesign -n 500 --no-pager | grep -E 'BaseUrlGuard|app\.base-url'` — 1줄 이상 출력
+  - 검증 (게이트 2): 위 출력의 어떤 라인에도 `localhost` 미포함 (`grep -v localhost` 가 모두 살아남음)
+  - 추가: `HikariPool-1 - Start completed` 로그 존재 (DB 연결 성공)
+  - SMTP-RUNBOOK §4.2 + §6.1 트러블슈팅 참조
+
+### G5. 5종 이벤트 수동 smoke (Phase 33 D-M3 — 본 plan Task 4 에서 수동 sign-off)
+
+상세 절차: `SMTP-RUNBOOK.md` §5.1-5.2
+
+- [ ] **G5.1** 시나리오 1 (상신, DRAFT → SUBMITTED) — `[MiceSign]` prefix + 한글 subject UTF-8 + 본문 정상 + "문서 바로가기" 버튼 동작 + From 도메인 §1 IT 승인
+- [ ] **G5.2** 시나리오 2 (중간 승인, step N → step N+1) — 동일 5 항목
+- [ ] **G5.3** 시나리오 3 (최종 승인, last step → APPROVED) — 동일 5 항목 + 본문에 "최종 승인" 또는 등가 한글 표현
+- [ ] **G5.4** 시나리오 4 (반려, any step → REJECTED) — 동일 5 항목 + 반려 사유 표시
+- [ ] **G5.5** 시나리오 5 (회수, SUBMITTED → WITHDRAWN) — 동일 5 항목
+
+검증 환경: 운영 SMTP (출시 직전) 또는 MailHog (개발 환경 사전 검증). MailHog UI = `http://localhost:8025`.
+
+### G6. audit_log SQL 스팟 검증 (Phase 33 NFR-03 출시 전 보강)
+
+상세 SQL: `SMTP-RUNBOOK.md` §5.3-5.4
+
+- [ ] **G6.1** §G5 5 시나리오 각 문서별 `audit_log` COUNT=1 per action_type 확인
+  ```sql
+  SELECT action_type, COUNT(*) AS cnt
+  FROM audit_log
+  WHERE document_id = ?    -- 시나리오 별 문서 ID 치환
+  GROUP BY action_type
+  ORDER BY action_type;
+  ```
+  - 기대: 모든 action_type 의 `cnt = 1` (SMTP listener 의 중복 INSERT 부재 — Phase 29 D-D6 자동 회귀의 manual confirmation)
+  - `cnt >= 2` 발견 시 즉시 출시 보류 + Phase 29 D-D6 회귀 조사 (`./gradlew test --tests com.micesign.approval.ApprovalServiceAuditTest`)
+- [ ] **G6.2** §G5 5 시나리오 각 문서별 `notification_log` status=SUCCESS, cnt=1 확인 (NOTIF-04 dedup unique constraint 회귀 검증)
+  ```sql
+  SELECT event_type, recipient_id, status, COUNT(*) AS cnt
+  FROM notification_log
+  WHERE document_id = ?
+  GROUP BY event_type, recipient_id, status
+  ORDER BY event_type, recipient_id;
+  ```
+  - 기대: 모든 행 `status = SUCCESS`, 각 (event_type, recipient_id) 조합 `cnt = 1`
+  - PENDING / FAILED 행 발견 시 SMTP-RUNBOOK §6.2 / §6.3 트러블슈팅으로
+
+### G7. NFR-01 운영 모니터링 게이트 활성화 (Phase 33 D-S2)
+
+상세 절차: `MONITORING.md` §2
+
+- [ ] **G7.1** MariaDB `slow_query_log = ON` + `long_query_time = 1.0` + my.cnf 영구화
+  - 검증: `mysql -uroot -e "SHOW VARIABLES WHERE variable_name IN ('slow_query_log', 'long_query_time', 'slow_query_log_file', 'log_output');"`
+  - 기대: `slow_query_log=ON / long_query_time=1.000000 / slow_query_log_file=/var/log/mysql/slow.log / log_output=FILE,TABLE`
+  - MONITORING.md §2.1 (임시) + §2.2 (영구화 — `/etc/mysql/mariadb.conf.d/50-server.cnf`) 참조
+- [ ] **G7.2** logrotate 설정 (`/etc/logrotate.d/mariadb-slow`) 적용
+  - 검증: `sudo logrotate -d /etc/logrotate.d/mariadb-slow` (dry-run, "rotating" 출력) + 파일 권한 = `mysql:mysql 640`
+  - MONITORING.md §2.4 참조 — T-33-10 디스크 full mitigation
+- [ ] **G7.3** `MONITORING.md` §3 정기 점검 사이클이 운영자 캘린더에 등록됨 (주간 월요일 오전 — 주간 집계 SQL 실행)
+  - 검증: 운영자 측 캘린더 / 운영 노트 등록 확인
+
+### G8. 디스크 + 백업 + 롤백 절차
+
+- [ ] **G8.1** 디스크 사용량 < 70%
+  - 검증: `df -h /var/lib/mysql /var/log /opt/micesign`
+  - 기대: 3 디렉토리 모두 `Use% < 70%` (slow_query_log 누적 + DB 성장 여유 확보)
+- [ ] **G8.2** MariaDB 일일 dump 백업 cron 등록 (또는 사내 IT 백업 정책 적용)
+  - 검증: `sudo crontab -u mysql -l | grep mysqldump` 또는 사내 IT 측 백업 정책 문서
+  - 보관 정책: 30일 (사내 IT 표준 따름)
+- [ ] **G8.3** Google Drive Service Account credentials 파일 권한 600 + backup 1부 별도 보관
+  - 검증: `stat -c '%a %U:%G' /etc/micesign/google-drive-credentials.json`
+  - 기대: `600 micesign:micesign`
+  - backup: 사내 IT 측 secret 보관소 또는 별도 암호화 USB
+- [ ] **G8.4** 롤백 절차 작성 — 직전 `.jar` 보존 + 롤백 시 systemd unit 의 ExecStart 라인 swap 절차
+  - 검증: `/opt/micesign/` 디렉토리에 `app.jar` (현재) + `app.jar.previous` (직전) 동시 존재
+  - 롤백 명령 (1줄): `sudo cp /opt/micesign/app.jar.previous /opt/micesign/app.jar && sudo systemctl restart micesign`
+
+### G9. 산출물 cross-reference 무결성
+
+- [ ] **G9.1** `SMTP-RUNBOOK.md` §6.4 가 `MONITORING.md` 를 cross-reference (33-02 verify 단계에서 자동 확인)
+  - 검증: `grep -q 'MONITORING.md' .planning/milestones/v1.2/SMTP-RUNBOOK.md` (PASS)
+- [ ] **G9.2** `application-prod.yml.example` 이 `SMTP-RUNBOOK.md` §2.1 에 명시 (33-01 산출물이 33-02 절차에 통합됨)
+  - 검증: `grep -q 'application-prod.yml.example' .planning/milestones/v1.2/SMTP-RUNBOOK.md` (PASS)
+- [ ] **G9.3** 본 AUDIT.md 의 §1 SC 매트릭스 / §2 Deferred / §3 Requirements / §4 게이트 4 섹션 모두 작성됨 + §5 출시 결정 기록 placeholder 존재
+  - 검증: 본 문서 §0 목차 6 항목 모두 §0/§1/§2/§3/§4/§5 헤더 존재
+
+---
+
+## §5. 출시 결정 기록 (출시 시점에 채움)
+
+본 § 는 출시 담당자가 §1-4 모든 게이트 PASS 확인 후 출시 시점에 직접 채움. 출시 사인오프의 **단일 source of truth** — 본 표가 채워지면 v1.2 운영 출시 완료로 간주.
+
+### §5.1 출시 메타데이터
+
+| 항목 | 값 |
+|------|-----|
+| 출시 일시 | YYYY-MM-DD HH:MM (KST) |
+| 출시 담당자 | (이름) |
+| 사인오프 결과 | PASS / FAIL |
+| FAIL 시 사유 | (해당 시 기재) |
+| §4 모든 게이트 PASS 여부 | YES / NO |
+| 운영 모니터링 게이트 활성화 (§G7) | YES / NO |
+| 다음 점검 예정일 | YYYY-MM-DD (출시일 + 7일 — 첫 주간 점검) |
+
+### §5.2 게이트 그룹별 PASS 결과 요약 (출시 시점 기록)
+
+| 게이트 | 결과 | 비고 |
+|--------|------|------|
+| G1 DB 마이그레이션 | PASS / FAIL | (V1-V19 적용 결과) |
+| G2 환경변수 + 자격증명 위생 | PASS / FAIL | (`stat`, systemd 결과) |
+| G3 SMTP 운영 연결 | PASS / FAIL | (telnet PASS / IT allowlist) |
+| G4 BaseUrlGuard startup | PASS / FAIL | (BaseUrlGuard 게이트 1+2 결과) |
+| G5 5종 이벤트 수동 smoke | PASS / FAIL | (Task 4 사용자 sign-off) |
+| G6 audit_log SQL 스팟 | PASS / FAIL | (Task 4 SQL cnt=1 확인) |
+| G7 NFR-01 운영 모니터링 게이트 | PASS / FAIL | (slow_query_log + logrotate) |
+| G8 디스크 + 백업 + 롤백 | PASS / FAIL | (df / mysqldump cron / 롤백 1줄) |
+| G9 산출물 cross-reference 무결성 | PASS / FAIL | (자동 grep PASS) |
+
+### §5.3 v1.2 archive 결정 (Plan 33-05 에서 처리)
+
+- [ ] 출시 후 최소 7일간 경과 + 첫 주간 점검 (`MONITORING.md` §3 + `SMTP-RUNBOOK.md` §6.3) 무이슈 PASS
+- [ ] `gsd:complete-milestone v1.2` 실행 → REQUIREMENTS.md v1.2 21 ID 모두 `[x]` 마크 + Traceability 표 Status `Complete`
+- [ ] `.planning/milestones/v1.2/` 디렉토리 archive 처리 (본 AUDIT.md + SMTP-RUNBOOK.md + MONITORING.md 보존)
+
+---
+
+## 변경 이력
+
+| 일자 | 변경 | 작성자 |
+|------|------|--------|
+| 2026-04-28 | v1.2 초판 (Phase 33 Plan 04 D-A1, §0-§5 작성) | (출시 담당) |
+
+---
+
+*문서 끝. 본 audit 는 v1.2 의 단일 출시 결정 source — §1-3 검증 + §4 게이트 PASS + §5 결정 기록 완료 시 출시. 비기술 stakeholder 도 §0 + §4 만 보고 출시 가능 여부 판단 가능 (D-A1 must-have).*
+
 
