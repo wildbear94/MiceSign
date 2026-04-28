@@ -1237,32 +1237,39 @@ class DashboardServiceIntegrationTest {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> 모든 Open Question 은 Plan 01-06 에서 plan-level 결정으로 반영됨. 아래 `**RESOLVED:**` 항목 참조.
 
 1. **D-A5 pending 카드 ADMIN 부서 확장의 실제 의미는?**
    - 무엇을 알고 있나: CONTEXT D-A5 = "ADMIN 인 경우 본인 + 부서원 앞 PENDING 결재 합산". "부서원" 이 계층 descendants 포함인지 단일 부서인지 명시 부재 (D-A6 는 drafter 기준으로 얘기하지만 approver 에 대해서는 explicit 아님).
    - 무엇이 불명확한가: `ApprovalLineRepository.countPendingByApproverIdIn(approverIds)` 의 approverIds 가 descendantDeptIds 를 통한 user 합집합인지 단일 부서 user 만인지.
    - 권장: 본 research 는 **descendantDeptIds → userIds** 로 해석 (D-A6 와 일관). planner 가 UAT 에서 최종 확정.
+   - **RESOLVED:** descendantDeptIds → userIds (approvers in self + descendant departments); drafter 스코프 D-A6 와 일관. Plan 02 DashboardService ADMIN 분기가 `findDescendantIds → findIdsByDepartmentIdIn` chain 으로 구현.
 
 2. **`recentPending` / `recentDocuments` 목록 스코프는 본인 기준? 아니면 카드와 동일 부서 확장?**
    - 무엇을 알고 있나: CONTEXT D-A4/A5 는 카드 카운트 스코프만 명시. 목록은 본인 스코프가 현재 구현.
    - 무엇이 불명확한가: ADMIN 대시보드의 "결재 대기 문서 5건" 이 부서 전체 PENDING 5건인지, 본인 앞 5건인지.
    - 권장: **목록은 본인 기준 유지** (Assumption A6). 근거: 목록 타이틀이 "내가 처리할 결재 5건" / "내가 기안한 최근 5건" 이며 "내가" 가 key. 부서 현황은 카드 숫자가 제공.
+   - **RESOLVED:** 본인 기준 유지 (카드 ≠ 리스트 스코프). ADMIN/SUPER_ADMIN 도 `recentPending`/`recentDocuments` 는 `userId` 기준. Plan 02 DashboardService 가 role 불문 `findPendingByApproverId(userId)` + `findByDrafterId(userId)` 호출.
 
 3. **`DashboardSummaryResponse` 필드명 `completedCount` 유지 vs `approvedCount` rename?**
    - 무엇을 알고 있나: CONTEXT D-A2 = "`completedCount` semantics 재정의(APPROVED only)" — semantics 만 변경, 필드명 유지 읽힘.
    - 무엇이 불명확한가: FE 타입 `dashboard.ts` 에서 `completedCount` 가 "승인 완료" 카드 라벨에 대응되므로 이름 변경하면 가독성 향상.
    - 권장: **필드명 유지 (`completedCount`)** + 주석으로 "= APPROVED only" 명기. FE 변경 최소화 (타입/로직 그대로).
+   - **RESOLVED:** 필드 이름 `completedCount` 유지 + 주석 "APPROVED only" (Plan 01 DTO + Plan 03 TS 인터페이스 모두 반영). BE/FE contract break 회피.
 
 4. **Phase 30 의 `DocumentSearchPermissionMatrixTest` fixture 확장 범위**
    - 무엇을 알고 있나: 현재 테스트는 단일 부서 ADMIN fixture.
    - 무엇이 불명확한가: D-A9 Option 1 채택 시 matrix 에 hierarchical fixture 를 얼마나 추가해야 regression 보장?
    - 권장: 최소 3 케이스 — (a) ADMIN 이 본인 부서 descendants 문서까지 검색 결과에 보임, (b) ADMIN 이 descendant 아닌 부서 문서 보이지 않음, (c) tab=department 도 descendant 모두 매칭. planner 가 task 단위에 반영.
+   - **RESOLVED:** Plan 02 Task 3 에서 3 hierarchical cases 추가 — `adminOfEngineering_sees_platformUser_document_via_hierarchy` (self + 하위) / `adminOfPlatform_does_not_see_engineering_sibling_documents` (상위 방향 차단) / `tab_department_for_admin_engineering_covers_platform` (tab=department scope). Plan 06 의 D-A9 Option 1 impl 과 연계.
 
 5. **i18n EN 파일 생성 여부**
    - 무엇을 알고 있나: `frontend/public/locales/ko/dashboard.json` 만 존재. UI-SPEC §13.1 이 `en/dashboard.json` 도 신규 생성 권고.
    - 무엇이 불명확한가: 본 Phase 범위에 포함?
    - 권장: **ko 만 수정, en 은 Deferred**. 기존 i18next fallback 이 영어 미존재 시 한국어 표시 → 영문 UI 는 v1.3+.
+   - **RESOLVED:** ko-only in this phase. en/dashboard.json 은 v1.3 i18n pass 로 deferred. Plan 03 Task 3 는 ko 만 수정.
 
 ---
 
