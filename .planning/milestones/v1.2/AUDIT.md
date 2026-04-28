@@ -132,3 +132,126 @@ ROADMAP.md 의 Phase 29-32 Success Criteria 원문을 그대로 옮겨 분류.
 | 32 CUSTOM | 3 | 3 | 37 (UAT 37/37) | 0 | **PASS** |
 | **합계** | **17** | **16** | **53 항목** | **1** | **17/17 출시 가능 (1건 운영 모니터링 게이트로 이관)** |
 
+---
+
+## §2. Deferred 항목 추적
+
+아래 항목은 v1.2 출시 게이트가 아닌 **운영 모니터링 게이트** 또는 **후속 마일스톤** (Phase 1-C / v2 / v1.3) 으로 이관됨. 모든 deferred 항목은 **출처 + 결정 사유 + 후속 게이트 + 발동 트리거 + 보존 산출물 + 종료 조건** 6개 항을 명시하여 추적 누락 위험을 zero 로 한다.
+
+### §2-A. NFR-01 (검색 95p ≤ 1초 합성 부하 실측)
+
+| 항목 | 내용 |
+|------|------|
+| **출처** | Phase 30 SC4, REQUIREMENTS NFR-01 + SRCH-06 (동일 요구사항 중복 명시) |
+| **결정** | Plan 30-05 deferral (2026-04-28) — `30-BENCH-REPORT.md` §Deferral Decision |
+| **사유** | 50인 사내 시스템에서 10K 문서 + 50 동시 활성 도달은 6-12개월 후 시나리오. 합성 부하 (ab) 측정값과 실 사용자 분포 차이 비대칭. 정적 분석 게이트 (QueryDSL 28-case 권한 매트릭스 + EXPLAIN 인덱스 사용) PASS 로 1차 안전망 확보. |
+| **후속 게이트** | 운영 모니터링 — `.planning/milestones/v1.2/MONITORING.md` (Phase 33-03 산출물, 450 lines) |
+| **트리거 (3 신호 — D-S2)** | (a) 사용자 체감 검색 지연 신고 1건 이상 / (b) MariaDB slow_query_log 의 `/api/v1/documents/search` 백엔드 쿼리가 1초 초과로 1회 이상 기록 / (c) 동시 활성 사용자 30명 도달 |
+| **보존 산출물** | `backend/src/main/java/com/micesign/tools/SearchBenchmarkSeeder.java` (`@Profile("bench")` idempotent 10K seeder) + `scripts/bench-search.sh` (3 시나리오 ab 부하 + REPORT auto-append) + `backend/src/main/resources/application-bench.yml` + `30-BENCH-REPORT.md` (재실측 결과 append 위치) |
+| **재개 절차** | `MONITORING.md` §4 — `./gradlew bootRun --args='--spring.profiles.active=bench'` → JWT 획득 → `BENCH_JWT="$BENCH_JWT" ./scripts/bench-search.sh` → `30-BENCH-REPORT.md` 갱신 → FAIL 시 V20 인덱스 후보 검토 (별도 phase) |
+| **종료 조건** | (1) 3 신호 6개월 무발동 → APM 도입 검토로 이관 / (2) 신호 발동 → 재실측 + 보강 1회 완료 시 cumulative 카운트 리셋 |
+
+### §2-B. stale PENDING 자동 청소 cron
+
+| 항목 | 내용 |
+|------|------|
+| **출처** | Phase 29 D-A11 |
+| **결정** | 자동화 거절 — 수동 운영 채택 (cron 도입은 과스펙) |
+| **사유** | 50인 + 드문 서버 재시작 가정. cron 도입 시 추가 운영 surface (실패 알림 / 모니터링 / cron 자체의 장애) 발생. PENDING-first 패턴 (Phase 29 D-A1) 의 의도된 trade-off. |
+| **후속 게이트** | `SMTP-RUNBOOK.md` §6.2 — 수동 FAILED 전환 SQL 운영 절차 (`UPDATE notification_log SET status='FAILED' ... WHERE created_at < DATE_SUB(NOW(), INTERVAL 10 MINUTE)`) |
+| **트리거** | 주간 점검 시 PENDING 행이 10분 이상 잔존 발견 (`SMTP-RUNBOOK §6.2` SQL 실행 결과) |
+| **보존 산출물** | `SMTP-RUNBOOK.md` §6.2 (수동 UPDATE SQL 그대로 복붙 가능) + Phase 29 의 `notification_log.created_at` / `status` 컬럼 (V6 migration) |
+| **종료 조건** | (1) 사용자 50인 → 200인 확장 시 cron 또는 scheduled task 도입 검토 / (2) Phase 1-C 운영 자동화 phase 에서 흡수 |
+
+### §2-C. 운영자 push 알림 파이프라인 (Slack/SMS/PagerDuty)
+
+| 항목 | 내용 |
+|------|------|
+| **출처** | Phase 29 D-B6 — `@Retryable` 최종 실패 시 push 알림 |
+| **결정** | ERROR 로그 + `notification_log.status=FAILED` 기록 only (Phase 1-C / v2 로 이관) |
+| **사유** | 50인 규모 + 주간 수동 SQL 조회로 충분. push 통합 시 외부 의존성 추가 (Slack API / Twilio / PagerDuty 등) + 인증 토큰 secret 관리 비용. |
+| **후속 게이트** | `SMTP-RUNBOOK.md` §6.3 — 주간 NOTIF FAILED 조회 SQL (`SELECT event_type, COUNT(*) FROM notification_log WHERE status='FAILED' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY event_type`) |
+| **트리거** | 주간 점검 시 `failed_cnt > 0` 발견 시 `error_message` 별 빈도 SQL 로 원인 분기 |
+| **보존 산출물** | `SMTP-RUNBOOK.md` §6.3 SQL + Phase 29 의 ERROR 로그 발생 지점 (`ApprovalEmailSender.@Recover` 메서드) |
+| **종료 조건** | Phase 1-C 운영 자동화 phase 에서 push 통합 검토 또는 v2 마일스톤에서 흡수 |
+
+### §2-D. secret 관리 도구 (git-crypt / SOPS / Vault / AWS Secrets Manager)
+
+| 항목 | 내용 |
+|------|------|
+| **출처** | Phase 33 D-C2 |
+| **결정** | 도입하지 않음 — 50인 단일 환경에서 systemd EnvironmentFile + chmod 600 충분 |
+| **사유** | 외부 secret 매니저 도입 = 추가 인프라 + 운영자 학습 비용. 현재 1 서버 단일 환경에서 ROI 부정. PRD "사내 단일 서버 systemd" 가정 (`PROJECT.md` Constraints) 과 일치. |
+| **후속 게이트** | (없음) — Phase 1-C 또는 v2 확장 시 재검토 |
+| **트리거** | (a) multi-environment 분리 (staging / prod) 도입 / (b) compliance 요구 (ISO 27001 / 사내 보안 정책 등) 발생 / (c) 50인 → 200인 확장 |
+| **보존 산출물** | `application-prod.yml` (env var only 패턴, hardcoded default 미포함 — Phase 33-01 commit `12fc094`) + `application-prod.yml.example` (운영 변수 카탈로그) + `.gitignore` 의 `.env.production` 차단 line + `SMTP-RUNBOOK.md` §2 절차 |
+
+### §2-E. APM 도구 도입 (DataDog / NewRelic / Pinpoint / Pyroscope)
+
+| 항목 | 내용 |
+|------|------|
+| **출처** | Phase 33 D-S2 의 대안 검토 (33-CONTEXT §Deferred 명시) |
+| **결정** | 도입하지 않음 — slow_query_log + 사용자 신고로 충분 |
+| **사유** | APM 라이센스 비용 + 50인 트래픽 양에서 과스펙. 부하가 실제 발생하는 시점까지는 `MONITORING.md` 의 SQL 점검 사이클로 대체. |
+| **후속 게이트** | `MONITORING.md` §5.2 종료 조건 (1) — 3 신호 6개월 무발동 시 APM 검토 또는 사내 Grafana 도입 시 dashboard 화 |
+| **트리거** | (a) 부하 발생 빈도 증가 / (b) 다중 서비스 운영 시작 / (c) `MONITORING.md` §3 의 cumulative 카운트 누적 |
+| **보존 산출물** | `MONITORING.md` (모든 절차 자기완결적으로 문서화 — APM 도입 시 자동 export 또는 dashboard 패널 변환 가능 형식) |
+
+---
+
+## §3. Requirements ID 매핑 표
+
+`REQUIREMENTS.md` 의 v1.2 ID 21개 모두 등재. 각 ID 의 검증 phase + 자동 테스트 ID + 매뉴얼 UAT 또는 잔존 부채 명시.
+
+### §3-A. SMTP 이메일 알림 (NOTIF-01~05 + NFR-02 + NFR-03)
+
+| ID | 요구사항 (요약) | 검증 phase | 자동 테스트 | 매뉴얼 / 잔존 부채 |
+|----|----------------|------------|-------------|------|
+| NOTIF-01 | 5종 이벤트 자동 메일 발송 | Phase 29 | `ApprovalNotificationIntegrationTest` (5 이벤트 + skipInactive) | `29-HUMAN-UAT.md` Test 1 PASS |
+| NOTIF-02 | 메일 "문서 바로가기" → app.base-url 절대 URL + 한글 subject UTF-8 | Phase 29 | `ApprovalNotificationIntegrationTest` (subject + body URL 단언) + `BaseUrlGuard.java` localhost 차단 | `29-HUMAN-UAT.md` Test 1 PASS |
+| NOTIF-03 | `@Retryable(maxAttempts=3)` 재시도 + `notification_log` PENDING→SUCCESS/FAILED | Phase 29 | `ApprovalEmailSenderRetryTest.mailSendException_retriesThreeTimes_thenRecoversToFailed` (Plan 29-04) | (없음) |
+| NOTIF-04 | RETIRED/INACTIVE 수신자 자동 skip + 동일 (doc, event, recipient) 중복 SUCCESS zero | Phase 29 | `ApprovalNotificationIntegrationTest.skipInactiveUsers` + `duplicateInsert_throwsDataIntegrityViolation` + V19 unique constraint | (없음) |
+| NOTIF-05 | `[MiceSign]` prefix + 한글 UTF-8 본문 (MimeMessageHelper UTF-8 강제) | Phase 29 | `ApprovalNotificationIntegrationTest` (subject UTF-8) + `approval-base.html` UTF-8 meta + Malgun Gothic CJK 폰트 | `29-HUMAN-UAT.md` Test 1 PASS |
+| NFR-02 | `@Async` + AFTER_COMMIT (트랜잭션 비블로킹) | Phase 29 | `ApprovalServiceAuditTest` (트랜잭션 분리) | `29-HUMAN-UAT.md` Test 2 PASS (timing) |
+| NFR-03 | audit_log 중복 INSERT 방지 (COUNT=1 per action) | Phase 29 | `ApprovalServiceAuditTest` 5 메서드 모두 `isEqualTo(1)` PASS | **출시 §G6 SQL 스팟 보강** (5종 smoke 직후 운영 환경 manual confirmation) |
+
+### §3-B. 검색/필터링 (SRCH-01~06 + NFR-01)
+
+| ID | 요구사항 (요약) | 검증 phase | 자동 테스트 | 매뉴얼 / 잔존 부채 |
+|----|----------------|------------|-------------|------|
+| SRCH-01 | 권한 WHERE 절 보안 수정 (FSD FN-SEARCH-001) | Phase 30 | QueryDSL 28-case 권한 매트릭스 (Plan 30-02) — `EXISTS approval_line` 분기 회귀 | (없음 — 보안 수정 자동 회귀로 충분) |
+| SRCH-02 | 키워드 LIKE 검색 (제목/문서번호) | Phase 30 | `DocumentRepositoryCustomImpl` 단위 테스트 (Plan 30-02) | (없음) |
+| SRCH-03 | 상태(복수) + 양식 + 기간 필터 | Phase 30 | `DocumentListPage.test.tsx` (Plan 30-04) + repo 단위 테스트 | (없음) |
+| SRCH-04 | 기안자(드롭다운) 필터 | Phase 30 | `/users/search` 엔드포인트 테스트 (Plan 30-03) + `DrafterCombo` 컴포넌트 단위 테스트 | (없음) |
+| SRCH-05 | offset 페이지네이션 + URL query 동기화 | Phase 30 | `DocumentListPage.test.tsx` 21 `@Test` (Plan 30-04) — `paramsSerializer` + `useSearchParams` 회귀 | (없음) |
+| SRCH-06 | 95p ≤ 1초 (10K seed + 50 동시) | Phase 30 → **Deferred** | EXPLAIN 정적 인덱스 사용 검증 PASS (Plan 30-02) | §2-A (`MONITORING.md` 운영 모니터링 게이트) |
+| NFR-01 | 검색 응답 95p ≤ 1초 (NFR 관점, SRCH-06 와 중복 명시) | Phase 30 → **Deferred** | (동일 — SRCH-06) | §2-A (동일) |
+
+### §3-C. 대시보드 고도화 (DASH-01~05)
+
+| ID | 요구사항 (요약) | 검증 phase | 자동 테스트 | 매뉴얼 / 잔존 부채 |
+|----|----------------|------------|-------------|------|
+| DASH-01 (v1.2) | 4 카운트 카드 + role-based (USER/ADMIN/SUPER_ADMIN) | Phase 31 | `DashboardServiceIntegrationTest` matrix (Plan 31-02) — 3 role × 4 카운트 = 12 case | `31-UAT.md` Test 1-3 PASS |
+| DASH-02 (v1.2) | "내가 처리할 결재 5건" + "내가 기안한 최근 5건" | Phase 31 | `DashboardPage` smoke test (Plan 31-04) | `31-UAT.md` Test 14 PASS |
+| DASH-03 (v1.2) | "새 문서 작성" CTA → 양식 선택 화면 | Phase 31 | `DashboardPage` 라우팅 단언 (Plan 31-04) | `31-UAT.md` Test 14 PASS (TemplateSelectionModal) |
+| DASH-04 | skeleton + empty state UI | Phase 31 | smoke test (Plan 31-04) | `31-UAT.md` Test 9-11 PASS (skeleton 동기화 / empty / error state) |
+| DASH-05 | mutation 후 `invalidateQueries(['dashboard'])` | Phase 31 | invalidate spy 테스트 4 mutation 훅 (Plan 31-05) — useApprove/useReject/useSubmitDocument/useWithdrawDocument | `31-UAT.md` Test 4-7 PASS (4 mutation 실시간 갱신) + Test 8 (skeleton 플래시 없음 — placeholderData 효과) |
+
+### §3-D. 양식 확장 (FORM-01~02)
+
+| ID | 요구사항 (요약) | 검증 phase | 자동 테스트 | 매뉴얼 / 잔존 부채 |
+|----|----------------|------------|-------------|------|
+| FORM-01 | "회의록" 프리셋 즉시 로드 (5 fields, prefix=MTG, icon=Users) | Phase 32 | `presets.test.ts` 9 단언 GREEN (length=6 + meeting fields=5 + Zod `.strict()` 통과) | `32-HUMAN-UAT.md` 섹션 1-2 (1-22, 16 항목) PASS — T-32-02 옵션 A 확정 |
+| FORM-02 | "품의서" 프리셋 즉시 로드 (4 fields, prefix=PRP, icon=FileSignature, 첨부 미포함) | Phase 32 | `presets.test.ts` (proposal fields=4) + Vite build PASS (646ms) | `32-HUMAN-UAT.md` 섹션 3 (23-30, 8 항목) PASS — D-B6 첨부 미포함 시각 확인 |
+
+### §3-E. 매핑 커버리지 종합
+
+- **v1.2 requirements 총량:** 21 ID
+- **자동 회귀로 PASS (잔존 부채 없음):** 18 (NOTIF-01/02/03/04/05 + NFR-02 + SRCH-01/02/03/04/05 + DASH-01/02/03/04/05 + FORM-01/02)
+- **Deferred (운영 모니터링 게이트):** 2 (SRCH-06 + NFR-01 — 동일 요구사항 중복 명시)
+- **자동 + 출시 전 SQL 스팟 보강:** 1 (NFR-03 → §4 §G6)
+- **미매핑 (gap):** 0
+
+**판독:** v1.2 의 모든 요구사항 ID 가 단일 표에서 검증 경로 추적 가능. Deferred 2건은 §2-A 의 후속 게이트로 보존 + NFR-03 1건은 §G6 SQL 스팟으로 자동 회귀 보강. 출시 게이트 결정에 누락된 요구사항 zero.
+
+
