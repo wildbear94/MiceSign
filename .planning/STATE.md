@@ -27,15 +27,15 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 Phase: 33 (e2e) — COMPLETE (Wave 4 wrap-up)
 Plan: 5/5 complete
-Status: v1.2 ship-ready · archive 시점 사용자 결정 대기 (Plan 33-05 Task 6 checkpoint)
+Status: v1.2 ship-ready · **archive: DEFERRED** (사용자 결정 2026-04-28 — 운영 출시 + 1-2주 안정화 후 archive)
 Last activity: 2026-04-28 — Phase 33 wrap-up complete (33-01~05 모두 종결)
 
 Progress: [█████████░] 96% (v1.2 — Phase 32 잔여 외 4 phase 종결)
 
-**다음 행동 후보:**
-- **archive-now** — `/gsd-complete-milestone v1.2` 즉시 실행 (출시 일정과 연동 시)
-- **defer-archive** — 운영 출시 + 안정화 (1-2주 모니터링) 까지 대기
-- **archive-after-32** — Phase 32 closure 후 archive (Phase 32 가 별도 일정으로 진행 중)
+**Archive 결정 (2026-04-28):** `defer-archive` 채택
+- 사유: AUDIT.md §G5/§G6/§5 의 RELEASE-DEFERRED 패턴과 정합 — 실 출시 + 운영 안정화 후 archive 시점 동기화
+- 트리거: 출시 일자 결정 + 1-2주 운영 모니터링 무이슈 → `/gsd-complete-milestone v1.2`
+- v1.3 신규 milestone 시작은 archive 시점 또는 그 이후 별도 `/gsd-new-milestone`
 
 **Phase 33 종결 요약:**
 - 33-01 — application-prod.yml 자격증명 위생 (4 commits)
