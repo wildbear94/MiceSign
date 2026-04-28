@@ -1,0 +1,46 @@
+# MiceSign 운영 환경변수 카탈로그 (Phase 33 D-C1)
+# ============================================================
+# 본 파일은 /etc/micesign/.env.production 에 그대로 복사 후 값을 채워 사용.
+# 실제 운영 파일은 git 추적 대상 아님 (.gitignore 의 .env / .env.production 패턴 차단).
+#
+# 권장 권한 (운영자 수행):
+#   sudo install -o micesign -g micesign -m 600 /dev/null /etc/micesign/.env.production
+#   sudo vi /etc/micesign/.env.production   # 값 채우기
+#
+# systemd unit (/etc/systemd/system/micesign.service) 의 [Service] 섹션에 다음 라인 추가 후
+# sudo systemctl daemon-reload && sudo systemctl restart micesign:
+#   EnvironmentFile=/etc/micesign/.env.production
+#
+# 상세 절차: .planning/milestones/v1.2/SMTP-RUNBOOK.md (Phase 33-02)
+# 보안 위생: secret 값을 본 .example 파일에 절대 채우지 말 것 — 본 파일은 git 추적 대상.
+# ============================================================
+
+# ----- DB (필수) -----
+# Phase 33 D-C1 — username/password 미주입 시 HikariCP startup 실패 (fail-fast 의도)
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=micesign
+DB_USER=
+DB_PASS=
+
+# ----- 앱 base URL (필수, BaseUrlGuard 가 localhost 검증 — Phase 29 D-D2) -----
+# 사내 실제 도메인으로 교체. localhost 포함 시 운영 startup 실패.
+APP_BASE_URL=https://micesign.사내도메인
+
+# ----- SMTP (필수 — Phase 29 + 33 D-M1) -----
+# 사내 메일 릴레이 (회사 IT 부서 협의 후 host/port/IP allowlist 확정)
+# MAIL_HOST 미설정 시 ApprovalEmailSender 가 stub 모드로 fallback (D-D7) — 운영에선 반드시 설정.
+MAIL_HOST=
+MAIL_PORT=25
+# IP allowlist 기반이면 username/password 빈 값 가능. 인증 필요 시 채우기.
+MAIL_USERNAME=
+MAIL_PASSWORD=
+
+# ----- (선택) 메일 재시도 백오프 — Phase 29 D-D3 -----
+# 기본 5분 (300000ms), FSD "2회 재시도 5분 간격" 규약. 운영 튜닝 필요 시 override.
+# APP_MAIL_RETRY_DELAY_MS=300000
+
+# ----- (선택) JWT secret 등 추가 secret 은 application-prod.yml 의 ${VAR:} 패턴에 맞춰 추가 -----
+# JWT_SECRET=
+# COOKIE_SECURE=true
+# GOOGLE_DRIVE_CREDENTIALS_PATH=/etc/micesign/google-drive-credentials.json
