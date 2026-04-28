@@ -11,8 +11,10 @@ interface ColumnConfigPanelProps {
 export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) {
   const { t } = useTranslation('admin');
 
+  const config = column.config ?? {};
+
   const updateConfig = (partial: Partial<SchemaFieldConfig>) => {
-    onUpdate({ ...column, config: { ...column.config, ...partial } });
+    onUpdate({ ...column, config: { ...config, ...partial } });
   };
 
   switch (column.type) {
@@ -26,7 +28,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
             </label>
             <input
               type="text"
-              value={column.config.placeholder || ''}
+              value={config.placeholder || ''}
               onChange={(e) => updateConfig({ placeholder: e.target.value })}
               className={SMALL_INPUT_CLASS}
             />
@@ -37,7 +39,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
             </label>
             <input
               type="number"
-              value={column.config.maxLength ?? ''}
+              value={config.maxLength ?? ''}
               onChange={(e) =>
                 updateConfig({
                   maxLength: e.target.value ? parseInt(e.target.value, 10) : undefined,
@@ -59,7 +61,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
             </label>
             <input
               type="number"
-              value={column.config.min ?? ''}
+              value={config.min ?? ''}
               onChange={(e) =>
                 updateConfig({
                   min: e.target.value ? parseFloat(e.target.value) : undefined,
@@ -74,7 +76,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
             </label>
             <input
               type="number"
-              value={column.config.max ?? ''}
+              value={config.max ?? ''}
               onChange={(e) =>
                 updateConfig({
                   max: e.target.value ? parseFloat(e.target.value) : undefined,
@@ -89,7 +91,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
             </label>
             <input
               type="text"
-              value={column.config.unit || ''}
+              value={config.unit || ''}
               onChange={(e) => updateConfig({ unit: e.target.value })}
               className={SMALL_INPUT_CLASS}
             />
@@ -100,7 +102,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
             </label>
             <input
               type="text"
-              value={column.config.placeholder || ''}
+              value={config.placeholder || ''}
               onChange={(e) => updateConfig({ placeholder: e.target.value })}
               className={SMALL_INPUT_CLASS}
             />
@@ -116,7 +118,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
       );
 
     case 'select': {
-      const options = column.config.options || [];
+      const options = config.options || [];
       return (
         <div className="space-y-2">
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -188,7 +190,7 @@ export function ColumnConfigPanel({ column, onUpdate }: ColumnConfigPanelProps) 
           </label>
           <textarea
             rows={2}
-            value={column.config.content || ''}
+            value={config.content || ''}
             onChange={(e) => updateConfig({ content: e.target.value })}
             className={`w-full px-3 py-2 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors resize-none border-gray-300 dark:border-gray-600`}
           />

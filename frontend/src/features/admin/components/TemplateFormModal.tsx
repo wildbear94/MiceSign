@@ -14,6 +14,7 @@ import { detectCircularDeps } from '../../document/utils/detectCircularDeps';
 import SchemaFieldEditor from './SchemaFieldEditor';
 import type { SchemaField } from './SchemaFieldEditor';
 import { validateFormula } from './SchemaFieldEditor/calculationRuleUtils';
+import { parseSchemaDefinition } from './SchemaFieldEditor/utils';
 import { FormPreview, FullscreenPreviewPortal } from './FormPreview';
 
 const templateSchema = z.object({
@@ -119,12 +120,14 @@ export default function TemplateFormModal({
   useEffect(() => {
     if (!open || !editingTemplate) return;
     if (detailQuery.data?.schemaDefinition) {
-      try {
-        const schema = JSON.parse(detailQuery.data.schemaDefinition);
-        setSchemaFields(schema.fields || []);
-        setConditionalRules(schema.conditionalRules || []);
-        setCalculationRules(schema.calculationRules || []);
-      } catch {
+      const parsed = parseSchemaDefinition(detailQuery.data.schemaDefinition);
+      if (parsed.ok) {
+        setSchemaFields(parsed.data.fields);
+        setConditionalRules(parsed.data.conditionalRules);
+        setCalculationRules(parsed.data.calculationRules);
+      } else {
+        console.error('[TemplateFormModal] schemaDefinition parse failed:', parsed.reason, parsed.error);
+        toast.error('양식 정의를 불러오지 못했습니다. 관리자에게 문의해주세요.');
         setSchemaFields([]);
         setConditionalRules([]);
         setCalculationRules([]);
@@ -135,6 +138,16 @@ export default function TemplateFormModal({
       setCalculationRules([]);
     }
   }, [open, editingTemplate, detailQuery.data]);
+
+  // Reset schema state when modal closes so the next open starts clean
+  // (prevents stale unsaved fields/rules leaking between editing sessions).
+  useEffect(() => {
+    if (!open) {
+      setSchemaFields([]);
+      setConditionalRules([]);
+      setCalculationRules([]);
+    }
+  }, [open]);
 
   // Focus trap + escape
   useEffect(() => {
@@ -158,8 +171,6 @@ export default function TemplateFormModal({
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onClose, isFullscreen]);
-
-  if (!open) return null;
 
   const onSubmit = async (data: TemplateFormData) => {
     // D-10: table 타입 필드의 최소 1개 컬럼 밸리데이션
@@ -255,6 +266,8 @@ export default function TemplateFormModal({
       calculationRules.some((r) => validateFormula(r.formula, schemaFields, r.targetFieldId) !== null),
     [calcCycles, calculationRules, schemaFields],
   );
+
+  if (!open) return null;
 
   const inputClassName = (hasError: boolean) =>
     `w-full h-11 px-4 text-sm border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors ${
