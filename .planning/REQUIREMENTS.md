@@ -159,11 +159,16 @@ Requirements for Milestone v1.2: Phase 1-B — 일상 업무 대체 수준 (SMTP
 
 ### SMTP 이메일 알림 (NOTIF)
 
-- [ ] **NOTIF-01**: 사용자가 결재 이벤트 5종(상신/중간 승인/최종 승인/반려/회수) 발생 시 해당 수신자에게 HTML 이메일을 수신한다 (EmailService stub 제거, 실 JavaMailSender 발송)
-- [ ] **NOTIF-02**: 사용자가 이메일 본문의 "문서 바로가기" 버튼을 클릭하면 해당 결재 문서 상세 페이지로 직접 이동한다 (`app.base-url` 기반 절대 URL)
-- [ ] **NOTIF-03**: 시스템이 이메일 발송 실패 시 최대 2회 자동 재시도(5분 간격)하며, 발송 이력을 `notification_log`에 PENDING→SUCCESS/FAILED로 기록한다 (`@Retryable` + `@Recover`)
-- [ ] **NOTIF-04**: 시스템이 퇴직(`RETIRED`) 또는 비활성(`INACTIVE`) 사용자 수신을 자동으로 스킵한다
-- [ ] **NOTIF-05**: 모든 알림 이메일 제목에 `[MiceSign]` prefix가 붙고 본문이 한글 UTF-8로 정상 표기된다 (`MimeMessageHelper` UTF-8 강제)
+- [x] **NOTIF-01
+**: 사용자가 결재 이벤트 5종(상신/중간 승인/최종 승인/반려/회수) 발생 시 해당 수신자에게 HTML 이메일을 수신한다 (EmailService stub 제거, 실 JavaMailSender 발송)
+- [x] **NOTIF-02
+**: 사용자가 이메일 본문의 "문서 바로가기" 버튼을 클릭하면 해당 결재 문서 상세 페이지로 직접 이동한다 (`app.base-url` 기반 절대 URL)
+- [x] **NOTIF-03
+**: 시스템이 이메일 발송 실패 시 최대 2회 자동 재시도(5분 간격)하며, 발송 이력을 `notification_log`에 PENDING→SUCCESS/FAILED로 기록한다 (`@Retryable` + `@Recover`)
+- [x] **NOTIF-04
+**: 시스템이 퇴직(`RETIRED`) 또는 비활성(`INACTIVE`) 사용자 수신을 자동으로 스킵한다
+- [x] **NOTIF-05
+**: 모든 알림 이메일 제목에 `[MiceSign]` prefix가 붙고 본문이 한글 UTF-8로 정상 표기된다 (`MimeMessageHelper` UTF-8 강제)
 
 ### 문서 검색/필터링 (SRCH)
 
@@ -197,8 +202,10 @@ Requirements for Milestone v1.2: Phase 1-B — 일상 업무 대체 수준 (SMTP
 ### 비기능 요구사항 (NFR - v1.2 범위 내)
 
 - [ ] **NFR-01**: 검색 응답 95p ≤ 1초 (SRCH-06과 중복 명시 — NFR 관점)
-- [ ] **NFR-02**: 이메일 발송이 결재 트랜잭션을 블로킹하지 않는다 (`@Async` + `AFTER_COMMIT`)
-- [ ] **NFR-03**: 감사 로그 중복 방지 — 리스너에서 `audit_log`를 추가 INSERT 하지 않는다 (기존 서비스 동기 기록 유지, `COUNT=1 per action` 테스트)
+- [x] **NFR-02
+**: 이메일 발송이 결재 트랜잭션을 블로킹하지 않는다 (`@Async` + `AFTER_COMMIT`)
+- [x] **NFR-03
+**: 감사 로그 중복 방지 — 리스너에서 `audit_log`를 추가 INSERT 하지 않는다 (기존 서비스 동기 기록 유지, `COUNT=1 per action` 테스트)
 
 ## Traceability
 

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: phases
 status: executing
-stopped_at: Completed 33-01-PLAN.md
-last_updated: "2026-04-28T02:56:04.263Z"
+stopped_at: Completed 33-02-PLAN.md
+last_updated: "2026-04-28T03:10:42.360Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 8
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 33 (e2e) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-28
 
@@ -79,6 +79,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 32 P32-04 | 0m 43s | 1 tasks | 1 files |
 | Phase 32 P32-05 | 1m 16s | 1 tasks tasks | 1 files files |
 | Phase 33 P01 | 1m 26s | 3 tasks tasks | 3 files files |
+| Phase 33 P02 | 6m 16s | 2 tasks tasks | 1 file files |
 
 ## Accumulated Context
 
@@ -134,6 +135,10 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 32-05] presets.test.ts 9 단언 게이트 (length=6/keys=6entry+meeting 5 fields+proposal 4 fields/preserve 5) — Wave 1 의도된 fail 일괄 해소, vitest+tsc+build 모두 PASS
 - [Phase 32-05] 신규 단언 형식 = 기존 preset-specific 단언 100% mimicking (find!+toHaveLength+map(f=>f.id)+toEqual) — 향후 preset 추가 시 동일 답습 패턴 확립
 - [Phase 33-01] application-prod.yml hardcoded DB default 제거 + .example 카탈로그 + .env.production gitignore — D-C1 1단계 (소스/설정 위생) 완결, 2-5단계는 33-02 SMTP-RUNBOOK 운영 시점
+- [Phase 33-02] SMTP-RUNBOOK.md (480 lines, 6 섹션) — D-M1 사내 릴레이 + D-M2 markdown 체크리스트 + D-M3 5종 smoke 결정 실행. 사내 IT 와 §1 만 발췌 공유 가능. 33-04 AUDIT.md 출시 게이트 체크리스트의 source.
+- [Phase 33-02] D-D2 BaseUrlGuard 2-게이트 grep PASS 패턴 (게이트 1: 로그 존재 / 게이트 2: localhost 부재) — Phase 29 fail-fast listener 의 운영 절차 fail-fast 게이트로 활용. localhost 가 메일 본문에 새는 사고를 startup 시점에 차단.
+- [Phase 33-02] D-A11 stale PENDING 수동 FAILED 전환 SQL + D-B6 NOTIF FAILED 주간 조회 SQL 인계 흡수 — Phase 29 가 자동화 거절한 두 항목을 §6.2/§6.3 수동 운영 SQL 로 보완. 50인 환경에서 cron/push 알림 미도입 결정의 실행 가능성 입증.
+- [Phase 33-02] D-C2 secret 도구 미도입 inline 메모 (§2 인트로) — systemd EnvironmentFile + chmod 600 충분, Vault/SOPS/git-crypt/AWS Secrets Manager 거절. 50인 → 200인 확장 또는 v2 시점에 재검토.
 
 ### Pending Todos
 
@@ -147,8 +152,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T02:56:04.259Z
-Stopped at: Completed 33-01-PLAN.md
+Last session: 2026-04-28T03:10:27.568Z
+Stopped at: Completed 33-02-PLAN.md
 Resume file: None
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
