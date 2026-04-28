@@ -63,7 +63,7 @@
 
 - **D-D1:** 운영 SMTP 공급자 = **Phase 29 범위에서 불특정** — `application.yml`의 `spring.mail.*`은 env var(`MAIL_HOST/MAIL_PORT/MAIL_USERNAME/MAIL_PASSWORD`) 주입만 유지, 공급자 최종 결정(사내 릴레이 / Gmail Workspace / O365 / SES)은 Phase 33 ops 런북. Phase 29는 공급자 agnostic.
 - **D-D2:** `application-prod.yml`에 **`app: base-url: ${APP_BASE_URL:https://micesign.사내도메인}` 추가** + **`@Profile("prod") ApplicationReadyEvent` listener**로 `baseUrl.contains("localhost")` 시 startup 실패 (Pitfall 19 방지). `APP_BASE_URL` env var는 배포 시 설정.
-- **D-D3:** 테스트 환경 = **GreenMail 1.6.x(JUnit 5) + MailHog/Mailpit(수동 UAT) 병행** — GreenMail은 `@SpringBootTest` 통합 테스트용(한글 제목 디코딩, retry 경로, UNIQUE 제약 검증), MailHog는 개발자 수동 UAT(시각적 확인).
+- **D-D3:** 테스트 환경 = **GreenMail 2.1.x(JUnit 5, Jakarta Mail 2.x) + MailHog/Mailpit(수동 UAT) 병행** — GreenMail은 `@SpringBootTest` 통합 테스트용(한글 제목 디코딩, retry 경로, UNIQUE 제약 검증), MailHog는 개발자 수동 UAT(시각적 확인). *(2026-04-23 updated: 1.6.x는 javax.mail 기반으로 Spring Boot 3/Jakarta Mail과 비호환 — RESEARCH Assumptions Log A1/A2 참조, planner가 mvnrepository에서 최신 2.1.x 패치 pinning)*
 - **D-D4:** 스레드 풀은 **기존 `micesign-async` 유지** — 50명 규모에서 core=2/max=5/queue=100 충분. 전용 `mailExecutor` 분리는 Phase 33 성능 실측 후 필요 시 추가(research P2).
 - **D-D5:** GreenMail 통합 테스트 = **5종 이벤트 × [기본 발송 + 한글 제목 디코딩 + 수신자 규칙 + RETIRED/INACTIVE skip]** — `ApprovalNotificationIntegrationTest`. `@Retryable` 경로 검증(MailSendException 강제 주입 → 3회 시도 → FAILED)은 별도 테스트 클래스.
 - **D-D6:** CI 게이트 = **`ApprovalServiceAuditTest` (audit_log COUNT=1 per action, NFR-03) + GreenMail 수신자 규칙 테스트** — 두 셋트가 통과해야 Phase 29 완료.
