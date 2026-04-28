@@ -97,7 +97,7 @@
 - [x] **Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장** - FSD FN-SEARCH-001 권한 predicate(보안 수정) + drafterId 필터 + URL query 동기화 페이지네이션 구현 (completed 2026-04-27)
 - [x] **Phase 31: 대시보드 고도화** - 4번째 "진행 중" 카운트 카드 노출 + 결재 mutation 후 invalidateQueries 로 실시간 갱신 + 로딩/빈 상태 UI (completed 2026-04-24)
 - [ ] **Phase 32: CUSTOM 프리셋 확장** - v1.1 빌더 기반 회의록/품의서 JSON 프리셋 2종 추가 (하드코딩 컴포넌트 없이)
-- [ ] **Phase 33: E2E 검증 + 운영 전환** - MailHog→운영 SMTP 런북, 검색 10K/50-user 1초 NFR 실측, 통합 회귀 테스트 (선택적 wrap-up)
+- [x] **Phase 33: E2E 검증 + 운영 전환** - 보안 보강(application-prod.yml 자격증명 위생) + 운영 SMTP 런북 + NFR-01 운영 모니터링 게이트 + v1.2-MILESTONE-AUDIT 9 출시 게이트 (completed 2026-04-28)
 
 ## Phase Details
 
@@ -318,13 +318,13 @@ Plans:
   1. MailHog 개발 환경에서 5종 이벤트(상신/중간 승인/최종 승인/반려/회수) 이메일이 각각 1통씩 정확히 도착하고, 운영 SMTP 전환 런북(`MAIL_HOST/MAIL_PORT/MAIL_USERNAME/MAIL_PASSWORD` 체크리스트 + `app.base-url` 검증)이 문서화된다
   2. 10,000 문서 seed + 50 동시 사용자 부하 테스트에서 `/api/v1/documents/search` 95p ≤ 1초가 실측 통과하고 측정 리포트가 `.planning/milestones/v1.2/` 에 기록된다
   3. 결재 승인·반려 직후 대시보드 `invalidateQueries` 가 실시간으로 반영되며, `audit_log` 에 각 action 당 정확히 1개 row 가 존재한다 (SMTP 리스너로 인한 중복 없음)
-**Plans:** 5 plans
+**Plans:** 5/5 plans complete
 Plans:
-- [ ] 33-01-PLAN.md — 보안 보강: application-prod.yml 자격증명 위생 + .env.production 카탈로그 + .gitignore 차단 (D-C1, Wave 1)
-- [ ] 33-02-PLAN.md — 운영 SMTP 전환 런북 (.planning/milestones/v1.2/SMTP-RUNBOOK.md — 사내 IT 협업 + systemd EnvironmentFile + 5종 smoke + 트러블슈팅, D-M1/M2/M3, Wave 2)
-- [ ] 33-03-PLAN.md — NFR-01 운영 모니터링 게이트 (.planning/milestones/v1.2/MONITORING.md — slow_query_log + 3 신호 + Plan 30-05 인프라 재활용 절차, D-S2, Wave 2)
-- [ ] 33-04-PLAN.md — v1.2-MILESTONE-AUDIT (.planning/milestones/v1.2/AUDIT.md — SC 매트릭스 + Deferred 추적 + Requirements 매핑 + 9 출시 게이트 + 5종 smoke 사용자 sign-off, D-A1, Wave 3)
-- [ ] 33-05-PLAN.md — Phase 33 종결 verification + ROADMAP/STATE/VALIDATION 갱신 + v1.2 archive 시점 결정 (Wave 4)
+- [x] 33-01-PLAN.md — 보안 보강: application-prod.yml 자격증명 위생 + .env.production 카탈로그 + .gitignore 차단 (D-C1, Wave 1)
+- [x] 33-02-PLAN.md — 운영 SMTP 전환 런북 (.planning/milestones/v1.2/SMTP-RUNBOOK.md — 사내 IT 협업 + systemd EnvironmentFile + 5종 smoke + 트러블슈팅, D-M1/M2/M3, Wave 2)
+- [x] 33-03-PLAN.md — NFR-01 운영 모니터링 게이트 (.planning/milestones/v1.2/MONITORING.md — slow_query_log + 3 신호 + Plan 30-05 인프라 재활용 절차, D-S2, Wave 2)
+- [x] 33-04-PLAN.md — v1.2-MILESTONE-AUDIT (.planning/milestones/v1.2/AUDIT.md — SC 매트릭스 + Deferred 추적 + Requirements 매핑 + 9 출시 게이트 + 5종 smoke 사용자 sign-off, D-A1, Wave 3)
+- [x] 33-05-PLAN.md — Phase 33 종결 verification + ROADMAP/STATE/VALIDATION 갱신 + v1.2 archive 시점 결정 (Wave 4)
 **Note**: 본 phase 는 사용자 결정 D-S1 (CONTEXT.md) 에 따라 축소 scope — NFR-01 합성 부하 실측은 운영 모니터링 게이트로 이관 (`.planning/milestones/v1.2/MONITORING.md` §3 + AUDIT.md §2-A)
 **UI hint**: no
 
@@ -357,4 +357,4 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33
 | 30. 검색 권한 WHERE 절 보안 수정 + 필터 확장 | v1.2 | 5/5 | Complete    | 2026-04-27 |
 | 31. 대시보드 고도화 | v1.2 | 6/6 | Complete    | 2026-04-24 |
 | 32. CUSTOM 프리셋 확장 | v1.2 | 0/TBD | Not started | — |
-| 33. E2E 검증 + 운영 전환 | v1.2 | 0/TBD | Not started | — |
+| 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
