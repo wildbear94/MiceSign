@@ -1,6 +1,9 @@
 spring:
   datasource:
     url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:micesign}
+    # Phase 33 D-C1 — 운영 자격증명은 env var only.
+    # /etc/micesign/.env.production (chmod 600) 에서 EnvironmentFile= 로 주입.
+    # default 비워둠으로써 미주입 시 HikariCP startup 실패 → 사고 fail-fast.
     username: ${DB_USER:}
     password: ${DB_PASS:}
     driver-class-name: org.mariadb.jdbc.Driver
