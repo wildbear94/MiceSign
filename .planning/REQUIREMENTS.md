@@ -201,7 +201,8 @@ Requirements for Milestone v1.2: Phase 1-B — 일상 업무 대체 수준 (SMTP
 
 ### 비기능 요구사항 (NFR - v1.2 범위 내)
 
-- [ ] **NFR-01**: 검색 응답 95p ≤ 1초 (SRCH-06과 중복 명시 — NFR 관점)
+- [x] **NFR-01
+**: 검색 응답 95p ≤ 1초 (SRCH-06과 중복 명시 — NFR 관점)
 - [x] **NFR-02
 **: 이메일 발송이 결재 트랜잭션을 블로킹하지 않는다 (`@Async` + `AFTER_COMMIT`)
 - [x] **NFR-03
