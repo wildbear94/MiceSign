@@ -299,14 +299,15 @@ Plans:
   1. 관리자가 양식 생성 모달의 프리셋 갤러리에서 "회의록" 을 선택하면 회의 일시/참석자/안건/결정사항 필드가 사전 정의된 CUSTOM 스키마가 즉시 로드되어 저장 없이 편집 가능한 상태로 열린다
   2. 관리자가 "품의서" 프리셋을 선택하면 품의 배경·제안 내용·예상 효과·첨부 필드가 사전 정의된 CUSTOM 스키마가 즉시 로드된다
   3. 두 프리셋 JSON 모두 v1.1 `templateImportSchema` Zod 검증을 통과하고, 프리셋 기반으로 생성된 양식이 사용자 기안 화면에서 `DynamicCustomForm` 으로 정상 렌더된다 (과거 문서 snapshot 불변성 유지)
-**Plans:** 6 plans
+**Plans:** 6/6 plans complete
 Plans:
-- [ ] 32-01-PLAN.md — meeting.json 작성 + Zod 통과 (Wave 1, FORM-01)
-- [ ] 32-02-PLAN.md — proposal.json 작성 + Zod 통과 (Wave 1, FORM-02)
+- [x] 32-01-PLAN.md — meeting.json 작성 + Zod 통과 (Wave 1, FORM-01)
+- [x] 32-02-PLAN.md — proposal.json 작성 + Zod 통과 (Wave 1, FORM-02)
 - [x] 32-03-PLAN.md — PresetGallery ICON_MAP/I18N_MAP 4 entry 추가 (Wave 2, FORM-01/02)
-- [ ] 32-04-PLAN.md — ko/admin.json 4 신규 i18n 키 추가 (Wave 2, FORM-01/02)
-- [ ] 32-05-PLAN.md — presets.test.ts length=6 + meeting/proposal 신규 단언 (Wave 2, FORM-01/02)
-- [ ] 32-06-PLAN.md — 통합 검증 (vitest+build+tsc) + 32-HUMAN-UAT.md (Wave 3, autonomous=false)
+- [x] 32-04-PLAN.md — ko/admin.json 4 신규 i18n 키 추가 (Wave 2, FORM-01/02)
+- [x] 32-05-PLAN.md — presets.test.ts length=6 + meeting/proposal 신규 단언 (Wave 2, FORM-01/02)
+- [x] 32-06-PLAN.md — 통합 검증 PASS + HUMAN-UAT signed off 2026-04-26 + 32-REVIEW-FIX 4 fixes (Wave 3)
+**Code Review:** 32-REVIEW.md (status=issues_found, 0 critical / 2 warning / 5 info) → 32-REVIEW-FIX.md (4 fixed: WR-02/IN-01/IN-02/IN-03 / 3 skipped: WR-01·IN-04·IN-05 with CONTEXT-D-A5/D-C5/D-E1 + UAT T-32-02 rationale)
 **UI hint**: yes
 
 ### Phase 33: E2E 검증 + 운영 전환
@@ -356,7 +357,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34
 | 29. SMTP 이메일 알림 인프라 (Retrofit) | v1.2 | 5/5 | Complete    | 2026-04-23 |
 | 30. 검색 권한 WHERE 절 보안 수정 + 필터 확장 | v1.2 | 5/5 | Complete    | 2026-04-27 |
 | 31. 대시보드 고도화 | v1.2 | 6/6 | Complete    | 2026-04-24 |
-| 32. CUSTOM 프리셋 확장 | v1.2 | 0/TBD | Not started | — |
+| 32. CUSTOM 프리셋 확장 | v1.2 | 6/6 | Complete    | 2026-04-26 |
 | 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
 | 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 6/6 | Complete    | 2026-04-29 |
 

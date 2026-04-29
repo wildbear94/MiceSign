@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: phase_34_complete
-stopped_at: Phase 34 (drafter-info-header) complete — UAT approved 2026-04-29, ROADMAP/VALIDATION synced. Phase 32 (CUSTOM 프리셋 확장) remains the only incomplete phase in v1.2.
-last_updated: "2026-04-29T07:00:00.000Z"
+status: v1.2_all_phases_complete
+stopped_at: "v1.2 all 6 phases complete — Phase 32 ROADMAP/STATE sync (2026-04-29) + 32-REVIEW-FIX 4 fixes applied. Phase 32 was actually finished 2026-04-26 (UAT signed off) but ROADMAP/STATE was stale. v1.2 ship-ready pending defer-archive trigger."
+last_updated: "2026-04-29T08:00:00.000Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 15
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 39
-  completed_plans: 38
-  percent: 97
+  completed_plans: 39
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,15 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 ## Current Position
 
-Phase: 34 (drafter-info-header) — **COMPLETE** (UAT approved 2026-04-29)
-Plan: 6/6 complete (34-01~06)
-Status: Phase 34 종결 — v1.2 잔여 phase = 32 (CUSTOM 프리셋 확장) 만 남음
-Last activity: 2026-04-29 — Phase 34 wrap-up (UAT approved, ROADMAP/VALIDATION/STATE synced)
+Phase: v1.2 milestone all phases COMPLETE — most recent: Phase 32 sync (2026-04-29) + Phase 34 종결 (2026-04-29)
+Plan: 39/39 complete across 7 v1.2 phases (29/30/31/32/33/34 + 24.1 inserted)
+Status: **v1.2 ship-ready** — `defer-archive` 결정 (2026-04-28) 유지, 출시 트리거 대기
+Last activity: 2026-04-29 — Phase 32 sync + 32-REVIEW-FIX 4건 + ROADMAP/STATE/VALIDATION 정합
 
-Progress: [██████████] 97% (38/39 plans — Phase 32 잔여 외 6 phase 종결)
+Progress: [██████████] 100% (39/39 plans — v1.2 모든 phase 종결)
+
+**Phase 32 sync 정정 메모 (2026-04-29):**
+이전 STATE/ROADMAP 의 "Phase 32 잔여" 표기는 실제 진행 상황과 어긋난 stale 상태였음. 실제로는 2026-04-22~26 사이에 완료 (6/6 plans, UAT signed off 2026-04-26 by park sang young, decision=pass). Phase 33/34 의 STATE 갱신이 Phase 32 표 동기화를 누락한 채 진행되어 발생한 누적 표기 오류. Phase 34 종결 시 발견하여 본 sync 로 정정.
 
 **Phase 34 종결 요약 (2026-04-29):**
 
@@ -131,6 +134,7 @@ Progress: [██████████] 97% (38/39 plans — Phase 32 잔여 
 - v1.2 roadmap appended 2026-04-22: Phases 29-33 (SMTP/Search/Dashboard/Forms/E2E)
 - Phase 34 added 2026-04-29: 양식 기안자 정보 헤더 자동 채움 — 모든 양식 헤더에 부서/직위(직책)/기안자명/기안일 SUBMITTED snapshot 표시. document_content JSON 에 drafterSnapshot 키 저장 (Flyway 불필요). v1.2 ship-ready 이후 추가, archive 시점 결정에 영향 없음 (Phase 32 와 독립 병행)
 - Phase 34 complete 2026-04-29: 6/6 plans, 14 form integration points wired, 14-point HUMAN-UAT approved. Latent bug Pitfall 6 (DocumentDetailResponse.drafter nested type) 정정 동시 포함. Q1=A (UserProfile 확장) / Q2=A (snapshot 직렬화 실패 시 트랜잭션 롤백) / Q3=A (latent bug 동시 정정) 모두 ship
+- Phase 32 ROADMAP/STATE sync 2026-04-29: 실제 완료일 2026-04-26 (UAT signed off, 6/6 plans). 32-REVIEW-FIX.md 추가 — 4 fixes applied (WR-02 brittle 단언/IN-01 한국어 정규식/IN-02 sort dependency/IN-03 type modifier), 3 skipped (WR-01 D-A5+T-32-02 옵션A 채택, IN-04 future enhancement, IN-05 D-C5+D-E1 dual-source by design). v1.2 milestone 전체 종결 — Phase 32 stale 표기로 인한 v1.2 sync 정합성 오류 정리
 
 ### Decisions
 
