@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import type { DrafterLive, DrafterSnapshot } from '../DrafterInfoHeader';
 import DynamicCustomForm from '../dynamic/DynamicCustomForm';
 import DynamicCustomReadOnly from '../dynamic/DynamicCustomReadOnly';
 import GeneralForm from './GeneralForm';
@@ -25,6 +26,8 @@ export interface TemplateEditProps {
   };
   onSave: (data: { title: string; bodyHtml?: string; formData?: string }) => Promise<void>;
   readOnly?: boolean;
+  /** Phase 34 — DRAFT 모드 헤더 데이터. 신규/저장된 DRAFT 모두 라이브 정보로 정규화. */
+  drafterLive: DrafterLive;
 }
 
 export interface TemplateReadOnlyProps {
@@ -33,6 +36,12 @@ export interface TemplateReadOnlyProps {
   formData?: string | null;
   /** CUSTOM 템플릿 전용 — DocumentDetailResponse.schemaDefinitionSnapshot 값 (JSON string) */
   schemaSnapshot?: string | null;
+  /** Phase 34 — submit 시점 박제된 snapshot (legacy 문서는 null). */
+  drafterSnapshot: DrafterSnapshot | null;
+  /** Phase 34 — snapshot null 일 때 fallback. */
+  drafterLive: DrafterLive;
+  /** Phase 34 — snapshot null 일 때 날짜 source. */
+  submittedAt: string;
 }
 
 export interface TemplateEntry {
