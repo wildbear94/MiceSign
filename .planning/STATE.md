@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: executing
-stopped_at: "Phase 35-01 Task 1+2 committed (4eea6f1, 0348499) — Task 3 checkpoint:human-verify awaiting UAT (35-HUMAN-UAT.md)"
-last_updated: "2026-04-29T08:34:35.094Z"
-last_activity: 2026-04-29 -- Phase 35-01 reached checkpoint (Task 1+2 PASS, Task 3 awaiting human UAT)
+status: v1.2_all_phases_complete
+stopped_at: "Phase 35 complete — UAT approved 2026-04-29 (7/7 gates PASS). v1.2 milestone 8 phases all complete: 24.1 + 29 + 30 + 31 + 32 + 33 + 34 + 35. Ship-ready pending defer-archive trigger."
+last_updated: "2026-04-29T09:30:00.000Z"
+last_activity: 2026-04-29 -- Phase 35 종결 (UAT approved, ROADMAP/STATE synced)
 progress:
   total_phases: 16
-  completed_phases: 7
-  total_plans: 34
-  completed_plans: 34
+  completed_phases: 8
+  total_plans: 40
+  completed_plans: 40
   percent: 100
 ---
 
@@ -25,12 +25,21 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 ## Current Position
 
-Phase: 35 (backend-logging) — EXECUTING (checkpoint reached)
-Plan: 1 of 1 — Task 1+2 committed, Task 3 awaiting human UAT
-Status: Awaiting human UAT sign-off (35-HUMAN-UAT.md)
-Last activity: 2026-04-29 -- Phase 35-01 reached checkpoint (Task 1+2 PASS)
+Phase: 35 (backend-logging) — **COMPLETE** (UAT approved 2026-04-29 — 7/7 gates PASS)
+Plan: 1/1 complete
+Status: **v1.2 ship-ready** — 모든 phase 완료. defer-archive (2026-04-28) 결정 유지, 출시 트리거 대기
+Last activity: 2026-04-29 — Phase 35 종결 (logback 일별 롤링 + 30일 보관 + prod=INFO/dev=DEBUG 프로필 분리)
 
-Progress: [█████████░] 97% (39/40 plans est. — Phase 35 plan_count 미정)
+Progress: [██████████] 100% (40/40 plans — v1.2 모든 phase 종결)
+
+**Phase 35 종결 요약 (2026-04-29):**
+
+- Task 1 (4eea6f1) — `application.yml` logging block: file.name + 5종 rolling-policy + UTF-8 charset + root=INFO
+- Task 2 (0348499) — `application-dev.yml` `root: DEBUG` + `application-prod.yml.example` LOG_DIR 카탈로그 + `.gitignore` `backend/logs/`
+- Task 3 (HUMAN-UAT) — dev/prod 부팅 smoke 7/7 게이트 PASS (사용자 직접 검증)
+- 산출물: `backend/src/main/resources/application*.yml` 3 파일 + `.gitignore`. logback-spring.xml 미생성 (D-A1 채택, Spring Boot 3.x 표준 only).
+- 무수정 (보존): `application-prod.yml`, `application-bench.yml`, Phase 33 자격증명 위생
+- 운영 인계: `LOG_DIR=/var/log/micesign` env var → systemd EnvironmentFile 추가 권장 (코드 외 인계, SMTP-RUNBOOK 다음 갱신 시)
 
 **Phase 32 sync 정정 메모 (2026-04-29):**
 이전 STATE/ROADMAP 의 "Phase 32 잔여" 표기는 실제 진행 상황과 어긋난 stale 상태였음. 실제로는 2026-04-22~26 사이에 완료 (6/6 plans, UAT signed off 2026-04-26 by park sang young, decision=pass). Phase 33/34 의 STATE 갱신이 Phase 32 표 동기화를 누락한 채 진행되어 발생한 누적 표기 오류. Phase 34 종결 시 발견하여 본 sync 로 정정.
@@ -136,6 +145,7 @@ Progress: [█████████░] 97% (39/40 plans est. — Phase 35 pl
 - Phase 34 complete 2026-04-29: 6/6 plans, 14 form integration points wired, 14-point HUMAN-UAT approved. Latent bug Pitfall 6 (DocumentDetailResponse.drafter nested type) 정정 동시 포함. Q1=A (UserProfile 확장) / Q2=A (snapshot 직렬화 실패 시 트랜잭션 롤백) / Q3=A (latent bug 동시 정정) 모두 ship
 - Phase 32 ROADMAP/STATE sync 2026-04-29: 실제 완료일 2026-04-26 (UAT signed off, 6/6 plans). 32-REVIEW-FIX.md 추가 — 4 fixes applied (WR-02 brittle 단언/IN-01 한국어 정규식/IN-02 sort dependency/IN-03 type modifier), 3 skipped (WR-01 D-A5+T-32-02 옵션A 채택, IN-04 future enhancement, IN-05 D-C5+D-E1 dual-source by design). v1.2 milestone 전체 종결 — Phase 32 stale 표기로 인한 v1.2 sync 정합성 오류 정리
 - Phase 35 added 2026-04-29: 백엔드 로그 설정 — logback-spring.xml 일별 롤링 파일 어펜더 + 30일 보관 + 프로필 기반 레벨 분리 (prod=INFO / dev=전체). 운영 환경 배포 전 로깅 인프라 정립. 어떤 기존 phase 와도 의존성 없음. archive-defer trigger 와 독립 — 출시 안정화 후가 아니라 출시 전에 처리하는 게 자연스러움
+- Phase 35 complete 2026-04-29: 1/1 plan, 3 tasks (2 auto + 1 human-verify). Spring Boot 3.x 표준 logging.* properties 만 사용 (logback-spring.xml 미생성, D-A1 채택). UAT 7/7 gates PASS. v1.2 milestone 모든 phase 완료 (24.1+29+30+31+32+33+34+35 = 8 phases, 40 plans 100%)
 
 ### Decisions
 
