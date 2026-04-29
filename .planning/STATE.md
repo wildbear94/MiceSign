@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: phase_33_complete
-stopped_at: Completed 33-05-PLAN.md (Phase 33 wrap-up — v1.2 ship-ready, archive pending user decision)
-last_updated: "2026-04-28T09:30:00.000Z"
-last_activity: 2026-04-28
+status: executing
+stopped_at: Phase 34 Plan 01 complete — latent bug fix landed (Wave 1 done)
+last_updated: "2026-04-29T05:47:54.832Z"
+last_activity: 2026-04-29
 progress:
-  total_phases: 5
-  completed_phases: 4
-  total_plans: 27
-  completed_plans: 26
-  percent: 96
+  total_phases: 15
+  completed_phases: 5
+  total_plans: 33
+  completed_plans: 28
+  percent: 85
 ---
 
 # Project State
@@ -21,23 +21,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 33 — e2e
+**Current focus:** Phase 34 — drafter-info-header
 
 ## Current Position
 
-Phase: 33 (e2e) — COMPLETE (Wave 4 wrap-up)
-Plan: 5/5 complete
-Status: v1.2 ship-ready · **archive: DEFERRED** (사용자 결정 2026-04-28 — 운영 출시 + 1-2주 안정화 후 archive)
-Last activity: 2026-04-28 — Phase 33 wrap-up complete (33-01~05 모두 종결)
+Phase: 34 (drafter-info-header) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-04-29
 
-Progress: [█████████░] 96% (v1.2 — Phase 32 잔여 외 4 phase 종결)
+Progress: [█████████░] 85%
 
 **Archive 결정 (2026-04-28):** `defer-archive` 채택
+
 - 사유: AUDIT.md §G5/§G6/§5 의 RELEASE-DEFERRED 패턴과 정합 — 실 출시 + 운영 안정화 후 archive 시점 동기화
 - 트리거: 출시 일자 결정 + 1-2주 운영 모니터링 무이슈 → `/gsd-complete-milestone v1.2`
 - v1.3 신규 milestone 시작은 archive 시점 또는 그 이후 별도 `/gsd-new-milestone`
 
 **Phase 33 종결 요약:**
+
 - 33-01 — application-prod.yml 자격증명 위생 (4 commits)
 - 33-02 — SMTP-RUNBOOK.md 480 lines (3 commits)
 - 33-03 — MONITORING.md 450 lines (2 commits)
@@ -47,6 +49,7 @@ Progress: [█████████░] 96% (v1.2 — Phase 32 잔여 외 4 p
 - 축소 scope (D-S1) — NFR-01 합성 부하 실측은 운영 모니터링 게이트로 이관 (`MONITORING.md §3` + `AUDIT.md §2-A`)
 
 **Deferred 항목 인계 (release-time):**
+
 - NFR-01 → MONITORING.md (3 신호 발동 시 재실측: SearchBenchmarkSeeder + bench-search.sh)
 - stale PENDING / NOTIF FAILED 주간 점검 → SMTP-RUNBOOK.md §6
 - secret manager / APM → v1.3 또는 50→200 확장 시점
@@ -102,6 +105,7 @@ Progress: [█████████░] 96% (v1.2 — Phase 32 잔여 외 4 p
 | Phase 33 P01 | 1m 26s | 3 tasks tasks | 3 files files |
 | Phase 33 P02 | 6m 16s | 2 tasks tasks | 1 file files |
 | Phase 33 P03 | 5min | 1 tasks | 1 files |
+| Phase 34 P01 | 2m 32s | 2 tasks tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -166,6 +170,7 @@ Progress: [█████████░] 96% (v1.2 — Phase 32 잔여 외 4 p
 - [Phase 33-04] AUDIT.md (436 lines, 6 섹션) — §0 요약 + §1 17 SC 매트릭스 + §2 5 Deferred + §3 21 Requirements 매핑 + §4 9 출시 게이트 + §5 출시 결정 placeholder. RELEASE-DEFERRED for Task 4 (사용자 결정 2026-04-28): 5종 smoke + audit_log SQL sign-off 는 phase 종결 gate 가 아닌 release-time gate 로 보존 — D-M3 ('출시 전 1회 수동 smoke') 정의 및 Plan 30-05 deferral 패턴과 정합.
 - [Phase 33-04] release-time gate vs phase-completion gate 분리 패턴 확립 — wrap-up phase 의 deliverable 은 'gate 정의 + 절차 문서화' 이며 gate 통과 마킹은 출시 시점에 별도 수행. AUDIT.md §G5/§G6/§5 placeholder 가 unchecked 보존되며 출시 담당자가 SMTP-RUNBOOK §5 절차 후 직접 마킹.
 - [Phase 33-05] Phase 33 종결 verification + ROADMAP/STATE/VALIDATION 갱신 — 33-01~04 산출물 grep 검증 PASS (4 산출물 + cross-reference 무결성), ROADMAP Phase 33 [x] + 5/5 + 2026-04-28, STATE v1.2 ship-ready 상태, 33-VALIDATION.md (doc-only Nyquist) 작성. archive 시점은 Task 6 사용자 결정 대기 (archive-now / defer-archive / archive-after-32).
+- [Phase Phase 34-01]: DocumentDetailResponse FE 타입을 backend flat record (drafterName/departmentName/positionName) 와 정합 + DocumentDetailPage L228 doc.drafter.name → doc.drafterName 정정 — D-G1/G2/G3 latent bug atomic 분리, 후속 plan 34-04/34-05 헤더 통합이 type-correct base 위에서 진행 가능
 
 ### Pending Todos
 
@@ -179,13 +184,14 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T09:30:00.000Z
-Stopped at: Completed 33-05-PLAN.md (Phase 33 wrap-up — v1.2 ship-ready, archive 시점 사용자 결정 대기)
-Resume file: None
+Last session: 2026-04-29T05:47:54.826Z
+Stopped at: Phase 34 Plan 01 complete — latent bug fix landed (Wave 1 done)
+Resume file: .planning/phases/34-drafter-info-header/34-02-PLAN.md
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 
 **v1.2 ship-ready checkpoint (2026-04-28):**
+
 - 5/5 phase 중 4 종결 (29/30/31/33), Phase 32 만 잔여 (별도 일정)
 - 출시 게이트 9개 정의 완료 (AUDIT.md §4) — release-time 마킹 대기 항목 8개 (G5.1-5/G6.1-2/§5.1-3)
 - 다음 액션: 사용자 archive 시점 결정 (Plan 33-05 Task 6 checkpoint:decision)
