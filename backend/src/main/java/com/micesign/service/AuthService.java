@@ -261,13 +261,22 @@ public class AuthService {
     }
 
     private UserProfileDto buildUserProfile(User user) {
+        // Phase 34 (D-F2) — null-safe LAZY join (DocumentMapper L21~24 SoT pattern).
+        // Class-level @Transactional (L26) keeps the LAZY proxy attached for both
+        // login() and refresh() call paths.
+        String departmentName = user.getDepartment() != null
+                ? user.getDepartment().getName() : null;
+        String positionName = user.getPosition() != null
+                ? user.getPosition().getName() : null;
         return new UserProfileDto(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole().name(),
                 user.getDepartmentId(),
-                user.isMustChangePassword()
+                user.isMustChangePassword(),
+                departmentName,            // Phase 34 (D-F2)
+                positionName               // Phase 34 (D-F2)
         );
     }
 }

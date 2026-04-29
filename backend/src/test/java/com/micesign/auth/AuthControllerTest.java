@@ -63,6 +63,40 @@ class AuthControllerTest {
     }
 
     @Test
+    void login_responseIncludesDeptAndPosition() throws Exception {
+        // Phase 34 (D-F1/D-F2/D-E1) — login response must expose live departmentName + positionName
+        // populated via null-safe LAZY join in AuthService.buildUserProfile.
+        // SUPER_ADMIN seeded in V2 has departmentId=1; positionName key MUST be present per D-C4
+        // (value MAY be null if seed assigns no position — assertion accepts either).
+        LoginRequest request = new LoginRequest(ADMIN_EMAIL, ADMIN_PASSWORD, false);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.user.email").value(ADMIN_EMAIL))
+                // Both keys MUST be present in payload (D-C4 — key-present convention)
+                .andExpect(jsonPath("$.data.user.departmentName").exists())
+                .andExpect(jsonPath("$.data.user.positionName").exists())
+                .andReturn();
+
+        com.fasterxml.jackson.databind.JsonNode userNode =
+                objectMapper.readTree(result.getResponse().getContentAsString())
+                        .path("data").path("user");
+
+        // departmentName: SUPER_ADMIN seeded with departmentId=1 — MUST be non-null
+        org.junit.jupiter.api.Assertions.assertFalse(userNode.path("departmentName").isMissingNode(),
+                "departmentName key must exist in login response");
+        org.junit.jupiter.api.Assertions.assertNotNull(userNode.path("departmentName").asText(null),
+                "departmentName must be non-null for SUPER_ADMIN (V2 seed assigns departmentId=1)");
+
+        // positionName: key MUST be present per D-C4; value MAY be null depending on V2 seed
+        org.junit.jupiter.api.Assertions.assertTrue(userNode.has("positionName"),
+                "positionName key must be present even if value is null (D-C4)");
+    }
+
+    @Test
     void loginInvalidCredentials() throws Exception {
         LoginRequest request = new LoginRequest(ADMIN_EMAIL, "wrongpassword", false);
 
