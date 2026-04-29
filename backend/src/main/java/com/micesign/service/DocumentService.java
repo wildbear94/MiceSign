@@ -295,6 +295,46 @@ public class DocumentService {
         document.setStatus(DocumentStatus.SUBMITTED);
         document.setSubmittedAt(LocalDateTime.now());
 
+        // Phase 34: drafter snapshot 박제 (D-C1, D-C2, D-A3)
+        // Permanently captures the drafter's department / position / name and the
+        // submission timestamp into content.formData under a new `drafterSnapshot`
+        // key, so future user dept/position changes (transfer, promotion) do NOT
+        // alter what is shown on the historical document header (D-A5, D-C5).
+        User drafter = document.getDrafter();
+        String departmentName = drafter.getDepartment() != null
+                ? drafter.getDepartment().getName() : null;
+        String positionName = drafter.getPosition() != null
+                ? drafter.getPosition().getName() : null;
+        try {
+            java.util.Map<String, Object> body;
+            String currentFormData = content.getFormData();
+            if (currentFormData == null || currentFormData.isBlank()) {
+                body = new java.util.LinkedHashMap<>();
+            } else {
+                body = objectMapper.readValue(
+                        currentFormData,
+                        new com.fasterxml.jackson.core.type.TypeReference<java.util.LinkedHashMap<String, Object>>() {});
+            }
+            java.util.Map<String, Object> snapshot = new java.util.LinkedHashMap<>();
+            snapshot.put("departmentName", departmentName);
+            snapshot.put("positionName", positionName);  // null 허용 (D-C4) — key present, value JSON null
+            snapshot.put("drafterName", drafter.getName());
+            snapshot.put("draftedAt", document.getSubmittedAt().toString()); // ISO LocalDateTime
+            body.put("drafterSnapshot", snapshot);
+            content.setFormData(objectMapper.writeValueAsString(body));
+            documentContentRepository.save(content);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize drafterSnapshot for document {}: {}",
+                    document.getId(), e.getMessage());
+            // D-C7 (CONTEXT.md, Q2=A) — see PLAN 34-03 §rationale: rollback path validated by
+            // code review, not unit test (provoking JsonProcessingException requires mocking
+            // ObjectMapper which would break production reuse). RESEARCH option B
+            // (swallow + log.warn, mirroring the audit-log try/catch below) was deliberately
+            // rejected — data consistency over partial write: the entire submit transaction
+            // rolls back so no document transitions to SUBMITTED without a snapshot.
+            throw new RuntimeException("DOC_SNAPSHOT_FAILED", e);
+        }
+
         // Set currentStep to first non-REFERENCE step (if approval lines exist)
         List<ApprovalLine> approvalLines = approvalLineRepository.findByDocumentIdOrderByStepOrderAsc(docId);
         if (!approvalLines.isEmpty()) {
