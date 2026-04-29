@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
 status: executing
-stopped_at: Phase 34 Plan 01 complete — latent bug fix landed (Wave 1 done)
-last_updated: "2026-04-29T05:47:54.832Z"
+stopped_at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
+last_updated: "2026-04-29T05:54:47.519Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 15
   completed_phases: 5
   total_plans: 33
-  completed_plans: 28
-  percent: 85
+  completed_plans: 29
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 34 (drafter-info-header) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 88%
 
 **Archive 결정 (2026-04-28):** `defer-archive` 채택
 
@@ -106,6 +106,7 @@ Progress: [█████████░] 85%
 | Phase 33 P02 | 6m 16s | 2 tasks tasks | 1 file files |
 | Phase 33 P03 | 5min | 1 tasks | 1 files |
 | Phase 34 P01 | 2m 32s | 2 tasks tasks | 2 files files |
+| Phase 34 P02 | 2m 11s | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -171,6 +172,7 @@ Progress: [█████████░] 85%
 - [Phase 33-04] release-time gate vs phase-completion gate 분리 패턴 확립 — wrap-up phase 의 deliverable 은 'gate 정의 + 절차 문서화' 이며 gate 통과 마킹은 출시 시점에 별도 수행. AUDIT.md §G5/§G6/§5 placeholder 가 unchecked 보존되며 출시 담당자가 SMTP-RUNBOOK §5 절차 후 직접 마킹.
 - [Phase 33-05] Phase 33 종결 verification + ROADMAP/STATE/VALIDATION 갱신 — 33-01~04 산출물 grep 검증 PASS (4 산출물 + cross-reference 무결성), ROADMAP Phase 33 [x] + 5/5 + 2026-04-28, STATE v1.2 ship-ready 상태, 33-VALIDATION.md (doc-only Nyquist) 작성. archive 시점은 Task 6 사용자 결정 대기 (archive-now / defer-archive / archive-after-32).
 - [Phase Phase 34-01]: DocumentDetailResponse FE 타입을 backend flat record (drafterName/departmentName/positionName) 와 정합 + DocumentDetailPage L228 doc.drafter.name → doc.drafterName 정정 — D-G1/G2/G3 latent bug atomic 분리, 후속 plan 34-04/34-05 헤더 통합이 type-correct base 위에서 진행 가능
+- [Phase ?]: [Phase 34-02] UserProfileDto extended (departmentName + positionName, both nullable) — single SoT for login + refresh responses; AuthService.buildUserProfile null-safe LAZY join replicates DocumentMapper L21~24 pattern; class-level @Transactional (L26) covers LAZY safety, no per-method retrofit needed.
 
 ### Pending Todos
 
@@ -184,9 +186,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T05:47:54.826Z
-Stopped at: Phase 34 Plan 01 complete — latent bug fix landed (Wave 1 done)
-Resume file: .planning/phases/34-drafter-info-header/34-02-PLAN.md
+Last session: 2026-04-29T05:54:47.513Z
+Stopped at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
+Resume file: .planning/phases/34-drafter-info-header/34-03-PLAN.md
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 
