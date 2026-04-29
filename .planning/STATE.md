@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: executing
-stopped_at: Completed 34-05-PLAN.md
-last_updated: "2026-04-29T06:27:44.323Z"
+status: phase_34_complete
+stopped_at: Phase 34 (drafter-info-header) complete — UAT approved 2026-04-29, ROADMAP/VALIDATION synced. Phase 32 (CUSTOM 프리셋 확장) remains the only incomplete phase in v1.2.
+last_updated: "2026-04-29T07:00:00.000Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 15
-  completed_phases: 5
-  total_plans: 33
-  completed_plans: 32
+  completed_phases: 6
+  total_plans: 39
+  completed_plans: 38
   percent: 97
 ---
 
@@ -25,18 +25,30 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 ## Current Position
 
-Phase: 34 (drafter-info-header) — EXECUTING
-Plan: 6 of 6
-Status: Ready to execute
-Last activity: 2026-04-29
+Phase: 34 (drafter-info-header) — **COMPLETE** (UAT approved 2026-04-29)
+Plan: 6/6 complete (34-01~06)
+Status: Phase 34 종결 — v1.2 잔여 phase = 32 (CUSTOM 프리셋 확장) 만 남음
+Last activity: 2026-04-29 — Phase 34 wrap-up (UAT approved, ROADMAP/VALIDATION/STATE synced)
 
-Progress: [██████████] 97%
+Progress: [██████████] 97% (38/39 plans — Phase 32 잔여 외 6 phase 종결)
 
-**Archive 결정 (2026-04-28):** `defer-archive` 채택
+**Phase 34 종결 요약 (2026-04-29):**
+
+- 34-01 — Latent FE bug fix (DocumentDetailResponse flat-field alignment + L228 정정), 3 commits
+- 34-02 — BE auth 확장 (UserProfileDto + AuthService null-safe LAZY join), 3 commits
+- 34-03 — BE snapshot 캡처 + D-C7 트랜잭션 롤백 + 3 신규 통합 테스트, 3 commits
+- 34-04 — DrafterInfoHeader 컴포넌트 + 3-case vitest + 8 i18n + UserProfile FE + templateRegistry, 5 commits
+- 34-05 — 14 통합 지점 + 2 페이지 consumer + 중복 셀 제거, 4 commits
+- 34-06 — 자동 회귀 PASS (BE 170/173, FE 63/63, tsc 0, build OK) + 14-point HUMAN-UAT approved, 2 commits + 1 종결 commit
+- 산출물: `frontend/src/features/document/components/DrafterInfoHeader.tsx` (신규), 14 양식 통합, `document_content.form_data.drafterSnapshot` JSON 키 박제
+- Pre-existing flakiness 3건 (ApprovalWorkflowTest) → `.planning/phases/34-drafter-info-header/deferred-items.md` 인계 (Phase 34 무관, master 에서 동일 재현 검증됨)
+
+**Archive 결정 (2026-04-28, 변경 없음):** `defer-archive` 유지
 
 - 사유: AUDIT.md §G5/§G6/§5 의 RELEASE-DEFERRED 패턴과 정합 — 실 출시 + 운영 안정화 후 archive 시점 동기화
 - 트리거: 출시 일자 결정 + 1-2주 운영 모니터링 무이슈 → `/gsd-complete-milestone v1.2`
 - v1.3 신규 milestone 시작은 archive 시점 또는 그 이후 별도 `/gsd-new-milestone`
+- Phase 34 가 v1.2 ship-ready 이후 추가됐지만 archive 시점 결정에는 영향 없음 (Phase 32 잔여와 함께 출시 시점에 종합 판단)
 
 **Phase 33 종결 요약:**
 
@@ -118,6 +130,7 @@ Progress: [██████████] 97%
 - Phase 24.1 inserted after Phase 24: 사용자 측 동적 폼 렌더러 - CUSTOM 템플릿으로 기안 작성/조회를 위한 DynamicFormRenderer 구현 (URGENT)
 - v1.2 roadmap appended 2026-04-22: Phases 29-33 (SMTP/Search/Dashboard/Forms/E2E)
 - Phase 34 added 2026-04-29: 양식 기안자 정보 헤더 자동 채움 — 모든 양식 헤더에 부서/직위(직책)/기안자명/기안일 SUBMITTED snapshot 표시. document_content JSON 에 drafterSnapshot 키 저장 (Flyway 불필요). v1.2 ship-ready 이후 추가, archive 시점 결정에 영향 없음 (Phase 32 와 독립 병행)
+- Phase 34 complete 2026-04-29: 6/6 plans, 14 form integration points wired, 14-point HUMAN-UAT approved. Latent bug Pitfall 6 (DocumentDetailResponse.drafter nested type) 정정 동시 포함. Q1=A (UserProfile 확장) / Q2=A (snapshot 직렬화 실패 시 트랜잭션 롤백) / Q3=A (latent bug 동시 정정) 모두 ship
 
 ### Decisions
 

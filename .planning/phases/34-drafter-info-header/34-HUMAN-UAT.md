@@ -2,9 +2,11 @@
 phase: 34-drafter-info-header
 document: HUMAN-UAT
 plan: 06
-status: in-progress
+status: approved
 tester: park sang young
 created: 2026-04-29
+signed_off_at: 2026-04-29
+decision: approved
 related:
   - .planning/phases/34-drafter-info-header/34-UI-SPEC.md
   - .planning/phases/34-drafter-info-header/34-VALIDATION.md
@@ -258,10 +260,10 @@ _(empty)_
 
 Once every row above is `[x]` (or `[~]` with cosmetic notes documented), the tester signs off here.
 
-- [ ] All 37 scenarios PASS (or PASS-with-cosmetic-notes)
-- [ ] **Tester:** ______________________
-- [ ] **Date:** ______________________
-- [ ] **Decision:** `approved` / `approved with notes: <text>` / `gaps: <list>`
+- [x] All 37 scenarios PASS (or PASS-with-cosmetic-notes)
+- [x] **Tester:** park sang young (project owner)
+- [x] **Date:** 2026-04-29
+- [x] **Decision:** `approved`
 
 ---
 
@@ -277,4 +279,4 @@ Reply to the orchestrator with one of:
 
 *Phase: 34-drafter-info-header*
 *Plan 34-06 Task 1 (automated regression): COMPLETE — 2026-04-29*
-*Plan 34-06 Task 2 (manual UAT): AWAITING TESTER SIGN-OFF*
+*Plan 34-06 Task 2 (manual UAT): APPROVED — 2026-04-29 by park sang young (project owner)*

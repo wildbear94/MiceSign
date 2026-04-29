@@ -1,10 +1,12 @@
 ---
 phase: 34
 slug: drafter-info-header
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: approved
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-29
+approved_at: 2026-04-29
+approval_outcome: 6/6 plans executed, automated regression PASS (BE 170/173 — 3 pre-existing flaky), 14-point HUMAN-UAT approved by park sang young
 ---
 
 # Phase 34 — Validation Strategy
@@ -86,11 +88,11 @@ created: 2026-04-29
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (4 신규 테스트 메서드 / 2 신규 테스트 파일)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s for quick suite
-- [ ] `nyquist_compliant: true` set in frontmatter (after PLAN approval)
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (3 BE test methods in DocumentSubmitTest + 1 BE test method in AuthControllerTest + 1 FE test file DrafterInfoHeader.test.tsx with 3 cases — all green)
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s for quick suite (DocumentSubmitTest ~10s, FE vitest ~3s)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending — locked when PLAN.md 작성 완료 + plan-checker 통과
+**Approval:** **approved 2026-04-29** by park sang young (project owner). Phase 34 종결 — 14-point HUMAN-UAT PASS, automated regression PASS, all 35 D-IDs covered.

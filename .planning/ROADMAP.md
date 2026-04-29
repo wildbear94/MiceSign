@@ -358,7 +358,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34
 | 31. 대시보드 고도화 | v1.2 | 6/6 | Complete    | 2026-04-24 |
 | 32. CUSTOM 프리셋 확장 | v1.2 | 0/TBD | Not started | — |
 | 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
-| 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 5/6 | In Progress|  |
+| 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 6/6 | Complete    | 2026-04-29 |
 
 ### Phase 34: 양식 기안자 정보 헤더 자동 채움
 **Goal**: 모든 결재 양식 최상단에 부서/직위·직책/기안자/기안일 4-필드 always-on 헤더가 자동 표시되며 (DRAFT 모드 = live, SUBMITTED 모드 = submit 시점 박제 snapshot, legacy 문서 = live + (현재 정보) 배지 fallback), 기안자가 이후 부서이동·승진해도 박제된 snapshot 은 변경되지 않는다 (D-A5 immutable).
@@ -369,12 +369,12 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34
   2. 사용자가 문서를 상신하면 backend 가 동일 트랜잭션 내에서 drafter 의 부서/직위/이름/제출시각을 document_content.form_data 의 drafterSnapshot 키로 박제 — 직렬화 실패 시 트랜잭션 전체 롤백 (D-C7)
   3. 사용자가 SUBMITTED 문서를 조회하면 헤더가 snapshot 4 필드를 표시하며, snapshot 이 없는 legacy 문서는 live 정보 + (현재 정보) amber 배지로 fallback
   4. 14 통합 지점 (Edit 7 + ReadOnly 7) 모두 단일 DrafterInfoHeader 컴포넌트 + 단일 visual contract — 양식별 분기 로직 도입 0건
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans complete
 Plans:
 - [x] 34-01-PLAN.md — Latent FE bug fix: DocumentDetailResponse flat-field alignment + L228 doc.drafter.name → doc.drafterName (Wave 1, D-G1/G2/G3)
 - [x] 34-02-PLAN.md — BE auth 확장: UserProfileDto + AuthService.buildUserProfile + AuthControllerTest (Wave 1, D-F1/F2)
 - [x] 34-03-PLAN.md — BE snapshot 캡처: DocumentService.submit drafterSnapshot 머지 + D-C7 롤백 + DocumentSubmitTest 3 신규 (Wave 1, D-A3/A4/C1~C7)
 - [x] 34-04-PLAN.md — FE foundation: DrafterInfoHeader 컴포넌트 + 3-case vitest + UserProfile + 8 i18n + templateRegistry props (Wave 2, D-D1~D5/D7/E2)
 - [x] 34-05-PLAN.md — FE 14-point integration: 7 Edit + 7 ReadOnly 헤더 삽입 + DocumentEditorPage/DocumentDetailPage props (Wave 3, D-D6/B1~B3)
-- [ ] 34-06-PLAN.md — 통합 검증 (BE+FE suite + tsc + build) + 14-point HUMAN-UAT + ROADMAP/STATE/VALIDATION 동기화 (Wave 4, autonomous=false)
+- [x] 34-06-PLAN.md — 통합 검증 PASS (BE 170/173, FE 63/63, tsc 0, build OK) + 14-point HUMAN-UAT approved 2026-04-29 + ROADMAP/STATE/VALIDATION 동기화 (Wave 4)
 **UI hint**: yes
