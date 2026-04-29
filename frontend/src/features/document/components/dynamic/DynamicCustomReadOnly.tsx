@@ -6,6 +6,7 @@ import type {
   ColumnDefinition,
 } from '../../types/dynamicForm';
 import type { TemplateReadOnlyProps } from '../templates/templateRegistry';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 
 /**
  * Phase 24.1-03: CUSTOM 템플릿 읽기 전용 컴포넌트.
@@ -19,6 +20,9 @@ export default function DynamicCustomReadOnly({
   title,
   formData,
   schemaSnapshot,
+  drafterSnapshot,
+  drafterLive,
+  submittedAt,
 }: TemplateReadOnlyProps) {
   const schema = useMemo<SchemaDefinition | null>(() => {
     if (!schemaSnapshot) return null;
@@ -42,6 +46,12 @@ export default function DynamicCustomReadOnly({
   if (!schema) {
     return (
       <div className="p-4">
+        <DrafterInfoHeader
+          mode="submitted"
+          snapshot={drafterSnapshot}
+          live={drafterLive}
+          submittedAt={submittedAt}
+        />
         <h2 className="text-xl font-bold mb-4">{title}</h2>
         <div className="text-red-600">양식 정보를 불러올 수 없습니다.</div>
       </div>
@@ -56,6 +66,12 @@ export default function DynamicCustomReadOnly({
 
   return (
     <div className="p-4 space-y-4">
+      <DrafterInfoHeader
+        mode="submitted"
+        snapshot={drafterSnapshot}
+        live={drafterLive}
+        submittedAt={submittedAt}
+      />
       <h2 className="text-xl font-bold mb-4">{title}</h2>
       {schema.fields
         .filter((f) => !hiddenFields.has(f.id) && f.type !== 'hidden')

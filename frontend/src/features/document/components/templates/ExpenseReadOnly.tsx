@@ -2,18 +2,41 @@ import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '../../utils/currency';
 import type { ExpenseFormData } from '../../types/document';
 import type { TemplateReadOnlyProps } from './templateRegistry';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 
-export default function ExpenseReadOnly({ formData }: TemplateReadOnlyProps) {
+export default function ExpenseReadOnly({
+  formData,
+  drafterSnapshot,
+  drafterLive,
+  submittedAt,
+}: TemplateReadOnlyProps) {
   const { t } = useTranslation('document');
 
   if (!formData) {
-    return <p className="text-sm text-gray-400">내용 없음</p>;
+    return (
+      <div>
+        <DrafterInfoHeader
+          mode="submitted"
+          snapshot={drafterSnapshot}
+          live={drafterLive}
+          submittedAt={submittedAt}
+        />
+        <p className="text-sm text-gray-400">내용 없음</p>
+      </div>
+    );
   }
 
   const data: ExpenseFormData = JSON.parse(formData);
 
   return (
-    <div className="overflow-x-auto">
+    <div>
+      <DrafterInfoHeader
+        mode="submitted"
+        snapshot={drafterSnapshot}
+        live={drafterLive}
+        submittedAt={submittedAt}
+      />
+      <div className="overflow-x-auto">
       <table className="w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         <thead>
           <tr className="bg-gray-50 dark:bg-gray-800">
@@ -60,6 +83,7 @@ export default function ExpenseReadOnly({ formData }: TemplateReadOnlyProps) {
           </tr>
         </tfoot>
       </table>
+      </div>
     </div>
   );
 }

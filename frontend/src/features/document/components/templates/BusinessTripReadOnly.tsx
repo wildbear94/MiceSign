@@ -2,18 +2,41 @@ import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '../../utils/currency';
 import type { BusinessTripFormData } from '../../types/document';
 import type { TemplateReadOnlyProps } from './templateRegistry';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 
-export default function BusinessTripReadOnly({ formData }: TemplateReadOnlyProps) {
+export default function BusinessTripReadOnly({
+  formData,
+  drafterSnapshot,
+  drafterLive,
+  submittedAt,
+}: TemplateReadOnlyProps) {
   const { t } = useTranslation('document');
 
   if (!formData) {
-    return <p className="text-sm text-gray-400">내용 없음</p>;
+    return (
+      <div>
+        <DrafterInfoHeader
+          mode="submitted"
+          snapshot={drafterSnapshot}
+          live={drafterLive}
+          submittedAt={submittedAt}
+        />
+        <p className="text-sm text-gray-400">내용 없음</p>
+      </div>
+    );
   }
 
   const data: BusinessTripFormData = JSON.parse(formData);
 
   return (
-    <div className="space-y-4">
+    <div>
+      <DrafterInfoHeader
+        mode="submitted"
+        snapshot={drafterSnapshot}
+        live={drafterLive}
+        submittedAt={submittedAt}
+      />
+      <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
@@ -134,6 +157,7 @@ export default function BusinessTripReadOnly({ formData }: TemplateReadOnlyProps
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
