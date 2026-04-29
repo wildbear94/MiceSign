@@ -8,15 +8,13 @@ describe('presets', () => {
   });
 
   it('has expected keys', () => {
-    const keys = presets.map((p) => p.key).sort();
-    expect(keys).toEqual([
-      'expense',
-      'leave',
-      'meeting',
-      'proposal',
-      'purchase',
-      'trip',
-    ]);
+    // IN-02 fix (Phase 32 REVIEW): Set-based comparison avoids coupling to
+    // the `localeCompare` sort policy in presets/index.ts. The contract is
+    // "all 6 keys present", not "this exact sorted order".
+    const keys = new Set(presets.map((p) => p.key));
+    expect(keys).toEqual(
+      new Set(['expense', 'leave', 'meeting', 'proposal', 'purchase', 'trip']),
+    );
   });
 
   it('each preset passes templateImportSchema', () => {
