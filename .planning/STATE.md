@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
 status: executing
-stopped_at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
-last_updated: "2026-04-29T06:14:59.563Z"
+stopped_at: Completed 34-05-PLAN.md
+last_updated: "2026-04-29T06:27:44.323Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 15
   completed_phases: 5
   total_plans: 33
-  completed_plans: 31
-  percent: 94
+  completed_plans: 32
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 34 (drafter-info-header) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [█████████░] 94%
+Progress: [██████████] 97%
 
 **Archive 결정 (2026-04-28):** `defer-archive` 채택
 
@@ -109,6 +109,7 @@ Progress: [█████████░] 94%
 | Phase 34 P02 | 2m 11s | 2 tasks | 3 files |
 | Phase 34 P03 | 5m 34s | 2 tasks | 4 files |
 | Phase 34 P04 | 5min | 3 tasks | 5 files |
+| Phase 34 P05 | 8m 21s | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -181,6 +182,9 @@ Progress: [█████████░] 94%
 - [Phase ?]: DrafterInfoHeader is pure-presentation — parent pages resolve live/snapshot props (UI-SPEC §Component API)
 - [Phase ?]: templateRegistry props extension enforced at JSX call sites (2 page-level errors), not on form-component definitions — TS subset destructuring is correct behavior
 - [Phase ?]: 8 i18n keys under document.drafterInfo.* (Korean only, no en/document.json change per Phase 32-04 precedent)
+- [Phase ?]: Phase 34 Plan 05: Mechanical fan-out — single 1~3 line insertion pattern applied verbatim across 14 form components (D-D6 honored, no per-form branching)
+- [Phase ?]: Phase 34 Plan 05: ReadOnly early-return branches wrapped with header — always-on contract honored even on empty/legacy formData (Rule 2 scope expansion)
+- [Phase ?]: Phase 34 Plan 05: DocumentDetailPage duplicate 기안자 meta-grid cell deleted per UI-SPEC §Position note — comment marker preserved for traceability
 
 ### Pending Todos
 
@@ -194,8 +198,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T06:14:48.000Z
-Stopped at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
+Last session: 2026-04-29T06:27:44.317Z
+Stopped at: Completed 34-05-PLAN.md
 Resume file: None
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
