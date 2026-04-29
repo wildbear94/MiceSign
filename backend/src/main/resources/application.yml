@@ -35,6 +35,25 @@ spring:
             enable: true
             required: true
 
+# Phase 35 — 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리)
+# D-A1: logback-spring.xml 미생성 — Spring Boot 3.x 표준 logging.* properties 만 사용
+# D-B1: ${LOG_DIR:-logs} 로 dev=프로젝트 루트 상대경로, prod=systemd EnvironmentFile 의 LOG_DIR 주입
+# D-D1: root=INFO 가 base 기본 (운영 기본값과 동일) — dev 프로필에서 DEBUG 로 override
+logging:
+  file:
+    name: ${LOG_DIR:-logs}/micesign.log
+  charset:
+    file: UTF-8
+  level:
+    root: INFO
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_DIR:-logs}/micesign-%d{yyyy-MM-dd}.%i.log.gz
+      max-history: 30
+      max-file-size: 100MB
+      total-size-cap: 1GB
+      clean-history-on-start: true
+
 jwt:
   secret: ${JWT_SECRET:defaultDevSecretKeyThatIsAtLeast32CharsLong!!}
   access-token-ttl: 1800000      # 30 minutes in milliseconds
