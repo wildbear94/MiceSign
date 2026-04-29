@@ -45,18 +45,30 @@ describe('presets', () => {
     expect(hasTable).toBe(true);
   });
 
-  it('meeting preset has 5 fields', () => {
+  it('meeting preset has the required fields and 3 table fields', () => {
+    // WR-02 fix (Phase 32 REVIEW): Set-based assertion + structural check
+    // (table count) — order-independent, catches type regressions.
     const meeting = presets.find((p) => p.key === 'meeting')!;
-    expect(meeting.data.schemaDefinition.fields).toHaveLength(5);
-    const ids = meeting.data.schemaDefinition.fields.map((f) => f.id);
-    expect(ids).toEqual(['title', 'meetingDate', 'attendees', 'agenda', 'decisions']);
+    const ids = new Set(meeting.data.schemaDefinition.fields.map((f) => f.id));
+    expect(ids).toEqual(
+      new Set(['title', 'meetingDate', 'attendees', 'agenda', 'decisions']),
+    );
+    expect(
+      meeting.data.schemaDefinition.fields.filter((f) => f.type === 'table'),
+    ).toHaveLength(3);
   });
 
-  it('proposal preset has 4 fields', () => {
+  it('proposal preset has the required fields and 3 textarea fields', () => {
+    // WR-02 fix (Phase 32 REVIEW): Set-based assertion + structural check
+    // (textarea count) — order-independent, catches type regressions.
     const proposal = presets.find((p) => p.key === 'proposal')!;
-    expect(proposal.data.schemaDefinition.fields).toHaveLength(4);
-    const ids = proposal.data.schemaDefinition.fields.map((f) => f.id);
-    expect(ids).toEqual(['title', 'background', 'proposal', 'expectedEffect']);
+    const ids = new Set(proposal.data.schemaDefinition.fields.map((f) => f.id));
+    expect(ids).toEqual(
+      new Set(['title', 'background', 'proposal', 'expectedEffect']),
+    );
+    expect(
+      proposal.data.schemaDefinition.fields.filter((f) => f.type === 'textarea'),
+    ).toHaveLength(3);
   });
 
   it('all preset names are Korean', () => {
