@@ -225,7 +225,7 @@ export default function DocumentDetailPage() {
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">기안자</span>
             <span className="text-gray-900 dark:text-gray-50">
-              {doc.drafter.name} ({doc.drafter.departmentName})
+              {doc.drafterName} ({doc.departmentName})
             </span>
           </div>
           <div>
