@@ -362,7 +362,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34 -> 35
 | 32. CUSTOM 프리셋 확장 | v1.2 | 6/6 | Complete    | 2026-04-26 |
 | 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
 | 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 6/6 | Complete    | 2026-04-29 |
-| 35. 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리) | v1.2 | 0/TBD | Not started | — |
+| 35. 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리) | v1.2 | 0/1 | Not started | — |
 
 ### Phase 34: 양식 기안자 정보 헤더 자동 채움
 **Goal**: 모든 결재 양식 최상단에 부서/직위·직책/기안자/기안일 4-필드 always-on 헤더가 자동 표시되며 (DRAFT 모드 = live, SUBMITTED 모드 = submit 시점 박제 snapshot, legacy 문서 = live + (현재 정보) 배지 fallback), 기안자가 이후 부서이동·승진해도 박제된 snapshot 은 변경되지 않는다 (D-A5 immutable).
@@ -385,11 +385,11 @@ Plans:
 
 ### Phase 35: 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리)
 
-**Goal:** [To be planned] — 운영 환경 배포 전 로깅 인프라 정립. 사용자 의도: logback-spring.xml 기반 일별 롤링 파일 어펜더 + 30일 보관 정책 + 프로필 기반 레벨 분리 (prod=INFO 만 / dev=전체 — DEBUG/TRACE 포함)
-**Requirements**: TBD (phase-local 또는 신규 LOG-XX REQ-ID, plan-phase 단계 결정)
+**Goal:** Spring Boot 백엔드의 로깅 인프라를 운영 배포 가능 수준으로 정립한다 — logback-spring.xml 신규 작성 없이 application*.yml 만으로 (1) 일별 롤링 (2) 30일 보관 (3) prod=INFO/dev=DEBUG 프로필 분리 (4) gzip 압축 + 1GB 디스크 안전망 + 한글 UTF-8 로그 + clean-history-on-start 정합성을 구현한다 (D-A1 채택, Spring Boot 3.x 표준 logging.* properties 만 사용).
+**Requirements**: phase-local (LOG-01~04 — D-A1~D-G3 decision IDs 만 추적, 사용자 결정 2026-04-29)
 **Depends on:** Phase 34 (none functional — sequence number only; 어떤 phase 와도 무관)
-**Plans:** 0 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 35 to break down)
+- [ ] 35-01-PLAN.md — application.yml logging 블록 + application-dev.yml root=DEBUG override + application-prod.yml.example LOG_DIR 카탈로그 + .gitignore backend/logs/ + dev/prod 부팅 smoke 검증 (Wave 1, D-A1~D-G3)
 **UI hint**: no
