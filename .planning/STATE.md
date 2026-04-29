@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: phases
 status: executing
 stopped_at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
-last_updated: "2026-04-29T05:54:47.519Z"
+last_updated: "2026-04-29T06:05:30.958Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 15
   completed_phases: 5
   total_plans: 33
-  completed_plans: 29
-  percent: 88
+  completed_plans: 30
+  percent: 91
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 34 (drafter-info-header) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 91%
 
 **Archive 결정 (2026-04-28):** `defer-archive` 채택
 
@@ -107,6 +107,7 @@ Progress: [█████████░] 88%
 | Phase 33 P03 | 5min | 1 tasks | 1 files |
 | Phase 34 P01 | 2m 32s | 2 tasks tasks | 2 files files |
 | Phase 34 P02 | 2m 11s | 2 tasks | 3 files |
+| Phase 34 P03 | 5m 34s | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -173,6 +174,9 @@ Progress: [█████████░] 88%
 - [Phase 33-05] Phase 33 종결 verification + ROADMAP/STATE/VALIDATION 갱신 — 33-01~04 산출물 grep 검증 PASS (4 산출물 + cross-reference 무결성), ROADMAP Phase 33 [x] + 5/5 + 2026-04-28, STATE v1.2 ship-ready 상태, 33-VALIDATION.md (doc-only Nyquist) 작성. archive 시점은 Task 6 사용자 결정 대기 (archive-now / defer-archive / archive-after-32).
 - [Phase Phase 34-01]: DocumentDetailResponse FE 타입을 backend flat record (drafterName/departmentName/positionName) 와 정합 + DocumentDetailPage L228 doc.drafter.name → doc.drafterName 정정 — D-G1/G2/G3 latent bug atomic 분리, 후속 plan 34-04/34-05 헤더 통합이 type-correct base 위에서 진행 가능
 - [Phase ?]: [Phase 34-02] UserProfileDto extended (departmentName + positionName, both nullable) — single SoT for login + refresh responses; AuthService.buildUserProfile null-safe LAZY join replicates DocumentMapper L21~24 pattern; class-level @Transactional (L26) covers LAZY safety, no per-method retrofit needed.
+- [Phase ?]: Phase 34-03: Backend snapshot capture in DocumentService.submitDocument with D-C7 transaction-rollback (rejects audit-log swallow pattern)
+- [Phase ?]: Phase 34-03: Test C immutability uses /withdraw because /approve is not yet implemented (Phase 7 deferred)
+- [Phase ?]: Phase 34-03: Added V18 test migration to align H2 user.position_id with production NULL constraint
 
 ### Pending Todos
 
@@ -186,9 +190,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T05:54:47.513Z
+Last session: 2026-04-29T06:05:30.953Z
 Stopped at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
-Resume file: .planning/phases/34-drafter-info-header/34-03-PLAN.md
+Resume file: None
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 
