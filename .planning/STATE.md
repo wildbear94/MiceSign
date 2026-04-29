@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: phases
 status: executing
 stopped_at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
-last_updated: "2026-04-29T06:05:30.958Z"
+last_updated: "2026-04-29T06:14:59.563Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 15
   completed_phases: 5
   total_plans: 33
-  completed_plans: 30
-  percent: 91
+  completed_plans: 31
+  percent: 94
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 34 (drafter-info-header) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 94%
 
 **Archive 결정 (2026-04-28):** `defer-archive` 채택
 
@@ -108,6 +108,7 @@ Progress: [█████████░] 91%
 | Phase 34 P01 | 2m 32s | 2 tasks tasks | 2 files files |
 | Phase 34 P02 | 2m 11s | 2 tasks | 3 files |
 | Phase 34 P03 | 5m 34s | 2 tasks | 4 files |
+| Phase 34 P04 | 5min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -177,6 +178,9 @@ Progress: [█████████░] 91%
 - [Phase ?]: Phase 34-03: Backend snapshot capture in DocumentService.submitDocument with D-C7 transaction-rollback (rejects audit-log swallow pattern)
 - [Phase ?]: Phase 34-03: Test C immutability uses /withdraw because /approve is not yet implemented (Phase 7 deferred)
 - [Phase ?]: Phase 34-03: Added V18 test migration to align H2 user.position_id with production NULL constraint
+- [Phase ?]: DrafterInfoHeader is pure-presentation — parent pages resolve live/snapshot props (UI-SPEC §Component API)
+- [Phase ?]: templateRegistry props extension enforced at JSX call sites (2 page-level errors), not on form-component definitions — TS subset destructuring is correct behavior
+- [Phase ?]: 8 i18n keys under document.drafterInfo.* (Korean only, no en/document.json change per Phase 32-04 precedent)
 
 ### Pending Todos
 
@@ -190,7 +194,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T06:05:30.953Z
+Last session: 2026-04-29T06:14:48.000Z
 Stopped at: Phase 34-02 complete — UserProfileDto extended for DRAFT-mode header data source
 Resume file: None
 
