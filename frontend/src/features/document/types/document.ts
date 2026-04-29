@@ -12,21 +12,17 @@ export interface DocumentResponse {
   updatedAt: string;
 }
 
-export interface DrafterInfo {
-  id: number;
-  name: string;
-  departmentName: string;
-  positionName: string | null;
-}
-
 export interface DocumentDetailResponse extends DocumentResponse {
-  drafter: DrafterInfo;
   bodyHtml: string | null;
   formData: string | null; // JSON string, parsed on frontend
   submittedAt: string | null;
   completedAt: string | null;
   // Phase 7 additions
   drafterId: number;
+  // Phase 34 (D-G1) — flat drafter fields aligned with backend DocumentDetailResponse record
+  drafterName: string;
+  departmentName: string;
+  positionName: string | null;
   currentStep: number | null;
   sourceDocId: number | null;
   approvalLines: ApprovalLineResponse[];
