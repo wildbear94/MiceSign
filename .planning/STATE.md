@@ -109,6 +109,7 @@ Progress: [█████████░] 96% (v1.2 — Phase 32 잔여 외 4 p
 
 - Phase 24.1 inserted after Phase 24: 사용자 측 동적 폼 렌더러 - CUSTOM 템플릿으로 기안 작성/조회를 위한 DynamicFormRenderer 구현 (URGENT)
 - v1.2 roadmap appended 2026-04-22: Phases 29-33 (SMTP/Search/Dashboard/Forms/E2E)
+- Phase 34 added 2026-04-29: 양식 기안자 정보 헤더 자동 채움 — 모든 양식 헤더에 부서/직위(직책)/기안자명/기안일 SUBMITTED snapshot 표시. document_content JSON 에 drafterSnapshot 키 저장 (Flyway 불필요). v1.2 ship-ready 이후 추가, archive 시점 결정에 영향 없음 (Phase 32 와 독립 병행)
 
 ### Decisions
 
