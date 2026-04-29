@@ -1,5 +1,15 @@
 {
   "pageTitle": "내 문서",
+  "drafterInfo": {
+    "departmentLabel": "부서",
+    "positionLabel": "직위·직책",
+    "drafterLabel": "기안자",
+    "draftedAtLabel": "기안일",
+    "draftedAtPlaceholder": "—",
+    "currentInfoBadge": "(현재 정보)",
+    "headerAriaLabel": "기안자 정보",
+    "emptyPosition": "—"
+  },
   "newDocument": "새 문서",
   "templateModal": {
     "title": "새 문서 작성",
