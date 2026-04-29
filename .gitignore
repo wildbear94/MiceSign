@@ -33,6 +33,7 @@ frontend/.env
 # ===== Logs =====
 *.log
 logs/
+backend/logs/
 
 # ===== QueryDSL Generated =====
 backend/src/main/generated/

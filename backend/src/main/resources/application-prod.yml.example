@@ -44,3 +44,10 @@ MAIL_PASSWORD=
 # JWT_SECRET=
 # COOKIE_SECURE=true
 # GOOGLE_DRIVE_CREDENTIALS_PATH=/etc/micesign/google-drive-credentials.json
+
+# ----- (선택) 로그 디렉터리 — Phase 35 D-B1 -----
+# 미주입 시 default 'logs' (Spring Boot 작동 디렉터리 기준 상대경로) — 운영에선 절대경로 권장.
+# 사전 디렉터리 생성 + 권한 (운영자 수행, D-B3):
+#   sudo install -d -o micesign -g micesign -m 750 /var/log/micesign
+# 일별 롤링 + 30일 보관 + 1GB cap + clean-history-on-start=true 자동 적용 (application.yml 의 base 정책).
+# LOG_DIR=/var/log/micesign
