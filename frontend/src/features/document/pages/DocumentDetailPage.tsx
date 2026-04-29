@@ -222,12 +222,7 @@ export default function DocumentDetailPage() {
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">상태</span>
             <DocumentStatusBadge status={doc.status} />
           </div>
-          <div>
-            <span className="text-gray-500 dark:text-gray-400 block mb-0.5">기안자</span>
-            <span className="text-gray-900 dark:text-gray-50">
-              {doc.drafterName} ({doc.departmentName})
-            </span>
-          </div>
+          {/* Phase 34 (D-D6, UI-SPEC §Position note): 기안자 cell removed — DrafterInfoHeader replaces it inside ReadOnlyComponent */}
           <div>
             <span className="text-gray-500 dark:text-gray-400 block mb-0.5">문서번호</span>
             <span className="text-gray-900 dark:text-gray-50">{doc.docNumber ?? '-'}</span>
@@ -253,6 +248,23 @@ export default function DocumentDetailPage() {
             bodyHtml={doc.bodyHtml}
             formData={doc.formData}
             schemaSnapshot={schemaSnapshot}
+            drafterSnapshot={(() => {
+              // Phase 34 (D-D4 legacy fallback): try parse formData.drafterSnapshot;
+              // legacy/empty/malformed → null → DrafterInfoHeader falls back to live + (현재 정보) badge
+              try {
+                return doc.formData
+                  ? (JSON.parse(doc.formData)?.drafterSnapshot ?? null)
+                  : null;
+              } catch {
+                return null;
+              }
+            })()}
+            drafterLive={{
+              drafterName: doc.drafterName,
+              departmentName: doc.departmentName,
+              positionName: doc.positionName,
+            }}
+            submittedAt={doc.submittedAt ?? ''}
           />
         ) : (
           <p className="text-sm text-gray-400">알 수 없는 양식입니다.</p>

@@ -28,7 +28,9 @@ import { useAutoSave } from '../hooks/useAutoSave';
 export default function DocumentEditorPage() {
   const { t } = useTranslation('document');
   const { t: tApproval } = useTranslation('approval');
-  const currentUserId = useAuthStore((s) => s.user?.id);
+  // Phase 34: 전체 user 객체로 변경 — drafterLive 헤더 데이터 source 로 departmentName/positionName 도 사용 (D-F1)
+  const user = useAuthStore((s) => s.user);
+  const currentUserId = user?.id;
   const navigate = useNavigate();
   const { templateCode, id } = useParams<{
     templateCode?: string;
@@ -326,6 +328,19 @@ export default function DocumentEditorPage() {
                 : undefined
             }
             onSave={handleSave}
+            drafterLive={
+              existingDoc
+                ? {
+                    drafterName: existingDoc.drafterName,
+                    departmentName: existingDoc.departmentName,
+                    positionName: existingDoc.positionName,
+                  }
+                : {
+                    drafterName: user?.name ?? '',
+                    departmentName: user?.departmentName ?? '',
+                    positionName: user?.positionName ?? null,
+                  }
+            }
           />
         )}
       </div>
