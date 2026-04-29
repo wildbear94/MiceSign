@@ -1,10 +1,13 @@
 package com.micesign.document;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micesign.admin.TestTokenHelper;
+import com.micesign.domain.enums.UserRole;
 import com.micesign.dto.document.ApprovalLineRequest;
 import com.micesign.dto.document.CreateDocumentRequest;
 import com.micesign.dto.document.UpdateDocumentRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,6 +263,135 @@ class DocumentSubmitTest {
     }
 
     // ──────────────────────────────────────────────
+    // Phase 34 Plan 03 — drafter snapshot capture tests (D-C1, D-C4, D-C5, D-E1)
+    // ──────────────────────────────────────────────
+
+    /**
+     * Test A — submit captures drafterSnapshot with 4 fields populated for SUPER_ADMIN
+     * (V2 seed: department_id=1 / position_id=7).
+     * Verifies D-C1 (snapshot key shape) + D-A3 (snapshot at submit) + D-A4 (draftedAt = submittedAt).
+     */
+    @Test
+    void submitDraft_capturesDrafterSnapshot() throws Exception {
+        Long docId = createGeneralDraft("snapshot 캡처 테스트");
+        addApprovalLine(docId);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String formDataJson = objectMapper.readTree(result.getResponse().getContentAsString())
+                .path("data").path("formData").asText();
+        JsonNode snapshot = objectMapper.readTree(formDataJson).path("drafterSnapshot");
+
+        Assertions.assertFalse(snapshot.isMissingNode(),
+                "drafterSnapshot must be present after submit (D-C1)");
+        Assertions.assertNotNull(
+                snapshot.path("departmentName").asText(null),
+                "departmentName must be populated for SUPER_ADMIN (V2 seed has dept)");
+        Assertions.assertNotNull(
+                snapshot.path("positionName").asText(null),
+                "positionName must be populated for SUPER_ADMIN (V2 seed has position_id=7)");
+        Assertions.assertNotNull(
+                snapshot.path("drafterName").asText(null),
+                "drafterName must equal user name (D-A1)");
+        Assertions.assertNotNull(
+                snapshot.path("draftedAt").asText(null),
+                "draftedAt must equal submittedAt ISO string (D-A4)");
+    }
+
+    /**
+     * Test B — drafter with NULL position_id produces JSON null at the key, not omission.
+     * Verifies D-C4 (positionName key present, value JSON null).
+     */
+    @Test
+    void submitDraft_capturesDrafterSnapshot_nullPosition() throws Exception {
+        // Insert a fresh user with position_id = NULL
+        Long noPositionUserId = 80L;
+        jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", noPositionUserId);
+        jdbcTemplate.update(
+                "INSERT INTO \"user\" (id, employee_no, name, email, password, department_id, position_id, role, status, failed_login_count, must_change_password) " +
+                        "VALUES (?, 'NOPOS', '직위없음테스터', 'nopos@micesign.com', '$2a$10$07mcjXBfvelJFwjs8DnoJOnEqprFy.dnQL1NdnRvlqEWwwmX62SOW', 2, NULL, 'USER', 'ACTIVE', 0, FALSE)",
+                noPositionUserId);
+
+        String noPositionToken = tokenHelper.tokenForRole(
+                noPositionUserId, "nopos@micesign.com", "직위없음테스터",
+                UserRole.USER, 2L);
+
+        Long docId = createGeneralDraftAs("직위 null 케이스", noPositionToken);
+        addApprovalLineFor(docId, APPROVER_ID);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
+                .header("Authorization", "Bearer " + noPositionToken))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String formDataJson = objectMapper.readTree(result.getResponse().getContentAsString())
+                .path("data").path("formData").asText();
+        JsonNode snapshot = objectMapper.readTree(formDataJson).path("drafterSnapshot");
+
+        Assertions.assertTrue(
+                snapshot.has("positionName"),
+                "positionName key must be present even when null (D-C4 — JSON null per document/* convention)");
+        Assertions.assertTrue(
+                snapshot.path("positionName").isNull(),
+                "positionName value must be JSON null (not omitted)");
+        // Other 3 fields must still be populated
+        Assertions.assertEquals("경영지원부",
+                snapshot.path("departmentName").asText(null),
+                "departmentName must reflect department_id=2 (V2 seed: '경영지원부')");
+        Assertions.assertEquals("직위없음테스터",
+                snapshot.path("drafterName").asText(null),
+                "drafterName must reflect inserted user");
+    }
+
+    /**
+     * Test C — Snapshot is immutable across status transitions (D-C5).
+     * Plan §rationale: D-C7 rollback path is defensive and not tested here (provoking
+     * JsonProcessingException requires mocking ObjectMapper which would conflict with
+     * production reuse). This test verifies D-C5: once written, drafterSnapshot must not
+     * change as the document moves through other states. Withdraw is the only post-submit
+     * transition currently exposed (approve/reject endpoints land in Phase 7), and per
+     * RESEARCH the withdrawDocument() service does not touch formData — so withdraw is a
+     * valid invariant probe.
+     */
+    @Test
+    void snapshotImmutableAfterStatusChange() throws Exception {
+        Long docId = createGeneralDraft("immutability 검증");
+        addApprovalLine(docId);
+
+        MvcResult submitResult = mockMvc.perform(post("/api/v1/documents/" + docId + "/submit")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andReturn();
+        String formDataAfterSubmit = objectMapper.readTree(submitResult.getResponse().getContentAsString())
+                .path("data").path("formData").asText();
+        JsonNode snapshotAfterSubmit =
+                objectMapper.readTree(formDataAfterSubmit).path("drafterSnapshot");
+
+        // Withdraw — a state transition that does NOT touch formData (RESEARCH-verified)
+        mockMvc.perform(post("/api/v1/documents/" + docId + "/withdraw")
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk());
+
+        // Re-fetch document
+        MvcResult fetched = mockMvc.perform(get("/api/v1/documents/" + docId)
+                .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andReturn();
+        String formDataAfterWithdraw = objectMapper.readTree(fetched.getResponse().getContentAsString())
+                .path("data").path("formData").asText();
+        JsonNode snapshotAfterWithdraw =
+                objectMapper.readTree(formDataAfterWithdraw).path("drafterSnapshot");
+
+        Assertions.assertEquals(
+                snapshotAfterSubmit.toString(),
+                snapshotAfterWithdraw.toString(),
+                "drafterSnapshot must be immutable across status transitions (D-C5)");
+    }
+
+    // ──────────────────────────────────────────────
     // Helpers
     // ──────────────────────────────────────────────
 
@@ -301,6 +433,38 @@ class DocumentSubmitTest {
                 "INSERT INTO approval_line (document_id, approver_id, line_type, step_order, status, created_at) " +
                         "VALUES (?, ?, 'APPROVE', 1, 'PENDING', CURRENT_TIMESTAMP)",
                 docId, APPROVER_ID);
+    }
+
+    /**
+     * Phase 34 Plan 03 — token-parameterized variant of createGeneralDraft.
+     * Mirrors {@link #createGeneralDraft(String)} but uses the supplied auth token
+     * (needed for the null-position test which acts as a different drafter user).
+     */
+    private Long createGeneralDraftAs(String title, String authToken) throws Exception {
+        CreateDocumentRequest request = new CreateDocumentRequest(
+                "GENERAL", title, "<p>본문 내용입니다.</p>", null, null);
+
+        MvcResult result = mockMvc.perform(post("/api/v1/documents")
+                .header("Authorization", "Bearer " + authToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        return objectMapper.readTree(result.getResponse().getContentAsString())
+                .path("data").path("id").asLong();
+    }
+
+    /**
+     * Phase 34 Plan 03 — approver-parameterized variant of addApprovalLine.
+     * Direct DB insert (same as {@link #addApprovalLine(Long)}) but allows the test
+     * to pick the approver — useful when the drafter differs from the default user.
+     */
+    private void addApprovalLineFor(Long docId, Long approverId) {
+        jdbcTemplate.update(
+                "INSERT INTO approval_line (document_id, approver_id, line_type, step_order, status, created_at) " +
+                        "VALUES (?, ?, 'APPROVE', 1, 'PENDING', CURRENT_TIMESTAMP)",
+                docId, approverId);
     }
 
     private Long createLeaveDraft() throws Exception {
