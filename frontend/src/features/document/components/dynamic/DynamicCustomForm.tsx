@@ -10,6 +10,7 @@ import { executeCalculations } from '../../utils/executeCalculations';
 import type { SchemaDefinition, FieldDefinition } from '../../types/dynamicForm';
 import type { TemplateEditProps } from '../templates/templateRegistry';
 import DynamicFieldRenderer from './DynamicFieldRenderer';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 
 /**
  * Phase 24.1-03: CUSTOM 템플릿 편집 컴포넌트.
@@ -30,6 +31,7 @@ export default function DynamicCustomForm({
   initialData,
   onSave,
   readOnly,
+  drafterLive,
 }: TemplateEditProps) {
   const { templateCode } = useParams<{ templateCode: string }>();
   const existingSnapshotRaw = initialData?.schemaSnapshot;
@@ -72,6 +74,7 @@ export default function DynamicCustomForm({
       initialData={initialData}
       onSave={onSave}
       readOnly={readOnly}
+      drafterLive={drafterLive}
     />
   );
 }
@@ -81,11 +84,13 @@ function DynamicFormInner({
   initialData,
   onSave,
   readOnly,
+  drafterLive,
 }: {
   schema: SchemaDefinition;
   initialData?: TemplateEditProps['initialData'];
   onSave: TemplateEditProps['onSave'];
   readOnly?: boolean;
+  drafterLive: TemplateEditProps['drafterLive'];
 }) {
   const parsedFormData = useMemo<Record<string, unknown>>(() => {
     if (!initialData?.formData) return {};
@@ -211,6 +216,7 @@ function DynamicFormInner({
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4"
       >
+        <DrafterInfoHeader mode="draft" live={drafterLive} />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             제목<span className="text-red-500 ml-1">*</span>

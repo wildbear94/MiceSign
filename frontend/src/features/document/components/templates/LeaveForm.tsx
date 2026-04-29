@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLeaveTypes } from '../../hooks/useLeaveTypes';
 import { calculateLeaveDays } from '../../utils/leaveDays';
 import FileAttachmentArea from '../attachment/FileAttachmentArea';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 import { leaveFormSchema, type LeaveFormValues } from '../../validations/leaveSchema';
 import type { TemplateEditProps } from './templateRegistry';
 import type { LeaveFormData } from '../../types/document';
@@ -14,6 +15,7 @@ export default function LeaveForm({
   initialData,
   onSave,
   readOnly = false,
+  drafterLive,
 }: TemplateEditProps) {
   const { t } = useTranslation('document');
   const { data: leaveTypes = [] } = useLeaveTypes();
@@ -112,6 +114,7 @@ export default function LeaveForm({
 
   return (
     <form id="document-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <DrafterInfoHeader mode="draft" live={drafterLive} />
       <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
         {t('template.LEAVE')}
       </div>

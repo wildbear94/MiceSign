@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import FileAttachmentArea from '../attachment/FileAttachmentArea';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 import { overtimeFormSchema, type OvertimeFormValues } from '../../validations/overtimeSchema';
 import type { TemplateEditProps } from './templateRegistry';
 import type { OvertimeFormData } from '../../types/document';
@@ -12,6 +13,7 @@ export default function OvertimeForm({
   initialData,
   onSave,
   readOnly = false,
+  drafterLive,
 }: TemplateEditProps) {
   const { t } = useTranslation('document');
 
@@ -93,6 +95,7 @@ export default function OvertimeForm({
 
   return (
     <form id="document-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <DrafterInfoHeader mode="draft" live={drafterLive} />
       <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
         {t('template.OVERTIME')}
       </div>

@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import TiptapEditor from '../TiptapEditor';
 import FileAttachmentArea from '../attachment/FileAttachmentArea';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 import { generalFormSchema, type GeneralFormValues } from '../../validations/generalSchema';
 import type { TemplateEditProps } from './templateRegistry';
 
@@ -12,6 +13,7 @@ export default function GeneralForm({
   initialData,
   onSave,
   readOnly = false,
+  drafterLive,
 }: TemplateEditProps) {
   const { t } = useTranslation('document');
 
@@ -48,6 +50,7 @@ export default function GeneralForm({
 
   return (
     <form id="document-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <DrafterInfoHeader mode="draft" live={drafterLive} />
       <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
         {t('template.GENERAL')}
       </div>

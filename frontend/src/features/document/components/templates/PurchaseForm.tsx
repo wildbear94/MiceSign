@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Plus, X } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency';
 import FileAttachmentArea from '../attachment/FileAttachmentArea';
+import DrafterInfoHeader from '../DrafterInfoHeader';
 import { purchaseFormSchema, type PurchaseFormValues } from '../../validations/purchaseSchema';
 import type { TemplateEditProps } from './templateRegistry';
 import type { PurchaseFormData } from '../../types/document';
@@ -14,6 +15,7 @@ export default function PurchaseForm({
   initialData,
   onSave,
   readOnly = false,
+  drafterLive,
 }: TemplateEditProps) {
   const { t } = useTranslation('document');
 
@@ -93,6 +95,7 @@ export default function PurchaseForm({
 
   return (
     <form id="document-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <DrafterInfoHeader mode="draft" live={drafterLive} />
       <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
         {t('template.PURCHASE')}
       </div>
