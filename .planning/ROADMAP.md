@@ -96,8 +96,10 @@
 - [x] **Phase 29: SMTP 이메일 알림 인프라 (Retrofit)** - EmailService 스텁을 실 JavaMailSender 발송으로 전환하고 PENDING-first 로깅 + @Retryable 격리 + 5종 Thymeleaf 템플릿으로 5개 결재 이벤트 알림 완성 (completed 2026-04-23)
 - [x] **Phase 30: 검색 권한 WHERE 절 보안 수정 + 필터 확장** - FSD FN-SEARCH-001 권한 predicate(보안 수정) + drafterId 필터 + URL query 동기화 페이지네이션 구현 (completed 2026-04-27)
 - [x] **Phase 31: 대시보드 고도화** - 4번째 "진행 중" 카운트 카드 노출 + 결재 mutation 후 invalidateQueries 로 실시간 갱신 + 로딩/빈 상태 UI (completed 2026-04-24)
-- [ ] **Phase 32: CUSTOM 프리셋 확장** - v1.1 빌더 기반 회의록/품의서 JSON 프리셋 2종 추가 (하드코딩 컴포넌트 없이)
+- [x] **Phase 32: CUSTOM 프리셋 확장** - v1.1 빌더 기반 회의록/품의서 JSON 프리셋 2종 추가 (하드코딩 컴포넌트 없이) (completed 2026-04-26)
 - [x] **Phase 33: E2E 검증 + 운영 전환** - 보안 보강(application-prod.yml 자격증명 위생) + 운영 SMTP 런북 + NFR-01 운영 모니터링 게이트 + v1.2-MILESTONE-AUDIT 9 출시 게이트 (completed 2026-04-28)
+- [x] **Phase 34: 양식 기안자 정보 헤더 자동 채움** - 모든 양식 14 통합 지점에 always-on `DrafterInfoHeader` (부서/직위·직책/기안자/기안일) + SUBMITTED-time snapshot 박제 + DRAFT live + legacy fallback (completed 2026-04-29)
+- [ ] **Phase 35: 백엔드 로그 설정** - logback-spring.xml 일별 롤링 + 30일 보관 + prod=INFO/dev=전체 프로필별 분리
 
 ## Phase Details
 
@@ -332,8 +334,8 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34
-(Phases 29, 30, 31, 32 모두 Phase 28 에만 의존하므로 병렬 작업 가능 — 권장 순서: 29 먼저(함정 밀도 최고), 30 의 SRCH-01 보안 수정은 첫 PR 로 조기 착수, 31/32 는 휴식 사이클, 33 은 모든 phase 완료 후. Phase 34 는 v1.2 ship-ready 이후 추가된 양식 헤더 보강 — Phase 32 (CUSTOM 프리셋) 와 독립 병행 가능)
+Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34 -> 35
+(Phases 29, 30, 31, 32 모두 Phase 28 에만 의존하므로 병렬 작업 가능 — 권장 순서: 29 먼저(함정 밀도 최고), 30 의 SRCH-01 보안 수정은 첫 PR 로 조기 착수, 31/32 는 휴식 사이클, 33 은 모든 phase 완료 후. Phase 34 는 v1.2 ship-ready 이후 추가된 양식 헤더 보강 — Phase 32 (CUSTOM 프리셋) 와 독립 병행 가능. Phase 35 는 운영 환경 배포 전 로깅 인프라 정립 — 어떤 phase 와도 의존성 없음)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -360,6 +362,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34
 | 32. CUSTOM 프리셋 확장 | v1.2 | 6/6 | Complete    | 2026-04-26 |
 | 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
 | 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 6/6 | Complete    | 2026-04-29 |
+| 35. 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리) | v1.2 | 0/TBD | Not started | — |
 
 ### Phase 34: 양식 기안자 정보 헤더 자동 채움
 **Goal**: 모든 결재 양식 최상단에 부서/직위·직책/기안자/기안일 4-필드 always-on 헤더가 자동 표시되며 (DRAFT 모드 = live, SUBMITTED 모드 = submit 시점 박제 snapshot, legacy 문서 = live + (현재 정보) 배지 fallback), 기안자가 이후 부서이동·승진해도 박제된 snapshot 은 변경되지 않는다 (D-A5 immutable).
@@ -379,3 +382,14 @@ Plans:
 - [x] 34-05-PLAN.md — FE 14-point integration: 7 Edit + 7 ReadOnly 헤더 삽입 + DocumentEditorPage/DocumentDetailPage props (Wave 3, D-D6/B1~B3)
 - [x] 34-06-PLAN.md — 통합 검증 PASS (BE 170/173, FE 63/63, tsc 0, build OK) + 14-point HUMAN-UAT approved 2026-04-29 + ROADMAP/STATE/VALIDATION 동기화 (Wave 4)
 **UI hint**: yes
+
+### Phase 35: 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리)
+
+**Goal:** [To be planned] — 운영 환경 배포 전 로깅 인프라 정립. 사용자 의도: logback-spring.xml 기반 일별 롤링 파일 어펜더 + 30일 보관 정책 + 프로필 기반 레벨 분리 (prod=INFO 만 / dev=전체 — DEBUG/TRACE 포함)
+**Requirements**: TBD (phase-local 또는 신규 LOG-XX REQ-ID, plan-phase 단계 결정)
+**Depends on:** Phase 34 (none functional — sequence number only; 어떤 phase 와도 무관)
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 35 to break down)
+**UI hint**: no
