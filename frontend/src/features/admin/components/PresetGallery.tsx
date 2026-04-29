@@ -9,8 +9,11 @@ import {
   Users,
   FileSignature,
   LayoutTemplate,
-  type LucideIcon,
 } from 'lucide-react';
+// IN-03 fix (Phase 32 REVIEW): split type-only `LucideIcon` import into a
+// dedicated `import type` statement for verbatimModuleSyntax consistency.
+// Cosmetic — no runtime change.
+import type { LucideIcon } from 'lucide-react';
 import { presets } from '../presets';
 import type { TemplateImportData } from '../validations/templateImportSchema';
 
