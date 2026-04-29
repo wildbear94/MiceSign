@@ -72,8 +72,25 @@ describe('presets', () => {
   });
 
   it('all preset names are Korean', () => {
+    // IN-01 fix (Phase 32 REVIEW): replace lenient `/[가-힣]/` (single Korean
+    // char passes — e.g., "X회") with whitelist-style assertion that maps each
+    // preset key to its canonical Korean name. Catches both partial-Korean
+    // names and accidental name changes.
+    const expectedNames: Record<string, string> = {
+      expense: '경비신청서',
+      leave: '휴가신청서',
+      trip: '출장신청서',
+      purchase: '구매신청서',
+      meeting: '회의록',
+      proposal: '품의서',
+    };
     for (const p of presets) {
-      expect(p.data.name).toMatch(/[가-힣]/);
+      const expected = expectedNames[p.key];
+      expect(expected, `unknown preset key: ${p.key}`).toBeDefined();
+      expect(p.data.name).toBe(expected);
+      // Defensive: every char must be Korean letter, space, or middle-dot
+      expect(p.data.name).toMatch(/^[가-힣\s·]+$/);
+      expect(p.data.name.length).toBeGreaterThanOrEqual(2);
     }
   });
 });
