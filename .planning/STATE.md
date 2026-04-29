@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: v1.2_all_phases_complete
-stopped_at: "Phase 35 complete — UAT approved 2026-04-29 (7/7 gates PASS). v1.2 milestone 8 phases all complete: 24.1 + 29 + 30 + 31 + 32 + 33 + 34 + 35. Ship-ready pending defer-archive trigger."
-last_updated: "2026-04-29T09:30:00.000Z"
-last_activity: 2026-04-29 -- Phase 35 종결 (UAT approved, ROADMAP/STATE synced)
+status: phase_36_added
+stopped_at: "Phase 36 (양식 필드 한 줄 최대 3개 레이아웃) added 2026-04-30 — v1.2 ship-ready 이후 사용자가 추가 요청한 양식 레이아웃 확장. archive-defer trigger 와 독립 — 현재 시점에 처리 가능."
+last_updated: "2026-04-30T00:00:00.000Z"
+last_activity: 2026-04-30 -- Phase 36 scaffolding (form-row-layout)
 progress:
-  total_phases: 16
+  total_phases: 17
   completed_phases: 8
   total_plans: 40
   completed_plans: 40
-  percent: 100
+  percent: 97
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 ## Current Position
 
-Phase: 35 (backend-logging) — **COMPLETE** (UAT approved 2026-04-29 — 7/7 gates PASS)
-Plan: 1/1 complete
-Status: **v1.2 ship-ready** — 모든 phase 완료. defer-archive (2026-04-28) 결정 유지, 출시 트리거 대기
-Last activity: 2026-04-29 — Phase 35 종결 (logback 일별 롤링 + 30일 보관 + prod=INFO/dev=DEBUG 프로필 분리)
+Phase: 36 (form-row-layout) — Not started (Phase 35 종결 후 사용자 추가)
+Plan: 0/TBD (run /gsd-plan-phase 36)
+Status: v1.2 기존 8 phase 모두 ship-ready · Phase 36 (양식 한 줄 최대 3 필드) 추가됨
+Last activity: 2026-04-30 — Phase 36 scaffolding (양식 필드 한 줄 최대 3개 레이아웃)
 
-Progress: [██████████] 100% (40/40 plans — v1.2 모든 phase 종결)
+Progress: [█████████░] 97% (40/41 plans est. — Phase 36 plan_count 미정)
 
 **Phase 35 종결 요약 (2026-04-29):**
 
@@ -146,6 +146,7 @@ Progress: [██████████] 100% (40/40 plans — v1.2 모든 pha
 - Phase 32 ROADMAP/STATE sync 2026-04-29: 실제 완료일 2026-04-26 (UAT signed off, 6/6 plans). 32-REVIEW-FIX.md 추가 — 4 fixes applied (WR-02 brittle 단언/IN-01 한국어 정규식/IN-02 sort dependency/IN-03 type modifier), 3 skipped (WR-01 D-A5+T-32-02 옵션A 채택, IN-04 future enhancement, IN-05 D-C5+D-E1 dual-source by design). v1.2 milestone 전체 종결 — Phase 32 stale 표기로 인한 v1.2 sync 정합성 오류 정리
 - Phase 35 added 2026-04-29: 백엔드 로그 설정 — logback-spring.xml 일별 롤링 파일 어펜더 + 30일 보관 + 프로필 기반 레벨 분리 (prod=INFO / dev=전체). 운영 환경 배포 전 로깅 인프라 정립. 어떤 기존 phase 와도 의존성 없음. archive-defer trigger 와 독립 — 출시 안정화 후가 아니라 출시 전에 처리하는 게 자연스러움
 - Phase 35 complete 2026-04-29: 1/1 plan, 3 tasks (2 auto + 1 human-verify). Spring Boot 3.x 표준 logging.* properties 만 사용 (logback-spring.xml 미생성, D-A1 채택). UAT 7/7 gates PASS. v1.2 milestone 모든 phase 완료 (24.1+29+30+31+32+33+34+35 = 8 phases, 40 plans 100%)
+- Phase 36 added 2026-04-30: 양식 필드 한 줄 최대 3개 레이아웃 — 양식 한 줄에 최대 3 필드 배치 가능하도록 폼 렌더러/빌더 확장. v1.2 ship-ready 이후 사용자 추가 요청. Phase 21~26 양식 빌더 + Phase 24.1 DynamicCustomForm + Phase 34 14 통합 지점 위에서 작업. archive-defer trigger 와 독립
 
 ### Decisions
 

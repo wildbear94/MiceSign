@@ -100,6 +100,7 @@
 - [x] **Phase 33: E2E 검증 + 운영 전환** - 보안 보강(application-prod.yml 자격증명 위생) + 운영 SMTP 런북 + NFR-01 운영 모니터링 게이트 + v1.2-MILESTONE-AUDIT 9 출시 게이트 (completed 2026-04-28)
 - [x] **Phase 34: 양식 기안자 정보 헤더 자동 채움** - 모든 양식 14 통합 지점에 always-on `DrafterInfoHeader` (부서/직위·직책/기안자/기안일) + SUBMITTED-time snapshot 박제 + DRAFT live + legacy fallback (completed 2026-04-29)
 - [x] **Phase 35: 백엔드 로그 설정** - Spring Boot 3.x logging.* properties (logback-spring.xml 미사용) 일별 롤링 + 30일 보관 + prod=INFO/dev=전체 프로필별 분리 + UTF-8 + gzip + 1GB cap (completed 2026-04-29)
+- [ ] **Phase 36: 양식 필드 한 줄 최대 3개 레이아웃** - 양식 한 줄에 최대 3개 필드 배치 가능하도록 폼 렌더러/빌더 확장
 
 ## Phase Details
 
@@ -335,7 +336,7 @@ Plans:
 
 **Execution Order:**
 Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34 -> 35
-(Phases 29, 30, 31, 32 모두 Phase 28 에만 의존하므로 병렬 작업 가능 — 권장 순서: 29 먼저(함정 밀도 최고), 30 의 SRCH-01 보안 수정은 첫 PR 로 조기 착수, 31/32 는 휴식 사이클, 33 은 모든 phase 완료 후. Phase 34 는 v1.2 ship-ready 이후 추가된 양식 헤더 보강 — Phase 32 (CUSTOM 프리셋) 와 독립 병행 가능. Phase 35 는 운영 환경 배포 전 로깅 인프라 정립 — 어떤 phase 와도 의존성 없음)
+(Phases 29, 30, 31, 32 모두 Phase 28 에만 의존하므로 병렬 작업 가능 — 권장 순서: 29 먼저(함정 밀도 최고), 30 의 SRCH-01 보안 수정은 첫 PR 로 조기 착수, 31/32 는 휴식 사이클, 33 은 모든 phase 완료 후. Phase 34 는 v1.2 ship-ready 이후 추가된 양식 헤더 보강 — Phase 32 (CUSTOM 프리셋) 와 독립 병행 가능. Phase 35 는 운영 환경 배포 전 로깅 인프라 정립 — 어떤 phase 와도 의존성 없음. Phase 36 은 v1.2 ship-ready 이후 추가된 양식 레이아웃 확장 — Phase 21~26 의 양식 빌더 인프라 위에서 작업)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -363,6 +364,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34 -> 35
 | 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
 | 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 6/6 | Complete    | 2026-04-29 |
 | 35. 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리) | v1.2 | 1/1 | Complete    | 2026-04-29 |
+| 36. 양식 필드 한 줄 최대 3개 레이아웃 | v1.2 | 0/TBD | Not started | — |
 
 ### Phase 34: 양식 기안자 정보 헤더 자동 채움
 **Goal**: 모든 결재 양식 최상단에 부서/직위·직책/기안자/기안일 4-필드 always-on 헤더가 자동 표시되며 (DRAFT 모드 = live, SUBMITTED 모드 = submit 시점 박제 snapshot, legacy 문서 = live + (현재 정보) 배지 fallback), 기안자가 이후 부서이동·승진해도 박제된 snapshot 은 변경되지 않는다 (D-A5 immutable).
@@ -393,3 +395,14 @@ Plans:
 Plans:
 - [x] 35-01-PLAN.md — application.yml logging 블록 + application-dev.yml root=DEBUG override + application-prod.yml.example LOG_DIR 카탈로그 + .gitignore backend/logs/ + dev/prod 부팅 smoke (Wave 1, D-A1~D-G3) — UAT approved 2026-04-29 (7/7 gates PASS)
 **UI hint**: no
+
+### Phase 36: 양식 필드 한 줄 최대 3개 레이아웃
+
+**Goal:** [To be planned] — 사용자 의도: 양식 한 줄에 최대 3개 필드 배치 가능. 현재는 한 줄 1 필드 vertical stack — 짧은 필드(name/date/select 등)들 옆 나란히 배치 + table 같은 wide 필드는 단독 줄 유지. 빌더에서 row 그룹핑 설정 vs 자동 배치 전략은 plan-phase 단계 결정.
+**Requirements**: TBD (phase-local 또는 신규 LAYOUT-XX REQ-ID, plan-phase 단계 결정)
+**Depends on:** Phase 35 (sequence number only — 기능 의존성은 Phase 21~26 의 양식 빌더 인프라 + Phase 24.1 의 DynamicCustomForm 렌더러 + Phase 34 의 14 통합 지점 위에서 작업)
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 36 to break down)
+**UI hint**: yes
