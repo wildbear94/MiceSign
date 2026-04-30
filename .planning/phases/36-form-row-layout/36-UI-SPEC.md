@@ -1,10 +1,12 @@
 ---
 phase: 36
 slug: form-row-layout
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-30
+reviewed_at: 2026-04-30
+review_outcome: 5/6 PASS, 1 FLAG (Dim 5 — badge micro-padding px-1.5 py-0.5 inherited from FieldCard.tsx L97 production SoT, non-blocking)
 ---
 
 # Phase 36 — UI Design Contract
