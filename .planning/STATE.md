@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
 status: executing
-stopped_at: Phase 36 Plan 01 complete (Wave 1 foundation — data-model + Zod refinements + groupFieldsByRow utility)
-last_updated: "2026-04-30T04:31:25Z"
-last_activity: 2026-04-30 -- Phase 36 Plan 01 complete (5 commits, 7 files, 14 new tests, all green)
+stopped_at: "Phase 36 Plan 02 complete (Wave 2 builder UI — RowPositionSelector + FieldCard wiring + SchemaFieldEditor guard); next: 36-03 renderer (DynamicCustomForm/ReadOnly + FormPreview)"
+last_updated: "2026-04-30T04:46:26.624Z"
+last_activity: 2026-04-30
 progress:
   total_phases: 17
   completed_phases: 7
-  total_plans: 41
-  completed_plans: 35
-  percent: 85
+  total_plans: 38
+  completed_plans: 36
+  percent: 95
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 36 (form-row-layout) — EXECUTING
-Plan: 2 of 4 (next: 36-02 — builder UI + RowPositionSelector)
-Status: Plan 01 complete; Wave 1 foundation shipped (rowGroup type + WIDE_TYPES + Zod refines + groupFieldsByRow)
-Last activity: 2026-04-30 -- Phase 36 Plan 01 complete (5 commits, 7 files, 14 new tests, all green)
+Plan: 3 of 4 (next: 36-02 — builder UI + RowPositionSelector)
+Status: Ready to execute
+Last activity: 2026-04-30
 
-Progress: [████████▌─] 85% (35/41 plans)
+Progress: [██████████] 95%
 
 **Phase 35 종결 요약 (2026-04-29):**
 
@@ -135,6 +135,7 @@ Progress: [████████▌─] 85% (35/41 plans)
 | Phase 34 P04 | 5min | 3 tasks | 5 files |
 | Phase 34 P05 | 8m 21s | 3 tasks | 16 files |
 | Phase 36 P01 | 12m 47s | 3 tasks | 7 files |
+| Phase 36 P02 | 4m 30s | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -221,6 +222,9 @@ Progress: [████████▌─] 85% (35/41 plans)
 - [Phase 36-01]: Tailwind static-class enumeration pattern established — `ROW_GROUP_BORDER_CLASSES` + `ROW_GROUP_PILL_CLASSES` as module-scope `as const` 4-element literal-string arrays. Cycle index = `(rowGroup - 1) % 4`. CRITICAL anti-pattern documented (no template interpolation `bg-${color}-100` because Tailwind compile-time content scanner cannot detect dynamic strings — silent production-build break). Pattern reusable for future indexed-color cycles (e.g., department color tags, priority levels).
 - [Phase 36-01]: groupFieldsByRow generic over `T extends { id, type, rowGroup? }` — single utility serves both SchemaField (builder side, FormPreview Wave 2) and FieldDefinition (renderer side, DynamicCustomForm/ReadOnly Wave 3). Avoids type-conversion shims at the consumer boundary. Local `WIDE_TYPES = new Set(['textarea', 'table'])` at module scope (NOT imported from admin/SchemaFieldEditor/constants.ts) — keeps document feature standalone, tested with anonymous `TestField` shape.
 - [Phase 36-01]: D-D1 backward-compat invariant pinned by test — "all rowGroup undefined → all singles" case 2 of groupFieldsByRow.test.ts. Legacy `schemaSnapshot.fields[*].rowGroup` is absent on Phase 24.1 SUBMITTED docs → utility's first-branch short-circuit emits `{ kind: 'single' }` per field → renderer's `space-y-4` vertical stack identical to current output. Zero layout shift on legacy docs is observable, not just claimed.
+- [Phase 36-02]: Module-scope literal class strings (SELECTED/UNSELECTED/DISABLED + FLASH_CLASS) replace Tailwind interpolation in RowPositionSelector — pattern reusable for any future indexed/state-driven component. First instance of transient-on-click visual feedback in builder via useState<number|null>+setTimeout(200) — codifies pattern for future violation flashes.
+- [Phase 36-02]: T-36-06 (hard-cap-3 bypass) 3-layer mitigation operational: visual disable + native HTML disabled attr + handler-side 'if (isDisabled) return' guard. Wave 1 Zod refinement is import-boundary fallback. Layer 2 in builder UI completes the threat coverage; Wave 1 Zod (Layer 1) + groupFieldsByRow defensive cap (Layer 3) operational since Plan 36-01.
+- [Phase 36-02]: D-C4 force-single-row guard placed at TOP of SchemaFieldEditor.updateField body — mutates local 'updated' reference BEFORE onChange + BEFORE rules-cleanup branches. Downstream cleanup (D-25 conditional rules cleanup, Phase 25 calculation rules cleanup, Pitfall 3 table column type cleanup) all see the cleaned field. Guard is synchronous within React controlled-input flow → admin cannot persist wide-type-with-rowGroup state via UI (T-36-09 mitigation).
 
 ### Pending Todos
 
@@ -234,9 +238,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-30T04:31:25Z
-Stopped at: Phase 36 Plan 01 complete — Wave 1 foundation (data-model + Zod + utility). Next: 36-02 builder UI.
-Resume file: .planning/phases/36-form-row-layout/36-02-PLAN.md
+Last session: 2026-04-30T04:46:26.619Z
+Stopped at: Phase 36 Plan 02 complete (Wave 2 builder UI — RowPositionSelector + FieldCard wiring + SchemaFieldEditor guard); next: 36-03 renderer (DynamicCustomForm/ReadOnly + FormPreview)
+Resume file: .planning/phases/36-form-row-layout/36-03-PLAN.md
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 

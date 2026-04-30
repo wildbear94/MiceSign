@@ -364,7 +364,7 @@ Phases execute in numeric order: 29 -> 30 -> 31 -> 32 -> 33 -> 34 -> 35
 | 33. E2E 검증 + 운영 전환 | v1.2 | 5/5 | Complete    | 2026-04-28 |
 | 34. 양식 기안자 정보 헤더 자동 채움 | v1.2 | 6/6 | Complete    | 2026-04-29 |
 | 35. 백엔드 로그 설정 (logback 일별 롤링 + 30일 보관 + prod/dev 프로필 분리) | v1.2 | 1/1 | Complete    | 2026-04-29 |
-| 36. 양식 필드 한 줄 최대 3개 레이아웃 | v1.2 | 0/4 | Not started | — |
+| 36. 양식 필드 한 줄 최대 3개 레이아웃 | v1.2 | 2/4 | In Progress|  |
 
 ### Phase 34: 양식 기안자 정보 헤더 자동 채움
 **Goal**: 모든 결재 양식 최상단에 부서/직위·직책/기안자/기안일 4-필드 always-on 헤더가 자동 표시되며 (DRAFT 모드 = live, SUBMITTED 모드 = submit 시점 박제 snapshot, legacy 문서 = live + (현재 정보) 배지 fallback), 기안자가 이후 부서이동·승진해도 박제된 snapshot 은 변경되지 않는다 (D-A5 immutable).
@@ -401,11 +401,11 @@ Plans:
 **Goal:** CUSTOM 양식의 사용자 정의 필드들을 한 줄에 최대 3개까지 가로 배치할 수 있도록 SchemaField 데이터 모델 (rowGroup?: number, D-F1 option (i)) + 양식 빌더 명시적 row 그룹 설정 UI (RowPositionSelector pill 셀렉터 + FieldCard rowGroup 인디케이터 + force-single 가드) + DynamicCustomForm/ReadOnly/FormPreview 렌더러 grid 도입 (md+ md:grid-cols-{1,2,3} + sm 1-col fallback) — 3 layer 작업. CUSTOM 양식만 적용 (built-in 6 무수정), wide 필드 (textarea/table) 단독 행 강제, 기존 SUBMITTED 문서는 schemaSnapshot 으로 vertical stack 그대로 유지 (zero layout shift), 하드 캡 = 3 (visual disable + Zod refine + 런타임 방어 3-layer).
 **Requirements**: phase-local (D-A1~D-G5 decision IDs 추적, 사용자 결정 2026-04-30)
 **Depends on:** Phase 35 (sequence number only — 기능 의존성은 Phase 21~26 의 양식 빌더 인프라 + Phase 24.1 의 DynamicCustomForm 렌더러 + Phase 34 의 14 통합 지점 위에서 작업)
-**Plans:** 4 plans
+**Plans:** 2/4 plans executed
 
 Plans:
 - [x] 36-01-PLAN.md — Wave 1: SchemaField/FieldDefinition rowGroup 확장 + WIDE_TYPES/dynamic-class 상수 + Zod refine 2종 (wide-type 가드 + cap=3) + groupFieldsByRow 유틸 + 8-case unit test (completed 2026-04-30, 5 commits, 7 files, 14 new tests, tsc 0 errors, full vitest 77 pass)
-- [ ] 36-02-PLAN.md — Wave 2: RowPositionSelector NEW 컴포넌트 + 8-case vitest + FieldCard 통합 (border-l + 헤더 pill/badge + 확장 패널 셀렉터) + SchemaFieldEditor rowOccupancy memo + force-single 가드
+- [x] 36-02-PLAN.md — Wave 2: RowPositionSelector NEW 컴포넌트 + 8-case vitest + FieldCard 통합 (border-l + 헤더 pill/badge + 확장 패널 셀렉터) + SchemaFieldEditor rowOccupancy memo + force-single 가드
 - [ ] 36-03-PLAN.md — Wave 3: FormPreview + DynamicCustomForm + DynamicCustomReadOnly grid 도입 (D-D1 backward compat invariant + D-19 hidden-field 처리 보존)
 - [ ] 36-04-PLAN.md — Wave 4: ko/admin.json 13 i18n 키 + ko/document.json ARIA 미러 + 통합 회귀 (tsc/vitest/vite build + dynamic class CSS 토큰 검증) + 7-gate HUMAN-UAT
 **UI hint**: yes
