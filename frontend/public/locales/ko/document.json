@@ -1,5 +1,8 @@
 {
   "pageTitle": "내 문서",
+  "rowLayout": {
+    "rowGroupAriaLabel": "{{number}}행 그룹"
+  },
   "drafterInfo": {
     "departmentLabel": "부서",
     "positionLabel": "직위·직책",

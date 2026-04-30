@@ -300,6 +300,21 @@
         "selfReference": "자기 자신을 참조할 수 없습니다",
         "circularDependency": "순환 참조 감지"
       }
+    },
+    "rowLayout": {
+      "sectionLabel": "행 위치",
+      "singleButton": "단독",
+      "rowButton": "행 {{number}}",
+      "newRowButton": "+ 새 행",
+      "helperHint": "같은 '행' 의 필드들이 한 줄에 가로 배치됩니다 (모바일에서는 한 줄로 표시됩니다)",
+      "rowFullTooltip": "이 행은 이미 3개 필드가 가득 찼습니다",
+      "rowFullToast": "한 줄에는 최대 3개 필드까지 배치할 수 있습니다",
+      "wideTypeAutoSingleToast": "이 필드는 한 줄을 차지하는 필드라 행 그룹에서 빠집니다",
+      "wideTypeBadge": "한 줄 차지",
+      "rowGroupBadge": "{{number}}행",
+      "rowGroupAriaLabel": "{{number}}행 그룹",
+      "zodWideTypeError": "긴 텍스트와 표 필드는 행 그룹에 속할 수 없습니다",
+      "zodCapExceededError": "한 줄에는 최대 3개 필드까지만 배치할 수 있습니다"
     }
   },
   "registration": {
