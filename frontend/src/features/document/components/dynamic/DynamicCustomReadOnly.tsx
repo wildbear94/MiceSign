@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { evaluateConditions } from '../../utils/evaluateConditions';
+import {
+  groupFieldsByRow,
+  GRID_COLS_CLASS,
+} from '../../utils/groupFieldsByRow';
 import type {
   SchemaDefinition,
   FieldDefinition,
@@ -24,6 +29,8 @@ export default function DynamicCustomReadOnly({
   drafterLive,
   submittedAt,
 }: TemplateReadOnlyProps) {
+  const { t } = useTranslation('document');
+
   const schema = useMemo<SchemaDefinition | null>(() => {
     if (!schemaSnapshot) return null;
     try {
@@ -73,15 +80,37 @@ export default function DynamicCustomReadOnly({
         submittedAt={submittedAt}
       />
       <h2 className="text-xl font-bold mb-4">{title}</h2>
-      {schema.fields
-        .filter((f) => !hiddenFields.has(f.id) && f.type !== 'hidden')
-        .map((field) => (
-          <ReadOnlyField
-            key={field.id}
-            field={field}
-            value={values[field.id]}
-          />
-        ))}
+      {groupFieldsByRow(
+        schema.fields.filter(
+          (f) => !hiddenFields.has(f.id) && f.type !== 'hidden',
+        ),
+      ).map((g) => {
+        if (g.kind === 'single') {
+          return (
+            <ReadOnlyField
+              key={g.field.id}
+              field={g.field}
+              value={values[g.field.id]}
+            />
+          );
+        }
+        return (
+          <div
+            key={`row-${g.rowGroup}-${g.fields[0].id}`}
+            role="group"
+            aria-label={t('rowLayout.rowGroupAriaLabel', {
+              number: g.rowGroup,
+            })}
+            className={`grid grid-cols-1 ${GRID_COLS_CLASS[g.cols]} gap-4`}
+          >
+            {g.fields.map((f) => (
+              <div key={f.id} className="min-w-0">
+                <ReadOnlyField field={f} value={values[f.id]} />
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
