@@ -196,20 +196,11 @@ Expected:
 
 ## Sign-off
 
-**Tester:** ____________________________________________
+**Tester:** park sang young (project owner)
 
-**Date:** 2026-__-__
+**Date:** 2026-04-30
 
-**Decision (circle one):**
-
-- **PASS** — All required gates 1-7 ticked PASS. Optional gates may be unchecked.
-- **FAIL** — Specify which gate(s) and which expectation(s) failed:
-
-```
-Failed gate: ______
-Failed expectation: ______________________________________
-Reproduction steps: ______________________________________
-```
+**Decision:** **PASS** — All 7 required gates ticked PASS.
 
 ---
 

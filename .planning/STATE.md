@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: planning
-stopped_at: "Phase 36 Plan 04 Tasks 1+2+3 complete (i18n catalog + integration verify + UAT staging); AWAITING HUMAN UAT sign-off (Task 4 checkpoint:human-verify, gate=blocking)"
-last_updated: "2026-04-30T05:06:38.146Z"
-last_activity: 2026-04-30
+status: phase_36_complete
+stopped_at: "Phase 36 complete — UAT approved 2026-04-30 (7/7 gates PASS). v1.2 milestone all 9 phases complete: 24.1 + 29 + 30 + 31 + 32 + 33 + 34 + 35 + 36. Ship-ready pending defer-archive trigger."
+last_updated: "2026-04-30T06:00:00.000Z"
+last_activity: 2026-04-30 -- Phase 36 종결 (UAT approved, ROADMAP/STATE synced)
 progress:
   total_phases: 17
-  completed_phases: 8
-  total_plans: 38
-  completed_plans: 38
+  completed_phases: 9
+  total_plans: 44
+  completed_plans: 44
   percent: 100
 ---
 
@@ -25,12 +25,22 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 ## Current Position
 
-Phase: 36 (form-row-layout) — AWAITING HUMAN UAT
-Plan: 4 of 4 (Wave 4 — i18n + integration verify + UAT staging done; Task 4 = HUMAN-UAT execution)
-Status: Tasks 1+2+3 PASS, Task 4 = `checkpoint:human-verify` gate=blocking; user must execute 7-gate checklist at .planning/phases/36-form-row-layout/36-HUMAN-UAT.md and resume with `approved` (or `failed: gate N — reason`)
-Last activity: 2026-04-30
+Phase: 36 (form-row-layout) — **COMPLETE** (UAT approved 2026-04-30 — 7/7 gates PASS)
+Plan: 4/4 complete
+Status: **v1.2 ship-ready** — 9 phases 모두 완료. defer-archive (2026-04-28) 결정 유지, 출시 트리거 대기
+Last activity: 2026-04-30 — Phase 36 종결 (양식 한 줄 최대 3개 필드 레이아웃, 14 파일 / 13 tasks)
 
-Progress: [██████████] 97%
+Progress: [██████████] 100% (44/44 plans — v1.2 모든 phase 종결)
+
+**Phase 36 종결 요약 (2026-04-30):**
+
+- Wave 1 (36-01) — 데이터 모델 (rowGroup field) + Zod refines + groupFieldsByRow 유틸리티 (8/8 tests), 6 commits
+- Wave 2 (36-02) — 빌더 UI (RowPositionSelector + FieldCard wiring + SchemaFieldEditor wide-type guard, 8/8 tests), 5 commits
+- Wave 3 (36-03) — 렌더러 wiring (FormPreview + DynamicCustomForm + DynamicCustomReadOnly grid layout), 4 commits
+- Wave 4 (36-04) — i18n 13 keys + 빌드 CSS 17 dynamic tokens 검증 + 통합 테스트 + 7-gate HUMAN-UAT approved, 4 commits
+- 산출물: `frontend/src/features/document/utils/groupFieldsByRow.ts` (신규 유틸), `RowPositionSelector.tsx` (신규 빌더 UI), 14 파일 영향
+- 무수정 (보존): built-in 6 양식 12 파일 (D-B2), Phase 34 DrafterInfoHeader (D-B4), 백엔드 (frontend-only phase)
+- 회귀: vitest 85 pass / 0 fail, tsc 0 errors, vite build OK
 
 **Phase 35 종결 요약 (2026-04-29):**
 
@@ -151,6 +161,7 @@ Progress: [██████████] 97%
 - Phase 35 added 2026-04-29: 백엔드 로그 설정 — logback-spring.xml 일별 롤링 파일 어펜더 + 30일 보관 + 프로필 기반 레벨 분리 (prod=INFO / dev=전체). 운영 환경 배포 전 로깅 인프라 정립. 어떤 기존 phase 와도 의존성 없음. archive-defer trigger 와 독립 — 출시 안정화 후가 아니라 출시 전에 처리하는 게 자연스러움
 - Phase 35 complete 2026-04-29: 1/1 plan, 3 tasks (2 auto + 1 human-verify). Spring Boot 3.x 표준 logging.* properties 만 사용 (logback-spring.xml 미생성, D-A1 채택). UAT 7/7 gates PASS. v1.2 milestone 모든 phase 완료 (24.1+29+30+31+32+33+34+35 = 8 phases, 40 plans 100%)
 - Phase 36 added 2026-04-30: 양식 필드 한 줄 최대 3개 레이아웃 — 양식 한 줄에 최대 3 필드 배치 가능하도록 폼 렌더러/빌더 확장. v1.2 ship-ready 이후 사용자 추가 요청. Phase 21~26 양식 빌더 + Phase 24.1 DynamicCustomForm + Phase 34 14 통합 지점 위에서 작업. archive-defer trigger 와 독립
+- Phase 36 complete 2026-04-30: 4/4 plans, 13 tasks (12 auto + 1 human-verify). 데이터 모델 옵션 (i) rowGroup?: number 채택, 빌더 pill selector, 렌더러 grid + sm 1-col fallback, schemaSnapshot zero layout shift. UAT 7/7 gates PASS. v1.2 milestone 모든 phase 완료 (24.1+29+30+31+32+33+34+35+36 = 9 phases, 44 plans 100%)
 
 ### Decisions
 
