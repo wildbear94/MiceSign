@@ -189,3 +189,135 @@ describe('templateImportSchema', () => {
     expect(result.success).toBe(true);
   });
 });
+
+// === Phase 36 — rowGroup field tests (D-F1, D-C1, D-C2, D-F3) ===
+
+describe('templateImportSchema — rowGroup field', () => {
+  it('accepts rowGroup on text field (non-wide type)', () => {
+    const payload = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          { id: 'a', type: 'text', label: 'A', required: false, rowGroup: 1 },
+        ],
+        conditionalRules: [],
+        calculationRules: [],
+      },
+    };
+    const result = templateImportSchema.safeParse(payload);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects rowGroup on textarea field with i18n key zodWideTypeError', () => {
+    const payload = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          { id: 'a', type: 'textarea', label: 'A', required: false, rowGroup: 1 },
+        ],
+        conditionalRules: [],
+        calculationRules: [],
+      },
+    };
+    const result = templateImportSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain('templates.rowLayout.zodWideTypeError');
+    }
+  });
+
+  it('rejects rowGroup on table field with i18n key zodWideTypeError', () => {
+    const payload = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          {
+            id: 't',
+            type: 'table',
+            label: 'T',
+            required: false,
+            rowGroup: 1,
+            config: {
+              columns: [
+                { id: 'c', type: 'text', label: 'C', required: false },
+              ],
+            },
+          },
+        ],
+        conditionalRules: [],
+        calculationRules: [],
+      },
+    };
+    const result = templateImportSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain('templates.rowLayout.zodWideTypeError');
+    }
+  });
+
+  it('accepts up to 3 consecutive same-rowGroup non-wide fields (cap=3 boundary)', () => {
+    const payload = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          { id: 'a', type: 'text', label: 'A', required: false, rowGroup: 1 },
+          { id: 'b', type: 'number', label: 'B', required: false, rowGroup: 1 },
+          { id: 'c', type: 'date', label: 'C', required: false, rowGroup: 1 },
+        ],
+        conditionalRules: [],
+        calculationRules: [],
+      },
+    };
+    const result = templateImportSchema.safeParse(payload);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects 4 consecutive same-rowGroup non-wide fields with i18n key zodCapExceededError', () => {
+    const payload = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          { id: 'a', type: 'text', label: 'A', required: false, rowGroup: 1 },
+          { id: 'b', type: 'number', label: 'B', required: false, rowGroup: 1 },
+          { id: 'c', type: 'date', label: 'C', required: false, rowGroup: 1 },
+          { id: 'd', type: 'text', label: 'D', required: false, rowGroup: 1 },
+        ],
+        conditionalRules: [],
+        calculationRules: [],
+      },
+    };
+    const result = templateImportSchema.safeParse(payload);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const messages = result.error.issues.map((i) => i.message);
+      expect(messages).toContain('templates.rowLayout.zodCapExceededError');
+    }
+  });
+
+  it('accepts non-consecutive same-rowGroup fields interrupted by wide field (consecutive semantic)', () => {
+    // rowGroup=1, textarea (wide, no rowGroup), rowGroup=1 — algorithm short-circuits
+    // per consecutive run. Two separate runs of length 1 each → both ≤3 → success.
+    const payload = {
+      ...validPayload,
+      schemaDefinition: {
+        ...validPayload.schemaDefinition,
+        fields: [
+          { id: 'a', type: 'text', label: 'A', required: false, rowGroup: 1 },
+          { id: 'b', type: 'textarea', label: 'B', required: false },
+          { id: 'c', type: 'text', label: 'C', required: false, rowGroup: 1 },
+        ],
+        conditionalRules: [],
+        calculationRules: [],
+      },
+    };
+    const result = templateImportSchema.safeParse(payload);
+    expect(result.success).toBe(true);
+  });
+});
