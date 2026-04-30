@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: executing
-stopped_at: "Phase 36 Plan 02 complete (Wave 2 builder UI — RowPositionSelector + FieldCard wiring + SchemaFieldEditor guard); next: 36-03 renderer (DynamicCustomForm/ReadOnly + FormPreview)"
-last_updated: "2026-04-30T04:56:59.253Z"
+status: planning
+stopped_at: "Phase 36 Plan 04 Tasks 1+2+3 complete (i18n catalog + integration verify + UAT staging); AWAITING HUMAN UAT sign-off (Task 4 checkpoint:human-verify, gate=blocking)"
+last_updated: "2026-04-30T05:06:38.146Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 17
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 38
-  completed_plans: 37
-  percent: 97
+  completed_plans: 38
+  percent: 100
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 
 ## Current Position
 
-Phase: 36 (form-row-layout) — EXECUTING
-Plan: 4 of 4 (next: 36-02 — builder UI + RowPositionSelector)
-Status: Ready to execute
+Phase: 36 (form-row-layout) — AWAITING HUMAN UAT
+Plan: 4 of 4 (Wave 4 — i18n + integration verify + UAT staging done; Task 4 = HUMAN-UAT execution)
+Status: Tasks 1+2+3 PASS, Task 4 = `checkpoint:human-verify` gate=blocking; user must execute 7-gate checklist at .planning/phases/36-form-row-layout/36-HUMAN-UAT.md and resume with `approved` (or `failed: gate N — reason`)
 Last activity: 2026-04-30
 
 Progress: [██████████] 97%
@@ -137,6 +137,7 @@ Progress: [██████████] 97%
 | Phase 36 P01 | 12m 47s | 3 tasks | 7 files |
 | Phase 36 P02 | 4m 30s | 3 tasks | 4 files |
 | Phase 36 P03 | 4m 33s | 3 tasks | 4 files |
+| Phase 36 P04 | 3m 35s | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -229,6 +230,8 @@ Progress: [██████████] 97%
 - [Phase ?]: Phase 36-03: GRID_COLS_CLASS literal map exported from groupFieldsByRow.ts as single SoT for renderer column-class lookup; all 3 CUSTOM-form renderers consume it via static GRID_COLS_CLASS[g.cols] lookup for Tailwind compile-time scan compliance
 - [Phase ?]: Phase 36-03: D-19 hidden-field invariant preserved in DynamicCustomForm via per-cell branching in renderCell helper — grid-cell non-table-hidden returns empty placeholder div with display:none for CSS grid track auto-collapse
 - [Phase ?]: Phase 36-03: D-D1 backward-compat zero-shift confirmed — legacy schemaSnapshot fields with rowGroup undefined emit all-single output → identical vertical stack on DynamicCustomReadOnly (PRIMARY legacy SUBMITTED doc viewing surface)
+- [Phase ?]: [Phase 36-04]: 13 templates.rowLayout.* Korean i18n keys added to ko/admin.json + 1 mirrored rowLayout.rowGroupAriaLabel to ko/document.json (cross-namespace single-key mirror keeps renderer self-contained); en/* Korean-only precedent honored (Phase 32-04 / Phase 34 D-E2). Built-CSS grep verifies T-36-19 mitigation: all 17 dynamic Tailwind class tokens detected by compile-time scanner. Full vitest 85/0 fail = zero regression vs Wave 3 baseline.
+- [Phase ?]: [Phase 36-04]: Phase 36 closure gated by HUMAN UAT (D-G5 manual UAT). 7 mandatory visual gates documented in 36-HUMAN-UAT.md (builder pill / hard-cap-3 flash / md+ grid / sm 1-col / wide-type guard / legacy zero-shift / FormPreview live reflection) + 2 optional checks (dark mode / Phase 24.1 conditional+calculation regression). User sign-off required before STATE/ROADMAP mark Phase 36 complete.
 
 ### Pending Todos
 
@@ -242,9 +245,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-30T04:56:25.671Z
-Stopped at: Phase 36 Plan 02 complete (Wave 2 builder UI — RowPositionSelector + FieldCard wiring + SchemaFieldEditor guard); next: 36-03 renderer (DynamicCustomForm/ReadOnly + FormPreview)
-Resume file: None
+Last session: 2026-04-30T05:02:00.000Z
+Stopped at: Phase 36 Plan 04 Tasks 1+2+3 complete (i18n catalog + integration verify + UAT staging); AWAITING HUMAN UAT sign-off (Task 4 checkpoint:human-verify, gate=blocking)
+Resume file: .planning/phases/36-form-row-layout/36-HUMAN-UAT.md
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 
