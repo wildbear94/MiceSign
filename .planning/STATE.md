@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: v1.2 기존 8 phase 모두 ship-ready · Phase 36 (양식 한 줄 최대 3 필드) 추가됨
-stopped_at: Phase 36 plans verified (4 plans, 13 tasks, 26 D-IDs covered) — ready to execute
-last_updated: "2026-04-30T04:13:26.118Z"
-last_activity: 2026-04-30 — Phase 36 scaffolding (양식 필드 한 줄 최대 3개 레이아웃)
+status: executing
+stopped_at: Phase 36 Plan 01 complete (Wave 1 foundation — data-model + Zod refinements + groupFieldsByRow utility)
+last_updated: "2026-04-30T04:31:25Z"
+last_activity: 2026-04-30 -- Phase 36 Plan 01 complete (5 commits, 7 files, 14 new tests, all green)
 progress:
   total_phases: 17
   completed_phases: 7
-  total_plans: 38
-  completed_plans: 34
-  percent: 89
+  total_plans: 41
+  completed_plans: 35
+  percent: 85
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-22)
 
 **Core value:** Employees can submit approval documents and get them approved/rejected through a clear, sequential workflow
-**Current focus:** Phase 35 — backend-logging
+**Current focus:** Phase 36 — form-row-layout
 
 ## Current Position
 
-Phase: 36 (form-row-layout) — Not started (Phase 35 종결 후 사용자 추가)
-Plan: 0/TBD (run /gsd-plan-phase 36)
-Status: v1.2 기존 8 phase 모두 ship-ready · Phase 36 (양식 한 줄 최대 3 필드) 추가됨
-Last activity: 2026-04-30 — Phase 36 scaffolding (양식 필드 한 줄 최대 3개 레이아웃)
+Phase: 36 (form-row-layout) — EXECUTING
+Plan: 2 of 4 (next: 36-02 — builder UI + RowPositionSelector)
+Status: Plan 01 complete; Wave 1 foundation shipped (rowGroup type + WIDE_TYPES + Zod refines + groupFieldsByRow)
+Last activity: 2026-04-30 -- Phase 36 Plan 01 complete (5 commits, 7 files, 14 new tests, all green)
 
-Progress: [█████████░] 97% (40/41 plans est. — Phase 36 plan_count 미정)
+Progress: [████████▌─] 85% (35/41 plans)
 
 **Phase 35 종결 요약 (2026-04-29):**
 
@@ -134,6 +134,7 @@ Progress: [█████████░] 97% (40/41 plans est. — Phase 36 pl
 | Phase 34 P03 | 5m 34s | 2 tasks | 4 files |
 | Phase 34 P04 | 5min | 3 tasks | 5 files |
 | Phase 34 P05 | 8m 21s | 3 tasks | 16 files |
+| Phase 36 P01 | 12m 47s | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -214,6 +215,12 @@ Progress: [█████████░] 97% (40/41 plans est. — Phase 36 pl
 - [Phase ?]: Phase 34 Plan 05: Mechanical fan-out — single 1~3 line insertion pattern applied verbatim across 14 form components (D-D6 honored, no per-form branching)
 - [Phase ?]: Phase 34 Plan 05: ReadOnly early-return branches wrapped with header — always-on contract honored even on empty/legacy formData (Rule 2 scope expansion)
 - [Phase ?]: Phase 34 Plan 05: DocumentDetailPage duplicate 기안자 meta-grid cell deleted per UI-SPEC §Position note — comment marker preserved for traceability
+- [Phase 36-01]: D-F1 option (i) ENACTED — `rowGroup?: number` placed AFTER `config` field on both SchemaField (admin builder) and FieldDefinition (renderer/JSON). Optional placement-last per project convention. Single-key delta keeps Phase 24.1 conditional/calculation rule engines unaffected (rowGroup is layout-only, never consulted by predicates).
+- [Phase 36-01]: D-F3 hard cap=3 ENACTED at 2 of 3 layers in this plan — Layer 1 (Zod refine #2 walks consecutive same-rowGroup non-wide runs, rejects >3 with i18n key `templates.rowLayout.zodCapExceededError`) + Layer 3 (groupFieldsByRow defensive `Math.min(bucket.length, 3)` cap + leftover-as-singles for >3 edge case). Layer 2 (builder UI visual disable) deferred to Plan 36-02.
+- [Phase 36-01]: WIDE_TYPES = new Set<SchemaFieldType>(['textarea', 'table']) — single source of truth in `admin/SchemaFieldEditor/constants.ts` for builder layer. Zod validation layer (`admin/validations/templateImportSchema.ts`) and runtime utility (`document/utils/groupFieldsByRow.ts`) keep local `WIDE_TYPES_FOR_VALIDATION` / `WIDE_TYPES` mirrors to avoid cross-feature import coupling. The 3-mirror pattern is intentional — Zod and renderer are stand-alone code paths that should not import from admin/components.
+- [Phase 36-01]: Tailwind static-class enumeration pattern established — `ROW_GROUP_BORDER_CLASSES` + `ROW_GROUP_PILL_CLASSES` as module-scope `as const` 4-element literal-string arrays. Cycle index = `(rowGroup - 1) % 4`. CRITICAL anti-pattern documented (no template interpolation `bg-${color}-100` because Tailwind compile-time content scanner cannot detect dynamic strings — silent production-build break). Pattern reusable for future indexed-color cycles (e.g., department color tags, priority levels).
+- [Phase 36-01]: groupFieldsByRow generic over `T extends { id, type, rowGroup? }` — single utility serves both SchemaField (builder side, FormPreview Wave 2) and FieldDefinition (renderer side, DynamicCustomForm/ReadOnly Wave 3). Avoids type-conversion shims at the consumer boundary. Local `WIDE_TYPES = new Set(['textarea', 'table'])` at module scope (NOT imported from admin/SchemaFieldEditor/constants.ts) — keeps document feature standalone, tested with anonymous `TestField` shape.
+- [Phase 36-01]: D-D1 backward-compat invariant pinned by test — "all rowGroup undefined → all singles" case 2 of groupFieldsByRow.test.ts. Legacy `schemaSnapshot.fields[*].rowGroup` is absent on Phase 24.1 SUBMITTED docs → utility's first-branch short-circuit emits `{ kind: 'single' }` per field → renderer's `space-y-4` vertical stack identical to current output. Zero layout shift on legacy docs is observable, not just claimed.
 
 ### Pending Todos
 
@@ -227,9 +234,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-30T04:13:26.111Z
-Stopped at: Phase 36 plans verified (4 plans, 13 tasks, 26 D-IDs covered) — ready to execute
-Resume file: .planning/phases/36-form-row-layout/36-01-PLAN.md
+Last session: 2026-04-30T04:31:25Z
+Stopped at: Phase 36 Plan 01 complete — Wave 1 foundation (data-model + Zod + utility). Next: 36-02 builder UI.
+Resume file: .planning/phases/36-form-row-layout/36-02-PLAN.md
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 

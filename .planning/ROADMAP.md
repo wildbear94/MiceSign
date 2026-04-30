@@ -404,7 +404,7 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 36-01-PLAN.md — Wave 1: SchemaField/FieldDefinition rowGroup 확장 + WIDE_TYPES/dynamic-class 상수 + Zod refine 2종 (wide-type 가드 + cap=3) + groupFieldsByRow 유틸 + 8-case unit test
+- [x] 36-01-PLAN.md — Wave 1: SchemaField/FieldDefinition rowGroup 확장 + WIDE_TYPES/dynamic-class 상수 + Zod refine 2종 (wide-type 가드 + cap=3) + groupFieldsByRow 유틸 + 8-case unit test (completed 2026-04-30, 5 commits, 7 files, 14 new tests, tsc 0 errors, full vitest 77 pass)
 - [ ] 36-02-PLAN.md — Wave 2: RowPositionSelector NEW 컴포넌트 + 8-case vitest + FieldCard 통합 (border-l + 헤더 pill/badge + 확장 패널 셀렉터) + SchemaFieldEditor rowOccupancy memo + force-single 가드
 - [ ] 36-03-PLAN.md — Wave 3: FormPreview + DynamicCustomForm + DynamicCustomReadOnly grid 도입 (D-D1 backward compat invariant + D-19 hidden-field 처리 보존)
 - [ ] 36-04-PLAN.md — Wave 4: ko/admin.json 13 i18n 키 + ko/document.json ARIA 미러 + 통합 회귀 (tsc/vitest/vite build + dynamic class CSS 토큰 검증) + 7-gate HUMAN-UAT
