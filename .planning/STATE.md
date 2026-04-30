@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: phases
-status: phase_36_added
-stopped_at: "Phase 36 (양식 필드 한 줄 최대 3개 레이아웃) added 2026-04-30 — v1.2 ship-ready 이후 사용자가 추가 요청한 양식 레이아웃 확장. archive-defer trigger 와 독립 — 현재 시점에 처리 가능."
-last_updated: "2026-04-30T00:00:00.000Z"
-last_activity: 2026-04-30 -- Phase 36 scaffolding (form-row-layout)
+status: v1.2 기존 8 phase 모두 ship-ready · Phase 36 (양식 한 줄 최대 3 필드) 추가됨
+stopped_at: Phase 36 plans verified (4 plans, 13 tasks, 26 D-IDs covered) — ready to execute
+last_updated: "2026-04-30T04:13:26.118Z"
+last_activity: 2026-04-30 — Phase 36 scaffolding (양식 필드 한 줄 최대 3개 레이아웃)
 progress:
   total_phases: 17
-  completed_phases: 8
-  total_plans: 40
-  completed_plans: 40
-  percent: 97
+  completed_phases: 7
+  total_plans: 38
+  completed_plans: 34
+  percent: 89
 ---
 
 # Project State
@@ -227,9 +227,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T08:34:35.089Z
-Stopped at: Phase 35-01 Task 1+2 PASS — Task 3 (checkpoint:human-verify) awaiting human UAT sign-off
-Resume file: .planning/phases/35-backend-logging/35-HUMAN-UAT.md
+Last session: 2026-04-30T04:13:26.111Z
+Stopped at: Phase 36 plans verified (4 plans, 13 tasks, 26 D-IDs covered) — ready to execute
+Resume file: .planning/phases/36-form-row-layout/36-01-PLAN.md
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 
