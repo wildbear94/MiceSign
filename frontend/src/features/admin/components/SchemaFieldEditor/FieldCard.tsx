@@ -1,15 +1,22 @@
 import { useState } from 'react';
-import { ChevronRight, ChevronUp, ChevronDown, Trash2, Zap, Sigma } from 'lucide-react';
+import { ChevronRight, ChevronUp, ChevronDown, Trash2, Zap, Sigma, Square } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ConditionalRule, CalculationRule } from '../../../document/types/dynamicForm';
 import type { SchemaField } from './types';
-import { INPUT_CLASS, CONDITION_EXCLUDED_TARGET_TYPES } from './constants';
+import {
+  INPUT_CLASS,
+  CONDITION_EXCLUDED_TARGET_TYPES,
+  WIDE_TYPES,
+  ROW_GROUP_BORDER_CLASSES,
+  ROW_GROUP_PILL_CLASSES,
+} from './constants';
 import { toFieldId } from './utils';
 import { TypeBadge } from './TypeBadge';
 import { FieldConfigEditor } from './FieldConfigEditor';
 import { ConditionalRuleEditor } from './ConditionalRuleEditor';
 import { CalculationRuleEditor } from './CalculationRuleEditor';
 import { renderFormulaFriendly } from './calculationRuleUtils';
+import RowPositionSelector from './RowPositionSelector';
 
 export function FieldCard({
   field,
@@ -30,6 +37,7 @@ export function FieldCard({
   onAddCalcRule,
   onUpdateCalcRule,
   onDeleteCalcRule,
+  rowOccupancy,
 }: {
   field: SchemaField;
   index: number;
@@ -49,6 +57,8 @@ export function FieldCard({
   onAddCalcRule: (rule: CalculationRule) => void;
   onUpdateCalcRule: (rule: CalculationRule) => void;
   onDeleteCalcRule: (targetFieldId: string) => void;
+  // Phase 36 — required, passed from SchemaFieldEditor for cap-3 enforcement in selector
+  rowOccupancy: Record<number, number>;
 }) {
   const { t } = useTranslation('admin');
   const [labelEdited, setLabelEdited] = useState(false);
@@ -57,6 +67,19 @@ export function FieldCard({
 
   const myCalcRule = calculationRules.find((r) => r.targetFieldId === field.id);
   const hasCalcCycle = cycles.some((c) => c.includes(field.id));
+
+  // Phase 36 — wide-type detection + row-group border-l class via static array lookup.
+  // Tailwind compile-time scanner requires literal class strings; the cycle index is
+  // resolved at runtime against pre-enumerated array entries (see constants.ts).
+  const isWide = WIDE_TYPES.has(field.type);
+  const rowBorderClass =
+    field.rowGroup !== undefined && !isWide
+      ? ROW_GROUP_BORDER_CLASSES[(field.rowGroup - 1) % 4]
+      : '';
+  const rowPillClass =
+    field.rowGroup !== undefined && !isWide
+      ? ROW_GROUP_PILL_CLASSES[(field.rowGroup - 1) % 4]
+      : '';
 
   const handleLabelChange = (newLabel: string) => {
     onUpdate({ ...field, label: newLabel });
@@ -71,7 +94,9 @@ export function FieldCard({
   };
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+    <div
+      className={`border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-colors ${rowBorderClass}`}
+    >
       {/* Collapsed header */}
       <div
         className="flex items-center gap-3 px-4 py-3 cursor-pointer select-none"
@@ -81,6 +106,21 @@ export function FieldCard({
           className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? 'rotate-90' : ''}`}
         />
         <TypeBadge type={field.type} />
+        {/* Phase 36 — rowGroup pill (non-wide grouped fields only) */}
+        {field.rowGroup !== undefined && !isWide && (
+          <span
+            className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-xs rounded ${rowPillClass}`}
+          >
+            {t('templates.rowLayout.rowGroupBadge', { number: field.rowGroup })}
+          </span>
+        )}
+        {/* Phase 36 — wide-type "한 줄 차지" amber badge (textarea/table) */}
+        {isWide && (
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs rounded bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+            <Square className="w-3 h-3" />
+            {t('templates.rowLayout.wideTypeBadge')}
+          </span>
+        )}
         <span className="text-sm font-medium text-gray-900 dark:text-gray-50 truncate flex-1">
           {field.label || (
             <span className="text-gray-400 dark:text-gray-500 italic">
@@ -186,6 +226,24 @@ export function FieldCard({
               {t('templates.fieldRequired')}
             </span>
           </label>
+
+          {/* Phase 36 — Row position selector (non-wide types only; UI-SPEC §B lines 268~286) */}
+          {!isWide && (
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
+              <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
+                {t('templates.rowLayout.sectionLabel')}
+              </label>
+              <RowPositionSelector
+                value={field.rowGroup ?? null}
+                onChange={(rg) => onUpdate({ ...field, rowGroup: rg ?? undefined })}
+                currentRowOccupancy={rowOccupancy}
+                ownCurrentRowGroup={field.rowGroup ?? null}
+              />
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                {t('templates.rowLayout.helperHint')}
+              </p>
+            </div>
+          )}
 
           {/* Type-specific config */}
           <FieldConfigEditor
