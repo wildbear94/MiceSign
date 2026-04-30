@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { SchemaField, SchemaFieldType, SchemaFieldEditorProps } from './types';
-import { FIELD_TYPE_META, FALLBACK_TYPE_META, FIELD_TYPES } from './constants';
+import { FIELD_TYPE_META, FALLBACK_TYPE_META, FIELD_TYPES, WIDE_TYPES } from './constants';
 import { FieldCard } from './FieldCard';
 import { cleanupRulesForDeletedField, cleanupRulesForTypeChange } from './conditionalRuleUtils';
 import { detectCircularDeps } from '../../../document/utils/detectCircularDeps';
@@ -54,8 +54,33 @@ export default function SchemaFieldEditor({
 
   const cycles = useMemo(() => detectCircularDeps(calculationRules), [calculationRules]);
 
+  // Phase 36 — count of non-wide fields per rowGroup (for cap-3 enforcement in RowPositionSelector)
+  const rowOccupancy = useMemo(() => {
+    const occ: Record<number, number> = {};
+    for (const f of fields) {
+      if (f.rowGroup !== undefined && !WIDE_TYPES.has(f.type)) {
+        occ[f.rowGroup] = (occ[f.rowGroup] ?? 0) + 1;
+      }
+    }
+    return occ;
+  }, [fields]);
+
   const updateField = (index: number, updated: SchemaField) => {
     const oldField = fields[index];
+
+    // Phase 36 — Wide-type force-single-row guard (D-C4).
+    // When admin changes type to textarea/table while rowGroup is set, silently clear
+    // rowGroup and notify via toast. Must run BEFORE onChange + rules-cleanup so downstream
+    // sees the cleaned field.
+    if (
+      oldField.type !== updated.type &&
+      WIDE_TYPES.has(updated.type) &&
+      updated.rowGroup !== undefined
+    ) {
+      updated = { ...updated, rowGroup: undefined };
+      toast(t('templates.rowLayout.wideTypeAutoSingleToast'));
+    }
+
     const newFields = [...fields];
     newFields[index] = updated;
     onChange(newFields);
@@ -225,6 +250,7 @@ export default function SchemaFieldEditor({
               onDeleteCalcRule={(targetFieldId) => onCalculationRulesChange?.(
                 calculationRules.filter(r => r.targetFieldId !== targetFieldId)
               )}
+              rowOccupancy={rowOccupancy}
             />
           ))}
         </div>
