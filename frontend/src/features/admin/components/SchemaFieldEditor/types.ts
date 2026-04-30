@@ -46,6 +46,8 @@ export interface SchemaField {
   label: string;
   required: boolean;
   config: SchemaFieldConfig;
+  // Phase 36 — 1-indexed row group, undefined = single-row vertical stack
+  rowGroup?: number;
 }
 
 export interface SchemaFieldEditorProps {

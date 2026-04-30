@@ -45,6 +45,8 @@ export interface FieldDefinition {
   label: string;
   required: boolean;
   config?: FieldConfig;
+  // Phase 36 — 1-indexed row group, undefined = single-row vertical stack
+  rowGroup?: number;
 }
 
 export interface ConditionalRule {

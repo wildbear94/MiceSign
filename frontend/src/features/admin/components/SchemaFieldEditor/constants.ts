@@ -107,3 +107,25 @@ export const PRESET_OPTIONS: PresetOption[] = [
   { type: 'field-sum', labelKey: 'templates.calculation.presets.fieldSum', exampleKey: 'templates.calculation.presets.fieldSumExample' },
   { type: 'ratio',     labelKey: 'templates.calculation.presets.ratio',    exampleKey: 'templates.calculation.presets.ratioExample' },
 ];
+
+// === Phase 36: Row Layout Constants ===
+
+// Phase 36 — wide-field types that ALWAYS render as single-row (D-C3 whitelist)
+export const WIDE_TYPES = new Set<SchemaFieldType>(['textarea', 'table']);
+
+// Phase 36 — row-group color cycle. Tailwind requires literal class strings at module scope
+// for compile-time detection (CRITICAL: dynamic interpolation breaks production build).
+// Cycle index = (rowGroup - 1) % 4. UI-SPEC §"Color" lines 105~111.
+export const ROW_GROUP_BORDER_CLASSES = [
+  'border-l-4 border-l-blue-400 dark:border-l-blue-500',
+  'border-l-4 border-l-emerald-400 dark:border-l-emerald-500',
+  'border-l-4 border-l-violet-400 dark:border-l-violet-500',
+  'border-l-4 border-l-amber-400 dark:border-l-amber-500',
+] as const;
+
+export const ROW_GROUP_PILL_CLASSES = [
+  'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+  'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',
+  'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+] as const;
