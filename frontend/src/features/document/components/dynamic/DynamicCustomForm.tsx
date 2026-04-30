@@ -3,10 +3,15 @@ import { useForm, FormProvider, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { templateApi } from '../../api/templateApi';
 import { schemaToZod, buildDefaultValues } from '../../utils/schemaToZod';
 import { evaluateConditions } from '../../utils/evaluateConditions';
 import { executeCalculations } from '../../utils/executeCalculations';
+import {
+  groupFieldsByRow,
+  GRID_COLS_CLASS,
+} from '../../utils/groupFieldsByRow';
 import type { SchemaDefinition, FieldDefinition } from '../../types/dynamicForm';
 import type { TemplateEditProps } from '../templates/templateRegistry';
 import DynamicFieldRenderer from './DynamicFieldRenderer';
@@ -178,6 +183,45 @@ function DynamicFormInner({
     return ids;
   }, [schema.calculationRules]);
 
+  const { t } = useTranslation('document');
+
+  // Phase 36 Wave 3 — per-cell hidden-field handling preserving Phase 24.1 D-19.
+  // table-type hidden fields render with display:none to preserve RHF
+  // useFieldArray state. Non-table hidden fields unmount (return null).
+  // For grid cells, non-table hidden returns an empty placeholder div with
+  // display:none so the CSS grid track exists (auto-collapse keeps siblings
+  // in their original columns).
+  const renderCell = (field: FieldDefinition, isInGrid: boolean) => {
+    const isHidden = hiddenFields.has(field.id);
+    if (isHidden && field.type !== 'table') {
+      return isInGrid ? (
+        <div key={field.id} style={{ display: 'none' }} />
+      ) : null;
+    }
+    const errMsg = form.formState.errors[field.id]?.message as
+      | string
+      | undefined;
+    return (
+      <div
+        key={field.id}
+        className={isInGrid ? 'min-w-0' : undefined}
+        style={isHidden ? { display: 'none' } : undefined}
+      >
+        <DynamicFieldRenderer
+          field={field}
+          mode="edit"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          register={form.register as any}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          control={form.control as any}
+          error={errMsg}
+          dynamicRequired={requiredFields.has(field.id)}
+          disabled={readOnly || calcResultFieldIds.has(field.id)}
+        />
+      </div>
+    );
+  };
+
   const onSubmit = async (values: FormValues) => {
     const { __title, ...formFields } = values;
 
@@ -234,29 +278,20 @@ function DynamicFormInner({
           )}
         </div>
 
-        {schema.fields.map((field: FieldDefinition) => {
-          const isHidden = hiddenFields.has(field.id);
-          // table 외 숨김 필드는 unmount (값은 form state 에 보존됨 — D-19)
-          if (isHidden && field.type !== 'table') return null;
-          const errMsg = form.formState.errors[field.id]?.message as
-            | string
-            | undefined;
+        {groupFieldsByRow(schema.fields).map((g) => {
+          if (g.kind === 'single') {
+            return renderCell(g.field, false);
+          }
           return (
             <div
-              key={field.id}
-              style={isHidden ? { display: 'none' } : undefined}
+              key={`row-${g.rowGroup}-${g.fields[0].id}`}
+              role="group"
+              aria-label={t('rowLayout.rowGroupAriaLabel', {
+                number: g.rowGroup,
+              })}
+              className={`grid grid-cols-1 ${GRID_COLS_CLASS[g.cols]} gap-4`}
             >
-              <DynamicFieldRenderer
-                field={field}
-                mode="edit"
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                register={form.register as any}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                control={form.control as any}
-                error={errMsg}
-                dynamicRequired={requiredFields.has(field.id)}
-                disabled={readOnly || calcResultFieldIds.has(field.id)}
-              />
+              {g.fields.map((f) => renderCell(f, true))}
             </div>
           );
         })}
