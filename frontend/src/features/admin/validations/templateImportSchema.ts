@@ -80,8 +80,16 @@ const fieldDefinitionSchema = z
     label: z.string().min(1),
     required: z.boolean(),
     config: fieldConfigSchema.optional(),
+    // Phase 36 — 1-indexed row group, optional. Wide types (textarea/table) MUST NOT
+    // have rowGroup — enforced by schemaDefinitionSchema.refine() below.
+    rowGroup: z.number().int().positive().optional(),
   })
   .strict();
+
+// Phase 36 — module-scope Set to avoid per-validation reallocation.
+// Mirror of WIDE_TYPES (admin/components/SchemaFieldEditor/constants.ts) but
+// kept local here to avoid cross-feature imports in the validation layer.
+const WIDE_TYPES_FOR_VALIDATION = new Set<string>(['textarea', 'table']);
 
 const conditionalRuleSchema = z
   .object({
@@ -112,7 +120,47 @@ const schemaDefinitionSchema = z
     conditionalRules: z.array(conditionalRuleSchema).optional(),
     calculationRules: z.array(calculationRuleSchema).optional(),
   })
-  .strict();
+  .strict()
+  // Phase 36 Refine #1 — wide-type guard (D-C1, D-C2):
+  // textarea/table fields MUST NOT carry rowGroup (they always render single-row).
+  .refine(
+    (s) =>
+      s.fields.every(
+        (f) =>
+          !WIDE_TYPES_FOR_VALIDATION.has(f.type) || f.rowGroup === undefined,
+      ),
+    { message: 'templates.rowLayout.zodWideTypeError' },
+  )
+  // Phase 36 Refine #2 — hard cap=3 (D-F3):
+  // Walk fields linearly; for each consecutive run of same-rowGroup non-wide fields,
+  // count MUST NOT exceed 3. Wide-type fields and undefined-rowGroup fields break runs.
+  .refine(
+    (s) => {
+      let i = 0;
+      while (i < s.fields.length) {
+        const rg = s.fields[i].rowGroup;
+        if (
+          rg === undefined ||
+          WIDE_TYPES_FOR_VALIDATION.has(s.fields[i].type)
+        ) {
+          i++;
+          continue;
+        }
+        let count = 0;
+        while (
+          i < s.fields.length &&
+          s.fields[i].rowGroup === rg &&
+          !WIDE_TYPES_FOR_VALIDATION.has(s.fields[i].type)
+        ) {
+          count++;
+          i++;
+        }
+        if (count > 3) return false;
+      }
+      return true;
+    },
+    { message: 'templates.rowLayout.zodCapExceededError' },
+  );
 
 export const templateImportSchema = z
   .object({
