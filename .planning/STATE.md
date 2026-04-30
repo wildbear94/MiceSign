@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: phases
 status: executing
 stopped_at: "Phase 36 Plan 02 complete (Wave 2 builder UI — RowPositionSelector + FieldCard wiring + SchemaFieldEditor guard); next: 36-03 renderer (DynamicCustomForm/ReadOnly + FormPreview)"
-last_updated: "2026-04-30T04:46:26.624Z"
+last_updated: "2026-04-30T04:56:59.253Z"
 last_activity: 2026-04-30
 progress:
   total_phases: 17
   completed_phases: 7
   total_plans: 38
-  completed_plans: 36
-  percent: 95
+  completed_plans: 37
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-22)
 ## Current Position
 
 Phase: 36 (form-row-layout) — EXECUTING
-Plan: 3 of 4 (next: 36-02 — builder UI + RowPositionSelector)
+Plan: 4 of 4 (next: 36-02 — builder UI + RowPositionSelector)
 Status: Ready to execute
 Last activity: 2026-04-30
 
-Progress: [██████████] 95%
+Progress: [██████████] 97%
 
 **Phase 35 종결 요약 (2026-04-29):**
 
@@ -136,6 +136,7 @@ Progress: [██████████] 95%
 | Phase 34 P05 | 8m 21s | 3 tasks | 16 files |
 | Phase 36 P01 | 12m 47s | 3 tasks | 7 files |
 | Phase 36 P02 | 4m 30s | 3 tasks | 4 files |
+| Phase 36 P03 | 4m 33s | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -225,6 +226,9 @@ Progress: [██████████] 95%
 - [Phase 36-02]: Module-scope literal class strings (SELECTED/UNSELECTED/DISABLED + FLASH_CLASS) replace Tailwind interpolation in RowPositionSelector — pattern reusable for any future indexed/state-driven component. First instance of transient-on-click visual feedback in builder via useState<number|null>+setTimeout(200) — codifies pattern for future violation flashes.
 - [Phase 36-02]: T-36-06 (hard-cap-3 bypass) 3-layer mitigation operational: visual disable + native HTML disabled attr + handler-side 'if (isDisabled) return' guard. Wave 1 Zod refinement is import-boundary fallback. Layer 2 in builder UI completes the threat coverage; Wave 1 Zod (Layer 1) + groupFieldsByRow defensive cap (Layer 3) operational since Plan 36-01.
 - [Phase 36-02]: D-C4 force-single-row guard placed at TOP of SchemaFieldEditor.updateField body — mutates local 'updated' reference BEFORE onChange + BEFORE rules-cleanup branches. Downstream cleanup (D-25 conditional rules cleanup, Phase 25 calculation rules cleanup, Pitfall 3 table column type cleanup) all see the cleaned field. Guard is synchronous within React controlled-input flow → admin cannot persist wide-type-with-rowGroup state via UI (T-36-09 mitigation).
+- [Phase ?]: Phase 36-03: GRID_COLS_CLASS literal map exported from groupFieldsByRow.ts as single SoT for renderer column-class lookup; all 3 CUSTOM-form renderers consume it via static GRID_COLS_CLASS[g.cols] lookup for Tailwind compile-time scan compliance
+- [Phase ?]: Phase 36-03: D-19 hidden-field invariant preserved in DynamicCustomForm via per-cell branching in renderCell helper — grid-cell non-table-hidden returns empty placeholder div with display:none for CSS grid track auto-collapse
+- [Phase ?]: Phase 36-03: D-D1 backward-compat zero-shift confirmed — legacy schemaSnapshot fields with rowGroup undefined emit all-single output → identical vertical stack on DynamicCustomReadOnly (PRIMARY legacy SUBMITTED doc viewing surface)
 
 ### Pending Todos
 
@@ -238,9 +242,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-30T04:46:26.619Z
+Last session: 2026-04-30T04:56:25.671Z
 Stopped at: Phase 36 Plan 02 complete (Wave 2 builder UI — RowPositionSelector + FieldCard wiring + SchemaFieldEditor guard); next: 36-03 renderer (DynamicCustomForm/ReadOnly + FormPreview)
-Resume file: .planning/phases/36-form-row-layout/36-03-PLAN.md
+Resume file: None
 
 **Planned Phase:** 32 (custom) — 6 plans — 2026-04-25T10:37:34.637Z
 
