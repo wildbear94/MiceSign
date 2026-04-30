@@ -20,6 +20,22 @@
 
 const WIDE_TYPES = new Set<string>(['textarea', 'table']);
 
+/**
+ * Phase 36 Wave 3 — static literal Tailwind class map for grid column count.
+ *
+ * Tailwind CSS detects classes via static source scanning. Template-string
+ * interpolation like `md:grid-cols-${cols}` does NOT survive the scan, so we
+ * enumerate the literal class strings here at module scope and look them up
+ * by `cols` value (1/2/3) from `groupFieldsByRow` output. All three renderers
+ * (FormPreview, DynamicCustomForm, DynamicCustomReadOnly) import this single
+ * SoT — Tailwind sees one source of literal `md:grid-cols-N` class strings.
+ */
+export const GRID_COLS_CLASS: Record<1 | 2 | 3, string> = {
+  1: 'md:grid-cols-1',
+  2: 'md:grid-cols-2',
+  3: 'md:grid-cols-3',
+} as const;
+
 export type FieldRowGroup<T extends { id: string; type: string; rowGroup?: number }> =
   | { kind: 'single'; field: T }
   | { kind: 'grid'; rowGroup: number; cols: 1 | 2 | 3; fields: T[] };

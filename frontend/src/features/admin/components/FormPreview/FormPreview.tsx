@@ -5,6 +5,10 @@ import type { SchemaField } from '../SchemaFieldEditor/types';
 import type { ConditionalRule, CalculationRule } from '../../../document/types/dynamicForm';
 import { evaluateConditions } from '../../../document/utils/evaluateConditions';
 import { executeCalculations } from '../../../document/utils/executeCalculations';
+import {
+  groupFieldsByRow,
+  GRID_COLS_CLASS,
+} from '../../../document/utils/groupFieldsByRow';
 import PreviewFieldRenderer from './PreviewFieldRenderer';
 
 interface FormPreviewProps {
@@ -82,18 +86,49 @@ export default function FormPreview({
         </div>
       )}
       <div className="space-y-4">
-        {fields
-          .filter((f) => f.type !== 'hidden' && !hiddenFields.has(f.id))
-          .map((field) => (
-            <PreviewFieldRenderer
-              key={field.id}
-              field={field}
-              value={formValues[field.id]}
-              onChange={(val) => setFormValues(prev => ({ ...prev, [field.id]: val }))}
-              dynamicRequired={requiredFields.has(field.id)}
-              disabled={calcResultIds.has(field.id)}
-            />
-          ))}
+        {groupFieldsByRow(
+          fields.filter((f) => f.type !== 'hidden' && !hiddenFields.has(f.id)),
+        ).map((g) => {
+          if (g.kind === 'single') {
+            return (
+              <div key={g.field.id}>
+                <PreviewFieldRenderer
+                  field={g.field}
+                  value={formValues[g.field.id]}
+                  onChange={(val) =>
+                    setFormValues((prev) => ({ ...prev, [g.field.id]: val }))
+                  }
+                  dynamicRequired={requiredFields.has(g.field.id)}
+                  disabled={calcResultIds.has(g.field.id)}
+                />
+              </div>
+            );
+          }
+          return (
+            <div
+              key={`row-${g.rowGroup}-${g.fields[0].id}`}
+              role="group"
+              aria-label={t('templates.rowLayout.rowGroupAriaLabel', {
+                number: g.rowGroup,
+              })}
+              className={`grid grid-cols-1 ${GRID_COLS_CLASS[g.cols]} gap-4`}
+            >
+              {g.fields.map((f) => (
+                <div key={f.id} className="min-w-0">
+                  <PreviewFieldRenderer
+                    field={f}
+                    value={formValues[f.id]}
+                    onChange={(val) =>
+                      setFormValues((prev) => ({ ...prev, [f.id]: val }))
+                    }
+                    dynamicRequired={requiredFields.has(f.id)}
+                    disabled={calcResultIds.has(f.id)}
+                  />
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
